@@ -1,0 +1,34 @@
+# segreti - MAI committare
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# dipendenze
+node_modules/
+.pnpm-store/
+
+# build
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# log
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# editor
+.vscode/
+.idea/
+
+# claude - locale, non condiviso
+.claude/settings.local.json
