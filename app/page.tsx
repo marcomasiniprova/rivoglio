@@ -1,5 +1,7 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import Manifesto from "@/components/Manifesto";
+import Costruttore from "@/components/Costruttore";
 import Funzioni from "@/components/Funzioni";
 import Passi from "@/components/Passi";
 import ContoAperto from "@/components/ContoAperto";
@@ -18,9 +20,11 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
+        <Manifesto />
         <Funzioni />
         <Passi />
         <ContoAperto />
+        <Costruttore />
         <PerChi />
         <Numeri />
         <Canali />

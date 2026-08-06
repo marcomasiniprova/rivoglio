@@ -1,4 +1,5 @@
 import TelefonoAlert from "./TelefonoAlert";
+import Macchina from "./Macchina";
 import { Anima } from "./Anima";
 import { ESEMPIO, CONTO, euro } from "@/lib/esempio";
 
@@ -75,25 +76,40 @@ const cards = [
 
 export default function Hero() {
   return (
-    <section className="cielo relative -mt-[84px] overflow-hidden px-5 pb-24 pt-[150px] sm:px-8 sm:pt-[170px]">
+    <section className="cielo relative -mt-[72px] overflow-hidden px-5 pb-20 pt-[124px] sm:-mt-[84px] sm:pb-24 sm:px-8 sm:pt-[170px]">
       <div className="relative mx-auto max-w-3xl text-center">
         <Anima ritardo={0.05}>
-          <p className="inline-flex items-center gap-2 rounded-pillola border border-white/70 bg-white/60 px-4 py-1.5 text-[13px] text-fumo backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-sole" />
+          <p className="inline-flex items-center gap-2 rounded-pillola border border-white/70 bg-white/70 px-3.5 py-1.5 text-[12px] text-fumo backdrop-blur sm:px-4 sm:text-[13px]">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-sole" />
             40 milioni di italiani non partiranno ad agosto
           </p>
         </Anima>
 
         <Anima ritardo={0.14}>
-          <h1 className="mt-7 text-[clamp(2.9rem,7.4vw,4.6rem)]">
+          <h1 className="mt-6 text-[clamp(2.35rem,8.2vw,4.6rem)] sm:mt-7">
             La tua fuga.
             <br />
             Al prezzo giusto.
           </h1>
         </Anima>
 
-        <Anima ritardo={0.24}>
-          <p className="mx-auto mt-6 max-w-[36rem] text-[17px] leading-relaxed text-fumo">
+        <Anima ritardo={0.2}>
+          <p className="mt-5 text-[15px] text-fumo sm:text-[17px]">
+            Cerchi{" "}
+            <Macchina
+              className="font-medium text-inchiostro"
+              frasi={[
+                "due notti al mare",
+                "una fuga in montagna",
+                "un weekend alle terme",
+                "due giorni in una città d'arte",
+              ]}
+            />
+          </p>
+        </Anima>
+
+        <Anima ritardo={0.28}>
+          <p className="mx-auto mt-5 max-w-[36rem] text-[15.5px] leading-relaxed text-fumo sm:mt-6 sm:text-[17px]">
             Imposti da dove parti e quanto vuoi spendere. Ricevi una notifica quando esiste
             una micro-vacanza di 1-3 notti sotto la tua soglia, col prezzo totale già
             calcolato: alloggio e viaggio.

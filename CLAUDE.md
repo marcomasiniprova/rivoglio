@@ -5,58 +5,51 @@
 ## Cos'è e qual è l'obiettivo
 Ti avviso quando esiste una micro-vacanza (1-3 notti, entro X ore da casa tua)
 sotto il budget che decidi tu. Alloggio reale + auto calcolata. Tutta Italia.
-Si paga a crediti: 1 credito = 1 alert. Dettagli: `SPEC.md`. Scelte chiuse:
-`DECISIONI.md`. Leggili su richiesta, non ogni volta.
-**Obiettivo di Valerio: fare cassa entro ottobre 2026, non costruire per sempre.**
-Ogni scelta si giudica così: avvicina il primo utente pagante o no?
+Si paga a crediti: 1 credito = 1 alert. **Obiettivo di Valerio: fare cassa entro
+ottobre 2026.** Ogni scelta si giudica così: avvicina il primo utente pagante?
+Mappa: `PIANO.md`. Arretrati: `ARRETRATI.md`. Cosa costruiamo: `SPEC.md`.
+Scelte chiuse: `DECISIONI.md`. Marchio: `BRAND.md`. Social: `CONTENUTI.md`.
 
-## Come devi lavorare
-- **VELOCE. Fatti, non parole.** Ogni turno deve produrre qualcosa che si vede:
-  codice, una pagina, una cosa che funziona. Chiamate in parallelo sempre che
-  puoi. Niente riassunti di quello che stai per fare: fallo.
-- **Zero lavoro inutile.** Non cercare dati che non cambiano una decisione, non
-  misurare cose che non servono a spedire, non spiegare due volte. Se una
-  ricerca non sposta il progetto, non farla.
-- **Trattalo come se fosse tuo.** Non quello che basta: quello che faresti se ci
-  mettessi i tuoi soldi.
-- **Copia i migliori.** Prima di inventare, guarda come l'hanno risolto i
-  concorrenti e le app grandi. Studia, adatta, non ricominciare da zero.
-- **Sai lanciare, non solo programmare.** Dalla fase 0 al primo utente pagante:
-  prodotto, testo che converte, prezzo, distribuzione.
-- **Chiedi solo quando serve davvero.** Domande che cambiano il lavoro, max 2-3
-  alla volta. Sul resto decidi tu e dillo dopo. Contesta se hai un motivo
-  fondato, una volta sola, poi esegui.
+## Come devi lavorare — questa parte è la più importante
+- **FINISCI QUELLO CHE TI HA CHIESTO. TUTTO.** Se ti dà 10 cose, ne consegni 10
+  nella stessa seduta. Non due e poi torni a chiedere. Non fermarti a metà per
+  farti approvare un pezzo: **le domande si fanno mentre lavori, non al posto
+  di lavorare.**
+- **Niente fumo.** Ogni turno produce qualcosa che si vede e che è provato.
+  Zero riassunti di quello che stai per fare: fallo e poi dillo.
+- **Aggiornalo su dove siamo.** A ogni consegna: cosa è fatto, cosa manca, qual
+  è il prossimo pezzo. Non lasciarlo indovinare.
+- **Zero lavoro inutile.** Niente ricerche che non cambiano una decisione,
+  niente metriche che non servono a spedire.
+- **Copia i migliori.** Prima di inventare guarda i concorrenti e le app grandi.
+- **Trattalo come se fosse tuo**, non come un compito da consegnare.
 
 ## Le 6 regole
-1. **Prova o non è fatto.** "Fatto" solo con output reale: comando rieseguito o
-   file riletto. `.claude/verify.cmd` deve passare prima di dire finito.
-2. **Niente numeri inventati.** Prezzi, dati, benchmark: fonte reale citata,
-   oppure scritto "stima non verificata".
+1. **Prova o non è fatto.** Output reale: comando rieseguito o schermata
+   guardata. `npm run verify` deve passare prima di dire finito.
+2. **Niente numeri inventati.** Fonte reale citata, o scritto "stima".
 3. **Niente dati finti che sembrano veri.** Un'offerta non verificata va marcata
-   `demo` nel DB **e** nell'interfaccia. Mai in produzione.
-4. **Modifica solo il pezzo richiesto.** Zero refactoring o riscritture non
-   chieste, non cancellare commenti o edge case esistenti.
-5. **Segreti solo in `.env.local`.** Se una chiave finisce in un file tracciato:
-   fermati e avvisa.
-6. **Fine sessione:** aggiorna `STATO.md` (max 25 righe), verify, committa.
+   `demo` nel DB e nell'interfaccia. Mai in produzione.
+4. **Modifica solo il pezzo richiesto.** Zero refactoring non chiesti.
+5. **Segreti solo in `.env.local`.** Mai in un file tracciato.
+6. **Fine sessione:** aggiorna `STATO.md`, `PIANO.md` e `ARRETRATI.md`, verify,
+   committa.
 
 ## Come si scrive (ogni parola che vede l'utente)
-Dai del tu. Amico diretto che ha già fatto la ricerca al posto tuo. Frasi corte,
-zero gergo, zero superlativi da pubblicità. Voce: *"Dimmi da dove parti e quanto
-vuoi spendere. Al resto ci penso io."* Ogni numero mostrato dev'essere apribile:
-**la trasparenza è il prodotto.** Marchio per esteso: **Viaggio Anche Io**.
+Dai del tu, ma **professionale, non da amici al bar**. Frasi corte, zero gergo,
+zero superlativi. **MAI il trattino lungo (—): è il segno più riconoscibile del
+testo scritto da un'AI.** Usa punti e virgole. Ogni numero mostrato dev'essere
+apribile: **la trasparenza è il prodotto.** Marchio per esteso: Viaggio Anche Io.
+Tagline: *La tua fuga, al prezzo giusto.*
 
 ## Stack (fissato)
-Next 16 + React 19 + Tailwind 4 su **Netlify** (il piano gratuito permette l'uso
-commerciale, Vercel no) · **Supabase** (database + auth + RLS) · **Resend**
-(email) · **Telegram Bot API** (notifica principale) · dati: ISTAT comuni, MIMIT
-carburante. Funzioni Netlify: **10 secondi di limite** → il matcher va a lotti.
+Next 16 + React 19 + Tailwind 4 + **Motion** su **Netlify** · **Supabase** ·
+**Polar** (Valerio non ha partita IVA) · Resend · Telegram Bot API ·
+dati ISTAT e MIMIT. Funzioni Netlify: 10 secondi → il matcher va a lotti.
 
-## Confini — fermati e chiedi PRIMA
-Spendere soldi · comprare domini · installare o aggiornare software di sistema ·
-pubblicare online · qualsiasi cosa irreversibile. Account esterni (GitHub,
-Supabase, Resend via Composio): autorizzati da Valerio il 06/08, ma di' cosa fai.
-Tutto il resto: fai, poi riferisci.
+## Confini — chiedi PRIMA
+Spendere soldi · comprare domini · installare software di sistema · pubblicare
+online · qualsiasi cosa irreversibile. Tutto il resto: fai, poi riferisci.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

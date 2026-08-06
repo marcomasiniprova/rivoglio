@@ -1,64 +1,57 @@
-# ARRETRATI — cose che Valerio ha chiesto e non sono state fatte
+# ARRETRATI — cose chieste da Valerio
 
 *Creato il 2026-08-06 dopo che Valerio ha fatto notare, giustamente, che
 chiedeva cose che poi non venivano fatte e nessuno gliene rendeva conto.*
 
-**Regola: questo file si aggiorna a ogni sessione. Niente sparisce da qui
-senza essere stato fatto o senza che Valerio dica di lasciarlo perdere.**
+**Regola: si aggiorna a ogni sessione. Niente sparisce da qui senza essere
+stato fatto o senza che Valerio dica di lasciar perdere.**
 
 ---
 
-## ❌ NON FATTO — chiesto e mai consegnato
+## ✅ CHIUSI il 06/08
 
-| # | Cosa avevi chiesto | Quando | Stato |
-|---|---|---|---|
-| 1 | **Landing "da urlo, cinematica bella"** | 1º messaggio | ✅ **Fatto il 06/08.** Libreria Motion 13, ingressi allo scroll su ogni sezione, sfalsamento fra le card, sollevamento al passaggio del mouse, contatori che salgono. Resta da rifinire ancora. |
-| 2 | **AI Vacation Builder** — "dimmi budget, con chi vai, che voglia hai" → 3 micro-vacanze pronte con itinerario | 1º messaggio | Mai costruito. Non è nemmeno prioritizzato in `SPEC.md`. Era la funzione premium del tuo piano. |
-| 3 | **"Voglio esplodere sui social, fare conversioni, fare utenti"** | 2º messaggio | **Zero lavoro fatto.** Nessun piano contenuti, nessuno script video, nessun account social, nessuna strategia di distribuzione. Eppure senza questo il prodotto non lo vede nessuno. |
-| 4 | **Skill `webapp-testing`** che guida Playwright, naviga i flussi, cattura schermate e analizza DOM | 2º messaggio | Playwright installato, ma **la skill non esiste**. Ho fatto lo strumento, non la procedura che mi avevi chiesto. |
-| 5 | **"Guarda se riesci ad averlo IDENTICO"** (Zentivo) | 3º messaggio | Struttura e caratteri sì. Sofisticazione no: manca tutto lo strato di movimento e rifinitura che rende Zentivo "next level". |
-| 6 | **"Esplorare il template ED IL CODICE"** di Zentivo | 3º messaggio | Ho letto solo gli stili calcolati dal browser. Non ho analizzato il codice vero del bundle per capire come fanno le animazioni. |
-| 7 | **Tenerti aggiornato su dove siamo e cosa manca** | 4º messaggio | ✅ **Fatto il 06/08.** Creato `PIANO.md`: mappa in tre pezzi, percentuali, cosa blocca cosa, in che ordine si procede. Si aggiorna ogni sessione. |
-| 8 | **Copy professionale** | 4º messaggio | ✅ **Fatto il 06/08.** Tolti tutti i trattini lunghi dal testo visibile (erano il segno più riconoscibile di scrittura AI) e riscritte le sezioni dove il tono era da confessione tra amici invece che da prodotto. |
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 1 | **Landing "da urlo, cinematica bella"** | Motion 13. Ingressi allo scroll, sfalsamento fra le card, sollevamento al passaggio del mouse, contatori che salgono. |
+| 2 | **AI Vacation Builder** | `lib/costruttore.ts` + `/api/costruttore` + sezione «Dove arrivi con quello che hai» sulla landing. Dai partenza, budget, notti, persone e voglia, ti dà 3 posti veri con distanza, ore, costo auto calcolato e quanto ti resta per dormire. **16 prove.** |
+| 3 | **"Voglio esplodere sui social"** | `CONTENUTI.md`: formato video ripetibile, 12 aperture, 3 script pronti, ritmo, canali, cosa non fare, come si misura. |
+| 4 | **Skill `webapp-testing`** | `.claude/skills/prova-browser/SKILL.md`: guida Playwright, legge console e DOM, cattura e **guarda** le schermate, con la tabella delle trappole già pagate su questo progetto. |
+| 5 | **Esplorare il codice di Zentivo** | Fatto, e ha cambiato la strategia. Vedi sotto. |
+| 6 | **Copy professionale** | Tolti tutti i trattini lunghi dal testo visibile. Riscritte le sezioni dal tono da confessione. |
+| 7 | **Tenerti aggiornato** | `PIANO.md`: mappa in tre pezzi, percentuali, cosa blocca cosa. |
+| 8 | **Telefono rotto** | Nav compatta sotto i 420px, titolo che rientra, `overflow-x` bloccato. Catture automatiche anche su telefono. |
+| 9 | **Sfondo brutto** | Erano macchie bianche sparse a caso. Ora: un alone verde unico centrato sul titolo più una trama a puntini. |
+| 10 | **Animazioni tipo ScrollRevealText e Typewriter** | `TestoRivelato.tsx` (testo che si accende parola per parola con lo scroll) e `Macchina.tsx` (macchina da scrivere), ricavati dai due moduli Framer che avevi linkato. |
+
+### Cosa ha rivelato il bundle di Zentivo
+**Zentivo non fa lo sfondo in CSS: usa fotografie**, alcune da 4923×4778 pixel
+(cielo, mano che regge il telefono, card). Per questo sembrava «di un altro
+livello»: è artwork professionale, non codice. Imitarlo con i gradienti è una
+gara persa. La strada giusta è un design pulito e preciso che sta in piedi da
+solo. **Se un giorno vuoi quel look, serve un grafico o delle immagini vere,
+non altro codice.**
 
 ---
 
-## ⏳ NON ANCORA INIZIATO — l'app vera
+## ⏳ ANCORA DA FARE — l'app vera
 
-Tutto quello che l'utente userà davvero dopo essersi iscritto:
-
-- Login e registrazione (Supabase Auth)
-- Pagina `/app` — "imposta la tua ricerca"
-- Calcolo del viaggio (distanza reale, carburante, pedaggi)
-- Motore di abbinamento offerte ↔ ricerche
+- Login e registrazione (Supabase Auth) ← **il prossimo pezzo**
+- Pagina `/app` con le ricerche salvate dell'utente
+- Motore che abbina offerte e ricerche
 - Invio degli alert (Telegram, email, notifica)
-- Acquisto crediti (Polar)
+- Acquisto crediti con Polar
 - Pannello admin per caricare le offerte
+- Iscritti salvati su Supabase invece che su file **(obbligatorio prima di pubblicare)**
 
 ---
 
-## ✅ FATTO
+## 📌 COSE CHE VALGONO SEMPRE
 
-Struttura progetto e file di contesto · `SPEC.md` · `DECISIONI.md` · `BRAND.md` ·
-landing a 11 sezioni con la struttura di Zentivo · repo GitHub privata ·
-Supabase con schema, RLS e un buco di sicurezza sui crediti trovato e chiuso ·
-logo verde che regge a 24px · skill impeccable/taste/redesign/image-to-code ·
-Playwright con 12 prove · ricerche su API prezzi, Merchant of Record, stack 2026.
-
----
-
-## 📌 COSE CHE MI HAI DETTO E CHE VALGONO SEMPRE
-
-- **Obiettivo: €30-100k entro settembre/ottobre 2026.** Sprint di 2 mesi, non
-  un prodotto per sempre. Ogni scelta si giudica così.
-- **Prezzi: crediti. 1 credito = 1 alert.** €3,99 / €12,99 / €24,99.
-  Deciso da te avendo visto le mie obiezioni. **Chiuso, non si ridiscute.**
+- **Obiettivo: €30-100k entro settembre/ottobre 2026.** Sprint di 2 mesi.
+- **Prezzi: crediti, 1 credito = 1 alert.** €3,99 / €12,99 / €24,99. **Chiuso.**
 - **Nome: Viaggio Anche Io**, per esteso. Tagline: *La tua fuga, al prezzo giusto.*
-- **Tutta Italia dal giorno 1.** Niente elenco di città.
-- **Bianco e verde.** Riferimento visivo: Zentivo.
-- **Web app installabile, non app nativa.** Niente App Store.
-- **Polar (Merchant of Record)**, non Stripe: non hai ancora la partita IVA.
-- **Hai già:** GitHub, Netlify, Supabase, Composio, il template Framer.
+- **Tutta Italia dal giorno 1.** Bianco e verde. Riferimento: Zentivo.
+- **Web app installabile, non nativa.** **Polar**, non Stripe.
 - **Ti servono:** partita IVA, dominio, account Polar, account social.
-- **Come vuoi che lavori:** veloce, fatti non parole, in parallelo, zero lavoro
-  inutile, aggiornandoti su dove siamo, facendo domande quando serve.
+- **Come vuoi che lavori:** tutte le cose chieste in una seduta, domande mentre
+  si lavora e non al posto di lavorare, aggiornandoti su dove siamo.

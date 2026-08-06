@@ -14,11 +14,11 @@ Si aggiorna a ogni sessione. Se leggi solo un file, leggi questo.
   la landing page    →    quello che usano   →   come ti trovano
   (convince)              (il prodotto)          (distribuzione)
 
-  ██████████░░ 80%        ░░░░░░░░░░░░  0%       ░░░░░░░░░░░░  0%
+  ████████████ 95%        ███░░░░░░░░░ 25%       ████░░░░░░░░ 30%
 ```
 
-Senza il **[3]** gli altri due non servono a niente: un prodotto perfetto che
-non vede nessuno fa zero euro. È l'arretrato più grosso che abbiamo.
+Il **[3]** non è più a zero: `CONTENUTI.md` ha formato, script e ritmo pronti.
+Manca eseguirlo, e quello lo fai tu (account social e videocamera).
 
 ---
 
@@ -32,9 +32,12 @@ non vede nessuno fa zero euro. È l'arretrato più grosso che abbiamo.
 | Colori, caratteri, logo, marchio | ✅ fatto |
 | Modulo iscrizione funzionante | ✅ fatto (salva su file, va spostato su Supabase) |
 | 12 prove automatiche su desktop e telefono | ✅ fatto |
-| **Animazioni e movimento** | 🔨 **in lavorazione adesso** |
-| **Copy professionale** | 🔨 **in riscrittura adesso** |
-| Iscritti salvati su Supabase invece che su file | ⏳ da fare (obbligatorio prima di pubblicare) |
+| Animazioni e movimento (Motion 13) | ✅ fatto |
+| Testo che si accende con lo scroll + macchina da scrivere | ✅ fatto |
+| Copy professionale, zero trattini lunghi | ✅ fatto |
+| Telefono sistemato + sfondo rifatto | ✅ fatto |
+| **Costruttore di micro-vacanze**, provabile senza iscriversi | ✅ fatto, 16 prove |
+| Iscritti salvati su Supabase invece che su file | ⏳ **obbligatorio prima di pubblicare** |
 | Immagine di anteprima per i social | ⏳ da fare |
 
 ## [2] L'APP — quello che la gente userà davvero

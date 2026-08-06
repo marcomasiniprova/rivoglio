@@ -9,24 +9,26 @@ import { test } from "@playwright/test";
  * scorsa veloce fotografa le sezioni ancora trasparenti: la pagina sembra
  * vuota anche se è giusta. Ci sono già cascato una volta.
  */
-const ALTEZZA = 1400;
-
-test("cattura il nostro sito a fasce", async ({ page }) => {
+test("cattura il nostro sito a fasce", async ({ page }, info) => {
   test.setTimeout(240_000);
-  await page.setViewportSize({ width: 1440, height: ALTEZZA });
+  const telefono = info.project.name === "telefono";
+  const L = telefono ? 390 : 1440;
+  const H = telefono ? 844 : 1400;
+
+  await page.setViewportSize({ width: L, height: H });
   await page.goto("/", { waitUntil: "networkidle" });
   await page.waitForTimeout(900);
 
   const totale = await page.evaluate(() => document.documentElement.scrollHeight);
-  const n = Math.min(Math.ceil(totale / ALTEZZA), 12);
+  const n = Math.min(Math.ceil(totale / H), telefono ? 16 : 12);
 
   for (let i = 0; i < n; i++) {
-    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), i * ALTEZZA);
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), i * H);
     // tempo perché le animazioni d'ingresso finiscano (0.7s) più margine
     await page.waitForTimeout(1100);
     await page.screenshot({
-      path: `prove/nostro/fascia-${String(i + 1).padStart(2, "0")}.png`,
+      path: `prove/${info.project.name}/fascia-${String(i + 1).padStart(2, "0")}.png`,
     });
   }
-  console.log(`altezza: ${totale}px — ${n} fasce da ${ALTEZZA}px`);
+  console.log(`[${info.project.name}] altezza: ${totale}px — ${n} fasce da ${H}px`);
 });

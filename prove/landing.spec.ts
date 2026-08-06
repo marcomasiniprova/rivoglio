@@ -43,6 +43,31 @@ test.describe("Landing page", () => {
     await expect(page.getByText("Ci sei.")).toBeVisible({ timeout: 10_000 });
   });
 
+  test("il costruttore risponde con tre posti veri e numeri coerenti", async ({ page }) => {
+    await page.goto("/#costruttore");
+    await page.getByRole("button", { name: /Dimmi dove posso andare/i }).click();
+
+    // le tre schede devono comparire (aggancio esplicito, non testo a caso)
+    const schede = page.locator("[data-scheda='proposta']");
+    await expect(schede.first()).toBeVisible({ timeout: 15_000 });
+    await expect(schede).toHaveCount(3);
+
+    // e il conto deve tornare: budget - auto = quel che resta
+    const testo = await page.locator("#costruttore").innerText();
+    expect(testo).toMatch(/\d+h\d{2}/); // ore di viaggio
+    expect(testo).toMatch(/\d+ km/); // distanza
+    expect(testo).toContain("non invento prezzi");
+  });
+
+  test("chi parte da un'isola riceve la spiegazione, non un risultato falso", async ({
+    page,
+  }) => {
+    await page.goto("/#costruttore");
+    await page.getByLabel("Da dove parti").selectOption("Palermo");
+    await page.getByRole("button", { name: /Dimmi dove posso andare/i }).click();
+    await expect(page.getByText(/Parti da un'isola/i)).toBeVisible({ timeout: 15_000 });
+  });
+
   test("non si scorre in orizzontale (rottura classica sul telefono)", async ({ page }) => {
     await page.goto("/");
     const largo = await page.evaluate(
