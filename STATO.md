@@ -1,20 +1,26 @@
 # STATO — MicroStay Alert
 
 **Aggiornato:** 2026-08-06
-**Fase:** 0 — Brainstorming / definizione spec
+**Fase:** 0 — Design concordato, spec da scrivere
 
 ## Dove siamo
-- Struttura progetto creata (CLAUDE.md, STATO.md, SPEC.md, DECISIONI.md, .claude/).
-- SPEC.md è ancora vuota: si compila alla fine del brainstorming.
-- Nessuna riga di codice scritta. Nessuno stack scelto. Nessun account creato.
+- Struttura creata e committata. Cancello `verify` funzionante e **testato in
+  entrambi i versi**: exit 0 se ok, exit 1 se trova un segreto tracciato.
+- Design del prodotto presentato a Valerio, in attesa del suo ok.
+- Ricerca fonti dati chiusa: risultati in `DECISIONI.md` → "Vincoli verificati".
+  **Non rifarla.**
+- Zero righe di codice di prodotto. Nessun account creato. Nessuna spesa.
+
+## Deciso (dettaglio in DECISIONI.md)
+- Web app, non app nativa. Prezzo: €4,99/mese o €29/anno, annuale in evidenza.
+- Promessa: prezzo alloggio reale + stima auto calcolata e dichiarata.
+- Alert su Telegram (principale) + push web + email.
+- Ingestione offerte = innesto sostituibile.
 
 ## Prossimo passo
-Rispondere alle domande aperte in `SPEC.md` → sezione "Domande aperte",
-poi scrivere la spec completa e il piano di implementazione.
+Ricevuto l'ok sul design → scrivere `SPEC.md` → piano di implementazione.
 
 ## Bloccato su
-- Fonte dati prezzi (alloggio + trasporto): è la decisione che sblocca tutto.
-- Budget mensile disponibile per API/hosting.
-
-## Da non rifare
-(niente ancora)
+- Ok di Valerio sul design.
+- Tre risposte: città di lancio, nome, cosa ha già (dominio/Stripe/social).
+- Fonte prezzi offerte: **parcheggiata di proposito**, si decide per ultima.
