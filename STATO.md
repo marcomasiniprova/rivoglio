@@ -13,7 +13,12 @@
   In produzione senza chiavi si alza un errore invece di perderli.
 - **shadcn/ui a mano** (Button, Input, Label, Card) sui nostri colori:
   niente `init`, avrebbe riscritto `globals.css` e distrutto il design.
-- **64 prove** su desktop e telefono dentro `npm run verify` (erano 48).
+- **La landing mostra il prodotto**: sezione «com'è dentro» con la schermata
+  vera di `/app`, calcolata dal motore mentre la pagina carica.
+- **I pulsanti portano a registrarsi**, non più alla lista d'attesa.
+- **Immagine social** generata (prima usciva un rettangolo grigio) e sito
+  **installabile sulla schermata Home**.
+- **74 prove** su desktop e telefono dentro `npm run verify` (erano 48).
 - Piano riscritto in tre fasi: `PIANO.md`. Marketing: `DISTRIBUZIONE.md`.
 
 ## Prossimo passo
