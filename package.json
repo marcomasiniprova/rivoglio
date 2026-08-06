@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "tipi": "tsc --noEmit",
-    "verify": "npm run build && npm run tipi && npm run lint"
+    "prove": "playwright test",
+    "prove:occhi": "playwright test --headed",
+    "verify": "npm run build && npm run tipi && npm run lint && npm run prove"
   },
   "dependencies": {
     "next": "16.3.0",
@@ -16,6 +18,7 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -25,11 +25,12 @@ export function Marchio({ className = "h-9 w-9" }: { className?: string }) {
         strokeWidth="2.4"
         strokeLinecap="round"
       />
-      {/* la mezzeria: è questo che la fa leggere come strada, non come collina */}
+      {/* La mezzeria: è questo che la fa leggere come strada, non come collina.
+          Provata a 24px con Playwright: sotto strokeWidth 2 sparisce. Non ridurla. */}
       <path
-        d="M13.6 22.1h1.9M17.6 22.4h2.1"
+        d="M12.4 21.9h3.1M18 22.3h3"
         stroke="var(--color-mare)"
-        strokeWidth="1.5"
+        strokeWidth="2.1"
         strokeLinecap="round"
       />
     </svg>

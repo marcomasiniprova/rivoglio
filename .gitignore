@@ -35,3 +35,8 @@ pnpm-debug.log*
 
 # claude - locale, non condiviso
 .claude/settings.local.json
+
+# playwright
+prove/report/
+prove/schermate/
+test-results/
