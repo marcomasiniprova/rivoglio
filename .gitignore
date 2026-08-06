@@ -42,3 +42,10 @@ prove/schermate/
 test-results/
 prove/nostro/
 prove/zentivo/
+
+# catture schermo: materiale di lavoro, si rigenerano con CATTURA=1
+prove/desktop/
+prove/telefono/
+prove/nostro/
+prove/zentivo/
+prove/schermate/
