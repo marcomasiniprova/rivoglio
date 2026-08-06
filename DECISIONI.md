@@ -40,6 +40,24 @@ Verificato il 2026-08-06. Se serve rimetterlo in discussione, prima rileggi qui.
 - **Prezzo carburante** — dato pubblico dell'Osservatorio MIMIT, aggiornato ogni settimana. Il 06/08/2026: benzina self **€1,994/l** (rete stradale), €2,072/l in autostrada. **Da leggere dalla fonte, mai scritto fisso nel codice.**
 - **`.claude/verify.cmd` NON è uno script batch**, nonostante l'estensione. L'hook `verify-gate.js` legge il file, prende la **prima riga non commentata** e la passa a `powershell.exe -Command`. Quindi contiene UNA riga sola. La logica vera sta in `.claude/verify.ps1`. Sbagliato una volta il 06/08 (scritto come `.cmd` batch → PowerShell non sa leggere `@echo off`).
 
+## Chiuse il 06/08 — secondo giro
+
+| Decisione | Perché |
+|---|---|
+| **Web app ora, store dopo il primo incasso.** Scelta di Valerio. | Apple: 99€/anno, 15-30% su ogni credito venduto, più una revisione che su uno sprint di 8 settimane può costarne 2. Il pacchetto per gli store (Capacitor) entra in FASE 3, dopo che l'incasso esiste. Nel frattempo il manifest la rende installabile sulla schermata Home: sul telefono è indistinguibile da un'app scaricata. |
+| **Accesso: email+password come strada principale, link magico come alternativa.** | La password funziona a ogni accesso senza dipendere dalla consegna di un'email. Con la posta interna di Supabase limitata a 2 email l'ora, un login basato solo sul link magico si sarebbe piantato al terzo utente. |
+| **I pulsanti principali della landing portano a registrarsi, non alla lista d'attesa.** | La lista d'attesa aveva senso quando non esisteva il prodotto. Ora esiste: mandare la gente su un modulo email invece che dentro l'app butta via l'unica cosa che convince, cioè provarla. Il modulo resta in fondo per chi non vuole ancora un account. |
+| **`shadcn init` non si lancia su questo progetto.** | Riscrive `globals.css` con i suoi token e cancella il sistema di colori costruito sul verde. I componenti si copiano a mano: è lo stesso codice, senza il danno. |
+| **Nessun testo di Supabase arriva all'utente così com'è.** | Risponde in inglese. Un messaggio inglese in mezzo a un prodotto italiano fa sembrare tutto un giocattolo. Quello che non riconosciamo diventa generico e finisce nei log. |
+
+## Da rivedere quando ci sarà il dominio
+- **`mailer_autoconfirm` acceso** (conferma email spenta) è una toppa, non una scelta.
+  Motivo: la posta interna di Supabase manda **2 email l'ora**, quindi con la
+  conferma accesa il terzo iscritto della giornata non entra. Si riaccende
+  appena Resend è verificato sul dominio e collegato come SMTP.
+- `site_url` è ancora `http://localhost:3000` e `uri_allow_list` è vuota: i link
+  nelle email punteranno al posto sbagliato finché non si cambiano.
+
 ## Decisioni ancora aperte
 Vivono in `SPEC.md` → "Domande aperte". Appena chiuse, scendono qui.
 - Fonte prezzi offerte — **rimandata volontariamente** a fine progetto.

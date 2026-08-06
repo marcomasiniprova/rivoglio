@@ -4,6 +4,7 @@ import Logo from "./Logo";
 const voci = [
   { href: "#funzioni", testo: "Come funziona" },
   { href: "#conto", testo: "Il conto aperto" },
+  { href: "#dentro", testo: "Com'è dentro" },
   { href: "#prezzi", testo: "Prezzi" },
   { href: "#domande", testo: "Domande" },
 ];

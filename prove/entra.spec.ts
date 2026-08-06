@@ -59,9 +59,19 @@ test.describe("Accesso", () => {
     expect(sfora).toBe(false);
   });
 
-  test("dalla landing si arriva all'accesso", async ({ page }) => {
+  test("il pulsante principale della landing porta alla registrazione", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: "Provalo gratis" }).first().click();
-    await expect(page).toHaveURL(/\/entra/);
+    // il bottone grosso dell'hero, non uno dei tanti in fondo alla pagina
+    await page.getByRole("link", { name: /Provalo con 3 alert gratis/i }).click();
+    await expect(page).toHaveURL(/\/entra\?modo=registrati/);
+    await expect(page.getByRole("heading", { name: /Crea il tuo account/i })).toBeVisible();
+  });
+
+  test("nessun pulsante importante manda ancora alla lista d'attesa", async ({ page }) => {
+    await page.goto("/");
+    // Ora che l'account esiste, i CTA devono portare a registrarsi.
+    // Resta solo il modulo in fondo, per chi non vuole ancora un account.
+    const versoListaAttesa = page.locator('a[href="#iscriviti"]');
+    await expect(versoListaAttesa).toHaveCount(0);
   });
 });

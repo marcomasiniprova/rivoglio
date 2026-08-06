@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Anima } from "./Anima";
 
 const pacchetti = [
@@ -83,8 +84,8 @@ export default function Prezzi() {
                 {p.perAlert}€ ad alert · una volta sola
               </p>
 
-              <a
-                href="#iscriviti"
+              <Link
+                href="/entra?modo=registrati"
                 className={`mt-7 block rounded-pillola py-3.5 text-center text-[15px] font-medium transition-all ${
                   p.consigliato
                     ? "bg-white text-verde hover:bg-menta hover:text-verde-notte"
@@ -92,7 +93,7 @@ export default function Prezzi() {
                 }`}
               >
                 Inizia gratis
-              </a>
+              </Link>
             </Anima>
           ))}
         </div>

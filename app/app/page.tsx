@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
 import { MapPin } from "lucide-react";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
+import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { costruisci, PARTENZE } from "@/lib/costruttore";
 import type { Tipo } from "@/lib/destinazioni";
 import BaseDiPartenza from "@/components/app/BaseDiPartenza";
@@ -29,7 +31,13 @@ type RigaRicerca = {
 };
 
 export default async function PaginaApp() {
-  const utente = (await utenteCollegato())!;
+  /* Il layout reindirizza già chi non è collegato, ma React costruisce layout
+     e pagina insieme: senza questo controllo la pagina interroga Supabase lo
+     stesso e riempie i log di errori che poi nascondono quelli veri. */
+  if (!SUPABASE_CONFIGURATO) redirect("/entra");
+  const utente = await utenteCollegato();
+  if (!utente) redirect("/entra");
+
   const supabase = await supabaseServer();
 
   const [{ data: profilo }, { data: ricerche }] = await Promise.all([

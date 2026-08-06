@@ -1,3 +1,4 @@
+import Link from "next/link";
 import TelefonoAlert from "./TelefonoAlert";
 import Macchina from "./Macchina";
 import { Anima } from "./Anima";
@@ -118,15 +119,15 @@ export default function Hero() {
 
         <Anima ritardo={0.34}>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a
-              href="#iscriviti"
+            <Link
+              href="/entra?modo=registrati"
               className="group inline-flex w-full items-center justify-center gap-2 rounded-pillola bg-verde px-7 py-4 text-[16px] font-medium text-white shadow-[0_10px_30px_-10px_rgba(10,157,92,.65)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro hover:shadow-[0_16px_40px_-12px_rgba(10,157,92,.75)] sm:w-auto"
             >
               Provalo con 3 alert gratis
               <span className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
                 ↗
               </span>
-            </a>
+            </Link>
             <a
               href="#funzioni"
               className="inline-flex w-full items-center justify-center gap-2.5 rounded-pillola bg-white px-7 py-4 text-[16px] font-medium text-inchiostro shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg sm:w-auto"

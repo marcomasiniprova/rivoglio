@@ -2,6 +2,7 @@ import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import Manifesto from "@/components/Manifesto";
 import Costruttore from "@/components/Costruttore";
+import DentroApp from "@/components/DentroApp";
 import Funzioni from "@/components/Funzioni";
 import Passi from "@/components/Passi";
 import ContoAperto from "@/components/ContoAperto";
@@ -25,6 +26,7 @@ export default function Home() {
         <Passi />
         <ContoAperto />
         <Costruttore />
+        <DentroApp />
         <PerChi />
         <Numeri />
         <Canali />

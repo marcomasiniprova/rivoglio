@@ -11,7 +11,18 @@ const poppins = Poppins({
   display: "swap",
 });
 
+/**
+ * L'indirizzo di casa del sito. Serve a rendere assoluto il link
+ * dell'immagine social: senza, Facebook e WhatsApp cercano l'anteprima su
+ * localhost e non trovano niente.
+ * Su Netlify arriva da sola in URL; in locale ripiega su localhost.
+ */
+const CASA = new URL(
+  process.env.NEXT_PUBLIC_SITO ?? process.env.URL ?? "http://localhost:3000",
+);
+
 export const metadata: Metadata = {
+  metadataBase: CASA,
   title: "Viaggio Anche Io | La tua fuga, al prezzo giusto",
   description:
     "Imposti da dove parti e quanto vuoi spendere. Ricevi una notifica quando esiste una micro-vacanza di 1-3 notti sotto la tua soglia, col prezzo totale calcolato: alloggio e viaggio.",

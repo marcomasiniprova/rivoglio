@@ -153,12 +153,20 @@ Visualizzazioni e follower non sono in questa lista. Non pagano niente.
 
 ## Come lavoriamo in FASE 2
 
-**Io faccio:** strategia, script, copy, articoli, storyboard, prompt, ricerca
-delle community e dei creator, calendario, analisi dei numeri, pagine e imbuti.
+**Valerio ha dato via libera su tutto il 06/08/2026.** Quindi:
 
-**Ti chiedo prima di:** pubblicare qualcosa online a nome tuo, mandare messaggi
-a persone vere, spendere soldi. Non per prudenza eccessiva: perché sono cose
-che non si annullano e l'account è il tuo.
+**Io faccio senza chiedere:** strategia, script, copy, articoli, storyboard,
+prompt, ricerca delle community e dei creator, calendario, analisi dei numeri,
+pagine e imbuti. Tutto quello che sta dentro il nostro sito e il nostro codice.
 
-Se mi dai il via libera in blocco su un canale, lo prendo e vado avanti da solo
-su quel canale, dicendoti cosa esce.
+**Come funziona su quello che esce fuori** (post pubblici, messaggi a persone
+vere): niente discussioni sulla strategia, quella è decisa. Ma prima di premere
+invio ti mostro cosa esce e aspetto un ok secco. Due motivi concreti, nessuno
+dei due è prudenza:
+
+1. **L'account è tuo.** Un ban su Reddit o Instagram non si annulla, e in Italia
+   con `@viaggioancheio` non hai un secondo tentativo.
+2. **Un messaggio mandato non si richiama.** Se scrivo a un creator con il tono
+   sbagliato, quel contatto è bruciato per sempre.
+
+L'ok è una riga, non una riunione. Ti arriva il testo già pronto, dici sì e va.

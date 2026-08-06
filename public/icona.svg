@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="512" height="512">
+  <!-- Il marchio, identico a components/Logo.tsx. SOLO TRE FORME:
+       sole, orizzonte, mezzeria. Un quarto elemento a 24px diventa
+       una macchia: provato con Playwright, non aggiungerlo. -->
+  <rect width="32" height="32" rx="8.5" fill="#0a9d5c"/>
+  <circle cx="16" cy="13.2" r="5.1" fill="#f5c451"/>
+  <path d="M4.5 24.2C9 20.6 23 20.6 27.5 24.2" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M12.4 21.9h3.1M18 22.3h3" stroke="#0a9d5c" stroke-width="2.1" stroke-linecap="round"/>
+</svg>

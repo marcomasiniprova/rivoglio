@@ -15,6 +15,31 @@ const CARTELLA = "prove/schermate";
 
 test.describe.configure({ mode: "serial" });
 
+/** La sezione «com'è dentro» sulla landing. */
+test("com'e' dentro", async ({ page }, info) => {
+  fs.mkdirSync(CARTELLA, { recursive: true });
+  await page.goto("/#dentro");
+  // le sezioni entrano con lo scroll: se scatti subito fotografi il vuoto
+  await page.waitForTimeout(1600);
+  await page
+    .locator("#dentro")
+    .screenshot({ path: `${CARTELLA}/${info.project.name}-dentro.png` });
+});
+
+/** Solo la porta: funziona anche senza chiavi Supabase. */
+test("la porta", async ({ page }, info) => {
+  fs.mkdirSync(CARTELLA, { recursive: true });
+  const p = (nome: string) => `${CARTELLA}/${info.project.name}-${nome}.png`;
+
+  await page.goto("/entra");
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: p("porta-accedi") });
+
+  await page.getByRole("tab", { name: /Sono nuovo/i }).click();
+  await page.waitForTimeout(700);
+  await page.screenshot({ path: p("porta-registrati") });
+});
+
 test("giro completo: registrazione, partenza, ricerca", async ({ page }, info) => {
   test.setTimeout(120_000);
   fs.mkdirSync(CARTELLA, { recursive: true });
