@@ -30,14 +30,27 @@ const TITOLI: Record<Modo, { titolo: string; sotto: string; bottone: string }> =
   },
 };
 
+/**
+ * Gli errori che possono arrivare dal link nell'email.
+ * Ognuno dice cosa è successo E cosa fare: "link non valido" da solo
+ * lascia l'utente fermo davanti allo schermo.
+ */
+const ERRORI: Record<string, string> = {
+  scaduto:
+    "Quel link è già stato usato o è scaduto. Chiedine un altro qui sotto: ci mette un attimo.",
+  link: "Quel link non ha funzionato. Riprova a entrare da qui, oppure fatti mandare un link nuovo.",
+  configurazione:
+    "L'accesso non è collegato: mancano le chiavi di Supabase. È un problema nostro, non tuo.",
+};
+
 export default function ModuloEntra({
   modoIniziale = "accedi",
   poi = "/app",
-  erroreLink = false,
+  errore: erroreArrivato,
 }: {
   modoIniziale?: Modo;
   poi?: string;
-  erroreLink?: boolean;
+  errore?: string | null;
 }) {
   const [modo, setModo] = useState<Modo>(modoIniziale);
 
@@ -53,7 +66,8 @@ export default function ModuloEntra({
     modo === "accedi" ? accediInCorso : modo === "registrati" ? registraInCorso : magicoInCorso;
 
   const t = TITOLI[modo];
-  const errore = esito.errore ?? (erroreLink ? "Quel link è scaduto o è già stato usato. Chiedine un altro." : undefined);
+  const errore =
+    esito.errore ?? (erroreArrivato ? (ERRORI[erroreArrivato] ?? ERRORI.link) : undefined);
 
   return (
     <div className="w-full max-w-[420px]">

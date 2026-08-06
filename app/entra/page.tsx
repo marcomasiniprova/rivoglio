@@ -16,7 +16,7 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
   const grezzo = typeof p.poi === "string" ? p.poi : "/app";
   const poi = grezzo.startsWith("/") && !grezzo.startsWith("//") ? grezzo : "/app";
   const modo = p.modo === "registrati" ? "registrati" : "accedi";
-  const erroreLink = p.errore === "link";
+  const errore = typeof p.errore === "string" ? p.errore : null;
 
   return (
     <main className="grid min-h-dvh lg:grid-cols-2">
@@ -34,7 +34,7 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
         </div>
 
         <div className="flex flex-1 items-center justify-center py-14">
-          <ModuloEntra modoIniziale={modo} poi={poi} erroreLink={erroreLink} />
+          <ModuloEntra modoIniziale={modo} poi={poi} errore={errore} />
         </div>
 
         <p className="text-center text-xs leading-relaxed text-fumo-2">
