@@ -1,35 +1,42 @@
+import { Anima } from "./Anima";
+
 const canali = [
   {
     t: "Telegram",
-    d: "Il modo migliore. Arriva come una notifica normale, con suono, anche su iPhone.",
+    d: "Il canale migliore. Arriva come una notifica di sistema, con suono, anche su iPhone.",
     forte: true,
   },
-  { t: "Email", d: "La rete di sicurezza: arriva sempre, a tutti, senza installare niente." },
-  { t: "Notifica del browser", d: "Su Android basta un tocco. Su iPhone devi aggiungere il sito alla Home." },
+  { t: "Email", d: "Il canale di riserva: arriva sempre, senza installare nulla." },
+  {
+    t: "Notifica del browser",
+    d: "Su Android basta un tocco. Su iPhone serve aggiungere il sito alla schermata Home.",
+  },
 ];
 
 const fonti = [
   { t: "MIMIT", d: "Prezzo medio dei carburanti, aggiornato ogni settimana" },
-  { t: "ISTAT", d: "Elenco dei comuni italiani e coordinate" },
+  { t: "ISTAT", d: "Elenco dei comuni italiani e relative coordinate" },
   { t: "OpenStreetMap", d: "Distanze e tempi di percorrenza reali su strada" },
 ];
 
 export default function Canali() {
   return (
     <section className="px-5 py-24 sm:px-8 sm:py-28">
-      <div className="mx-auto max-w-[1120px] grid gap-14 lg:grid-cols-2 lg:gap-20">
-        <div>
+      <div className="mx-auto grid max-w-[1120px] gap-14 lg:grid-cols-2 lg:gap-20">
+        <Anima>
           <h2 className="text-[clamp(1.9rem,4vw,2.7rem)]">Come ti arriva</h2>
           <p className="mt-4 text-[16px] leading-relaxed text-fumo">
-            Scegli tu. Non c&apos;è nessuna app da scaricare: il posto in cui ti scrivo è
-            quello che usi già.
+            Scegli tu il canale. Non c&apos;è nessuna app da scaricare: la notifica arriva
+            dove sei già.
           </p>
           <div className="mt-7 space-y-3">
             {canali.map((c) => (
               <div
                 key={c.t}
-                className={`rounded-2xl border p-5 ${
-                  c.forte ? "border-verde/25 bg-menta-tenue" : "border-bordo/70 bg-white"
+                className={`rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-0.5 ${
+                  c.forte
+                    ? "border-verde/25 bg-menta-tenue"
+                    : "border-bordo/70 bg-white hover:border-verde/25"
                 }`}
               >
                 <p className="flex items-center gap-2 text-[16px] font-medium">
@@ -44,26 +51,29 @@ export default function Canali() {
               </div>
             ))}
           </div>
-        </div>
+        </Anima>
 
-        <div>
-          <h2 className="text-[clamp(1.9rem,4vw,2.7rem)]">Da dove prendo i dati</h2>
+        <Anima ritardo={0.12}>
+          <h2 className="text-[clamp(1.9rem,4vw,2.7rem)]">Da dove arrivano i dati</h2>
           <p className="mt-4 text-[16px] leading-relaxed text-fumo">
-            Fonti pubbliche e verificabili. Nessun numero uscito dal nulla.
+            Fonti pubbliche e verificabili. Nessun numero senza origine.
           </p>
           <div className="mt-7 space-y-3">
             {fonti.map((f) => (
-              <div key={f.t} className="rounded-2xl border border-bordo/70 bg-white p-5">
+              <div
+                key={f.t}
+                className="rounded-2xl border border-bordo/70 bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-verde/25"
+              >
                 <p className="text-[16px] font-medium">{f.t}</p>
                 <p className="mt-1.5 text-[14px] leading-relaxed text-fumo">{f.d}</p>
               </div>
             ))}
           </div>
           <p className="mt-5 text-[13.5px] leading-relaxed text-fumo-2">
-            Il prezzo dell&apos;alloggio viene dalla struttura o dal portale che la vende, e
-            nell&apos;alert trovi sempre il link per verificarlo tu.
+            Il prezzo dell&apos;alloggio viene dalla struttura o dal portale che lo vende.
+            Nell&apos;alert trovi sempre il link per verificarlo.
           </p>
-        </div>
+        </Anima>
       </div>
     </section>
   );

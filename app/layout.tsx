@@ -12,13 +12,13 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Viaggio Anche Io — la tua fuga, al prezzo giusto",
+  title: "Viaggio Anche Io | La tua fuga, al prezzo giusto",
   description:
-    "Dimmi da dove parti e quanto vuoi spendere. Ti avviso io quando c'è una micro-vacanza di 1-3 notti sotto la tua soglia, col prezzo totale: alloggio più viaggio.",
+    "Imposti da dove parti e quanto vuoi spendere. Ricevi una notifica quando esiste una micro-vacanza di 1-3 notti sotto la tua soglia, col prezzo totale calcolato: alloggio e viaggio.",
   openGraph: {
     title: "Viaggio Anche Io",
     description:
-      "40 milioni di italiani non partiranno ad agosto. Tu sì. Ti avviso quando c'è una fuga di due notti sotto il tuo budget.",
+      "40 milioni di italiani non partiranno ad agosto. Ricevi una notifica quando esiste una fuga di due notti sotto il tuo budget.",
     locale: "it_IT",
     type: "website",
   },

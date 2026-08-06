@@ -1,3 +1,4 @@
+import { Anima } from "./Anima";
 import { ESEMPIO, CONTO, euro } from "@/lib/esempio";
 
 const num = (n: number, d = 2) =>
@@ -20,7 +21,7 @@ export default function ContoAperto() {
     <section id="conto" className="px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-[1120px] overflow-hidden rounded-[2rem] bg-verde-notte px-6 py-16 text-white sm:px-14">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-          <div>
+          <Anima>
             <span className="inline-block rounded-pillola bg-white/10 px-3.5 py-1.5 text-[12.5px] font-medium text-menta">
               Il conto aperto
             </span>
@@ -38,11 +39,14 @@ export default function ContoAperto() {
             <p className="mt-5 max-w-lg text-[14.5px] leading-relaxed text-white/45">
               Sul treno non ti do un prezzo: Trenitalia e Italo non pubblicano dati
               affidabili, e preferisco non dirti un numero piuttosto che dirtene uno
-              sbagliato. Ti metto il link e controlli in dieci secondi.
+              sbagliato. Trovi il link per controllare in dieci secondi.
             </p>
-          </div>
+          </Anima>
 
-          <div className="rounded-[1.75rem] border border-white/15 bg-white/[0.06] p-6 backdrop-blur-sm sm:p-8">
+          <Anima
+            ritardo={0.12}
+            className="rounded-[1.75rem] border border-white/15 bg-white/[0.06] p-6 backdrop-blur-sm sm:p-8"
+          >
             <div className="flex items-baseline justify-between border-b border-dashed border-white/20 pb-4">
               <span className="font-display text-[22px] font-medium">
                 {ESEMPIO.partenza} → {ESEMPIO.destinazione}
@@ -99,7 +103,7 @@ export default function ContoAperto() {
               Esempio illustrativo. Consumo stimato {ESEMPIO.consumoKmL} km/l su
               un&apos;utilitaria a benzina; i pedaggi variano col percorso.
             </p>
-          </div>
+          </Anima>
         </div>
       </div>
     </section>

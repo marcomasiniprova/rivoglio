@@ -1,3 +1,5 @@
+import { Anima } from "./Anima";
+
 const pacchetti = [
   { crediti: 5, prezzo: "3,99", perAlert: "0,80" },
   { crediti: 20, prezzo: "12,99", perAlert: "0,65", consigliato: true },
@@ -14,35 +16,40 @@ export default function Prezzi() {
   return (
     <section id="prezzi" className="px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-[1120px]">
-        <div className="mx-auto max-w-2xl text-center">
+        <Anima className="mx-auto max-w-2xl text-center">
           <h2 className="text-[clamp(2.1rem,5vw,3.3rem)]">
             Paghi gli alert.
             <br />
             Non un abbonamento.
           </h2>
           <p className="mx-auto mt-5 max-w-lg text-[16.5px] leading-relaxed text-fumo">
-            Un credito vale un alert ricevuto. Quando hai trovato la tua vacanza smetti, e
-            i crediti che ti restano rimangono lì per la prossima volta.
+            Un credito vale un alert ricevuto. Quando trovi la vacanza smetti, e i crediti
+            che restano valgono per la prossima volta.
           </p>
-        </div>
+        </Anima>
 
-        <div className="mx-auto mt-11 flex max-w-xl items-center gap-4 rounded-2xl border border-verde/25 bg-menta-tenue p-5">
+        <Anima
+          ritardo={0.08}
+          className="mx-auto mt-11 flex max-w-xl items-center gap-4 rounded-2xl border border-verde/25 bg-menta-tenue p-5"
+        >
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-verde font-display text-[19px] font-medium text-white">
             3
           </span>
           <p className="text-[15px] leading-relaxed">
-            <span className="font-medium">I primi 3 alert sono gratis.</span>{" "}
+            <span className="font-medium">I primi 3 alert sono gratuiti.</span>{" "}
             <span className="text-fumo">
-              Alert veri, non una prova finta. Se non ti servo, non spendi un euro.
+              Alert reali, non una prova limitata. Se il servizio non ti è utile, non
+              spendi nulla.
             </span>
           </p>
-        </div>
+        </Anima>
 
         <div className="mt-7 grid gap-5 md:grid-cols-3">
-          {pacchetti.map((p) => (
-            <div
+          {pacchetti.map((p, i) => (
+            <Anima
               key={p.crediti}
-              className={`relative rounded-[1.5rem] border p-7 ${
+              ritardo={i * 0.1}
+              className={`relative rounded-[1.5rem] border p-7 transition-all duration-300 hover:-translate-y-1.5 ${
                 p.consigliato
                   ? "border-verde bg-verde text-white shadow-[0_28px_60px_-24px_rgba(10,157,92,.6)]"
                   : "border-bordo/70 bg-white"
@@ -86,7 +93,7 @@ export default function Prezzi() {
               >
                 Inizia gratis
               </a>
-            </div>
+            </Anima>
           ))}
         </div>
 

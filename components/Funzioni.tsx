@@ -1,3 +1,5 @@
+import { Anima } from "./Anima";
+
 const funzioni = [
   {
     titolo: "La soglia la scegli tu",
@@ -74,33 +76,36 @@ export default function Funzioni() {
   return (
     <section id="funzioni" className="px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-[1120px]">
-        <div className="mx-auto max-w-2xl text-center">
+        <Anima className="mx-auto max-w-2xl text-center">
           <h2 className="text-[clamp(2.1rem,5vw,3.3rem)]">
             Una ricerca sola.
             <br />
             Poi non cerchi più.
           </h2>
           <p className="mx-auto mt-5 max-w-lg text-[16.5px] leading-relaxed text-fumo">
-            Imposti i tuoi criteri una volta. Da lì in poi guardo io, tutti i giorni, e ti
-            scrivo solo quando c&apos;è qualcosa che ti torna davvero.
+            Imposti i tuoi criteri una volta. Da quel momento la ricerca è automatica e
+            ricevi una notifica solo quando esiste qualcosa che rispetta i tuoi limiti.
           </p>
-        </div>
+        </Anima>
 
         {/* la griglia di Zentivo: due card, telefono al centro, due card */}
         <div className="mt-14 grid gap-5 lg:grid-cols-[1fr_auto_1fr]">
           <div className="grid gap-5">
-            {funzioni.slice(0, 2).map((f) => (
-              <Card key={f.titolo} {...f} />
+            {funzioni.slice(0, 2).map((f, i) => (
+              <Card key={f.titolo} {...f} ritardo={i * 0.1} />
             ))}
           </div>
 
-          <div className="grid place-items-center rounded-[1.75rem] bg-gradient-to-b from-menta-tenue to-white px-6 py-10">
+          <Anima
+            ritardo={0.1}
+            className="grid place-items-center rounded-[1.75rem] bg-gradient-to-b from-menta-tenue to-white px-6 py-10"
+          >
             <TelefonoRicerca />
-          </div>
+          </Anima>
 
           <div className="grid gap-5">
-            {funzioni.slice(2).map((f) => (
-              <Card key={f.titolo} {...f} />
+            {funzioni.slice(2).map((f, i) => (
+              <Card key={f.titolo} {...f} ritardo={0.2 + i * 0.1} />
             ))}
           </div>
         </div>
@@ -109,23 +114,35 @@ export default function Funzioni() {
   );
 }
 
-function Card({ titolo, testo, icona }: { titolo: string; testo: string; icona: string }) {
+function Card({
+  titolo,
+  testo,
+  icona,
+  ritardo,
+}: {
+  titolo: string;
+  testo: string;
+  icona: string;
+  ritardo: number;
+}) {
   return (
-    <div className="rounded-[1.5rem] border border-bordo/70 bg-white p-7 transition-all hover:shadow-[0_18px_40px_-24px_rgba(5,46,31,.35)]">
-      <span className="grid h-11 w-11 place-items-center rounded-xl bg-menta-tenue">
-        <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-          <path
-            d={icona}
-            fill="none"
-            stroke="var(--color-verde)"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-      <h3 className="mt-5 text-[20px]">{titolo}</h3>
-      <p className="mt-2.5 text-[14.5px] leading-relaxed text-fumo">{testo}</p>
-    </div>
+    <Anima ritardo={ritardo} className="h-full">
+      <div className="group h-full rounded-[1.5rem] border border-bordo/70 bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-verde/25 hover:shadow-[0_20px_45px_-24px_rgba(5,46,31,.35)]">
+        <span className="grid h-11 w-11 place-items-center rounded-xl bg-menta-tenue transition-transform duration-300 group-hover:scale-110">
+          <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+            <path
+              d={icona}
+              fill="none"
+              stroke="var(--color-verde)"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+        <h3 className="mt-5 text-[20px]">{titolo}</h3>
+        <p className="mt-2.5 text-[14.5px] leading-relaxed text-fumo">{testo}</p>
+      </div>
+    </Anima>
   );
 }

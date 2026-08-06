@@ -37,7 +37,7 @@ export default function Logo({ scuro = false }: { scuro?: boolean }) {
     <Link
       href="/"
       className="group flex shrink-0 items-center gap-2.5"
-      aria-label="Viaggio Anche Io — la tua fuga, al prezzo giusto"
+      aria-label="Viaggio Anche Io, la tua fuga al prezzo giusto"
     >
       <Marchio className="h-9 w-9 transition-transform duration-500 group-hover:-rotate-6" />
       <span
