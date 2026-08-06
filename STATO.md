@@ -1,30 +1,36 @@
 # STATO — Viaggio Anche Io
 
 **Aggiornato:** 2026-08-06
-**Fase:** 1 — Landing page fatta (giorno 1-2 di 7)
+**Fase:** 2 — Infrastruttura in piedi, database protetto
 
 ## Dove siamo
-- **Landing page completa e funzionante.** Next 16 + React 19 + Tailwind 4.
-  Sezioni: hero col telefono, come funziona, il conto aperto, prezzi a crediti,
-  domande, iscrizione, footer. Build + tipi + lint: tutto verde.
-- Modulo di iscrizione **provato davvero**: email valida → 200 e salvata
-  (ripulita e in minuscolo); email sbagliata → 400; corpo rotto → 400.
-- I numeri dell'esempio vivono in un solo posto (`lib/esempio.ts`) così telefono
-  e sezione conto non possono divergere: 78 + 27 = 105, sotto soglia 120.
-- `SPEC.md` e `DECISIONI.md` completi. **Non ridiscutere le scelte lì dentro.**
+- **Repo privata:** github.com/marcomasiniprova/viaggioancheio (remote configurato,
+  non ancora pubblicata: manca `gh auth login`).
+- **Supabase attivo:** progetto `znwpzkzavzsktyfxwuye`, Francoforte (eu-central-1,
+  dati in UE). Servizi tutti `ACTIVE_HEALTHY`.
+- **Schema applicato e verificato:** profili, ricerche, offerte, invii,
+  transazioni, iscritti. RLS su tutte. Il profilo nasce da solo alla
+  registrazione, con 3 crediti.
+- **Buco di sicurezza trovato e chiuso** (migrazione 002): un utente registrato
+  poteva regalarsi crediti. Ora `crediti` è scrivibile solo da server.
+  Verificato leggendo il catalogo permessi, non a fiducia.
+- **Landing page** completa e funzionante. Logo rifatto in verde, regge a 24px.
+  `BRAND.md` scritto: colori fissi, caratteri, tono.
 
 ## Prossimo passo
-Giorno 3: Supabase — schema, iscrizione vera, form "imposta la tua ricerca".
+Skill `impeccable`/`taste` da installare a mano (l'installer vuole Node 22,
+qui c'è il 20) + Playwright per le prove sul browser. Poi: login utente e
+form "imposta la tua ricerca".
 
 ## Bloccato su — serve Valerio
-- **`lib/archivio.ts` scrive su file locale.** Su Netlify il filesystem non è
-  persistente: **va sostituito con Supabase PRIMA di mettere online**, altrimenti
-  le email degli iscritti si perdono in silenzio.
-- **Dominio** `viaggioancheio.it`: verificare e comprare (io non riesco a
-  controllare i domini da qui — rdap e DNS danno falsi positivi, provato).
-- **Stripe**: account da aprire (dati fiscali + IBAN). Serve al giorno 6.
-- **Fonte prezzi offerte**: parcheggiata di proposito, si decide per ultima.
+1. **`gh auth login`** — una volta sola, poi pubblico il codice.
+2. **Creare `.env.local`** — l'hook mi vieta di scriverlo (giusto). Contenuto
+   già consegnato in chat.
+3. **Link del template Framer** pubblicato, per ricostruirlo in codice.
+4. **Commercialista**: partita IVA. Senza, non incassi. Non rimandare.
+5. Dominio `viaggioancheio.it`. Fonte prezzi offerte: parcheggiata per ultima.
 
 ## Da non rifare
-- Ricerca API prezzi: risultati in `DECISIONI.md` → "Vincoli verificati".
+- Ricerca API prezzi e vincoli esterni: `DECISIONI.md`.
 - `.claude/verify.cmd` NON è un file batch: una riga sola.
+- Supabase: chiavi legacy da disabilitare dal pannello, usiamo `sb_publishable_`.
