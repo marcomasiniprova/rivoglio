@@ -185,3 +185,28 @@ test.describe("filtro sulla spazzatura raccolta dal web", () => {
     expect(notti("non-una-data", "2026-09-12")).toBe(0);
   });
 });
+
+import { leggiPrezzo } from "@/lib/offerte/raccoglitori/exa";
+
+test.describe("lettura del prezzo dalle pagine raccolte", () => {
+  test("riconosce i prezzi scritti come li scrivono gli italiani", () => {
+    expect(leggiPrezzo("Camera doppia da € 89 a notte")).toBe(89);
+    expect(leggiPrezzo("A partire da 120,50 euro")).toBe(120.5);
+    expect(leggiPrezzo("Prezzo: 95€ colazione inclusa")).toBe(95);
+  });
+
+  test("col piu' basso, perche' le pagine scrivono 'a partire da'", () => {
+    expect(leggiPrezzo("Singola 65€, doppia 89€, suite 240€")).toBe(65);
+  });
+
+  test("non inventa un prezzo quando non c'e'", () => {
+    expect(leggiPrezzo("Chiamaci per un preventivo personalizzato")).toBeNull();
+    expect(leggiPrezzo("")).toBeNull();
+  });
+
+  test("scarta i numeri che non possono essere una notte", () => {
+    // 5€ non e' una camera, 99000€ e' un errore di lettura, 2026 e' un anno
+    expect(leggiPrezzo("Sconto di 5€ sul soggiorno")).toBeNull();
+    expect(leggiPrezzo("Fatturato 99000€ nel 2026")).toBeNull();
+  });
+});

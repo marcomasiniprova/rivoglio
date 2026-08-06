@@ -49,7 +49,11 @@ export default async function PaginaApp() {
       .order("creata_il", { ascending: false }),
   ]);
 
-  const partenza = profilo?.comune ?? null;
+  /* Chi non ha ancora una partenza non ha fatto l'onboarding: si manda lì
+     invece di mostrargli un'app vuota che non sa cosa chiedergli. */
+  if (!profilo?.comune) redirect("/benvenuto");
+
+  const partenza = profilo.comune;
   const elenco = (ricerche ?? []) as RigaRicerca[];
 
   /**
