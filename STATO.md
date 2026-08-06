@@ -1,26 +1,28 @@
-# STATO — MicroStay Alert
+# STATO — Viaggio Anche Io
 
 **Aggiornato:** 2026-08-06
-**Fase:** 0 — Design concordato, spec da scrivere
+**Fase:** 1 — Landing page (giorno 1 di 7)
 
 ## Dove siamo
-- Struttura creata e committata. Cancello `verify` funzionante e **testato in
-  entrambi i versi**: exit 0 se ok, exit 1 se trova un segreto tracciato.
-- Design del prodotto presentato a Valerio, in attesa del suo ok.
-- Ricerca fonti dati chiusa: risultati in `DECISIONI.md` → "Vincoli verificati".
+- `SPEC.md` scritta e completa. `DECISIONI.md` pieno: nome, tono, pricing a
+  crediti, tutta Italia, Netlify, landing page per prima. **Non ridiscuterle.**
+- Cancello `verify` funzionante e testato nei due versi (exit 0 ok, exit 1 se
+  trova un segreto tracciato).
+- Ricerca fonti dati chiusa e scritta in `DECISIONI.md` → "Vincoli verificati".
   **Non rifarla.**
-- Zero righe di codice di prodotto. Nessun account creato. Nessuna spesa.
-
-## Deciso (dettaglio in DECISIONI.md)
-- Web app, non app nativa. Prezzo: €4,99/mese o €29/anno, annuale in evidenza.
-- Promessa: prezzo alloggio reale + stima auto calcolata e dichiarata.
-- Alert su Telegram (principale) + push web + email.
-- Ingestione offerte = innesto sostituibile.
+- Zero codice di prodotto scritto finora. Nessuna spesa fatta.
 
 ## Prossimo passo
-Ricevuto l'ok sul design → scrivere `SPEC.md` → piano di implementazione.
+Costruire la **landing page** (giorno 1-2 del piano in `SPEC.md` §11):
+vetrina + come funziona + prezzi a crediti + raccolta iscritti.
 
-## Bloccato su
-- Ok di Valerio sul design.
-- Tre risposte: città di lancio, nome, cosa ha già (dominio/Stripe/social).
-- Fonte prezzi offerte: **parcheggiata di proposito**, si decide per ultima.
+## Bloccato su — serve Valerio
+- **Dominio** `viaggioancheio.it`: verificare se è libero e comprarlo.
+  Io non riesco a controllare i domini da qui (rdap e DNS non funzionano
+  nell'ambiente — provato, dà falsi positivi).
+- **Stripe**: account da aprire, servono dati fiscali e IBAN. Serve al giorno 6.
+- **Fonte prezzi offerte**: parcheggiata di proposito, si decide per ultima.
+
+## Da non rifare
+- Ricerca API prezzi (Booking, Amadeus, Travelpayouts, SerpAPI, Trenitalia).
+- `.claude/verify.cmd` NON è un file batch: una riga sola. Vedi DECISIONI.md.
