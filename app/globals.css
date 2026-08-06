@@ -1,33 +1,31 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Viaggio Anche Io — sistema visivo "luce italiana"
-   Carta sbiancata dal sole, verde mare profondo, terracotta.
-   Non fintech: estate.
+   Viaggio Anche Io — sistema visivo
+   Struttura presa da Zentivo (Framer), colore portato sul verde.
+   Riferimenti misurati dal template: fondo #F6F8FA, titoli Geist 500
+   con spaziatura -2.4px e interlinea 1.0, bottoni a pillola 30px.
    ============================================================ */
 @theme {
-  /* fondali */
-  --color-sabbia: #faf6ee;
-  --color-sabbia-2: #f2ead9;
-  --color-sabbia-3: #e8dcc4;
+  --color-nebbia: #f6f8fa;
+  --color-nebbia-2: #eef2f5;
+  --color-bordo: #e4e9ee;
 
-  /* inchiostri */
-  --color-inchiostro: #12211c;
-  --color-fumo: #5f7169;
-  --color-fumo-2: #8b9a93;
+  --color-inchiostro: #0a0a0a;
+  --color-fumo: #6b7280;
+  --color-fumo-2: #9aa4b0;
 
-  /* verdi */
-  --color-mare: #0d5c46;
-  --color-mare-scuro: #073328;
+  /* il verde al posto del blu #1A4BED di Zentivo */
+  --color-verde: #0a9d5c;
+  --color-verde-scuro: #067a46;
+  --color-verde-notte: #052e1f;
   --color-menta: #7fe8ae;
-  --color-menta-2: #b6f2d2;
+  --color-menta-tenue: #e6faf0;
 
-  /* accenti caldi, usati col contagocce */
-  --color-terra: #d4632f;
   --color-sole: #f5c451;
 
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist), ui-sans-serif, sans-serif;
+  --font-sans: var(--font-poppins), ui-sans-serif, sans-serif;
 
   --radius-pillola: 999px;
 }
@@ -38,65 +36,81 @@
     scroll-behavior: smooth;
   }
   body {
-    background: var(--color-sabbia);
+    background: var(--color-nebbia);
     color: var(--color-inchiostro);
     font-family: var(--font-sans);
-    font-feature-settings: "ss01", "cv01";
   }
   ::selection {
     background: var(--color-menta);
-    color: var(--color-mare-scuro);
+    color: var(--color-verde-notte);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
   }
 }
 
-/* ---------- grana della carta: dà materia al fondo piatto ---------- */
-.grana::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+/* ---------- il "cielo": nuvole di gradiente, niente immagini ---------- */
+.cielo {
+  background:
+    /* nuvole: bianche, morbide, sparse come nel cielo di Zentivo */
+    radial-gradient(30% 20% at 14% 26%, rgba(255, 255, 255, 0.98) 0%, transparent 70%),
+    radial-gradient(26% 17% at 26% 17%, rgba(255, 255, 255, 0.95) 0%, transparent 70%),
+    radial-gradient(32% 21% at 86% 20%, rgba(255, 255, 255, 0.96) 0%, transparent 70%),
+    radial-gradient(22% 15% at 72% 11%, rgba(255, 255, 255, 0.9) 0%, transparent 70%),
+    radial-gradient(38% 24% at 50% 46%, rgba(255, 255, 255, 0.85) 0%, transparent 72%),
+    radial-gradient(28% 18% at 6% 52%, rgba(255, 255, 255, 0.8) 0%, transparent 72%),
+    radial-gradient(28% 18% at 95% 46%, rgba(255, 255, 255, 0.8) 0%, transparent 72%),
+    /* il "cielo" verde: pieno in alto, si spegne sul fondo pagina */
+      linear-gradient(
+        180deg,
+        #5fd99b 0%,
+        #86e5b6 18%,
+        #b4f0d2 38%,
+        #dcf8e9 58%,
+        var(--color-nebbia) 82%
+      );
 }
 
-/* ---------- entrata in scena: una sola sequenza, ben orchestrata ---------- */
+/* ---------- entrata in scena ---------- */
 @keyframes sali {
   from {
     opacity: 0;
-    transform: translateY(22px);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-@keyframes entra-scala {
+@keyframes entra {
   from {
     opacity: 0;
-    transform: translateY(30px) scale(0.965);
+    transform: translateY(34px) scale(0.97);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-.sali {
-  animation: sali 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.entra-scala {
-  animation: entra-scala 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-/* ---------- le card che fluttuano intorno al telefono ---------- */
 @keyframes fluttua {
   0%,
   100% {
     transform: translateY(0) rotate(var(--rot, 0deg));
   }
   50% {
-    transform: translateY(-13px) rotate(var(--rot, 0deg));
+    transform: translateY(-14px) rotate(var(--rot, 0deg));
   }
+}
+.sali {
+  animation: sali 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.entra {
+  animation: entra 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .fluttua {
   animation: fluttua 6.5s ease-in-out infinite;
@@ -104,7 +118,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sali,
-  .entra-scala,
+  .entra,
   .fluttua {
     animation: none !important;
   }

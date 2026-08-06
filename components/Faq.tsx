@@ -1,7 +1,6 @@
 /**
  * Le risposte qui devono restare ONESTE anche quando fanno perdere un'iscrizione.
- * Regola CLAUDE.md #2 e #3: niente promesse che il prodotto non mantiene.
- * In particolare la domanda sulle isole: la copertura lì è davvero sottile.
+ * In particolare quella sulle isole: la copertura lì è davvero sottile.
  */
 const domande = [
   {
@@ -32,17 +31,18 @@ const domande = [
     d: "E se per settimane non trovate niente?",
     r: "Allora non ti scrivo, e non spendi niente: i crediti si consumano solo quando un alert parte davvero. Se la tua soglia è troppo bassa per la tua zona te lo dico chiaramente, così puoi alzarla o allargare il raggio invece di aspettare a vuoto.",
   },
+  {
+    d: "Serve installare un'app?",
+    r: "No. Viaggio Anche Io si usa dal browser, sul telefono e sul computer, e se vuoi puoi aggiungerlo alla schermata Home così ha la sua icona come le altre app. Gli alert li ricevi su Telegram o per email, cioè dove sei già.",
+  },
 ];
 
 export default function Faq() {
   return (
-    <section id="domande" className="relative px-5 py-24 sm:px-8 sm:py-32">
-      <div className="mx-auto grid max-w-5xl gap-12 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-20">
+    <section id="domande" className="px-5 py-24 sm:px-8 sm:py-28">
+      <div className="mx-auto grid max-w-[1000px] gap-12 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-20">
         <div>
-          <p className="text-[13px] font-semibold uppercase tracking-[.16em] text-mare">
-            Domande
-          </p>
-          <h2 className="mt-4 font-display text-[clamp(2rem,4.5vw,2.9rem)] font-semibold leading-[1.05] tracking-[-0.03em]">
+          <h2 className="text-[clamp(2rem,4.4vw,2.9rem)]">
             Le cose che
             <br />
             chiedono tutti.
@@ -52,12 +52,12 @@ export default function Faq() {
           </p>
         </div>
 
-        <div className="divide-y divide-sabbia-3 border-y border-sabbia-3">
+        <div className="divide-y divide-bordo border-y border-bordo">
           {domande.map((q) => (
             <details key={q.d} className="group py-5">
               <summary className="flex cursor-pointer list-none items-start justify-between gap-6 text-[17px] font-medium leading-snug marker:hidden">
                 {q.d}
-                <span className="mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-sabbia-3 text-fumo transition-all group-open:rotate-45 group-open:border-mare group-open:bg-mare group-open:text-menta">
+                <span className="mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-bordo text-fumo transition-all group-open:rotate-45 group-open:border-verde group-open:bg-verde group-open:text-white">
                   <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden="true">
                     <path
                       d="M6 1.5v9M1.5 6h9"

@@ -3,7 +3,9 @@ import { test, expect } from "@playwright/test";
 test.describe("Landing page", () => {
   test("il messaggio principale c'è e si legge", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: /Viaggio anche io/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: /La tua fuga[\s\S]*Al prezzo giusto/i }),
+    ).toBeVisible();
     await expect(page.getByText(/40 milioni di italiani/i)).toBeVisible();
     await expect(page.getByRole("link", { name: /3 alert gratis/i }).first()).toBeVisible();
   });

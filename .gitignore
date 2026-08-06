@@ -40,3 +40,5 @@ pnpm-debug.log*
 prove/report/
 prove/schermate/
 test-results/
+prove/nostro/
+prove/zentivo/

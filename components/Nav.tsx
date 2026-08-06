@@ -1,38 +1,41 @@
 import Logo from "./Logo";
 
 const voci = [
-  { href: "#come-funziona", testo: "Come funziona" },
-  { href: "#trasparenza", testo: "Il conto aperto" },
+  { href: "#funzioni", testo: "Come funziona" },
+  { href: "#conto", testo: "Il conto aperto" },
   { href: "#prezzi", testo: "Prezzi" },
   { href: "#domande", testo: "Domande" },
 ];
 
+/** Barra a pillola fluttuante, come Zentivo. */
 export default function Nav() {
   return (
-    <header className="sticky top-0 z-50 border-b border-sabbia-3/60 bg-sabbia/80 backdrop-blur-xl">
-      <nav className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-5 sm:px-8">
+    <div className="sticky top-0 z-50 px-4 pt-4 sm:px-6">
+      <header className="mx-auto flex h-[68px] max-w-[1120px] items-center justify-between rounded-pillola border border-white/60 bg-white/55 pl-5 pr-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:pl-6">
         <Logo />
 
-        <ul className="hidden items-center gap-9 lg:flex">
+        <nav className="hidden items-center gap-8 lg:flex">
           {voci.map((v) => (
-            <li key={v.href}>
-              <a
-                href={v.href}
-                className="text-[15px] text-fumo transition-colors hover:text-inchiostro"
-              >
-                {v.testo}
-              </a>
-            </li>
+            <a
+              key={v.href}
+              href={v.href}
+              className="text-[15px] text-fumo transition-colors hover:text-inchiostro"
+            >
+              {v.testo}
+            </a>
           ))}
-        </ul>
+        </nav>
 
         <a
           href="#iscriviti"
-          className="rounded-pillola bg-menta px-5 py-2.5 text-[15px] font-semibold text-mare-scuro shadow-[0_1px_0_rgba(255,255,255,.6)_inset] transition-all hover:bg-menta-2 hover:shadow-lg hover:shadow-menta/40"
+          className="group inline-flex items-center gap-1.5 rounded-pillola bg-white px-5 py-3 text-[14.5px] font-medium text-inchiostro shadow-sm transition-all hover:shadow-md"
         >
           Provalo gratis
+          <span className="text-verde transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+            ↗
+          </span>
         </a>
-      </nav>
-    </header>
+      </header>
+    </div>
   );
 }

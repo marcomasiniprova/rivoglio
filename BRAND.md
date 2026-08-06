@@ -19,45 +19,52 @@ di qualsiasi altra: dice sia il desiderio (fuga) sia l'obiezione (prezzo).
 
 ## I colori
 
+> Struttura e misure vengono dal template **Zentivo** (Framer), che Valerio ha
+> scelto come riferimento. Il blu `#1A4BED` dell'originale è stato sostituito
+> dal nostro verde. Tutto il resto — griglie, pillole, spaziature — è quello.
+
 ### I due che fanno il marchio
 | | Codice | Dove si usa |
 |---|---|---|
-| **Verde mare** | `#0D5C46` | Il colore del marchio. Fondo del logo, bottoni pieni, sezioni scure, numeri importanti |
-| **Bianco caldo** | `#FAF6EE` | Il fondo di tutto |
-
-> **Perché non bianco puro (`#FFFFFF`)?** Su schermo intero il bianco puro è
-> aggressivo e fa affaticare gli occhi. `#FAF6EE` si legge comunque come bianco
-> ma è più caldo e più costoso all'occhio. Se lo vuoi puro si cambia in una riga.
+| **Verde** | `#0A9D5C` | Il colore del marchio. Logo, bottoni pieni, numeri importanti, accenti |
+| **Nebbia** | `#F6F8FA` | Il fondo di tutto (è il fondo di Zentivo) |
 
 ### Gli accenti
 | | Codice | Dove si usa |
 |---|---|---|
-| **Menta** | `#7FE8AE` | I bottoni che vuoi far cliccare, i segni di spunta, i numeri sul fondo scuro |
-| **Menta chiara** | `#B6F2D2` | Solo per gli sfondi tenui e il passaggio del mouse |
-| **Verde profondo** | `#073328` | Le sezioni scure, il passaggio del mouse sui bottoni scuri |
-| **Oro** | `#F5C451` | **Solo il sole del logo.** Nient'altro. È l'unico punto caldo del marchio |
-| **Terracotta** | `#D4632F` | Col contagocce: un pallino, un avviso. Mai una superficie grande |
+| **Verde scuro** | `#067A46` | Il passaggio del mouse sui bottoni verdi |
+| **Verde notte** | `#052E1F` | Le sezioni scure (il conto aperto, l'iscrizione) |
+| **Menta** | `#7FE8AE` | Numeri e spunte sul fondo scuro, bottoni sul verde |
+| **Menta tenue** | `#E6FAF0` | Sfondo delle icone e delle strisce chiare |
+| **Oro** | `#F5C451` | **Solo il sole del logo** e i messaggi d'errore sul fondo scuro |
 
 ### I testi
 | | Codice | Dove |
 |---|---|---|
-| **Inchiostro** | `#12211C` | Titoli e testo principale (nero con un fondo verde, non nero puro) |
-| **Fumo** | `#5F7169` | Testo secondario, descrizioni |
-| **Fumo chiaro** | `#8B9A93` | Note, didascalie, testo dei campi vuoti |
-
-### I fondi
-`#F2EAD9` per le sezioni alternate · `#E8DCC4` per i bordi e le linee di divisione.
+| **Inchiostro** | `#0A0A0A` | Titoli e testo principale (Zentivo usa il nero pieno) |
+| **Fumo** | `#6B7280` | Testo secondario, descrizioni |
+| **Fumo chiaro** | `#9AA4B0` | Note, didascalie, campi vuoti |
+| **Bordo** | `#E4E9EE` | Bordi delle card e linee di divisione |
 
 ---
 
 ## I caratteri
 
-- **Titoli — Fraunces.** Serif caldo, editoriale. Peso 600, spaziatura stretta
-  (`-0.03em`). Serve a dare autorevolezza senza freddezza.
-- **Testo — Instrument Sans.** Pulito, moderno, si legge bene piccolo.
+Gli stessi di Zentivo, misurati dal template dal vivo:
 
-**Mai** Inter, Roboto, Arial o i caratteri di sistema: sono il segno che nessuno
-ha scelto niente.
+- **Titoli — Geist.** Peso **500**, spaziatura **−0.04em**, interlinea **1.0**.
+  Non usare il grassetto pieno: Zentivo sta sul 500 ed è quello che gli dà
+  quell'aria pulita.
+- **Testo — Poppins.** Pesi 400/500/600.
+
+**Mai** Inter, Roboto, Arial o i caratteri di sistema.
+
+## Le forme
+
+- **Bottoni: pillole.** `border-radius: 999px`, sempre. Nessun bottone squadrato.
+- **Card: `1.5rem`** di raggio. Sezioni grandi: `2rem`.
+- **La barra di navigazione fluttua**: pillola bianca semitrasparente, staccata
+  dal bordo alto, con la sfocatura dietro.
 
 ---
 

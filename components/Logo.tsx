@@ -3,33 +3,28 @@ import Link from "next/link";
 /**
  * Il segno di Viaggio Anche Io.
  *
- * Vincolo di progetto: deve reggere a 24px, perché è lì che si vedrà quasi
- * sempre (favicon, avatar del bot Telegram, icona sulla schermata Home).
- * Per questo ha SOLO TRE forme: il sole, l'orizzonte, la linea di mezzeria.
- * Se aggiungi un quarto elemento, a 24px diventa una macchia — non farlo.
- *
- * Il sole resta oro (dal logo disegnato da Valerio): è l'unico punto caldo
- * del marchio e serve a staccare sul verde.
+ * Vincolo: deve reggere a 24px, perché è lì che si vede quasi sempre
+ * (favicon, avatar del bot Telegram, icona sulla schermata Home).
+ * SOLO TRE FORME: sole, orizzonte, mezzeria. Un quarto elemento a 24px
+ * diventa una macchia — provato con Playwright, non aggiungerlo.
  */
 export function Marchio({ className = "h-9 w-9" }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
-      <rect width="32" height="32" rx="8.5" fill="var(--color-mare)" />
-      {/* il sole */}
+      <rect width="32" height="32" rx="8.5" fill="var(--color-verde)" />
       <circle cx="16" cy="13.2" r="5.1" fill="var(--color-sole)" />
-      {/* l'orizzonte / la strada che si perde */}
       <path
         d="M4.5 24.2C9 20.6 23 20.6 27.5 24.2"
         fill="none"
-        stroke="var(--color-menta)"
+        stroke="#fff"
         strokeWidth="2.4"
         strokeLinecap="round"
       />
-      {/* La mezzeria: è questo che la fa leggere come strada, non come collina.
-          Provata a 24px con Playwright: sotto strokeWidth 2 sparisce. Non ridurla. */}
+      {/* la mezzeria fa leggere "strada" invece di "collina".
+          Provata a 24px: sotto strokeWidth 2 sparisce. Non ridurla. */}
       <path
         d="M12.4 21.9h3.1M18 22.3h3"
-        stroke="var(--color-mare)"
+        stroke="var(--color-verde)"
         strokeWidth="2.1"
         strokeLinecap="round"
       />
@@ -37,38 +32,20 @@ export function Marchio({ className = "h-9 w-9" }: { className?: string }) {
   );
 }
 
-/** Marchio + nome + tagline. La tagline è di Valerio, si tiene. */
-export default function Logo({
-  scuro = false,
-  tagline = false,
-}: {
-  scuro?: boolean;
-  tagline?: boolean;
-}) {
+export default function Logo({ scuro = false }: { scuro?: boolean }) {
   return (
     <Link
       href="/"
-      className="group flex items-center gap-2.5"
+      className="group flex shrink-0 items-center gap-2.5"
       aria-label="Viaggio Anche Io — la tua fuga, al prezzo giusto"
     >
-      <Marchio className="h-9 w-9 shrink-0 transition-transform duration-500 group-hover:-rotate-6" />
-      <span className="flex flex-col leading-none">
-        <span
-          className={`font-display text-[19px] font-semibold tracking-tight ${
-            scuro ? "text-sabbia" : "text-inchiostro"
-          }`}
-        >
-          Viaggio Anche Io
-        </span>
-        {tagline && (
-          <span
-            className={`mt-1 text-[11px] font-medium uppercase tracking-[.13em] ${
-              scuro ? "text-sabbia/50" : "text-fumo-2"
-            }`}
-          >
-            La tua fuga, al prezzo giusto
-          </span>
-        )}
+      <Marchio className="h-9 w-9 transition-transform duration-500 group-hover:-rotate-6" />
+      <span
+        className={`font-display text-[18px] font-medium leading-none tracking-[-0.03em] ${
+          scuro ? "text-white" : "text-inchiostro"
+        }`}
+      >
+        Viaggio Anche Io
       </span>
     </Link>
   );

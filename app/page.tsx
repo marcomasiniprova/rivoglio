@@ -1,7 +1,12 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
-import ComeFunziona from "@/components/ComeFunziona";
-import Trasparenza from "@/components/Trasparenza";
+import Funzioni from "@/components/Funzioni";
+import Passi from "@/components/Passi";
+import ContoAperto from "@/components/ContoAperto";
+import PerChi from "@/components/PerChi";
+import Numeri from "@/components/Numeri";
+import Canali from "@/components/Canali";
+import Testimonial from "@/components/Testimonial";
 import Prezzi from "@/components/Prezzi";
 import Faq from "@/components/Faq";
 import Iscriviti from "@/components/Iscriviti";
@@ -13,8 +18,13 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
-        <ComeFunziona />
-        <Trasparenza />
+        <Funzioni />
+        <Passi />
+        <ContoAperto />
+        <PerChi />
+        <Numeri />
+        <Canali />
+        <Testimonial />
         <Prezzi />
         <Faq />
         <Iscriviti />

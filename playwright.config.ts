@@ -8,6 +8,8 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "./prove",
+  // Le catture sono strumenti per guardare, non prove. Si lanciano a mano.
+  testIgnore: ["**/cattura-*.spec.ts"],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
