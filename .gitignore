@@ -5,6 +5,9 @@
 *.pem
 *.key
 
+# dati personali degli iscritti - MAI committare
+.dati/
+
 # dipendenze
 node_modules/
 .pnpm-store/
