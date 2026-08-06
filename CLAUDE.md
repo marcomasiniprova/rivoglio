@@ -11,10 +11,11 @@ Mappa: `PIANO.md`. Arretrati: `ARRETRATI.md`. Cosa costruiamo: `SPEC.md`.
 Scelte chiuse: `DECISIONI.md`. Marchio: `BRAND.md`. Social: `CONTENUTI.md`.
 
 ## Come devi lavorare — questa parte è la più importante
-- **FINISCI QUELLO CHE TI HA CHIESTO. TUTTO.** Se ti dà 10 cose, ne consegni 10
-  nella stessa seduta. Non due e poi torni a chiedere. Non fermarti a metà per
-  farti approvare un pezzo: **le domande si fanno mentre lavori, non al posto
-  di lavorare.**
+- **Consegna a pezzi, non in blocco.** Se la richiesta contiene più cose, fai la
+  prima, dilla, e continua con la successiva senza fermarti ad aspettare. Non
+  accumulare dieci lavori in un turno solo: Valerio resta mezz'ora davanti allo
+  schermo senza vedere niente. Il lavoro va avanti lo stesso, ma lui lo vede
+  crescere e può correggerti al primo pezzo invece che all'ultimo.
 - **Niente fumo.** Ogni turno produce qualcosa che si vede e che è provato.
   Zero riassunti di quello che stai per fare: fallo e poi dillo.
 - **Aggiornalo su dove siamo.** A ogni consegna: cosa è fatto, cosa manca, qual

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
+import { benvenuto } from "@/lib/email/messaggi";
 
 export type Esito = { errore?: string; avviso?: string };
 
@@ -112,6 +113,10 @@ export async function registrati(_precedente: Esito, dati: FormData): Promise<Es
 
   // Sessione già attiva: nel pannello Supabase la conferma email è spenta.
   if (data.session) {
+    // Il benvenuto parte da Resend, non da Supabase, e non blocca l'ingresso.
+    void benvenuto(email).then((e) => {
+      if (!e.ok) console.warn("[registrati] benvenuto non spedito:", e.motivo);
+    });
     revalidatePath("/", "layout");
     redirect(destinazioneSicura(dati.get("poi")));
   }

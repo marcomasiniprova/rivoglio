@@ -13,6 +13,7 @@ import Testimonial from "@/components/Testimonial";
 import Prezzi from "@/components/Prezzi";
 import Faq from "@/components/Faq";
 import Iscriviti from "@/components/Iscriviti";
+import Invito from "@/components/Invito";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -34,6 +35,7 @@ export default function Home() {
         <Prezzi />
         <Faq />
         <Iscriviti />
+        <Invito />
       </main>
       <Footer />
     </>

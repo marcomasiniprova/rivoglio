@@ -8,12 +8,12 @@ import { cn } from "@/lib/utils";
  * Le varianti sono le nostre, non quelle di default: qui il verde è il marchio.
  */
 const varianti = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-pillola font-medium transition-all duration-200 outline-none disabled:pointer-events-none disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-verde/40 focus-visible:ring-offset-2 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "riflesso inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-bottone font-medium transition-all duration-200 outline-none disabled:pointer-events-none disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-verde/40 focus-visible:ring-offset-2 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         pieno:
-          "bg-verde text-white shadow-[0_6px_20px_-6px_rgba(10,157,92,0.55)] hover:bg-verde-scuro hover:shadow-[0_10px_28px_-8px_rgba(10,157,92,0.6)] active:scale-[0.985]",
+          "bg-verde text-white shadow-[0_10px_24px_-10px_rgba(6,122,70,0.7),0_1px_0_0_rgba(255,255,255,0.22)_inset] hover:bg-verde-scuro hover:shadow-[0_16px_34px_-12px_rgba(6,122,70,0.8),0_1px_0_0_rgba(255,255,255,0.22)_inset] active:scale-[0.985]",
         scuro:
           "bg-inchiostro text-white hover:bg-inchiostro/85 active:scale-[0.985]",
         contorno:

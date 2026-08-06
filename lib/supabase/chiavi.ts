@@ -1,29 +1,39 @@
 /**
- * Le due chiavi pubbliche di Supabase, lette una volta sola.
+ * Le due chiavi PUBBLICHE di Supabase.
  *
- * Supabase sta migrando da `anon key` a `publishable key`: accettiamo entrambi
- * i nomi così il progetto non si rompe quando Valerio ruota le chiavi dal
- * pannello. Sono chiavi PUBBLICHE: finiscono nel browser per costruzione, ed è
- * la Row Level Security a proteggere i dati, non la segretezza della chiave.
+ * ─────────────────────────────────────────────────────────────────────────
+ * PERCHÉ SONO SCRITTE QUI DENTRO E NON È UN ERRORE
+ * ─────────────────────────────────────────────────────────────────────────
+ * La chiave `publishable` (prima si chiamava `anon`) è pubblica per
+ * costruzione: Supabase la mette nel bundle JavaScript che scarica ogni
+ * visitatore del sito. Chiunque apra gli strumenti da sviluppatore la vede.
+ * Non è un segreto e non lo è mai stata: a proteggere i dati è la Row Level
+ * Security, che su questo progetto è attiva su ogni tabella e già collaudata
+ * (il buco sui crediti è stato trovato e chiuso attaccandola).
  *
- * La `service_role` NON deve mai comparire qui dentro.
+ * Stanno qui come VALORE DI RISERVA, così il progetto parte anche senza
+ * `.env.local`. Se `.env.local` esiste, vince lui. In produzione si mettono
+ * nelle variabili d'ambiente di Netlify e questo file non viene mai letto.
+ *
+ * ⛔ LA CHIAVE `sb_secret_...` NON DEVE MAI FINIRE QUI DENTRO.
+ *    Quella scavalca la Row Level Security e legge tutto di tutti.
+ *    Vive solo nelle variabili d'ambiente del server, mai in un file.
+ * ─────────────────────────────────────────────────────────────────────────
  */
-export const URL_SUPABASE = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const RISERVA = {
+  url: "https://znwpzkzavzsktyfxwuye.supabase.co",
+  chiave: "sb_publishable_10LLmy1iXQDU7pBtpLtoBQ_BY5ynOGO",
+} as const;
+
+export const URL_SUPABASE = process.env.NEXT_PUBLIC_SUPABASE_URL || RISERVA.url;
 
 export const CHIAVE_PUBBLICA =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-  "";
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  RISERVA.chiave;
 
-/**
- * Vero solo se il progetto è configurato davvero.
- *
- * Serve perché il sito deve compilare e la landing deve funzionare anche
- * senza `.env.local`: senza questo controllo `createBrowserClient` esplode
- * durante la build e non pubblichi più niente.
- */
+/** Vero se abbiamo di che collegarci. Con la riserva è sempre vero. */
 export const SUPABASE_CONFIGURATO = Boolean(URL_SUPABASE && CHIAVE_PUBBLICA);
 
-/** Messaggio unico, così l'errore è lo stesso ovunque. */
 export const MANCA_CONFIGURAZIONE =
-  "Supabase non è configurato: manca NEXT_PUBLIC_SUPABASE_URL o la chiave pubblica in .env.local.";
+  "Supabase non è configurato: manca NEXT_PUBLIC_SUPABASE_URL o la chiave pubblica.";

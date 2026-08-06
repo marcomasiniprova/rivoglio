@@ -46,10 +46,10 @@ export default function Numeri() {
     <section className="px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-[1120px]">
         <Anima className="mx-auto max-w-2xl text-center">
-          <h2 className="text-[clamp(2.1rem,5vw,3.3rem)]">
+          <h2 className="text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.02]">
             Ogni numero
             <br />
-            ha una fonte.
+            <span className="corsivo text-verde-scuro">ha una fonte.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-lg text-[16.5px] leading-relaxed text-fumo">
             Su questo sito non trovi dati inventati. Ogni cifra qui sotto rimanda alla
@@ -61,11 +61,18 @@ export default function Numeri() {
           {numeri.map((n) => (
             <CardViva
               key={n.fonte}
-              className="flex h-full flex-col rounded-[1.5rem] border border-bordo/70 bg-white p-7 transition-shadow duration-300 hover:shadow-[0_20px_45px_-24px_rgba(5,46,31,.35)]"
+              /* Una sola elevazione: l'ombra. Bordo + ombra insieme fanno
+                 la "scheda fantasma", il difetto più comune di queste griglie. */
+              className="group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-white p-7 shadow-[0_1px_2px_rgba(5,46,31,.06),0_12px_28px_-20px_rgba(5,46,31,.28)] transition-shadow duration-500 hover:shadow-[0_2px_4px_rgba(5,46,31,.07),0_28px_56px_-26px_rgba(5,46,31,.4)]"
             >
-              <p className="font-display text-[42px] font-medium leading-none tracking-[-0.04em] text-verde">
+              {/* la luce che si accende sotto il numero al passaggio del mouse */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -left-10 -top-24 size-52 rounded-full bg-menta/45 opacity-0 blur-[54px] transition-opacity duration-700 group-hover:opacity-100"
+              />
+              <p className="numeri relative font-display text-[clamp(2.6rem,4.4vw,3.25rem)] font-medium leading-[0.9] tracking-[-0.045em] text-verde [text-shadow:0_1px_0_rgba(255,255,255,.9),0_10px_26px_rgba(10,157,92,.18)]">
                 {n.fermo ? (
-                  <span className="tabular-nums">
+                  <span>
                     {n.valore.toLocaleString("it-IT", {
                       minimumFractionDigits: n.decimali ?? 0,
                       maximumFractionDigits: n.decimali ?? 0,
@@ -80,7 +87,9 @@ export default function Numeri() {
                   />
                 )}
               </p>
-              <p className="mt-3.5 flex-1 text-[14.5px] leading-relaxed text-fumo">{n.testo}</p>
+              <p className="relative mt-4 flex-1 text-[14.5px] leading-relaxed text-fumo">
+                {n.testo}
+              </p>
               <a
                 href={n.link}
                 target="_blank"

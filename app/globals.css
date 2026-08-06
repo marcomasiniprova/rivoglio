@@ -2,10 +2,9 @@
 
 /* ============================================================
    Viaggio Anche Io — sistema visivo
-   Struttura dal template Zentivo, colore portato sul verde.
-   Zentivo usa FOTOGRAFIE ad altissima risoluzione per lo sfondo.
-   Noi non le abbiamo, quindi non si imitano con i gradienti:
-   si punta su un fondo pulito e deliberato.
+   Tre voci: Geist per i titoli, Poppins per il testo, e un serif
+   corsivo per la parola che deve restare in testa. Il serif si usa
+   POCO: una frase per sezione, mai un paragrafo.
    ============================================================ */
 @theme {
   --color-nebbia: #f6f8fa;
@@ -26,8 +25,12 @@
 
   --font-display: var(--font-geist), ui-sans-serif, sans-serif;
   --font-sans: var(--font-poppins), ui-sans-serif, sans-serif;
+  --font-corsivo: var(--font-serif), ui-serif, Georgia, serif;
 
   --radius-pillola: 999px;
+  /* I bottoni sono quadrati con gli angoli appena addolciti, non pillole.
+     La pillola resta per i controlli piccoli: etichette, filtri, contatori. */
+  --radius-bottone: 13px;
 }
 
 @layer base {
@@ -39,41 +42,205 @@
     background: var(--color-nebbia);
     color: var(--color-inchiostro);
     font-family: var(--font-sans);
-    /* niente scorrimento orizzontale sul telefono, mai */
     overflow-x: hidden;
   }
-  ::selection {
-    background: var(--color-menta);
-    color: var(--color-verde-notte);
-  }
+
   h1,
   h2,
   h3 {
     font-family: var(--font-display);
     font-weight: 500;
-    letter-spacing: -0.04em;
+    letter-spacing: -0.035em;
     line-height: 1;
-    /* le parole lunghe non devono sfondare lo schermo stretto */
     overflow-wrap: break-word;
+  }
+
+  /* ---------- le superfici che disegna il browser ----------
+     Selezione, cursore, barra di scorrimento e anello di fuoco escono
+     grigio-azzurri di sistema se non li tocchi. Sono il segnale più
+     economico che una pagina è stata costruita e non assemblata. */
+  ::selection {
+    background: var(--color-menta);
+    color: var(--color-verde-notte);
+  }
+  input,
+  textarea,
+  select {
+    caret-color: var(--color-verde);
+  }
+  :focus-visible {
+    outline: 2px solid color-mix(in oklab, var(--color-verde) 70%, transparent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-nebbia-2);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--color-verde) 26%, var(--color-bordo));
+    border: 3px solid var(--color-nebbia-2);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--color-verde) 55%, var(--color-bordo));
+  }
+  /* I numeri nelle tabelle e nei conti devono incolonnarsi. */
+  dd,
+  .numeri {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* ---------- il fondo dell'hero ----------
-   Un alone verde SOLO, centrato sul titolo, più una trama a puntini
-   appena percettibile. Prima erano macchie bianche sparse a caso e
-   sembravano sporco sul verde. */
+/* ---------- il corsivo di accento ---------- */
+.corsivo {
+  font-family: var(--font-corsivo);
+  font-style: italic;
+  font-weight: 400;
+  /* il serif ha un'altezza-x più bassa: senza questo sembra più piccolo */
+  font-size: 1.09em;
+  letter-spacing: -0.012em;
+}
+
+/* ============================================================
+   LO SFONDO DELL'HERO
+   Colonne verticali di luce che respirano a tempi diversi.
+   Tutto in CSS: nessun JavaScript, nessun canvas, nessun costo
+   di batteria. `transform` e `opacity` soltanto, così il browser
+   le anima sulla scheda grafica e non ridisegna mai la pagina.
+   ============================================================ */
 .cielo {
+  position: relative;
   background:
-    radial-gradient(circle at center, rgba(10, 157, 92, 0.06) 1px, transparent 1px) 0 0 /
-      22px 22px,
     radial-gradient(
       116% 62% at 50% -10%,
       #74e0a7 0%,
       #a6ecc6 20%,
       #d5f4e6 42%,
       #eef7f2 60%,
-      var(--color-nebbia) 76%
+      var(--color-nebbia) 78%
     );
+}
+
+.colonne {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  gap: clamp(10px, 1.6vw, 26px);
+  overflow: hidden;
+  /* le colonne sfumano verso il basso, non finiscono di netto */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 92%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 92%);
+  pointer-events: none;
+}
+
+.colonna {
+  width: clamp(16px, 2.4vw, 42px);
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.86) 0%,
+    rgba(255, 255, 255, 0.36) 38%,
+    rgba(127, 232, 174, 0.16) 74%,
+    transparent 100%
+  );
+  transform-origin: top center;
+  animation: fisarmonica var(--durata, 7s) cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  animation-delay: var(--ritardo, 0s);
+}
+
+@keyframes fisarmonica {
+  0%,
+  100% {
+    transform: scaleY(0.42) scaleX(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scaleY(1) scaleX(1.12);
+    opacity: 0.95;
+  }
+}
+
+/* L'alone che segue il titolo: un solo fuoco di luce, non macchie sparse. */
+.alone {
+  position: absolute;
+  left: 50%;
+  top: -14%;
+  width: min(1100px, 130vw);
+  aspect-ratio: 1.6;
+  translate: -50% 0;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(207, 245, 226, 0.55) 38%,
+    transparent 72%
+  );
+  filter: blur(6px);
+  pointer-events: none;
+  animation: respiro 9s ease-in-out infinite;
+}
+
+@keyframes respiro {
+  0%,
+  100% {
+    opacity: 0.75;
+    scale: 1;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.05;
+  }
+}
+
+/* ---------- vetro ----------
+   Usato solo dove c'è davvero qualcosa dietro da vedere: la barra in
+   cima e le schede sopra lo sfondo animato. Altrove è un costume. */
+.vetro {
+  background: color-mix(in srgb, #fff 62%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid color-mix(in srgb, #fff 75%, transparent);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.7) inset,
+    0 18px 40px -22px rgba(5, 46, 31, 0.35);
+}
+
+.vetro-scuro {
+  background: color-mix(in srgb, #052e1f 42%, transparent);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.12) inset;
+}
+
+/* ---------- il riflesso che scorre sui bottoni ----------
+   Parte solo al passaggio del mouse. Un riflesso perenne è rumore. */
+.riflesso {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.riflesso::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  translate: -130% 0;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.42) 50%,
+    transparent 62%
+  );
+  transition: translate 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.riflesso:hover::after {
+  translate: 130% 0;
 }
 
 /* ---------- movimento ---------- */
@@ -90,7 +257,6 @@
   animation: fluttua 6.5s ease-in-out infinite;
 }
 
-/* cursore della macchina da scrivere */
 @keyframes lampeggia {
   0%,
   49% {
@@ -102,9 +268,20 @@
   }
 }
 
+/* Chi ha chiesto meno animazioni nel sistema operativo non ne vede nessuna.
+   Le colonne restano ferme a metà corsa: la composizione regge lo stesso. */
 @media (prefers-reduced-motion: reduce) {
-  .fluttua {
+  .fluttua,
+  .colonna,
+  .alone {
     animation: none !important;
+  }
+  .colonna {
+    transform: scaleY(0.72);
+    opacity: 0.7;
+  }
+  .riflesso::after {
+    display: none;
   }
   html {
     scroll-behavior: auto;

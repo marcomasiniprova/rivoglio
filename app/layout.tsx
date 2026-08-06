@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
-import { Geist, Poppins } from "next/font/google";
+import { Geist, Instrument_Serif, Poppins } from "next/font/google";
 import "./globals.css";
 
-// Gli stessi caratteri di Zentivo: Geist per i titoli, Poppins per il testo.
+// Geist per i titoli, Poppins per il testo.
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"], display: "swap" });
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+  display: "swap",
+});
+
+/**
+ * La terza voce: un serif in corsivo, solo per la parola che deve restare
+ * in testa. Serve a spezzare la riga del titolo con un cambio di carattere
+ * invece che con un colore o un grassetto. È il trucco che fa sembrare
+ * scritto a mano un titolo altrimenti da modello.
+ * Si usa POCO: una frase per sezione al massimo, mai per un paragrafo.
+ */
+const serif = Instrument_Serif({
+  variable: "--font-serif",
+  subsets: ["latin"],
+  weight: "400",
+  style: "italic",
   display: "swap",
 });
 
@@ -39,7 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="it"
-      className={`${geist.variable} ${poppins.variable} h-full antialiased`}
+      className={`${geist.variable} ${poppins.variable} ${serif.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-nebbia text-inchiostro">{children}</body>
     </html>

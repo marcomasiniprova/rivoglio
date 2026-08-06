@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 import { PARTENZE } from "@/lib/costruttore";
 import type { Tipo } from "@/lib/destinazioni";
+import { ricercaAttiva } from "@/lib/email/messaggi";
 
 export type EsitoApp = { errore?: string; ok?: string };
 
@@ -91,6 +92,18 @@ export async function creaRicerca(_p: EsitoApp, dati: FormData): Promise<EsitoAp
   });
 
   if (error) return { errore: "Non sono riuscito a salvare la ricerca. Riprova." };
+
+  // Conferma per email della prima ricerca: non blocca il salvataggio.
+  if (utente.email) {
+    void ricercaAttiva(utente.email, {
+      partenza: profilo.comune,
+      budget,
+      ore: `${Math.floor(ore)}h${ore % 1 ? String(Math.round((ore % 1) * 60)).padStart(2, "0") : ""}`,
+      persone,
+    }).then((e) => {
+      if (!e.ok) console.warn("[creaRicerca] email non spedita:", e.motivo);
+    });
+  }
 
   revalidatePath("/app");
   return { ok: "Ricerca attiva. Ti avviso appena il conto torna." };

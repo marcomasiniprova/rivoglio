@@ -60,40 +60,66 @@ export default function Iscriviti() {
               </p>
             </div>
           ) : (
-            <form onSubmit={invia} className="mx-auto mt-9 max-w-lg">
-              <div className="flex flex-col gap-2.5 sm:flex-row">
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="la-tua@email.it"
-                  aria-label="La tua email"
-                  className="min-w-0 flex-1 rounded-pillola border border-white/20 bg-white/10 px-5 py-4 text-[16px] text-white placeholder:text-white/35 outline-none transition-colors focus:border-menta/60 focus:bg-white/15"
-                />
-                <input
-                  type="text"
-                  value={comune}
-                  onChange={(e) => setComune(e.target.value)}
-                  placeholder="Da dove parti?"
-                  aria-label="Il tuo comune di partenza"
-                  className="rounded-pillola border border-white/20 bg-white/10 px-5 py-4 text-[16px] text-white placeholder:text-white/35 outline-none transition-colors focus:border-menta/60 focus:bg-white/15 sm:w-[172px]"
-                />
+            /* I campi hanno la loro etichetta sopra e stanno su due righe
+               vere. Prima erano schiacciati uno accanto all'altro dentro
+               una riga sola: sul telefono diventavano illeggibili e su
+               desktop il secondo campo si stringeva a fisarmonica. */
+            <form onSubmit={invia} className="mx-auto mt-10 max-w-lg text-left">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="iscriviti-email"
+                    className="text-[13px] font-medium text-white/55"
+                  >
+                    La tua email
+                  </label>
+                  <input
+                    id="iscriviti-email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="la-tua@email.it"
+                    className="h-13 w-full min-w-0 rounded-bottone border border-white/15 bg-white/8 px-4 text-[16px] text-white outline-none transition-all duration-200 placeholder:text-white/30 focus:border-menta/60 focus:bg-white/14 focus:ring-4 focus:ring-menta/12"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="iscriviti-comune"
+                    className="text-[13px] font-medium text-white/55"
+                  >
+                    {/* "Da dove parti" collide col costruttore più su nella
+                        pagina: due campi con la stessa etichetta confondono
+                        i lettori di schermo prima ancora delle prove. */}
+                    Il tuo comune di partenza
+                  </label>
+                  <input
+                    id="iscriviti-comune"
+                    type="text"
+                    value={comune}
+                    onChange={(e) => setComune(e.target.value)}
+                    placeholder="Bologna"
+                    className="h-13 w-full min-w-0 rounded-bottone border border-white/15 bg-white/8 px-4 text-[16px] text-white outline-none transition-all duration-200 placeholder:text-white/30 focus:border-menta/60 focus:bg-white/14 focus:ring-4 focus:ring-menta/12"
+                  />
+                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={stato === "invio"}
-                className="mt-2.5 w-full rounded-pillola bg-menta py-4 text-[16px] font-semibold text-verde-notte transition-all hover:bg-white disabled:opacity-55"
+                className="riflesso mt-5 h-13 w-full rounded-bottone bg-menta text-[16px] font-semibold text-verde-notte shadow-[0_14px_32px_-14px_rgba(127,232,174,.7)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white disabled:pointer-events-none disabled:opacity-55"
               >
                 {stato === "invio" ? "Un attimo…" : "Avvisami quando si parte"}
               </button>
 
               {stato === "errore" && (
-                <p className="mt-3 text-[14px] text-sole">{messaggio}</p>
+                <p role="alert" className="mt-3 text-[14px] text-sole">
+                  {messaggio}
+                </p>
               )}
 
-              <p className="mt-4 text-[13px] leading-relaxed text-white/40">
+              <p className="mt-5 text-center text-[13px] leading-relaxed text-white/40">
                 Il comune serve solo a capire in che zone servono più offerte. Niente spam,
                 niente email inutili, cancellazione con un clic.
               </p>

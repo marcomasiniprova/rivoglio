@@ -45,9 +45,10 @@ test("giro completo: registrazione, partenza, ricerca", async ({ page }, info) =
   fs.mkdirSync(CARTELLA, { recursive: true });
   const p = (nome: string) => `${CARTELLA}/${info.project.name}-${nome}.png`;
 
-  // Supabase rifiuta i domini che non esistono davvero: `example.com` esiste
-  // ed è riservato apposta per le prove (RFC 2606).
-  const email = `prova${Date.now()}@example.com`;
+  /* Supabase rifiuta ogni dominio senza record MX: example.com,
+     viaggioancheio.it e qualsiasi dominio inventato vengono respinti con
+     "Email address is invalid". Serve un dominio con posta vera. */
+  const email = `viaggioancheio.prova.${Date.now()}@gmail.com`;
 
   // 1. la porta
   await page.goto("/entra?modo=registrati");
