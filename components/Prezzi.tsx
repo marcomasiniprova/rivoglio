@@ -56,7 +56,7 @@ export default function Prezzi() {
 
               <p
                 className={`font-display text-[46px] font-medium leading-none tracking-[-0.04em] ${
-                  p.consigliato ? "text-menta" : "text-inchiostro"
+                  p.consigliato ? "text-white" : "text-inchiostro"
                 }`}
               >
                 {p.crediti}
@@ -67,7 +67,7 @@ export default function Prezzi() {
 
               <p
                 className={`mt-6 font-display text-[30px] font-medium leading-none ${
-                  p.consigliato ? "text-white" : "text-inchiostro"
+                  p.consigliato ? "text-menta" : "text-inchiostro"
                 }`}
               >
                 {p.prezzo}€
