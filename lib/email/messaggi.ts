@@ -64,7 +64,7 @@ export function benvenuto(a: string, crediti = 3): Promise<Esito> {
       corpo:
         h("Il tuo account è pronto.") +
         p(
-          `Hai <strong style="color:${C.inchiostro}">${crediti} crediti</strong>. Un credito si consuma solo quando ricevi un alert vero, mai per cercare.`,
+          `Hai <strong style="color:${C.inchiostro}">${crediti} crediti</strong>. Un credito si consuma solo quando ti segnalo una destinazione vera, mai per cercare.`,
         ) +
         `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.menta};border-radius:14px;padding:20px 22px;margin:0 0 8px;">
            <tr><td style="font-family:${FONT};font-size:15px;line-height:1.7;color:${C.verdeNotte};">
@@ -190,7 +190,7 @@ export function alert(
         p(
           `<strong style="color:${C.inchiostro}">Il costo dell'auto è una stima nostra</strong>, calcolata su ${o.km} km andata e ritorno, consumo prudenziale e pedaggi medi. Il prezzo dell'alloggio è quello della struttura al momento del controllo e può cambiare.`,
         ),
-      coda: "Ricevi questa email perché hai una ricerca attiva con questi limiti. Questo alert ha consumato 1 credito.",
+      coda: "Ricevi questa email perché hai una ricerca attiva con questi limiti. Questa destinazione ha consumato 1 credito.",
     }),
     testo: `${o.destinazione} — ${euro(o.totale)} a testa, sotto la tua soglia di ${euro(o.soglia)}.\n\n${o.struttura}\n${o.notti} notti, in ${o.persone}, ${o.km} km (${o.ore} di auto)\n\nAlloggio a testa: ${euro(o.alloggio)}\nAuto a testa: ${euro(o.auto)}\nTotale a testa: ${euro(o.totale)}\nTi restano: ${euro(avanzo)}\n\nVedi l'offerta: ${o.link}`,
   });

@@ -16,6 +16,12 @@ const varianti = cva(
           "bg-verde text-white shadow-[0_10px_24px_-10px_rgba(6,122,70,0.7),0_1px_0_0_rgba(255,255,255,0.22)_inset] hover:bg-verde-scuro hover:shadow-[0_16px_34px_-12px_rgba(6,122,70,0.8),0_1px_0_0_rgba(255,255,255,0.22)_inset] active:scale-[0.985]",
         scuro:
           "bg-inchiostro text-white hover:bg-inchiostro/85 active:scale-[0.985]",
+        /* Vetro: la via secondaria. Sul principale non si mette, perché su
+           fondo chiaro perderebbe il contrasto proprio dove serve. */
+        vetro:
+          "vetro-bottone text-inchiostro hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.985]",
+        vetroScuro:
+          "vetro-bottone-scuro text-white hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.985]",
         contorno:
           "border border-bordo bg-white text-inchiostro hover:border-verde/40 hover:bg-menta-tenue active:scale-[0.985]",
         fantasma: "text-fumo hover:bg-nebbia-2 hover:text-inchiostro",

@@ -77,7 +77,7 @@ export default function Invito() {
 
           <Anima ritardo={0.28}>
             <p className="mt-6 text-[13.5px] text-white/60">
-              3 alert gratis. Nessuna carta, nessun abbonamento.
+              3 destinazioni gratis. Nessuna carta, nessun abbonamento.
             </p>
           </Anima>
         </div>

@@ -34,7 +34,7 @@ export default function Passi() {
               minuti.
             </h2>
             <p className="mt-5 text-[16.5px] leading-relaxed text-fumo">
-              Nessuna app da installare, nessuna carta da lasciare. I primi tre alert sono
+              Nessuna app da installare, nessuna carta da lasciare. Le prime tre destinazioni sono
               gratuiti.
             </p>
             <Link

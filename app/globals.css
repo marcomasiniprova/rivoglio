@@ -28,9 +28,10 @@
   --font-corsivo: var(--font-serif), ui-serif, Georgia, serif;
 
   --radius-pillola: 999px;
-  /* I bottoni sono quadrati con gli angoli appena addolciti, non pillole.
+  /* I bottoni sono RETTANGOLARI con gli angoli appena smussati, non pillole.
+     9px: si vede che è smussato, non si vede che è arrotondato.
      La pillola resta per i controlli piccoli: etichette, filtri, contatori. */
-  --radius-bottone: 13px;
+  --radius-bottone: 9px;
 }
 
 @layer base {
@@ -216,6 +217,89 @@
   -webkit-backdrop-filter: blur(22px) saturate(140%);
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.12) inset;
+}
+
+/* ---------- il bottone di vetro ----------
+   Sui bottoni SECONDARI. Sul principale no, e non è pigrizia: su fondo
+   chiaro il vetro trasparente perde contrasto, e il bottone che deve
+   farsi cliccare finirebbe per farsi notare meno di quello accanto.
+   Il vetro si mette dove c'è qualcosa dietro da rifrangere. */
+.vetro-bottone {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #fff 78%, transparent),
+    color-mix(in srgb, #fff 52%, transparent)
+  );
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid color-mix(in srgb, #fff 85%, transparent);
+  box-shadow:
+    /* la luce che entra dal bordo alto: è questa che fa "vetro" */
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.35),
+    0 1px 2px rgba(5, 46, 31, 0.06),
+    0 12px 28px -14px rgba(5, 46, 31, 0.3);
+  transition:
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.35s ease;
+}
+.vetro-bottone:hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #fff 92%, transparent),
+    color-mix(in srgb, #fff 68%, transparent)
+  );
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.4),
+    0 2px 4px rgba(5, 46, 31, 0.07),
+    0 20px 40px -16px rgba(5, 46, 31, 0.38);
+}
+
+/** Stessa cosa sopra i fondi scuri e le fotografie. */
+.vetro-bottone-scuro {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.07)
+  );
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.35),
+    0 14px 32px -16px rgba(0, 0, 0, 0.6);
+  transition:
+    box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.35s ease;
+}
+.vetro-bottone-scuro:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.28),
+    rgba(255, 255, 255, 0.12)
+  );
+}
+
+/* ---------- la luce dietro il titolo ----------
+   Non è un'ombra colorata piatta: sono due aloni sfalsati, uno stretto e
+   caldo e uno largo e freddo. È così che si comporta una luce vera. */
+.luce-testo {
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.75),
+    0 8px 26px rgba(10, 157, 92, 0.16),
+    0 22px 60px rgba(5, 46, 31, 0.1);
+}
+
+.luce-testo-chiaro {
+  text-shadow:
+    0 0 22px rgba(127, 232, 174, 0.45),
+    0 2px 40px rgba(127, 232, 174, 0.22),
+    0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 /* ---------- il riflesso che scorre sui bottoni ----------

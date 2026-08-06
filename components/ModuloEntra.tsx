@@ -20,7 +20,7 @@ const TITOLI: Record<Modo, { titolo: string; sotto: string; bottone: string }> =
   },
   registrati: {
     titolo: "Crea il tuo account",
-    sotto: "Ti regalo 3 crediti per provare. Nessuna carta, nessun abbonamento.",
+    sotto: "Ti regalo 3 destinazioni per provare. Nessuna carta, nessun abbonamento.",
     bottone: "Crea account e prendi 3 crediti",
   },
   magico: {

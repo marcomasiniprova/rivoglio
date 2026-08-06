@@ -11,15 +11,15 @@ const domande = [
   },
   {
     d: "Cosa succede quando finiscono i crediti?",
-    r: "Ricevi un ultimo messaggio di avviso, gratuito, e poi gli alert si fermano. Nessun addebito a sorpresa. Ricompri se e quando vuoi.",
+    r: "Ricevi un ultimo messaggio di avviso, gratuito, e poi le segnalazioni si fermano. Nessun addebito a sorpresa. Ricompri se e quando vuoi.",
   },
   {
     d: "Come faccio a sapere quanto spenderò?",
-    r: "Lo decidi prima tu. Imposti quanti alert vuoi ricevere al massimo in una settimana: sopra quel tetto non parte niente e non paghi niente. Con 2 alert a settimana, sai già che di più non spendi.",
+    r: "Lo decidi prima tu. Imposti quante destinazioni vuoi ricevere al massimo in una settimana: sopra quel tetto non parte niente e non paghi niente. Con 2 alert a settimana, sai già che di più non spendi.",
   },
   {
     d: "Da dove vengono i prezzi?",
-    r: "Il prezzo dell'alloggio è quello reale della struttura e nell'alert trovi sempre il link per verificarlo. Il costo dell'auto è una stima calcolata su distanza reale, prezzo medio nazionale del carburante e pedaggi, ed è indicata come stima. Sul treno non forniamo un prezzo: Trenitalia e Italo non pubblicano dati affidabili, quindi trovi il link per controllare.",
+    r: "Il prezzo dell'alloggio è quello reale della struttura e nel messaggio trovi sempre il link per verificarlo. Il costo dell'auto è una stima calcolata su distanza reale, prezzo medio nazionale del carburante e pedaggi, ed è indicata come stima. Sul treno non forniamo un prezzo: Trenitalia e Italo non pubblicano dati affidabili, quindi trovi il link per controllare.",
   },
   {
     d: "Funziona in tutta Italia?",
@@ -31,7 +31,7 @@ const domande = [
   },
   {
     d: "E se per settimane non trovate niente?",
-    r: "Allora non ricevi alert e non spendi niente: i crediti si consumano solo quando un alert parte davvero. Se la tua soglia è troppo bassa per la tua zona te lo diciamo, così puoi alzarla o allargare il raggio.",
+    r: "Allora non ricevi niente e non spendi niente: i crediti si consumano solo quando una destinazione parte davvero. Se la tua soglia è troppo bassa per la tua zona te lo diciamo, così puoi alzarla o allargare il raggio.",
   },
   {
     d: "Serve installare un'app?",

@@ -18,7 +18,7 @@ const funzioni = [
   },
   {
     titolo: "Ti scrivo solo se vale",
-    testo: "Imposti quanti alert vuoi al massimo a settimana. Sopra il tetto non parte niente, e non paghi niente.",
+    testo: "Imposti quante destinazioni vuoi al massimo a settimana. Sopra il tetto non parte niente, e non paghi niente.",
     icona: "M18 9A6 6 0 1 0 6 9c0 6-2.5 7.5-2.5 7.5h17S18 15 18 9ZM13.7 20a2 2 0 0 1-3.4 0",
   },
 ];

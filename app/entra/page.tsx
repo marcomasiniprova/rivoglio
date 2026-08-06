@@ -38,7 +38,7 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
         </div>
 
         <p className="text-center text-xs leading-relaxed text-fumo-2">
-          Entrando accetti che ti scriviamo solo per gli alert che hai chiesto tu.
+          Entrando accetti che ti scriviamo solo per le destinazioni che hai chiesto tu.
           Niente pubblicità, niente liste vendute a nessuno.
         </p>
       </div>

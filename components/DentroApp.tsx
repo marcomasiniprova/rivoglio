@@ -129,7 +129,7 @@ export default function DentroApp() {
                     ))}
                   </ul>
                   <p className="mt-3 text-xs text-fumo-2">
-                    Stima del viaggio, non un&apos;offerta. L&apos;alert arriva quando esiste
+                    Stima del viaggio, non un&apos;offerta. Ti segnalo la destinazione quando esiste
                     una struttura vera che ci sta dentro.
                   </p>
                 </div>
@@ -144,7 +144,7 @@ export default function DentroApp() {
               href="/entra?modo=registrati"
               className="group inline-flex items-center gap-2 rounded-pillola bg-verde px-7 py-4 text-[15px] font-medium text-white shadow-[0_10px_30px_-10px_rgba(10,157,92,.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro"
             >
-              Provala tu, 3 alert gratis
+              Provala tu, 3 destinazioni gratis
               <span className="transition-transform duration-300 group-hover:translate-x-0.5">
                 →
               </span>

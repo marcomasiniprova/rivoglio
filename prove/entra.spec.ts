@@ -28,7 +28,7 @@ test.describe("Accesso", () => {
     await page.goto("/entra");
     await page.getByRole("tab", { name: /Sono nuovo/i }).click();
     await expect(page.getByRole("heading", { name: /Crea il tuo account/i })).toBeVisible();
-    await expect(page.getByText(/3 crediti per provare/i)).toBeVisible();
+    await expect(page.getByText(/3 destinazioni per provare/i)).toBeVisible();
   });
 
   test("il link magico toglie la password", async ({ page }) => {
@@ -62,7 +62,7 @@ test.describe("Accesso", () => {
   test("il pulsante principale della landing porta alla registrazione", async ({ page }) => {
     await page.goto("/");
     // il bottone grosso dell'hero, non uno dei tanti in fondo alla pagina
-    await page.getByRole("link", { name: /Provalo con 3 alert gratis/i }).click();
+    await page.getByRole("link", { name: /Provalo con 3 destinazioni gratis/i }).click();
     await expect(page).toHaveURL(/\/entra\?modo=registrati/);
     await expect(page.getByRole("heading", { name: /Crea il tuo account/i })).toBeVisible();
   });

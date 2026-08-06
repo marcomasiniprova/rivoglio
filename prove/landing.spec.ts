@@ -7,7 +7,7 @@ test.describe("Landing page", () => {
       page.getByRole("heading", { level: 1, name: /La tua fuga[\s\S]*Al prezzo giusto/i }),
     ).toBeVisible();
     await expect(page.getByText(/40 milioni di italiani/i)).toBeVisible();
-    await expect(page.getByRole("link", { name: /3 alert gratis/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /3 destinazioni gratis/i }).first()).toBeVisible();
   });
 
   test("i numeri dell'esempio tornano: 78 + 27 = 105, sotto la soglia 120", async ({

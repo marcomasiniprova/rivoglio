@@ -106,7 +106,7 @@ export async function creaRicerca(_p: EsitoApp, dati: FormData): Promise<EsitoAp
   }
 
   revalidatePath("/app");
-  return { ok: "Ricerca attiva. Ti avviso appena il conto torna." };
+  return { ok: "Ricerca attiva. Ti segnalo la destinazione appena il conto torna." };
 }
 
 /**

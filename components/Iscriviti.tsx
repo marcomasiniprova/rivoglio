@@ -47,8 +47,8 @@ export default function Iscriviti() {
             Quest&apos;anno viaggi anche tu.
           </h2>
           <p className="mx-auto mt-5 max-w-md text-[16.5px] leading-relaxed text-white/65">
-            Lascia la tua email: ti avviso appena apro le iscrizioni, e i primi 3 alert te
-            li regalo.
+            Lascia la tua email: ti avviso appena apro le iscrizioni, e le prime 3
+            destinazioni te le regalo.
           </p>
 
           {stato === "fatto" ? (

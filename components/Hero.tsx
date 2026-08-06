@@ -87,7 +87,7 @@ export default function Hero() {
           {/* Il titolo cambia carattere a metà: la seconda riga è un serif
               corsivo. È un cambio di voce, non di colore: si legge come
               scritto a mano invece che generato. */}
-          <h1 className="text-[clamp(2.45rem,8.4vw,4.9rem)] leading-[0.98]">
+          <h1 className="luce-testo text-[clamp(2.45rem,8.4vw,4.9rem)] leading-[0.98]">
             La tua fuga.
             <br />
             <span className="corsivo text-verde-scuro">Al prezzo giusto.</span>
@@ -111,7 +111,7 @@ export default function Hero() {
 
         <Anima ritardo={0.24}>
           <p className="mx-auto mt-5 max-w-[34rem] text-[15.5px] leading-relaxed text-fumo sm:mt-6 sm:text-[17px]">
-            Imposti da dove parti e quanto vuoi spendere. Ricevi una notifica quando esiste
+            Imposti da dove parti e quanto vuoi spendere. Ti segnalo una destinazione quando esiste
             una micro-vacanza di 1-3 notti sotto la tua soglia, col prezzo totale già
             calcolato: alloggio e viaggio.
           </p>
@@ -123,14 +123,14 @@ export default function Hero() {
               href="/entra?modo=registrati"
               className="riflesso group inline-flex w-full items-center justify-center gap-2 rounded-bottone bg-verde px-7 py-4 text-[16px] font-medium text-white shadow-[0_12px_28px_-12px_rgba(6,122,70,.75),0_2px_0_0_rgba(255,255,255,.22)_inset] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro hover:shadow-[0_18px_40px_-14px_rgba(6,122,70,.85),0_2px_0_0_rgba(255,255,255,.22)_inset] sm:w-auto"
             >
-              Provalo con 3 alert gratis
+              Provalo con 3 destinazioni gratis
               <span className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
                 ↗
               </span>
             </Link>
             <a
               href="#dentro"
-              className="vetro inline-flex w-full items-center justify-center gap-2.5 rounded-bottone px-7 py-4 text-[16px] font-medium text-inchiostro transition-all duration-300 hover:-translate-y-0.5 sm:w-auto"
+              className="vetro-bottone inline-flex w-full items-center justify-center gap-2.5 rounded-bottone px-7 py-4 text-[16px] font-medium text-inchiostro transition-all duration-300 hover:-translate-y-0.5 sm:w-auto"
             >
               <span className="grid h-6 w-6 place-items-center rounded-full bg-inchiostro text-[9px] text-white">
                 ▶

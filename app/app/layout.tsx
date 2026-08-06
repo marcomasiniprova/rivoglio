@@ -37,7 +37,7 @@ export default async function LayoutApp({ children }: LayoutProps<"/app">) {
           <div className="flex items-center gap-2 sm:gap-3">
             <span
               className="inline-flex items-center gap-1.5 rounded-pillola bg-menta-tenue px-3 py-1.5 text-sm font-medium text-verde-notte"
-              title="1 credito = 1 alert ricevuto"
+              title="1 credito = 1 destinazione segnalata"
             >
               <Coins className="size-4 text-verde" aria-hidden="true" />
               {crediti}
@@ -57,7 +57,7 @@ export default async function LayoutApp({ children }: LayoutProps<"/app">) {
       <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-10 sm:px-8 sm:py-14">{children}</main>
 
       <footer className="border-t border-bordo px-5 py-6 text-center text-xs text-fumo-2">
-        Viaggio Anche Io · un credito si consuma solo quando ricevi un alert
+        Viaggio Anche Io · un credito si consuma solo quando ti segnalo una destinazione
       </footer>
     </div>
   );

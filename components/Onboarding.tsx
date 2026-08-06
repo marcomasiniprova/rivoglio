@@ -166,7 +166,7 @@ export default function Onboarding({ citta }: { citta: string[] }) {
     },
     {
       titolo: "Che voglia hai?",
-      sotto: "Puoi sceglierne più di una, o nessuna. Più filtri metti, meno alert riceverai.",
+      sotto: "Puoi sceglierne più di una, o nessuna. Più filtri metti, meno destinazioni riceverai.",
       avanti: true,
       contenuto: (
         <div className="grid grid-cols-2 gap-3">
@@ -330,7 +330,7 @@ export default function Onboarding({ citta }: { citta: string[] }) {
                     </p>
                   )}
                   <p className="mt-4 text-xs leading-relaxed text-fumo-2">
-                    Stima del viaggio, non un&apos;offerta. L&apos;alert arriva quando esiste una
+                    Stima del viaggio, non un&apos;offerta. Ti segnalo la destinazione quando esiste una
                     struttura vera che ci sta dentro, e allora ci sarà anche il prezzo del letto.
                   </p>
                 </div>

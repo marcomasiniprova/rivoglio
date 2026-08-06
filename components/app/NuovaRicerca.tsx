@@ -48,7 +48,7 @@ export default function NuovaRicerca({ prima }: { prima: boolean }) {
       <div className="border-b border-bordo bg-nebbia-2/50 px-6 py-4">
         <h2 className="font-display text-lg tracking-[-0.03em]">Cosa devo cercarti</h2>
         <p className="mt-1 text-sm text-fumo">
-          Quando esiste una fuga che sta dentro questi limiti, ti scrivo. Un alert, un credito.
+          Quando esiste una fuga che sta dentro questi limiti, ti scrivo. Una destinazione, un credito.
         </p>
       </div>
 
@@ -150,7 +150,7 @@ export default function NuovaRicerca({ prima }: { prima: boolean }) {
             <input key={t} type="hidden" name="tipi" value={t} />
           ))}
           <p className="text-xs text-fumo-2">
-            Non scegli niente? Ti guardo tutto. Più filtri metti, meno alert riceverai.
+            Non scegli niente? Ti guardo tutto. Più filtri metti, meno destinazioni riceverai.
           </p>
         </div>
 

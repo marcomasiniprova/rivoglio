@@ -182,7 +182,7 @@ export default function SchedaRicerca({
                   ))}
                 </ul>
                 <p className="mt-3 text-xs text-fumo-2">
-                  Stima del viaggio, non un&apos;offerta. L&apos;alert arriva quando esiste una
+                  Stima del viaggio, non un&apos;offerta. Ti segnalo la destinazione quando esiste una
                   struttura vera che ci sta dentro.
                 </p>
               </>

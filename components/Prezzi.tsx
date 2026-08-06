@@ -10,7 +10,7 @@ const pacchetti = [
 const garanzie = [
   ["Nessun abbonamento", "Non c'è niente da disdire, perché non si rinnova niente."],
   ["I crediti non scadono", "Li usi ad agosto o a febbraio. Sono tuoi."],
-  ["Il tetto lo decidi tu", "Imposti quanti alert vuoi al massimo a settimana. Sopra quello non parte niente, e non paghi niente."],
+  ["Il tetto lo decidi tu", "Imposti quante destinazioni vuoi al massimo a settimana. Sopra quello non parte niente, e non paghi niente."],
 ];
 
 export default function Prezzi() {
@@ -19,12 +19,12 @@ export default function Prezzi() {
       <div className="mx-auto max-w-[1120px]">
         <Anima className="mx-auto max-w-2xl text-center">
           <h2 className="text-[clamp(2.1rem,5vw,3.3rem)]">
-            Paghi gli alert.
+            Paghi le destinazioni.
             <br />
             Non un abbonamento.
           </h2>
           <p className="mx-auto mt-5 max-w-lg text-[16.5px] leading-relaxed text-fumo">
-            Un credito vale un alert ricevuto. Quando trovi la vacanza smetti, e i crediti
+            Un credito vale una destinazione segnalata. Quando trovi la vacanza smetti, e i crediti
             che restano valgono per la prossima volta.
           </p>
         </Anima>
@@ -37,9 +37,9 @@ export default function Prezzi() {
             3
           </span>
           <p className="text-[15px] leading-relaxed">
-            <span className="font-medium">I primi 3 alert sono gratuiti.</span>{" "}
+            <span className="font-medium">Le prime 3 destinazioni sono gratuite.</span>{" "}
             <span className="text-fumo">
-              Alert reali, non una prova limitata. Se il servizio non ti è utile, non
+              Destinazioni vere, non una prova limitata. Se il servizio non ti è utile, non
               spendi nulla.
             </span>
           </p>
@@ -70,7 +70,7 @@ export default function Prezzi() {
                 {p.crediti}
               </p>
               <p className={`mt-1.5 text-[14px] ${p.consigliato ? "text-white/70" : "text-fumo"}`}>
-                crediti = {p.crediti} alert
+                crediti = {p.crediti} destinazioni
               </p>
 
               <p
@@ -81,7 +81,7 @@ export default function Prezzi() {
                 {p.prezzo}€
               </p>
               <p className={`mt-1.5 text-[13px] ${p.consigliato ? "text-white/55" : "text-fumo-2"}`}>
-                {p.perAlert}€ ad alert · una volta sola
+                {p.perAlert}€ a destinazione · una volta sola
               </p>
 
               <Link

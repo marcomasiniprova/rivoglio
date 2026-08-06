@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Marchio } from "./Logo";
+import BadgeStore from "./BadgeStore";
 
 /**
  * Il footer.
@@ -98,7 +99,14 @@ export default function Footer() {
               totale già fatto. Da qualsiasi comune d&apos;Italia.
             </p>
 
-            <div className="mt-7 flex gap-2.5">
+            {/* I badge degli store stanno SOLO qui, non nella hero: qui si
+                leggono come "arriveranno", lassù si leggerebbero come
+                "ci sono già". Non sono cliccabili: vedi BadgeStore.tsx. */}
+            <div className="mt-7">
+              <BadgeStore />
+            </div>
+
+            <div className="mt-6 flex gap-2.5">
               {SOCIAL.map((s) => (
                 <a
                   key={s.nome}

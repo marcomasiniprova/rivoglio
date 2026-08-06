@@ -71,7 +71,7 @@ export default function Canali() {
           </div>
           <p className="mt-5 text-[13.5px] leading-relaxed text-fumo-2">
             Il prezzo dell&apos;alloggio viene dalla struttura o dal portale che lo vende.
-            Nell&apos;alert trovi sempre il link per verificarlo.
+            Nel messaggio trovi sempre il link per verificarlo.
           </p>
         </Anima>
       </div>
