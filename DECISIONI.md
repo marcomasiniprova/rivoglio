@@ -58,6 +58,45 @@ Verificato il 2026-08-06. Se serve rimetterlo in discussione, prima rileggi qui.
 - `site_url` è ancora `http://localhost:3000` e `uri_allow_list` è vuota: i link
   nelle email punteranno al posto sbagliato finché non si cambiano.
 
+## Chiuse il 07/08 — la fonte delle offerte, finalmente
+
+**Scelta di Valerio: raccolta automatica dal web** (Exa, Firecrawl, SearXNG,
+Playwright, agenti che navigano e leggono).
+
+Architettura decisa di conseguenza: **`lib/offerte/` con un tipo normalizzato
+unico e raccoglitori intercambiabili.** Nessuna parte del prodotto sa da dove
+arriva un'offerta: il motore vede solo righe nella tabella `offerte`. Così si
+cambia raccoglitore senza toccare niente altro, e se ne possono tenere accesi
+più di uno insieme.
+
+### Dove si può raccogliere e dove no — leggere PRIMA di scrivere codice
+Questa distinzione non è prudenza legale: è la differenza fra un sistema che
+funziona e uno che smette di funzionare dopo due settimane.
+
+| Fonte | Si può? | Perché |
+|---|---|---|
+| Siti di hotel, B&B, agriturismo **indipendenti** | ✅ **Sì, ed è la strada** | Vogliono essere trovati. Nessun sistema anti-bot, prezzi in chiaro, spesso dati strutturati `schema.org/Offer` già pronti. In Italia sono decine di migliaia |
+| Portali turistici regionali, consorzi, Pro Loco | ✅ Sì | Dati pubblici, spesso con feed |
+| Booking, Airbnb, Expedia | ❌ **No** | Vietato dalle loro condizioni; sistemi anti-bot seri (impronta del browser, blocco IP, CAPTCHA); e in UE i loro elenchi sono protetti dal diritto sui database. Un prodotto commerciale costruito sopra è un rischio vero, non teorico |
+| Google Hotels via SerpAPI | ⚠️ A pagamento | Legale, 25$/mese per 1.000 ricerche. Resta l'alternativa se la raccolta diretta non basta |
+
+**Regola operativa:** si rispetta sempre `robots.txt`, si va piano (una
+richiesta al secondo per dominio), ci si dichiara con uno user-agent vero e un
+indirizzo di contatto. Un raccoglitore che si maschera è un raccoglitore che
+verrà bloccato, e intanto brucia il dominio.
+
+**Ogni offerta raccolta nasce `stato = 'demo'`** e diventa `attiva` solo dopo
+una verifica. Nessun alert parte da un'offerta non verificata: mandare qualcuno
+su un link morto è l'unico errore da cui questo prodotto non si riprende.
+
+## Chiusa il 07/08 — la ritenzione
+
+**Prodotto stagionale, accettato consapevolmente.** Scelta di Valerio.
+Si incassa nei picchi (primavera, ponti, estate) e si accetta il silenzio in
+mezzo. Conseguenza da tenere a mente: **serve un flusso costante di utenti
+nuovi**, perché sui vecchi non si può contare. Questo sposta peso sulla FASE 2
+e rende il blog quotidiano più importante dei video, non meno.
+
 ## Decisioni ancora aperte
 Vivono in `SPEC.md` → "Domande aperte". Appena chiuse, scendono qui.
-- Fonte prezzi offerte — **rimandata volontariamente** a fine progetto.
+- Nessuna aperta al 07/08/2026.
