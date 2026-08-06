@@ -1,95 +1,124 @@
-# PIANO — dove siamo e cosa manca
+# PIANO — Viaggio Anche Io
 
-*Questo file risponde a una domanda sola: **a che punto siamo?***
-Si aggiorna a ogni sessione. Se leggi solo un file, leggi questo.
+*Se leggi un file solo, leggi questo. Risponde a una domanda: **a che punto siamo?***
 
-**Obiettivo:** primo utente pagante, poi €30-100k entro ottobre 2026.
-
----
-
-## La mappa in tre pezzi
-
-```
-  [1] LA VETRINA          [2] L'APP              [3] LA BENZINA
-  la landing page    →    quello che usano   →   come ti trovano
-  (convince)              (il prodotto)          (distribuzione)
-
-  ████████████ 95%        ███░░░░░░░░░ 25%       ████░░░░░░░░ 30%
-```
-
-Il **[3]** non è più a zero: `CONTENUTI.md` ha formato, script e ritmo pronti.
-Manca eseguirlo, e quello lo fai tu (account social e videocamera).
+**Obiettivo: €30-100k entro settembre/ottobre 2026.** Sprint, non maratona.
+Ogni scelta si giudica così: avvicina il primo utente pagante o no?
 
 ---
 
-## [1] LA VETRINA — la landing page
+## Le tre fasi
 
-**A che serve:** convincere uno sconosciuto a lasciare l'email in 30 secondi.
+```
+  FASE 1               FASE 2                  FASE 3
+  COSTRUISCI     →     DISTRIBUISCI      →     MANTIENI
+  prodotto vero        traffico e vendite      utenti e crescita
 
-| | Stato |
-|---|---|
-| Struttura a 11 sezioni in stile Zentivo | ✅ fatto |
-| Colori, caratteri, logo, marchio | ✅ fatto |
-| Modulo iscrizione funzionante | ✅ fatto (salva su file, va spostato su Supabase) |
-| 12 prove automatiche su desktop e telefono | ✅ fatto |
-| Animazioni e movimento (Motion 13) | ✅ fatto |
-| Testo che si accende con lo scroll + macchina da scrivere | ✅ fatto |
-| Copy professionale, zero trattini lunghi | ✅ fatto |
-| Telefono sistemato + sfondo rifatto | ✅ fatto |
-| **Costruttore di micro-vacanze**, provabile senza iscriversi | ✅ fatto, 16 prove |
-| Iscritti salvati su Supabase invece che su file | ⏳ **obbligatorio prima di pubblicare** |
-| Immagine di anteprima per i social | ⏳ da fare |
+  ██████░░░░░░ 50%     ██░░░░░░░░░░ 15%        ░░░░░░░░░░░░ 0%
+```
 
-## [2] L'APP — quello che la gente userà davvero
+Le fasi si **sovrappongono**: la distribuzione non aspetta che il prodotto sia
+finito, altrimenti arrivi a settembre con un'app perfetta e zero persone che la
+conoscono. Appena c'è qualcosa da mostrare, si comincia a mostrarlo.
 
-**A che serve:** è il prodotto. Senza, la landing vende il nulla.
+---
 
-| | Stato |
-|---|---|
-| Database, schema, regole di sicurezza | ✅ fatto |
-| Login e registrazione | ⏳ **il prossimo pezzo** |
-| Pagina "imposta la tua ricerca" | ⏳ da fare |
-| Calcolo viaggio (km, ore, benzina, pedaggi) | ⏳ da fare |
-| Motore che abbina offerte e ricerche | ⏳ da fare |
-| Invio alert su Telegram / email / notifica | ⏳ da fare |
-| Acquisto crediti con Polar | ⏳ da fare |
-| Pannello admin per caricare le offerte | ⏳ da fare |
-| AI Vacation Builder | ⏳ da fare (era nel piano originale) |
-| **Da dove arrivano le offerte** | ❓ **decisione parcheggiata da Valerio** |
+# FASE 1 — COSTRUISCI
 
-## [3] LA BENZINA — come ti trovano
+**Fatta quando:** uno sconosciuto si registra, imposta una ricerca, riceve un
+alert vero e può comprare crediti. End to end, senza che io tocchi niente.
 
-**A che serve:** portare gente sulla vetrina. Zero fatto finora.
+## 1.1 La vetrina (landing) — 95%
 
 | | Stato |
 |---|---|
-| Piano contenuti per TikTok e Reels | ⏳ da fare |
-| Format video ripetibile e script | ⏳ da fare |
-| Account social | ⏳ serve Valerio |
-| Dominio `viaggioancheio.it` | ⏳ serve Valerio |
+| 13 sezioni in stile Zentivo, in verde | ✅ |
+| Colori, caratteri, logo, marchio | ✅ |
+| Movimento: scroll, testo rivelato, macchina da scrivere | ✅ |
+| Costruttore di micro-vacanze provabile senza iscriversi | ✅ |
+| Telefono e sfondo sistemati | ✅ |
+| Iscritti salvati su Supabase (non più su file) | ✅ |
+| Link "Entra" e "Provalo gratis" verso l'app | ✅ |
+| Schermate vere dell'app dentro la landing | ⏳ appena `.env.local` esiste |
+| Immagine di anteprima per i social (og:image) | ⏳ |
+
+## 1.2 L'app — 45%
+
+| | Stato |
+|---|---|
+| Database, schema, RLS, buco sui crediti chiuso | ✅ |
+| **Accesso**: email+password, link magico, conferma via email | ✅ |
+| **Porta chiusa**: `proxy.ts` respinge chi non è collegato | ✅ |
+| **`/app`**: imposti partenza, budget, ore, notti, persone, voglia | ✅ |
+| **Anteprima onesta**: dove arrivi oggi con quel budget | ✅ |
+| Metti in pausa / riaccendi / cancelli una ricerca | ✅ |
+| Errori di Supabase tradotti in italiano | ✅ |
+| Contatore crediti in testa all'app | ✅ |
+| Motore che abbina offerte e ricerche (a lotti, limite 10s) | ⏳ |
+| Invio alert: Telegram, poi email | ⏳ |
+| Acquisto crediti con Polar | ⏳ |
+| Pannello per caricare le offerte | ⏳ |
+| Installabile sulla schermata Home (PWA + manifest) | ⏳ |
+
+## 1.3 Da dove arrivano le offerte — ❓ **decisione tua, parcheggiata**
+
+Senza questa, il motore gira a vuoto. Le opzioni verificate stanno in
+`DECISIONI.md`. **È il pezzo che decide se il prodotto esiste o no.**
+
+---
+
+# FASE 2 — DISTRIBUISCI
+
+Il piano operativo per esteso sta in **`DISTRIBUZIONE.md`**: canali, formati,
+imbuto TOFU/MOFU/BOFU, calendario, cosa faccio io e cosa serve da te.
+
+In due righe: **video verticali con un personaggio AI che prova l'app** come
+motore principale, blog quotidiano per la ricerca, presenza vera (non spam) in
+gruppi e community, contatto agli influencer. Tutto porta a una pagina sola:
+imposta la tua ricerca, prendi 3 alert gratis.
+
+| | Stato |
+|---|---|
+| Formato video, 12 aperture, 3 script pronti (`CONTENUTI.md`) | ✅ |
+| Piano completo di distribuzione (`DISTRIBUZIONE.md`) | ✅ |
+| Account social `@viaggioancheio` | ⏳ **serve Valerio** |
+| Dominio `viaggioancheio.it` | ⏳ **serve Valerio** |
+| Higgsfield / Seedance collegati | ⏳ **serve Valerio** |
+| Primo video pubblicato | ⏳ |
+| Blog sul sito (`/diario`) + primi 10 pezzi | ⏳ |
+
+---
+
+# FASE 3 — MANTIENI
+
+Si apre quando esistono utenti paganti. Prima è teoria.
+
+- Supporto: una casella che leggo io, risposte pronte, tempi dichiarati
+- Misure che contano: quanti si registrano → quanti impostano una ricerca →
+  quanti ricevono un alert → quanti comprano di nuovo
+- Il numero che decide tutto: **chi ricompra crediti dopo il primo pacchetto**
+- Miglioramenti guidati da quello che chiedono gli utenti, non da quello che
+  mi sembra bello
 
 ---
 
 ## Cosa blocca cosa
 
 ```
-partita IVA / Polar ──→ incassare
-    dominio ──────────→ pubblicare
- fonte offerte ───────→ alert veri (l'app funziona a vuoto senza)
+ dominio ──→ Resend verificato ──→ email che partono davvero ──→ lancio
+                                          ↑
+              (oggi Supabase manda 2 email l'ora: al terzo iscritto ti fermi)
+
+ partita IVA ──→ Polar ──→ incassare
+ fonte offerte ──→ alert veri (senza, il motore gira a vuoto)
 ```
 
-**La partita IVA è la cosa più urgente e non è tecnica.** Senza, tutto il
-resto è un esercizio.
+**Le due cose più urgenti non sono tecniche: partita IVA e dominio.**
 
 ---
 
-## L'ordine in cui procediamo
+## Prossimo pezzo di codice
+Motore di abbinamento offerte ↔ ricerche, a lotti per stare nei 10 secondi
+delle funzioni Netlify. Poi l'invio su Telegram.
 
-1. **Adesso:** movimento e copy sulla landing (la stai giudicando tu)
-2. **Poi:** login + pagina "imposta la tua ricerca"
-3. **Poi:** calcolo viaggio + motore di abbinamento, con i test
-4. **Poi:** invio alert
-5. **Poi:** crediti con Polar + pannello admin
-6. **Poi:** contenuti e lancio
-
-Gli arretrati e le cose promesse e non fatte stanno in `ARRETRATI.md`.
+Le cose chieste e non ancora fatte stanno in `ARRETRATI.md`.

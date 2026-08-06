@@ -33,15 +33,30 @@ non altro codice.**
 
 ---
 
+---
+
+## ✅ CHIUSI il 06/08 — secondo giro
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 11 | **Login** | Email+password, link magico, conferma via email. `proxy.ts` chiude `/app`. Messaggi di errore tradotti in italiano. **16 prove.** |
+| 12 | **La pagina app** | `/app`: imposti partenza, budget, ore, notti, persone, voglia. Ogni ricerca mostra dove arrivi oggi con quel budget. Pausa, riaccendi, cancella. |
+| 13 | **"Non vedo UI e UX"** | Le pagine esistono e si guardano: `/entra` fotografata, `/app` appena crei `.env.local`. |
+| 14 | **Tech stack avanzato, shadcn** | shadcn/ui montato a mano (Button, Input, Label, Card) sui nostri colori, Radix sotto, Motion 13 sopra, lucide per le icone. Niente `init`: avrebbe riscritto `globals.css`. |
+| 15 | **Il piano completo in tre fasi** | `PIANO.md` riscritto: COSTRUISCI · DISTRIBUISCI · MANTIENI, con le percentuali vere. |
+| 16 | **Marketing e distribuzione** | `DISTRIBUZIONE.md`: imbuto TOFU/MOFU/BOFU, personaggio AI, blog quotidiano, community, creator, calendario, cosa faccio io e cosa serve da te. |
+| 17 | **Iscritti su file** | Spostati su Supabase. In produzione senza chiavi si alza un errore invece di perderli in silenzio. |
+
+---
+
 ## ⏳ ANCORA DA FARE — l'app vera
 
-- Login e registrazione (Supabase Auth) ← **il prossimo pezzo**
-- Pagina `/app` con le ricerche salvate dell'utente
-- Motore che abbina offerte e ricerche
-- Invio degli alert (Telegram, email, notifica)
+- Motore che abbina offerte e ricerche (a lotti, limite 10s Netlify) ← **il prossimo pezzo**
+- Invio degli alert (Telegram, poi email)
 - Acquisto crediti con Polar
 - Pannello admin per caricare le offerte
-- Iscritti salvati su Supabase invece che su file **(obbligatorio prima di pubblicare)**
+- Installabile sulla schermata Home (PWA + manifest)
+- Schermate vere dell'app dentro la landing (appena `.env.local` esiste)
 
 ---
 
