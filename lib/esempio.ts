@@ -17,7 +17,8 @@ export const ESEMPIO = {
   destinazione: "Genova",
   tipo: "mare",
   notti: 2,
-  date: "ven 9 — dom 11 ago",
+  // Se aggiorni le date, controlla il calendario: il giorno deve essere vero.
+  date: "ven 14 · dom 16 ago",
   persone: 2,
   kmAndata: 145,
   durata: "1h50",

@@ -19,6 +19,10 @@ Resend a valerio@artecai.it, credito scalato 3→2, invio registrato.
   (9px) col vetro sui secondari, badge store nel footer (inerti, "Presto su"),
   bottone **Continua con Google** già pronto (aspetta le chiavi).
 - **108 prove** dentro `npm run verify`.
+- **Controllo completo del 07/08** (tutta la repo + verify): il quadro regge.
+  Corretti al volo data dell'esempio, trattini lunghi visibili, `.env.example`.
+  Tre punti aperti in `ARRETRATI.md`: capienza della camera, lettore MIMIT,
+  rimborso atomico quando entra Polar.
 
 ## Prossimo passo
 Cron in produzione per raccolta/abbinamento (endpoint pronti, serve

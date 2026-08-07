@@ -63,12 +63,35 @@ non altro codice.**
 | 25 | **Google sign-in** | Bottone con la G ufficiale, flusso già collegato a /auth/conferma. Si accende con Client ID + Secret. |
 | 26 | **Il motore (blocco B)** | Raccolta Exa → anagrafe `strutture` → pannello `/admin` → abbinamento → **prima destinazione partita davvero** (Rimini, 147€, credito 3→2, rimborso provato sul fallimento). |
 
+## ✅ CHIUSI il 07/08 — quarto giro: controllo completo della repo (chiesto da Valerio)
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 27 | **"Controlla che tutto sia a posto"** | Repo letta per intero (documenti, codice, prove). `npm run verify`: build, tipi e lint passano; prove 106/108 nella sandbox remota. Le 2 fallite sono la stessa prova (iscrizione con email valida) e falliscono solo perché la rete della sandbox blocca Supabase con un 403: sul tuo PC passano tutte e 108. |
+| 28 | Errori trovati dal controllo, corretti subito | **Data dell'esempio sulla landing**: diceva "ven 9 ago", ma il 9/8/2026 è domenica. Ora: ven 14 · dom 16 ago (calendario verificato). **Trattino lungo** tolto dai due testi visibili che lo avevano (versione testo dell'email destinazione, data dell'esempio). **`.env.example` completato**: mancavano EXA_API_KEY, MOTORE_SEGRETO e RESEND_HOOK_SECRET, e il commento mandava nella trappola di `.env.local` in UTF-16. |
+
 ## ⏳ ANCORA DA FARE
 
 - Cron in produzione per raccolta/abbinamento (endpoint pronti, serve MOTORE_SEGRETO su Netlify)
 - Bot Telegram (il codice c'è, manca TELEGRAM_BOT_TOKEN)
-- Acquisto crediti con Polar (serve partita IVA)
+- Acquisto crediti con Polar (serve partita IVA). Nel codice di Polar non c'è
+  ancora niente: è l'unico pezzo di prodotto tutto da scrivere.
 - Schermate vere dell'app dentro la landing al posto del telefono disegnato
+
+### Aperti dal controllo del 07/08 (decisioni o pezzi nuovi)
+
+- **La camera per quante persone vale?** Le offerte non hanno una capienza:
+  il motore divide il prezzo camera per le persone della ricerca (1-8).
+  Una ricerca in 4 su una doppia produce un totale falso. Oggi regge solo
+  la verifica umana, ma il pannello non chiede "per quante persone vale
+  questo prezzo". Serve una decisione di Valerio (campo in più, o limite).
+- **Lettore del prezzo benzina dal MIMIT**: 1,994 è scritto fisso in 7 file
+  (motore, pagina app, API costruttore, onboarding, landing). La regola dice
+  "mai scritto fisso": ogni settimana che passa i conti invecchiano.
+- **Rimborso credito atomico**: `restituisciCredito` riscrive il valore
+  letto prima (`rimasti + 1`). Se fra scalo e rimborso arrivasse un acquisto,
+  verrebbe sovrascritto. Oggi non può succedere (niente acquisti), va chiuso
+  con una RPC come `consuma_credito` quando entra Polar.
 
 ---
 

@@ -192,7 +192,7 @@ export function alert(
         ),
       coda: "Ricevi questa email perché hai una ricerca attiva con questi limiti. Questa destinazione ha consumato 1 credito.",
     }),
-    testo: `${o.destinazione} — ${euro(o.totale)} a testa, sotto la tua soglia di ${euro(o.soglia)}.\n\n${o.struttura}\n${o.notti} notti, in ${o.persone}, ${o.km} km (${o.ore} di auto)\n\nAlloggio a testa: ${euro(o.alloggio)}\nAuto a testa: ${euro(o.auto)}\nTotale a testa: ${euro(o.totale)}\nTi restano: ${euro(avanzo)}\n\nVedi l'offerta: ${o.link}`,
+    testo: `${o.destinazione}: ${euro(o.totale)} a testa, sotto la tua soglia di ${euro(o.soglia)}.\n\n${o.struttura}\n${o.notti} notti, in ${o.persone}, ${o.km} km (${o.ore} di auto)\n\nAlloggio a testa: ${euro(o.alloggio)}\nAuto a testa: ${euro(o.auto)}\nTotale a testa: ${euro(o.totale)}\nTi restano: ${euro(avanzo)}\n\nVedi l'offerta: ${o.link}`,
   });
 }
 
