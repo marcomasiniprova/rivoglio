@@ -20,6 +20,8 @@
  *   illegittimo: AirHelp. 3,2 miliardi non pagati: Euronews. (SPEC §2)
  */
 
+import { TESTO_RINUNCIA } from "@/lib/pratiche/recesso";
+
 export const COPY = {
   /** 3-6 parole. Regge anche bagagli, treni e bollette, non solo i voli. */
   tagline: "Riprenditi i soldi che ti devono.",
@@ -106,7 +108,7 @@ export const COPY = {
       {
         nome: "Leggi il verdetto",
         testo:
-          "Confrontiamo orario previsto ed effettivo su due fonti indipendenti e applichiamo il Regolamento CE 261/2004. Se il caso è incerto, te lo diciamo e non paghi.",
+          "Confrontiamo orario previsto ed effettivo sul tracciamento reale del volo e applichiamo il Regolamento CE 261/2004. Se il caso è incerto, te lo diciamo e non paghi.",
       },
       {
         nome: "Ricevi la pratica",
@@ -135,12 +137,12 @@ export const COPY = {
     occhiello: "Il dato oggettivo",
     titolo: "Vendiamo un fatto, non una promessa.",
     testo:
-      "Tutto parte da un dato: a che ora è atterrato davvero il tuo volo. Da solo non lo trovi più, soprattutto dopo anni. Noi sì, e lo verifichiamo due volte.",
+      "Tutto parte da un dato: a che ora è atterrato davvero il tuo volo. Da solo non lo trovi più, soprattutto dopo anni. Noi sì, e lo leggiamo dal tracciamento reale.",
     punti: [
       {
-        titolo: "Due fonti, non una",
+        titolo: "Solo dati tracciati",
         testo:
-          "Confrontiamo due archivi indipendenti di dati di volo. Se non concordano, il caso diventa incerto e non ti vendiamo niente.",
+          "L'orario viene dal tracciamento del volo, non da una stima. Se il dato non è verificato, il caso diventa incerto e non ti vendiamo niente.",
       },
       {
         titolo: "La prova resta",
@@ -214,7 +216,7 @@ export const COPY = {
         descrizione: "Scopri se il tuo volo rientra in una fascia di compensazione.",
         punti: [
           "Numero di volo e data, nient'altro",
-          "Verifica su due fonti indipendenti",
+          "Verifica sul tracciamento reale del volo",
           "Risposta chiara anche quando è un no",
         ],
         bottone: "Controlla gratis",
@@ -320,7 +322,7 @@ export const COPY = {
       {
         domanda: "E allora cosa pago, esattamente?",
         risposta:
-          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, verificato su due fonti indipendenti e archiviato come prova. Il secondo colpo: il sollecito già pronto al giorno 15, il punto esatto in cui la maggior parte delle persone lascia perdere. La garanzia: se entro 90 giorni non ricevi nulla, ti rimborsiamo per intero.",
+          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, letto dal tracciamento del volo e archiviato come prova. Il secondo colpo: il sollecito già pronto al giorno 15, il punto esatto in cui la maggior parte delle persone lascia perdere. La garanzia: se entro 90 giorni non ricevi nulla, ti rimborsiamo per intero.",
       },
       {
         domanda: "Quanto ricevo, se va a buon fine?",
@@ -410,6 +412,21 @@ export const COPY = {
       checkoutNonAttivo:
         "Il pagamento non è ancora attivo. Lascia l'email qui sopra: ti scriviamo appena lo è.",
       checkoutDemo: "Questo è un esempio dimostrativo: il pagamento è spento.",
+      /**
+       * #21: la rinuncia al recesso (art. 59 Cod. Consumo) prima di Polar.
+       * L'etichetta È il testo registrato nel database: unica fonte,
+       * lib/pratiche/recesso.ts. Se cambia lì, cambia anche qui.
+       */
+      recesso: {
+        etichetta: TESTO_RINUNCIA,
+        nota: "La garanzia non cambia: se entro 90 giorni la compagnia non ti paga, ti rimborsiamo per intero.",
+        blocco:
+          "Per proseguire metti la spunta qui sopra: senza il tuo consenso non possiamo preparare la pratica subito.",
+        errore: "Non siamo riusciti a registrare il consenso. Riprova tra qualche secondo.",
+        avvisoRimbalzo:
+          "Manca la spunta del consenso alla consegna immediata: mettila e riprova.",
+        attesa: "Registro il consenso.",
+      },
     },
 
     /** INCERTO: non si vende MAI. Si spiega e ci si ferma. */
@@ -615,6 +632,8 @@ export const COPY = {
         esito_pagata: "La compagnia ha pagato",
         esito_rifiutata: "La compagnia ha rifiutato",
         rimborsata: "Pratica rimborsata",
+        rinuncia_recesso: "Rinuncia al recesso registrata",
+        rinuncia_recesso_mancante: "Rinuncia al recesso da verificare",
         email_t0: "Email di conferma inviata",
         email_t2: "Promemoria d'invio inviato",
         email_t15: "Email col sollecito inviata",

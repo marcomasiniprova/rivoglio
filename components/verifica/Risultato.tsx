@@ -53,7 +53,7 @@ export type DatiVerifica = {
   /** Quali checkout link Polar sono configurati lato server. */
   checkout: { singola: boolean; famiglia: boolean };
   /** Rimbalzo dalla rotta di checkout: cosa dire e perché. */
-  avvisoCheckout: "demo" | "non-attivo" | "errore" | null;
+  avvisoCheckout: "demo" | "non-attivo" | "errore" | "recesso" | null;
 };
 
 /* ------------------------------------------------------------ attrezzi */
@@ -289,16 +289,17 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
   const ritardo = dati.ritardoMinuti !== null ? ritardoUmano(dati.ritardoMinuti) : null;
   const avviso = dati.avvisoCheckout;
   const compraSingola = dati.demo || dati.checkout.singola;
-  const compraFamiglia = dati.demo || dati.checkout.famiglia;
 
   const testoAvviso =
     avviso === "demo"
       ? t.checkoutDemo
       : avviso === "non-attivo"
         ? t.checkoutNonAttivo
-        : avviso === "errore"
-          ? COPY.comune.erroreGenerico
-          : null;
+        : avviso === "recesso"
+          ? t.recesso.avvisoRimbalzo
+          : avviso === "errore"
+            ? COPY.comune.erroreGenerico
+            : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -439,25 +440,7 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
               </p>
             )}
             {compraSingola ? (
-              <>
-                <Button asChild size="lg" className="h-auto w-full py-4 text-base">
-                  <a href={`/api/pratiche/checkout?verifica=${dati.idPagina}&tipo=singola`}>
-                    {t.cta}
-                  </a>
-                </Button>
-                {compraFamiglia && (
-                  <Button
-                    asChild
-                    variant="contorno"
-                    size="lg"
-                    className="h-auto w-full whitespace-normal py-3.5 text-center text-[0.95rem]"
-                  >
-                    <a href={`/api/pratiche/checkout?verifica=${dati.idPagina}&tipo=famiglia`}>
-                      {t.ctaFamiglia}
-                    </a>
-                  </Button>
-                )}
-              </>
+              <AcquistoPratica dati={dati} />
             ) : (
               !testoAvviso && (
                 <p className="rounded-xl bg-sole/15 px-4 py-3 text-sm leading-relaxed">
@@ -480,6 +463,129 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
         </Anima>
       )}
     </div>
+  );
+}
+
+/* --------------------- #21: la rinuncia al recesso, poi Polar -------- */
+
+/**
+ * La spunta di rinuncia al recesso (art. 59 Cod. Consumo) DAVANTI ai
+ * bottoni verso Polar. Senza spunta non si parte; con la spunta il
+ * consenso si registra sul server (/api/pratiche/recesso) e SOLO poi si
+ * naviga al checkout. Il cancello vero sta comunque nella rotta di
+ * checkout: qui l'esperienza, lì la legge.
+ */
+function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
+  const t = COPY.risultato.idoneo;
+  const idSpunta = useId();
+  const [accettato, setAccettato] = useState(false);
+  const [richiamo, setRichiamo] = useState(false);
+  const [inCorso, setInCorso] = useState(false);
+  const [errore, setErrore] = useState<string | null>(null);
+
+  const compraFamiglia = dati.demo || dati.checkout.famiglia;
+
+  async function vai(tipo: "singola" | "famiglia") {
+    if (inCorso) return;
+    if (!accettato) {
+      setRichiamo(true);
+      return;
+    }
+    const destinazione = `/api/pratiche/checkout?verifica=${dati.idPagina}&tipo=${tipo}`;
+    // Demo: non si vende e non c'è niente da firmare; il rimbalzo onesto
+    // lo dà la rotta di checkout.
+    if (dati.demo) {
+      window.location.assign(destinazione);
+      return;
+    }
+    setInCorso(true);
+    setErrore(null);
+    try {
+      const risposta = await fetch("/api/pratiche/recesso", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ verifica: dati.idPagina }),
+      });
+      const corpo = (await risposta.json().catch(() => null)) as { ok?: boolean } | null;
+      if (!risposta.ok || !corpo?.ok) throw new Error("registrazione fallita");
+      window.location.assign(destinazione);
+    } catch {
+      setInCorso(false);
+      setErrore(t.recesso.errore);
+    }
+  }
+
+  return (
+    <>
+      <label
+        htmlFor={idSpunta}
+        className={`flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3.5 text-sm leading-relaxed transition-colors ${
+          accettato
+            ? "border-verde/40 bg-menta-tenue"
+            : richiamo
+              ? "border-sole bg-sole/10"
+              : "border-bordo bg-white"
+        }`}
+      >
+        <input
+          id={idSpunta}
+          type="checkbox"
+          checked={accettato}
+          onChange={(e) => {
+            setAccettato(e.target.checked);
+            if (e.target.checked) setRichiamo(false);
+          }}
+          className="mt-0.5 size-4 shrink-0 accent-verde"
+        />
+        <span>{t.recesso.etichetta}</span>
+      </label>
+      <p className="px-1 text-[13px] leading-relaxed text-fumo">{t.recesso.nota}</p>
+      {richiamo && !accettato && (
+        <p role="status" className="rounded-xl bg-sole/15 px-4 py-3 text-sm leading-relaxed">
+          {t.recesso.blocco}
+        </p>
+      )}
+      {errore && (
+        <p role="alert" className="rounded-xl bg-sole/15 px-4 py-3 text-sm leading-relaxed">
+          {errore}
+        </p>
+      )}
+      <Button
+        asChild
+        size="lg"
+        className={`h-auto w-full py-4 text-base ${accettato ? "" : "opacity-60"}`}
+      >
+        <a
+          href={`/api/pratiche/checkout?verifica=${dati.idPagina}&tipo=singola`}
+          onClick={(e) => {
+            e.preventDefault();
+            void vai("singola");
+          }}
+        >
+          {inCorso ? t.recesso.attesa : t.cta}
+        </a>
+      </Button>
+      {compraFamiglia && (
+        <Button
+          asChild
+          variant="contorno"
+          size="lg"
+          className={`h-auto w-full whitespace-normal py-3.5 text-center text-[0.95rem] ${
+            accettato ? "" : "opacity-60"
+          }`}
+        >
+          <a
+            href={`/api/pratiche/checkout?verifica=${dati.idPagina}&tipo=famiglia`}
+            onClick={(e) => {
+              e.preventDefault();
+              void vai("famiglia");
+            }}
+          >
+            {t.ctaFamiglia}
+          </a>
+        </Button>
+      )}
+    </>
   );
 }
 

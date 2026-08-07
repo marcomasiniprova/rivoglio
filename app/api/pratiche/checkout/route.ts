@@ -33,7 +33,7 @@ export async function GET(req: Request) {
 
   // L'id entra in un Location header: si costruisce l'URL SOLO dopo che
   // il formato è riconosciuto (UUID o demo), mai da testo libero.
-  const paginaRisultato = (coda?: "demo" | "non-attivo" | "errore") =>
+  const paginaRisultato = (coda?: "demo" | "non-attivo" | "errore" | "recesso") =>
     NextResponse.redirect(
       new URL(`/verifica/${id}${coda ? `?checkout=${coda}` : ""}`, url.origin),
     );
@@ -47,13 +47,14 @@ export async function GET(req: Request) {
     const db = supabaseServizio();
     const { data: verifica, error } = await db
       .from("verifiche")
-      .select("id, esito, conferma, email")
+      .select("id, esito, conferma, email, rinuncia_recesso_il")
       .eq("id", id)
       .maybeSingle<{
         id: string;
         esito: string;
         conferma: string;
         email: string | null;
+        rinuncia_recesso_il: string | null;
       }>();
     if (error) throw new Error(error.message);
 
@@ -65,6 +66,11 @@ export async function GET(req: Request) {
     if (verifica.esito !== "idoneo" || verifica.conferma === "in_attesa") {
       return paginaRisultato();
     }
+
+    /* #21: senza la spunta di rinuncia al recesso (art. 59 Cod. Consumo),
+       registrata da /api/pratiche/recesso, non si va a Polar. Vale anche
+       per chi arriva con l'URL diretto: il cancello sta sul server. */
+    if (!verifica.rinuncia_recesso_il) return paginaRisultato("recesso");
 
     const link = linkCheckout(tipo, verifica.id, verifica.email);
     if (!link) return paginaRisultato("non-attivo");

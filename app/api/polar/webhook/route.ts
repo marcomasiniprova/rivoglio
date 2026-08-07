@@ -109,12 +109,16 @@ export async function POST(req: NextRequest) {
     volo_iata: string;
     data_locale: string;
     importo: number | null;
+    rinuncia_recesso_il: string | null;
+    rinuncia_recesso_testo: string | null;
   } | null = null;
   try {
     const db = supabaseServizio();
     const { data, error } = await db
       .from("verifiche")
-      .select("id, esito, conferma, volo_iata, data_locale, importo")
+      .select(
+        "id, esito, conferma, volo_iata, data_locale, importo, rinuncia_recesso_il, rinuncia_recesso_testo",
+      )
       .eq("id", verificaId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -156,6 +160,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ errore: "Pratica non creata." }, { status: 500 });
     }
     pratica = creata.pratica;
+
+    /* #21: la firma della rinuncia al recesso entra nella cronologia della
+       pratica. Il checkout la esige, quindi se qui manca è un'anomalia
+       (link Polar girato a mano?): si logga forte e si segna, per l'admin. */
+    if (verifica.rinuncia_recesso_il) {
+      await registraEvento(
+        pratica.id,
+        "rinuncia_recesso",
+        `Consenso all'esecuzione immediata e rinuncia al recesso registrati il ${verifica.rinuncia_recesso_il}. Testo accettato: ${verifica.rinuncia_recesso_testo ?? "non archiviato"}.`,
+      );
+    } else {
+      console.error(
+        `[polar] ordine ${ordineId ?? "?"} PAGATO SENZA rinuncia al recesso sulla verifica ${verificaId}: da guardare a mano.`,
+      );
+      await registraEvento(
+        pratica.id,
+        "rinuncia_recesso_mancante",
+        "Pagamento arrivato senza la spunta di rinuncia al recesso: da verificare a mano.",
+      );
+    }
   }
 
   const passaggio = await transizionePratica(

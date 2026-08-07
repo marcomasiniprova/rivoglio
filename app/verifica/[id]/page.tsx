@@ -42,7 +42,9 @@ const DEMO_OK = /^demo-([a-z0-9]{2,8})-([0-9]{4}-[0-9]{2}-[0-9]{2})$/i;
 
 /** Gli unici valori ammessi per ?checkout=: tutto il resto si ignora. */
 function avvisoCheckoutDa(grezzo: string | string[] | undefined): DatiVerifica["avvisoCheckout"] {
-  return grezzo === "demo" || grezzo === "non-attivo" || grezzo === "errore" ? grezzo : null;
+  return grezzo === "demo" || grezzo === "non-attivo" || grezzo === "errore" || grezzo === "recesso"
+    ? grezzo
+    : null;
 }
 
 /** I checkout link Polar configurati: il client non tocca mai gli env. */

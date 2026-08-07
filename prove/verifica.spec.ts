@@ -112,9 +112,22 @@ test.describe("La pagina del risultato (id demo, senza chiavi)", () => {
     page,
   }) => {
     await page.goto(urlDemo(idoneo250.voloIata));
+    // #21: prima si firma la rinuncia al recesso, poi si può proseguire.
+    await page.getByRole("checkbox").first().check();
     await page.getByRole("link", { name: COPY.risultato.idoneo.cta }).first().click();
     await expect(page).toHaveURL(/checkout=demo/);
     await expect(page.getByText(COPY.risultato.idoneo.checkoutDemo).first()).toBeVisible();
+  });
+
+  test("IDONEO: senza la spunta di rinuncia al recesso NON si va al checkout", async ({
+    page,
+  }) => {
+    await page.goto(urlDemo(idoneo250.voloIata));
+    await expect(page.getByText(COPY.risultato.idoneo.recesso.etichetta).first()).toBeVisible();
+    await page.getByRole("link", { name: COPY.risultato.idoneo.cta }).first().click();
+    // il richiamo compare e la pagina resta questa: nessun rimando a Polar
+    await expect(page.getByText(COPY.risultato.idoneo.recesso.blocco).first()).toBeVisible();
+    await expect(page).not.toHaveURL(/checkout=/);
   });
 
   test("NON IDONEO: risposta chiara, il dato mostrato, invito a riprovare", async ({ page }) => {
