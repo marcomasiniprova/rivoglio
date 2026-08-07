@@ -1,0 +1,262 @@
+/**
+ * Ogni stringa che l'app mostra vive qui (contratto in PROGETTO.md).
+ * Solo dati, nessuna funzione. Dove serve un valore, la stringa porta un
+ * segnaposto fra graffe, es. "Fino a {soglia} a testa": la schermata lo
+ * sostituisce col numero già formattato da `formati.ts` (euro, oreLeggibili,
+ * dataBreve). I titoli sono oggetti { prima, corsivo, dopo? } per <Titolo />;
+ * la punteggiatura che segue la parola in corsivo sta dentro `corsivo`,
+ * perché il componente aggiunge uno spazio prima di `dopo`.
+ */
+
+export const TESTI = {
+  comune: {
+    marchio: "Viaggio Anche Io",
+    tagline: "La tua fuga, al prezzo giusto.",
+    avanti: "Avanti",
+    indietro: "Torna indietro",
+    annulla: "Annulla",
+    riprova: "Riprova",
+    chiudi: "Chiudi",
+    caricamento: "Un attimo",
+    // Etichetta di accessibilità dell'avanzamento: {passo} e {totale} sono numeri.
+    passoDi: "Passo {passo} di {totale}",
+    tab: {
+      destinazioni: "Destinazioni",
+      ricerche: "Ricerche",
+      profilo: "Profilo",
+    },
+  },
+
+  onboarding: {
+    index: {
+      titolo: { prima: "La tua", corsivo: "fuga,", dopo: "al prezzo giusto." },
+      sottotitolo:
+        "Imposti da dove parti, la soglia a testa e le ore di auto. Quando esiste una micro-vacanza vera sotto la soglia, ti avviso io. Col conto già fatto.",
+      bottoni: { inizia: "Inizia", accedi: "Ho già un account" },
+    },
+    valore: {
+      titolo: { prima: "Il conto è", corsivo: "aperto." },
+      sottotitolo:
+        "Alloggio più auto, diviso per chi parte. Ogni numero si apre: vedi come l'ho calcolato.",
+      // Nome mostrato sulla card di esempio: dice subito che non è un'offerta.
+      struttura: "Struttura di esempio",
+      nota: "Questo è un esempio dimostrativo. Le destinazioni vere arrivano con un prezzo verificato e il link della struttura.",
+      bottoni: { avanti: "Avanti" },
+    },
+    criteri: {
+      titolo: { prima: "Dimmi cosa", corsivo: "cerchi." },
+      sottotitolo:
+        "Tre limiti, li cambi quando vuoi. L'account per ora non serve.",
+      partenza: {
+        etichetta: "Da dove parti",
+        segnaposto: "Scegli il comune",
+        nota: "Serve per calcolare chilometri, benzina e pedaggi. Non la diamo a nessuno.",
+        nessuna: "Questa città non c'è ancora fra le partenze coperte. Scegline una vicina.",
+      },
+      soglia: {
+        etichetta: "Quanto vuoi spendere a testa",
+        nota: "Tutto compreso: alloggio più auto. Non solo la camera.",
+      },
+      ore: {
+        etichetta: "Quante ore di auto al massimo",
+        nota: "Sola andata. Ragioniamo in ore, non in chilometri.",
+      },
+      bottoni: { avanti: "Avanti" },
+    },
+    aggancio: {
+      titolo: { prima: "Al resto penso", corsivo: "io." },
+      sottotitolo:
+        "Con questi limiti ti avviso quando esiste una destinazione vera. Le prime 3 sono gratis.",
+      // {comune} è il nome del comune, {soglia} da euro(), {ore} da oreLeggibili().
+      riepilogo: {
+        partenza: "Parti da {comune}",
+        soglia: "Fino a {soglia} a testa",
+        ore: "Massimo {ore} di auto",
+        // Valori di partenza della prima ricerca: {persone} e {notti} sono numeri.
+        resto: "Partite in {persone}, fino a {notti} notti. Lo cambi quando vuoi.",
+      },
+      bottoni: { avanti: "Va bene, andiamo", correggi: "Voglio cambiare qualcosa" },
+    },
+    registrati: {
+      titolo: { prima: "Dove ti mando le", corsivo: "destinazioni?" },
+      sottotitolo:
+        "Ti scrivo solo quando c'è una destinazione sotto la tua soglia. Per tutto il resto, silenzio.",
+      // Quando l'account nasce ma il salvataggio dei criteri fallisce:
+      // niente panico, si riprova senza ricreare niente.
+      criteriNonSalvati: "L'account è pronto, ma non sono riuscito a salvare i tuoi criteri.",
+      bottoni: { crea: "Crea l'account", accedi: "Ho già un account" },
+    },
+    avvisi: {
+      titolo: { prima: "Senza avviso non lo", corsivo: "sai." },
+      sottotitolo:
+        "1 credito vale 1 destinazione, e una destinazione buona dura poco. Se non ti avviso quando esiste, la scopri quando è finita.",
+      nota: "Se preferisci di no, va bene lo stesso: ricevi tutto per email.",
+      bottoni: { attiva: "Attiva gli avvisi", nonOra: "Non ora" },
+    },
+  },
+
+  // `campi` e `validazione` li usa anche il passo registrati dell'onboarding:
+  // stessi moduli, stesse parole.
+  accesso: {
+    titolo: { prima: "Entra nel tuo", corsivo: "account." },
+    sottotitolo: "Email e password con cui ti sei registrato.",
+    campi: {
+      email: "Email",
+      emailSegnaposto: "nome@esempio.it",
+      password: "Password",
+      passwordNota: "Almeno 8 caratteri.",
+    },
+    validazione: {
+      email: "Controlla l'indirizzo email.",
+      passwordVuota: "Scrivi la password.",
+      passwordCorta: "La password deve avere almeno 8 caratteri.",
+    },
+    bottoni: { entra: "Entra", registrati: "Non ho un account" },
+  },
+
+  destinazioni: {
+    titolo: { prima: "Le tue", corsivo: "destinazioni." },
+    // Pillola sulle destinazioni non ancora aperte.
+    nuova: "Nuova",
+    // {data} da dataBreve().
+    ricevuta: "Ricevuta {data}",
+    // {comune} è la partenza del profilo.
+    saluto: "Parti da {comune}.",
+    // Quando il profilo non ha coordinate: l'auto non si può calcolare.
+    senzaPartenza:
+      "Qui vedi solo l'alloggio. Dimmi da dove parti nel profilo e aggiungo l'auto al conto.",
+    alloggioATesta: "Alloggio a testa",
+    autoATesta: "Auto a testa (stima)",
+    totaleATesta: "Totale a testa",
+    // {prezzo} da euro(): il prezzo dell'alloggio prima della divisione.
+    alloggioIntero: "Alloggio intero: {prezzo}",
+    // {arrivo} e {ritorno} da dataBreve().
+    date: "Dal {arrivo} al {ritorno}",
+    vuoto: {
+      titolo: "Per ora, silenzio.",
+      testo:
+        "Quando esiste una destinazione sotto la tua soglia te la segnalo io. Fino ad allora niente rumore: nessuna offerta tanto per riempire.",
+    },
+    oggi: {
+      titolo: "Dove arrivi oggi",
+      nota: "Stima del viaggio, non un'offerta. Quando una struttura vera ci sta dentro, ti avviso.",
+      // Pillola su ogni proposta: è un calcolo, non un'offerta prenotabile.
+      stima: "Stima",
+      // {km} intero, {ore} da oreLeggibili(), {costo} e {resto} da euro().
+      km: "{km} km",
+      auto: "{ore} di auto",
+      autoATesta: "{costo} di auto a testa",
+      resta: "Ti restano {resto} a notte per dormire",
+    },
+    vediOfferta: "Vedi l'offerta",
+    stimaAuto:
+      "Il costo dell'auto è una stima. Aprila e vedi ogni voce: chilometri, benzina, pedaggi.",
+    avvisoPrezzo:
+      "Prezzo verificato quando te l'ho segnalata. Sulla pagina della struttura può cambiare: controlla prima di prenotare.",
+  },
+
+  ricerche: {
+    titolo: { prima: "Le tue", corsivo: "ricerche." },
+    stato: { inAscolto: "In ascolto", inPausa: "In pausa" },
+    // {soglia} da euro(), {ore} da oreLeggibili(), {min}/{max}/{n} numeri interi.
+    scheda: {
+      finoA: "Fino a {soglia} a testa",
+      maxAuto: "max {ore} di auto",
+      unaNotte: "1 notte",
+      nottiUguali: "{n} notti",
+      notti: "{min}-{max} notti",
+      unaPersona: "1 persona",
+      persone: "{n} persone",
+      tuttiITipi: "Tutto",
+    },
+    azioni: {
+      pausa: "Metti in pausa",
+      riprendi: "Riaccendi",
+      cancella: "Cancella",
+      // Titolo dell'avviso di conferma: il messaggio è `confermaCancella`.
+      confermaTitolo: "Cancello questa ricerca?",
+      confermaCancella: "Premi di nuovo per cancellarla davvero.",
+    },
+    vuoto: {
+      titolo: "Ancora nessuna ricerca.",
+      testo:
+        "Dimmi soglia, ore di auto e notti. Da lì ascolto io, e ti avviso solo quando c'è una destinazione che ci sta dentro.",
+      azione: "Crea la prima ricerca",
+    },
+    nuovaBottone: "Nuova ricerca",
+    nuova: {
+      titolo: { prima: "Una nuova", corsivo: "ricerca." },
+      sottotitolo: "La metti in pausa o la cancelli quando vuoi.",
+      campi: {
+        soglia: "Soglia a testa",
+        sogliaNota: "Tutto compreso: alloggio più auto.",
+        ore: "Ore di auto al massimo",
+        oreNota: "Sola andata.",
+        notti: "Notti",
+        persone: "Persone",
+        personeNota: "L'auto si divide: più siete, meno costa a testa.",
+        tipi: "Che voglia hai",
+        tipiNota:
+          "Puoi sceglierne più di una, o nessuna. Più filtri metti, meno destinazioni ricevi.",
+      },
+      bottoni: { crea: "Attiva la ricerca", annulla: "Annulla" },
+      // Etichette di accessibilità del più e del meno: {campo} è l'etichetta del campo.
+      aumenta: "Aumenta {campo}",
+      diminuisci: "Diminuisci {campo}",
+    },
+    // Stessi limiti validati in dati.ts: budget 30-600, ore 0,5-8, notti 1-3, persone 1-8.
+    limiti: {
+      soglia: "La soglia va da 30€ a 600€ a testa.",
+      ore: "Le ore di auto vanno da mezz'ora a 8.",
+      notti: "Le notti vanno da 1 a 3.",
+      persone: "Si parte da soli o al massimo in 8.",
+    },
+  },
+
+  profilo: {
+    titolo: { prima: "Il tuo", corsivo: "profilo." },
+    crediti: {
+      etichetta: "Crediti",
+      spiegazione:
+        "1 credito = 1 destinazione segnalata. Le prime 3 te le abbiamo regalate.",
+      finiti:
+        "Crediti finiti: le segnalazioni sono ferme. Nessun addebito automatico, mai.",
+    },
+    // Stato "Presto": si dice che l'acquisto non c'è ancora, senza bottoni finti.
+    acquisto: {
+      titolo: "Compra crediti",
+      stato: "Presto",
+      testo:
+        "L'acquisto dall'app non è ancora attivo, quindi qui non trovi bottoni finti. Quando arriva paghi una volta sola: niente abbonamento, e i crediti non scadono.",
+    },
+    tetto: {
+      etichetta: "Tetto settimanale",
+      // {n} è il numero massimo di destinazioni a settimana.
+      valore: "{n} a settimana",
+      spiegazione:
+        "È una promessa di spesa massima. Sopra questo numero di destinazioni a settimana non parte niente, e tu non spendi niente.",
+      // Etichette di accessibilità del più e del meno.
+      alza: "Alza il tetto",
+      abbassa: "Abbassa il tetto",
+    },
+    partenza: { etichetta: "Parti da", cambia: "Cambia" },
+    account: { email: "Email", esci: "Esci" },
+  },
+
+  notifiche: {
+    titolo: "Notifiche",
+    attive: "Attive. Ti avviso qui quando parte una destinazione.",
+    daChiedere: "Da attivare. Senza avviso non sai quando una destinazione esiste.",
+    negate:
+      "Spente dal telefono. Puoi riaccenderle nelle Impostazioni. Intanto ricevi tutto per email.",
+    attiva: "Attiva le notifiche",
+    emailRiserva: "Se restano spente, le destinazioni arrivano per email.",
+  },
+
+  // Mai colpevolizzare chi legge: il problema è nostro o della rete, non suo.
+  errori: {
+    rete: "Niente connessione in questo momento. Riprova appena torna la rete: non si è perso niente.",
+    sessione: "La sessione è scaduta. Entra di nuovo e ritrovi tutto com'era.",
+    generico: "Qualcosa non ha funzionato. Riprova fra un attimo.",
+  },
+} as const;
