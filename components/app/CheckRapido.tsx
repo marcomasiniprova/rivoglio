@@ -90,7 +90,7 @@ export default function CheckRapido() {
     >
       <div className="grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
         <div>
-          <label htmlFor="app-volo" className="text-[14px] font-medium text-inchiostro/75">
+          <label htmlFor="app-volo" className="block text-[14px] font-medium text-inchiostro/75">
             {FORM.volo.etichetta}
           </label>
           <input
@@ -100,11 +100,11 @@ export default function CheckRapido() {
             onChange={(e) => setVolo(e.target.value)}
             placeholder={FORM.volo.segnaposto}
             autoComplete="off"
-            className="mt-2 h-13 w-full rounded-bottone border border-bordo bg-white px-4 text-[16px] outline-none transition-all duration-200 placeholder:text-fumo-2 focus:border-verde/60 focus:ring-4 focus:ring-verde/10"
+            className="mt-2 block h-13 w-full rounded-bottone border border-bordo bg-white px-4 text-[16px] outline-none transition-all duration-200 placeholder:text-fumo-2 focus:border-verde/60 focus:ring-4 focus:ring-verde/10"
           />
         </div>
         <div>
-          <label htmlFor="app-data" className="text-[14px] font-medium text-inchiostro/75">
+          <label htmlFor="app-data" className="block text-[14px] font-medium text-inchiostro/75">
             {FORM.data.etichetta}
           </label>
           <input
@@ -114,7 +114,7 @@ export default function CheckRapido() {
             min={minData}
             max={maxData}
             onChange={(e) => setData(e.target.value)}
-            className="mt-2 h-13 w-full rounded-bottone border border-bordo bg-white px-4 text-[16px] outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/10"
+            className="mt-2 block h-13 w-full appearance-none rounded-bottone border border-bordo bg-white px-4 text-[16px] outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/10"
           />
         </div>
         <button

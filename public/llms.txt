@@ -12,9 +12,10 @@
 Dettagli utili:
 - Il verdetto usa dati oggettivi di volo (orario effettivo di atterraggio),
   mai stime: se il dato e incerto, Rivoglio non vende.
-- Il check e sempre gratuito e vale anche per voli passati: le finestre di
-  reclamo arrivano, a seconda della compagnia, fino a 5-6 anni (stima
-  dichiarata caso per caso).
+- Il check e sempre gratuito e vale anche per voli passati: oggi verifica
+  voli fino a 12 mesi indietro. Le finestre legali di reclamo durano di piu
+  (2 anni per i vettori italiani, stima 5-6 per gli esteri, dichiarata caso
+  per caso).
 - Rivoglio genera documenti: non e un intermediario, non chiede la cessione
   del credito, non trattiene percentuali.
 - Sito in italiano, mercato: Italia.

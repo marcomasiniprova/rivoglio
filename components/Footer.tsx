@@ -76,13 +76,13 @@ export default function Footer() {
             sfondo tolto): la mano entra dal bordo basso della card. */}
         <div className="mb-20 overflow-hidden rounded-[2rem] bg-white text-inchiostro">
           <div className="grid items-end gap-0 md:grid-cols-[1.1fr_0.9fr]">
-            <div className="px-7 py-10 sm:px-12 sm:py-14 md:pb-16 md:pt-16">
+            <div className="px-7 py-10 text-center sm:px-12 sm:py-14 md:pb-16 md:pt-16 md:text-left">
               <h2 className="luce-testo text-[clamp(1.9rem,3.8vw,2.7rem)] leading-[1.06]">
                 {F.cartolina.titolo}
                 <br />
                 <span className="corsivo text-verde-scuro">{F.cartolina.corsivo}</span>
               </h2>
-              <p className="mt-4 max-w-sm text-[15.5px] leading-relaxed text-fumo">
+              <p className="mx-auto mt-4 max-w-sm text-[15.5px] leading-relaxed text-fumo md:mx-0">
                 {F.cartolina.testo}
               </p>
               <Link
@@ -93,13 +93,14 @@ export default function Footer() {
                 <span aria-hidden="true">→</span>
               </Link>
             </div>
-            <div className="relative flex items-end justify-center px-6 pt-2 md:pt-8">
+            <div className="relative flex items-end justify-center overflow-hidden pt-4 md:pt-8">
               <Image
                 src="/telefono-app.png"
                 alt={F.cartolina.altTelefono}
                 width={878}
                 height={1257}
-                className="h-[320px] w-auto object-contain object-bottom sm:h-[380px] md:h-[440px]"
+                sizes="(min-width: 768px) 440px, 340px"
+                className="mb-[-2px] h-[340px] w-auto object-contain object-bottom sm:h-[390px] md:h-[440px]"
               />
             </div>
           </div>
@@ -190,6 +191,12 @@ export default function Footer() {
         <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-7 text-[13.5px] text-white/60 sm:flex-row sm:items-center sm:justify-between">
           <p>{F.copyright} · Fatto in Italia</p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <a
+              href={`mailto:${F.supporto.email}`}
+              className="transition-colors hover:text-menta"
+            >
+              {F.supporto.etichetta}: {F.supporto.email}
+            </a>
             {F.colonne.legale.voci.map((v) => (
               <Link
                 key={v.testo}

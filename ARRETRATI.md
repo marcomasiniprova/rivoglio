@@ -137,6 +137,18 @@ non altro codice.**
 | 59 | **Scanner anche sulla pagina del verdetto** | Arrivando con un link diretto la pagina si apre con la carta del volo scansionata dal raggio (1,3s), poi il reveal. Chi arriva dal check NON lo rivede (flag in sessione: due teatri di fila sono una presa in giro). Con reduced-motion si salta. |
 | 60 | **Giro Emil Kowalski di micro-animazioni** | Curve condivise registrate (--curva-fuori, --curva-dentro-fuori, dalle tabelle della skill animate). FAQ: la risposta entra scivolando (0,25s) e l'altezza si anima dove il browser lo sa fare. Card pratiche: ingresso in fila a 50ms. Tutto transform e opacity, tutto con la variante reduced-motion. |
 
+## ✅ CHIUSI l'8/08 — dodicesimo giro: le chiavi vere e il giro dell'onestà
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 61 | **Chiavi Mistral e AeroDataBox** | Salvate in `.env.development.local`. Scoperta di riflesso: con la chiave vera nel file, le PROVE andavano sull'API reale (bloccata in sandbox) e diventavano rosse. Doppio fix: i voli ZZ* vanno SEMPRE al fornitore demo (anche in produzione: ZZ non è un codice IATA e brucerebbe unità), e il server delle prove azzera le chiavi apposta (playwright.config). |
+| 62 | **La prova delle 2 ore, fatta con la TUA chiave** | Dentro i 365 giorni il dato regge: a 6 e a 11 mesi status Arrived, quality Live, revisedTime e perfino runwayTime. OLTRE i 365 giorni il piano BASIC rifiuta la richiesta. Documentato anche il rinominare del 2023: actualTime NON esiste più, si chiama revisedTime; runwayTime è le ruote a terra. |
+| 63 | **"Riscrivo su 12 mesi" (tua scelta dal popup)** | Headline "Hai preso un volo nell'ultimo anno?", note, sezione retroattiva, FAQ, llms.txt e immagine social riscritte: cosa VERIFICHIAMO (12 mesi) separato da quanto DURA il diritto (2 anni ITA, stima 5-6 esteri, che restano scritti perché veri per legge). |
+| 64 | **Campo data spappolato (1A)** | `block` + `appearance-none` + larghezza piena: Safari iOS ignorava la larghezza dei campi data. Provato a 390px. |
+| 65 | **Cartolina storta (1B)** | In locale era già a filo (misurato: fondo immagine = fondo card al pixel); blindata comunque: testo centrato sul telefono, immagine senza padding, 2px di sanguinamento sotto il bordo, sizes espliciti. Il difetto che vedi online è del deploy vecchio. |
+| 66 | **Email di supporto** | valerio@artecai.it nel footer (mailto), come da tua scelta. Si cambia con una riga quando c'è il dominio. |
+| 67 | **Newsletter "pareva non funzionare"** | Il salvataggio usa la chiave pubblica: l'iscrizione quasi certamente È salvata. A mancare è l'email di conferma: serve RESEND_API_KEY su Netlify, e finché il dominio non è verificato Resend spedisce solo a valerio@artecai.it. Intanto l'email di benvenuto è stata riscritta: era rimasta al prodotto viaggi ("fughe sotto soglia"), ora racconta l'Osservatorio. |
+
 ## ⏳ ANCORA DA FARE
 
 ### Per Rivoglio (dal documento, rimandati di proposito)

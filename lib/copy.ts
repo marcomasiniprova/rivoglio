@@ -59,17 +59,17 @@ export const COPY = {
 
   hero: {
     occhiello: "Lo scanner dei rimborsi",
-    titolo: "Hai preso un volo negli ultimi 5 anni?",
+    titolo: "Hai preso un volo nell'ultimo anno?",
     sottotitolo: "Forse ti devono fino a 600€. Controllalo gratis in 30 secondi.",
     /** Apre il "fino a 600€". */
     notaImporto:
       "600€ è l'importo massimo del Regolamento CE 261/2004: ritardi di 4 ore o più sulle tratte oltre i 3.500 km. Le altre fasce: 250€ fino a 1.500 km, 400€ fino a 3.500 km.",
-    /** Apre gli "ultimi 5 anni". */
+    /** Apre l'"ultimo anno". */
     notaFinestra:
-      "Per ITA e Aeroitalia puoi risalire fino a 2 anni. Per vettori esteri come Ryanair e Wizz Air la finestra è più lunga, stimata in 5 o 6 anni: dipende dalla compagnia, la calcoliamo caso per caso.",
+      "Oggi verifichiamo voli fino a 12 mesi indietro: è la profondità degli archivi di volo che interroghiamo. Il diritto in sé dura di più (2 anni per ITA e Aeroitalia, stimati 5 o 6 per i vettori esteri) e stiamo lavorando per allargare la finestra.",
     /** Etichette dei bottoni che aprono le due note qui sopra. */
     apriImporto: "Come nasce il 600€",
-    apriFinestra: "Perché 5 anni",
+    apriFinestra: "Perché 12 mesi",
     form: {
       volo: {
         etichetta: "Numero del volo",
@@ -257,9 +257,9 @@ export const COPY = {
 
   retroattivo: {
     occhiello: "Retroattivo",
-    titolo: "Vale anche per i voli di anni fa.",
+    titolo: "Vale anche per i voli dell'anno scorso.",
     testo:
-      "Un ritardo di due estati fa può valere quanto uno di ieri. Per ITA e Aeroitalia puoi risalire fino a 2 anni. Per vettori esteri come Ryanair e Wizz Air la finestra è più lunga, stimata in 5 o 6 anni.",
+      "Un ritardo dell'estate scorsa vale quanto uno di ieri: oggi il check verifica voli fino a 12 mesi indietro. Il diritto di reclamo per legge dura anche di più, e le finestre qui sotto restano valide: la scadenza te la dichiariamo caso per caso.",
     /** Le finestre per compagnia. Il "2 anni" viene dall'art. 949 cod. nav. */
     finestre: [
       {
@@ -274,7 +274,7 @@ export const COPY = {
       },
     ],
     avvertenza:
-      "La scadenza è una finestra stimata, dipende dalla compagnia. La dichiariamo caso per caso, dentro la tua verifica.",
+      "La scadenza è una finestra stimata, dipende dalla compagnia: la dichiariamo caso per caso dentro la tua verifica. Il check online oggi copre i voli degli ultimi 12 mesi.",
     suggerimento:
       "Non ricordi i dettagli? Cerca \"conferma volo\" nella tua casella email: numero e data saltano fuori in un minuto.",
     cta: "Controlla un volo passato",
@@ -340,7 +340,7 @@ export const COPY = {
       {
         domanda: "Fino a quando posso fare richiesta?",
         risposta:
-          "Dipende dalla compagnia. Per ITA e Aeroitalia la finestra è di 2 anni; per vettori esteri come Ryanair e Wizz Air è più lunga, stimata in 5 o 6 anni. È una stima, e la dichiariamo caso per caso: nella tua verifica trovi la data indicativa di scadenza.",
+          "Il diritto dura a lungo: 2 anni per ITA e Aeroitalia, stimati 5 o 6 per vettori esteri come Ryanair e Wizz Air (caso per caso, nella tua verifica trovi la data indicativa). Il check online oggi verifica voli fino a 12 mesi indietro.",
       },
       {
         domanda: "Quali voli posso controllare?",
@@ -716,7 +716,7 @@ export const COPY = {
           { testo: "Il dato oggettivo", ancora: "#dato-oggettivo" },
           { testo: "La garanzia", ancora: "#garanzia" },
           { testo: "I numeri e le fonti", ancora: "#numeri" },
-          { testo: "Voli di anni fa", ancora: "#retroattivo" },
+          { testo: "Voli dell'anno scorso", ancora: "#retroattivo" },
         ],
       },
       domande: {
@@ -741,6 +741,8 @@ export const COPY = {
     },
     disclaimer:
       "Rivoglio genera documenti a partire da dati di volo verificati. Non è un intermediario, non offre consulenza legale, non incassa per conto tuo e non chiede la cessione del credito. Il reclamo lo invii tu, dalla tua email. Gli importi indicati sono le fasce del Regolamento CE 261/2004: l'esito della richiesta dipende dalla compagnia.",
+    /** L'indirizzo vivo oggi: si cambia in uno @rivoglio quando c'è il dominio. */
+    supporto: { etichetta: "Supporto", email: "valerio@artecai.it" },
     copyright: "© 2026 Rivoglio",
   },
 } as const;

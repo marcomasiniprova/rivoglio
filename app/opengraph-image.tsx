@@ -87,7 +87,7 @@ export default async function Anteprima() {
               che ti devono.
             </span>
             <span style={{ color: "#a7d9c2", fontSize: 27, marginTop: 26, lineHeight: 1.4 }}>
-              Volo in ritardo negli ultimi 5 anni? Check gratuito
+              Volo in ritardo nell&apos;ultimo anno? Check gratuito
               <br />
               in 30 secondi, senza account. Reg. CE 261/2004.
             </span>

@@ -29,28 +29,25 @@ const euro = (n: number) =>
   n.toLocaleString("it-IT", { maximumFractionDigits: 0 }) + "€";
 
 /* ---------------------------------------------------------------- 1 */
-export function benvenutoLista(a: string, comune?: string | null): Promise<Esito> {
-  const dove = comune ? ` da ${comune}` : "";
+export function benvenutoLista(a: string, _comune?: string | null): Promise<Esito> {
   return spedisci({
     a,
-    oggetto: "Ci sei. Ti avviso io.",
+    oggetto: "Sei nell'Osservatorio dei Disservizi.",
     html: vestito({
-      titolo: "Ci sei",
+      titolo: "Sei dentro",
       corpo:
-        h("Ci sei.") +
+        h("Sei dentro.") +
         p(
-          `Ti ho segnato${dove}. Da adesso, quando esiste una fuga di 1-3 notti sotto la tua soglia, te lo dico io.`,
+          "Ogni settimana ti mando i 10 voli più in ritardo sui cieli italiani, presi dai dati che verifichiamo per i check. Una email a settimana, si annulla con un clic.",
         ) +
+        p("Solo l'Osservatorio: niente pubblicità, niente altro.") +
+        bottone("Controlla un volo, gratis", `${casa()}/app`) +
         p(
-          "Nel frattempo non ti mando niente. Nessuna newsletter, nessun promemoria, nessuna pubblicità: te lo prometto qui e vale.",
-        ) +
-        bottone("Crea il tuo account e prendi 3 alert", `${casa()}/entra?modo=registrati`) +
-        p(
-          `<strong style="color:${C.inchiostro}">Una cosa che nessuno ti dice:</strong> il prezzo della camera non è il prezzo della vacanza. Noi ti mostriamo il totale, benzina e pedaggi compresi, con il calcolo aperto.`,
+          `<strong style="color:${C.inchiostro}">Nel frattempo:</strong> se nell'ultimo anno hai preso un volo atterrato con più di 3 ore di ritardo, il check dice subito in che fascia rientri (250, 400 o 600 euro).`,
         ),
-      coda: "Ricevi questa email perché hai lasciato il tuo indirizzo su rivoglio.it.",
+      coda: "Ricevi questa email perché ti sei iscritto all'Osservatorio dei Disservizi di Rivoglio.",
     }),
-    testo: `Ci sei.\n\nTi ho segnato${dove}. Quando esiste una fuga di 1-3 notti sotto la tua soglia, te lo dico io.\nNel frattempo non ti mando niente.\n\nCrea il tuo account: ${casa()}/entra?modo=registrati`,
+    testo: `Sei dentro.\n\nOgni settimana i 10 voli più in ritardo sui cieli italiani, dai dati che verifichiamo per i check. Una email a settimana, si annulla con un clic.\n\nControlla un volo, gratis: ${casa()}/app`,
   });
 }
 

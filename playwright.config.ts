@@ -38,5 +38,13 @@ export default defineConfig({
         url: "http://localhost:3100",
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
+        /* Le prove girano SEMPRE in modalità demo: con le chiavi vere nei
+           .env locali il fornitore reale si accenderebbe e l'esito
+           dipenderebbe dalla rete (successo l'8/08: chiave salvata, demo
+           spenta, prove rosse). Qui le chiavi si azzerano apposta. */
+        env: {
+          AERODATABOX_API_KEY: "",
+          AVIATIONSTACK_API_KEY: "",
+        },
       },
 });

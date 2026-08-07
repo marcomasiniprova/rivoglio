@@ -68,8 +68,15 @@ function fattoDaRiga(riga: RigaVolo): FattoVolo {
   };
 }
 
-/** AeroDataBox se c'è la chiave, altrimenti la demo marcata. */
-function fornitoreAttivo(): FornitoreVoli {
+/**
+ * AeroDataBox se c'è la chiave, altrimenti la demo marcata.
+ * I voli ZZ* vanno SEMPRE alla demo, anche con la chiave vera: ZZ non è
+ * un codice IATA assegnato, sono i nostri casi dimostrativi (la landing
+ * e le prove ci contano), e mandarli all'API vera brucerebbe unità per
+ * un errore garantito.
+ */
+function fornitoreAttivo(voloIata: string): FornitoreVoli {
+  if (voloIata.toUpperCase().startsWith("ZZ")) return demo;
   return process.env.AERODATABOX_API_KEY ? aerodatabox : demo;
 }
 
@@ -108,7 +115,7 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
 
   // ── Strato 2b: il fornitore ──────────────────────────────────────────
   if (!fatto) {
-    const primario = fornitoreAttivo();
+    const primario = fornitoreAttivo(volo.valore);
     fatto = await primario.cerca(volo.valore, data.valore);
 
     if (!fatto) {
