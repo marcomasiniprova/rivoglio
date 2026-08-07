@@ -113,6 +113,9 @@ export function generaReclamo(
   pratica: PraticaPerLettera,
   fatto: FattoVolo,
   verdetto: Verdetto,
+  /* Righe opzionali già pronte (es. il meteo all'arrivo da lib/meteo):
+     il chiamante le procura, qui restano input deterministici. */
+  extra?: { meteo?: string | null },
 ): Lettera | null {
   if (verdetto.esito !== "idoneo") return null;
   if (!fatto.arrivoPrevistoUtc || !fatto.arrivoEffettivoUtc) return null;
@@ -140,7 +143,7 @@ I fatti, come risultano dai dati di volo (fonte: ${fatto.fonte}):
 - arrivo previsto: ${oraUtc(fatto.arrivoPrevistoUtc)};
 - arrivo effettivo: ${oraUtc(fatto.arrivoEffettivoUtc)};
 - ritardo all'arrivo: ${durata(verdetto.ritardoMinuti)}${fatto.kmOrtodromica ? `;\n- distanza della tratta: ${km(fatto.kmOrtodromica)}` : ""}.
-
+${extra?.meteo ? `\n${extra.meteo}\n` : ""}
 Ai sensi degli articoli 5 e 7 del Regolamento (CE) n. 261/2004, come interpretati dalla Corte di giustizia dell'Unione europea nella sentenza del 19 novembre 2009, cause riunite C-402/07 e C-432/07 (Sturgeon), un ritardo all'arrivo pari o superiore a tre ore dà diritto alla stessa compensazione pecuniaria prevista per la cancellazione del volo, salvo circostanze eccezionali che spetta al vettore provare.
 
 ${percheFascia(verdetto.importo, verdetto.ritardoMinuti, fatto.kmOrtodromica)}

@@ -108,7 +108,7 @@ export const COPY = {
       {
         nome: "Leggi il verdetto",
         testo:
-          "Confrontiamo orario previsto ed effettivo sul tracciamento reale del volo e applichiamo il Regolamento CE 261/2004. Se il caso è incerto, te lo diciamo e non paghi.",
+          "Confrontiamo orario previsto ed effettivo sui dati ufficiali del volo e applichiamo il Regolamento CE 261/2004. Se il caso è incerto, te lo diciamo e non paghi.",
       },
       {
         nome: "Ricevi la pratica",
@@ -137,7 +137,7 @@ export const COPY = {
     occhiello: "Il dato oggettivo",
     titolo: "Vendiamo un fatto, non una promessa.",
     testo:
-      "Tutto parte da un dato: a che ora è atterrato davvero il tuo volo. Da solo non lo trovi più, soprattutto dopo anni. Noi sì, e lo leggiamo dal tracciamento reale.",
+      "Tutto parte da un dato: a che ora è atterrato davvero il tuo volo. Incrociamo i dati ufficiali del volo con i tuoi documenti. Se non concordano, il caso è incerto e non paghi.",
     punti: [
       {
         titolo: "Solo dati tracciati",
@@ -216,7 +216,7 @@ export const COPY = {
         descrizione: "Scopri se il tuo volo rientra in una fascia di compensazione.",
         punti: [
           "Numero di volo e data, nient'altro",
-          "Verifica sul tracciamento reale del volo",
+          "Verifica sui dati ufficiali del volo",
           "Risposta chiara anche quando è un no",
         ],
         bottone: "Controlla gratis",
@@ -526,6 +526,23 @@ export const COPY = {
    * aggiungilo anche qui o il tracker mostra il codice grezzo.
    */
   pratica: {
+    /* ---- i documenti dell'utente: la seconda fonte (/pratica/[id]) ---- */
+    documenti: {
+      titolo: "Aggiungi i tuoi documenti",
+      testo:
+        "Carica la carta d'imbarco o l'email della compagnia: incrociamo i tuoi documenti coi dati ufficiali del volo. Se concordano, il reclamo è più solido. Se non concordano, controlliamo a mano e ti scriviamo.",
+      bottone: "Carica un documento",
+      troppoGrande: "Il file supera i 5MB: riprova con una foto più leggera.",
+      concorde:
+        "I tuoi documenti concordano coi dati ufficiali del volo. Il reclamo è più solido: due fonti, lo stesso fatto.",
+      discorde:
+        "I tuoi documenti non concordano coi dati che abbiamo verificato. Controlliamo a mano e ti scriviamo: fino ad allora la pratica non cambia.",
+      illeggibile:
+        "Non siamo riusciti a leggere il documento. Riprova con una foto più nitida e ben illuminata.",
+      privacy:
+        "Il file non viene salvato: lo leggiamo, registriamo l'esito del confronto e lo scartiamo.",
+    },
+
     /* ---- la testata dell'area riservata (/app/layout) ---- */
     testata: {
       esci: "Esci",

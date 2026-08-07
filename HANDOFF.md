@@ -1,58 +1,69 @@
 # HANDOFF — per la prossima sessione
 
-*Aggiornato: 2026-08-08, notte fonda (dopo #21 + #26 + audit prompt).
-Si aggiorna prima di ogni /clear.*
+*Aggiornato: 2026-08-08, notte fonda (dopo il giro #27: seconda fonte
+documenti, 20 compagnie, scioperi). Si aggiorna prima di ogni /clear.*
 
 ## Stato attuale
 - Rivoglio costruito e rifinito; ramo `claude/saas-app-repo-analysis-ghehqa`.
-  Verify dell'8/08 notte: build, tipi, lint ok; Playwright 204/206 (2 =
-  Osservatorio, rete sandbox verso Supabase, sul PC di Valerio passano);
-  eval motore 33/33, falsi positivi 0.
-- **#21 CHIUSO**: rinuncia al recesso con spunta versionata prima di Polar,
-  registrata in `verifiche`, cancello nella rotta di checkout, firma
-  copiata negli eventi pratica dal webhook.
-- **#26 CHIUSO**: motore 2026.08.2 sui campi veri: senza quality "Live"
-  nessun verdetto, codeshare non risolto sopra soglia = incerto, FR4001
-  reale nel golden set (30 casi).
-- **Punto 3 CHIUSO**: "due fonti indipendenti" tolto dalla vetrina finché
-  la seconda fonte non è viva (copy su "tracciamento reale del volo").
-- Migrazione `supabase/2026-08-08-recesso-e-live.sql` APPLICATA sul
-  Supabase vero via Composio (4 colonne verificate a mano).
+  Verify del giro #27: build, tipi, lint ok; Playwright 208/210 (2 =
+  Osservatorio, rete sandbox verso Supabase); eval 35/35 sui 32 casi d'oro.
+- **#22 e #27 CHIUSI** (ARRETRATI righe 72-77): la seconda fonte sono i
+  DOCUMENTI dell'utente (AviationStack free era finta: solo tempo reale,
+  licenza personale). OCR Mistral dentro la pratica dopo il pagamento,
+  file mai salvato, estrazione a regex, confronto deterministico,
+  discorde = conferma umana. Landing con la frase dettata da Valerio.
+- Motore 2026.08.3: regola scioperi (sopra soglia + sciopero noto =
+  incerto), golden set 32 casi, eval bloccante FP 0.
+- `lib/lettera/compagnie.ts`: 20 compagnie con entità legale, NEB,
+  indirizzo postale, accettaIntermediari (FR/U2/W6/V7/DY = solo reclamo
+  diretto del passeggero). Iberia e Transavia senza chiavi di nome
+  (sorelle omonime = società diverse).
+- Tabella `scioperi` APPLICATA e POPOLATA sul Supabase vero (migrazione
+  `20260809_scioperi`, 10 righe verificate con SELECT). Il file locale è
+  `supabase/2026-08-09-scioperi.sql`.
+- Open-Meteo nella lettera: PRONTO ma SPENTO dietro OPENMETEO_COMMERCIALE=1.
+  Scoperta: l'archivio commerciale richiede il piano Professional
+  (~99 USD/mese), non lo Standard da 29.
+- `lib/dati/aeroporti.json` (OpenFlights, 6.072 scali) + haversine come
+  riserva distanze.
 - ONLINE su rivoglio.netlify.app ma VECCHIO: i commit da f4e05a5 in poi
-  NON sono deployati. I deploy li fa Valerio a mano (o si riautorizza il
-  connettore Netlify su claude.ai).
-- Chiavi in .env.development.local: GEMINI (quota immagini 0, serve
-  fatturazione), FIGMA, MISTRAL, AERODATABOX. Mancano AVIATIONSTACK (la
-  crea Valerio) e UNSPLASH (in approvazione). Su Netlify mancano TUTTE
-  le chiavi segrete (Supabase secret, Resend, AeroDataBox, Mistral).
+  NON sono deployati. In QUESTA sessione remota il connettore Netlify non
+  è agganciato (serve l'autorizzazione su claude.ai, la sessione non può
+  fare l'OAuth): il deploy lo fa Valerio, o una sessione col connettore.
+- Chiavi in .env.development.local: GEMINI (quota immagini 0), FIGMA,
+  MISTRAL, AERODATABOX. Su Netlify mancano TUTTE le chiavi segrete
+  (Supabase secret, Resend, AeroDataBox, Mistral).
 
 ## Decisioni prese (ultime)
-- Senza "Live" sull'arrivo il motore non dà NESSUN verdetto (nemmeno il
-  no): un orario stimato non è un fatto. Cache: un atterrato non
-  verificato si richiede al fornitore, non si congela.
-- Codeshare IsCodeshared sopra soglia = incerto (la lettera va al vettore
-  operativo, che l'API non nomina). Sotto soglia il no resta un no.
-- Il testo della rinuncia è UNICO e versionato in `lib/pratiche/recesso.ts`;
-  copy.ts lo importa da lì. Se cambia il testo, cambia la versione.
-- Niente `aria-disabled` sui bottoni d'acquisto: il click senza spunta
-  mostra il richiamo (più onesto anche per gli screen reader).
-- Headline sui 12 MESI · voli ZZ* sempre demo · prove con chiavi azzerate.
+- Seconda fonte = documenti utente; l'upload vive DENTRO la pratica, dopo
+  il pagamento (popup dell'8/08). L'AI legge, non decide mai.
+- Scioperi: v1 conservativa, qualsiasi sciopero aereo del giorno (anche
+  handling/ATC locale) + ritardo sopra soglia = incerto; sotto soglia il
+  no resta un no. Confronto per codice IATA (voloIata.slice(0,2)).
+- Esclusi dal seed: scioperi revocati e settori non di linea (elicotteri).
+- Open-Meteo implementato ma spento finché Valerio non paga il piano.
+- PEC solo dal registro imprese; email reclami solo se vista su pagine del
+  dominio ufficiale (Air Europa sì; ITA, Lufthansa, Emirates no).
 
 ## File toccati in questo giro
-lib/regole/eu261.ts · lib/regole/casi-oro.ts · lib/voli/verifica.ts ·
-lib/voli/fornitori/{aerodatabox,demo}.ts · lib/pratiche/recesso.ts (nuovo) ·
-app/api/pratiche/recesso/route.ts (nuovo) · app/api/pratiche/checkout/route.ts ·
-app/api/polar/webhook/route.ts · app/verifica/[id]/page.tsx ·
-components/verifica/Risultato.tsx · lib/copy.ts · prove/verifica.spec.ts ·
-supabase/2026-08-08-recesso-e-live.sql (nuovo) · STATO.md · ARRETRATI.md
+lib/copy.ts (frase documenti + blocco pratica.documenti) ·
+lib/ocr/carta-imbarco.ts (nuovo) · app/api/pratiche/[id]/documento/route.ts
+(nuovo) · components/pratica/CaricaDocumento.tsx (nuovo, montato in
+app/pratica/[id]/page.tsx) · lib/lettera/compagnie.ts (10→20) ·
+lib/lettera/genera.ts (riga meteo opzionale) ·
+app/pratica/[id]/lettera/page.tsx (meteo + payload_grezzo) ·
+lib/meteo/openmeteo.ts (nuovo) · lib/scioperi/scioperi.ts (nuovo) ·
+lib/voli/distanza.ts + lib/dati/aeroporti.json (nuovi) ·
+lib/voli/verifica.ts (strato scioperi) · lib/voli/fornitori/aerodatabox.ts
+(IsOperator, km di riserva) · lib/regole/eu261.ts + casi-oro.ts (2026.08.3)
+· supabase/2026-08-09-scioperi.sql · STATO/PIANO/ARRETRATI/HANDOFF.
 
-## Cosa resta da fare (la mega to do vera è in ARRETRATI)
-1. #22 AviationStack appena arriva la chiave di Valerio (poi rimettere
-   "due fonti" in vetrina: le frasi vecchie sono nella history di copy.ts).
-2. #25 Osservatorio con le statistiche ritardi AeroDataBox.
-3. #27 i 7 pezzi: OpenFlights, fusi, Open-Meteo nel reclamo (l'asso),
-   scioperi MIT/ENAC, indirizzi 40 compagnie, OCR Mistral (da costruire:
-   è per questo che "sembra non funzionare").
+## Cosa resta da fare
+1. **Deploy**: il sito online è fermo a prima di f4e05a5. Serve Valerio
+   (manuale) o una sessione col connettore Netlify autorizzato.
+2. #25 Osservatorio con le statistiche ritardi AeroDataBox (ultimo pezzo
+   numerato).
+3. Scioperi di ottobre a inizio settembre (cruscotto MIT dal PC).
 4. Onboarding mobile ancora al prodotto viaggi (col tracker completo).
-5. Serve Valerio: deploy, chiavi su Netlify, prodotti Polar + approvazione,
-   AviationStack, fatturazione Gemini, dominio, social, legale.
+5. Serve Valerio: chiavi su Netlify, prodotti Polar + approvazione org,
+   fatturazione Gemini, dominio, social, legale.

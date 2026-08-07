@@ -36,11 +36,12 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | | Stato |
 |---|---|
 | Rules engine EU261 versionato, 3 stati, zero AI (`lib/regole/eu261.ts`) | ✅ 07/08 |
-| Golden set etichettato a mano + eval (falsi positivi 0, bloccante) | ✅ 25 casi, 28/28 verdi |
-| Schema dati: voli (cache+payload grezzo), verifiche, pratiche, eventi + RLS | ✅ applicato sul Supabase vero |
-| Fornitori dati volo (AeroDataBox, AviationStack, demo marcata) | ✅ 07/08, cache + payload grezzo come prova |
-| **Prova delle 2 ore: chiave AeroDataBox su 10 voli reali** | ⏳ **serve Valerio: è l'unico rischio che resta** |
-| Golden set esteso a 500 casi reali (gruppi FB, amici) | ⏳ dopo la prova |
+| Golden set etichettato a mano + eval (falsi positivi 0, bloccante) | ✅ 32 casi (dentro il FR4001 vero e 2 trappole sciopero) |
+| Schema dati: voli (cache+payload grezzo), verifiche, pratiche, eventi + RLS + scioperi | ✅ applicato sul Supabase vero |
+| Fornitori dati volo (AeroDataBox + demo marcata; distanze di riserva OpenFlights) | ✅ 8/08, cache + payload grezzo come prova |
+| Seconda fonte: documenti dell'utente via OCR Mistral dentro la pratica | ✅ 8/08 (concorde/discorde/illeggibile; discorde = conferma umana; file mai salvato) |
+| **Prova delle 2 ore: chiave AeroDataBox su voli reali** | ✅ 8/08: dati solidi con Live fino a 11 mesi (AZ610); oltre 365 giorni il BASIC rifiuta → vetrina onesta sui 12 mesi |
+| Golden set esteso a 500 casi reali (gruppi FB, amici) | ⏳ man mano che passano voli veri |
 
 ## 1.2 Le superfici web
 
@@ -49,11 +50,11 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | Landing check-first (hero col campo volo+data, garanzia, prezzi, FAQ oneste) | ✅ 07/08, rifinita (impeccable, taste, seo) |
 | Pagina risultato: reveal, dato oggettivo, card condivisibile, cattura email | ✅ 07/08 |
 | Checkout Polar (pratica 14,90 / famiglia 24,90) + webhook | ✅ codice pronto, firma provata su 10 casi · ⏳ i 2 link e il segreto da Valerio |
-| Lettera di reclamo deterministica + canali compagnie verificati | ✅ 10 compagnie, verificate il 07/08 |
+| Lettera di reclamo deterministica + canali compagnie verificati | ✅ 20 compagnie, riverificate l'8/08 (entità legali, NEB, chi rifiuta gli intermediari) + riga meteo pronta ma spenta |
 | Sequenza email T+0/2/15/30/60 (Resend) + cron follow-up | ✅ 07/08, invii idempotenti marcati a evento |
 | Tracker pratica (web) + area utente | ✅ 07/08 |
 | `/admin` shadow mode (conferma umana dei verdetti) | ✅ 07/08, SHADOW_MODE=1 |
-| Prove Playwright del flusso in modalità demo | ✅ 190/192 (2 = rete sandbox verso Supabase) + eval 28/28 |
+| Prove Playwright del flusso in modalità demo | ✅ 208/210 (2 = rete sandbox verso Supabase) + eval 35/35 |
 
 ## 1.3 Deploy e conti
 
@@ -106,16 +107,16 @@ Niente gamification, mai: si torna perché "mi devono dei soldi" succede
 ## Cosa blocca cosa
 
 ```
- chiave AeroDataBox ──→ prova 10 voli veri ──→ il check dà dati VERI (oggi: demo)
+ chiavi su Netlify (AERODATABOX + MISTRAL) ──→ il sito vero esce dalla demo e legge i documenti
  Polar: 2 checkout link + webhook secret ──→ si incassa
- chiavi su Netlify ──→ deploy completo (admin, email, motore)
+ deploy dell'ultimo ramo ──→ online il prodotto vero (oggi c'è il vecchio)
  dominio ──→ Resend verificato ──→ email a chiunque + link puliti nei video
  account social ──→ FASE 2
 ```
 
-**L'unico rischio tecnico rimasto è la prova AeroDataBox.** Tutto il resto
-è esecuzione.
+**La prova AeroDataBox è fatta (8/08, chiave vera su voli reali): non
+restano rischi tecnici aperti.** Tutto il resto è esecuzione.
 
 ## Prossimo pezzo di codice
-Chiudere il QA della build, deploy, poi: bagagli (settembre) e il tracker
-mobile completo. Le cose chieste e non fatte: `ARRETRATI.md`.
+Deploy dell'ultimo ramo, poi #25 (Osservatorio con statistiche ritardi
+vere). Le cose chieste e non fatte: `ARRETRATI.md`.

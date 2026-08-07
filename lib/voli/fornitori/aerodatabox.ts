@@ -17,6 +17,7 @@
  * - airline: {name, iata, icao} · greatCircleDistance: {km, ...} · isCargo
  */
 
+import { kmFraAeroporti } from "@/lib/voli/distanza";
 import type { FattoConPayload, FattoVolo, FornitoreVoli } from "../tipi";
 
 const HOST = "aerodatabox.p.rapidapi.com";
@@ -24,6 +25,7 @@ const HOST = "aerodatabox.p.rapidapi.com";
 type OrarioAdb = { utc?: string | null; local?: string | null } | null;
 
 type MovimentoAdb = {
+  airport?: { iata?: string | null } | null;
   scheduledTime?: OrarioAdb;
   revisedTime?: OrarioAdb;
   predictedTime?: OrarioAdb;
@@ -141,13 +143,21 @@ export const aerodatabox: FornitoreVoli = {
          (payload_grezzo conserva comunque tutta la risposta). */
       vettoreOperativo: compagnia,
       vettoreMarketing: volo.codeshareStatus === "IsCodeshared" ? compagnia : null,
-      vettoreDaDeterminare: volo.codeshareStatus === "IsCodeshared",
+      /* v1: si vende SOLO su IsOperator (regola di Valerio dell'8/08).
+         IsCodeshared, Unknown o campo assente: vettore da determinare,
+         il motore ferma la vendita. */
+      vettoreDaDeterminare: volo.codeshareStatus !== "IsOperator",
       arrivoPrevistoUtc: utcIso(volo.arrival?.scheduledTime),
       arrivoEffettivoUtc: stato === "atterrato" ? effettivo : null,
       stato,
       orarioVerificato: stato === "atterrato" ? tracciato : undefined,
       kmOrtodromica:
-        typeof volo.greatCircleDistance?.km === "number" ? volo.greatCircleDistance.km : null,
+        typeof volo.greatCircleDistance?.km === "number"
+          ? volo.greatCircleDistance.km
+          : kmFraAeroporti(
+              volo.departure?.airport?.iata ?? "",
+              volo.arrival?.airport?.iata ?? "",
+            ),
       fonte: "aerodatabox",
       payloadGrezzo: corpo,
     };

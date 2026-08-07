@@ -154,26 +154,32 @@ non altro codice.**
 | # | Cosa avevi chiesto | Come è stato chiuso |
 |---|---|---|
 | 68 | **#21 Rinuncia al recesso** ("te ne ho parlato e non la vedo", il buco più costoso) | Spunta esplicita con testo versionato (art. 59 Cod. Consumo, `lib/pratiche/recesso.ts`) prima dei bottoni Polar; consenso registrato lato server in `verifiche` (quando + testo esatto); la rotta di checkout respinge chi non ha firmato, anche con l'URL diretto; il webhook copia la firma nella cronologia della pratica e segnala l'anomalia se manca. Migrazione applicata e verificata sul Supabase vero. |
-| 69 | **Punto 3: "due fonti indipendenti" promesse senza averle** | Le 4 frasi in vetrina (come funziona, card del dato, pricing, FAQ) ora dicono "tracciamento reale del volo": vero da oggi anche nel motore. La frase "due fonti" torna quando arriva la tua chiave AviationStack (#22). |
+| 69 | **Punto 3: "due fonti indipendenti" promesse senza averle** | Le 4 frasi in vetrina (come funziona, card del dato, pricing, FAQ) ora dicono "tracciamento reale del volo": vero da oggi anche nel motore. Superato più tardi la stessa notte: la seconda fonte sono i documenti (riga 72). |
 | 70 | **#26 Motore sui campi veri** | Regola "senza Live niente vendita": quality senza "Live" sull'arrivo = NESSUN verdetto (nemmeno il no: 179 minuti stimati possono essere 185 veri). Codeshare non risolto sopra soglia = incerto (la lettera deve andare al vettore operativo). runwayTime/revisedTime già a posto. Golden set 25→30 casi, dentro il tuo FR4001 del 6/08 (155 min, non idoneo per 25 minuti). Versione regole 2026.08.2. Eval 33/33, falsi positivi 0. |
 | 71 | **"Leggi tutti i miei prompt, dimmi cosa è stato ignorato, mega to do list"** | Transcript completo riletto (34 messaggi, 17 prompt veri), audit consegnato in chat prompt per prompt, arretrati aggiornati qui sotto. |
+
+## ✅ CHIUSI l'8/08 notte fonda — quattordicesimo giro: la seconda fonte vera e i 7 pezzi (#27)
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 72 | **#22 La seconda fonte, dopo la scoperta che AviationStack free è finta** (solo tempo reale, licenza personale) | La seconda fonte sono i DOCUMENTI dell'utente, come hai deciso tu: dentro la pratica, dopo il pagamento, carichi carta d'imbarco o email della compagnia (`components/pratica/CaricaDocumento.tsx`). Mistral OCR fa UNA cosa (immagine → testo), l'estrazione dei campi è a regex, il confronto è deterministico: concorde = evento in cronologia, discorde = conferma umana, MAI un verdetto cambiato dal codice. Il file NON si salva. La landing dice la tua frase: "Incrociamo i dati ufficiali del volo con i tuoi documenti. Se non concordano, il caso è incerto e non paghi." |
+| 73 | **#27 OpenFlights come riserva distanze** | `lib/dati/aeroporti.json`: 6.072 aeroporti IATA (coordinate, città, fuso) congelati nel repo, `lib/voli/distanza.ts` con haversine. Se AeroDataBox non manda la distanza, la calcoliamo noi; se manca pure l'aeroporto, il campo resta nullo e il motore fa la sua parte (mai inventare). |
+| 74 | **#27 Scioperi (cgsse/MIT/ENAC), regola v1** | Tabella `scioperi` creata e POPOLATA sul Supabase vero (migrazione `20260809_scioperi`, 10 scioperi giugno-settembre 2026, controprova con SELECT: 10 righe). Fonti: ENAC (21/07 ufficiale) + testate che riportano i calendari MIT/CGS, perché i siti ufficiali dalla sandbox sono bloccati: da riverificare dal tuo PC. Regola nel motore (2026.08.3): sciopero noto + ritardo sopra soglia = INCERTO; sotto soglia il no resta un no. Esclusi apposta: DAT 21/07 (revocato) ed elicotteri Avincis 4/08 (non voli di linea). |
+| 75 | **#27 DB indirizzi reclamo, "fallo per terzo"** | `lib/lettera/compagnie.ts` da 10 a 20 compagnie con lo schema che hai dettato: entità legale, paese, ICAO, canale ufficiale, indirizzo postale, PEC (solo dal registro imprese), NEB con riferimento ENAC, accettaIntermediari, fonti citate riga per riga. Ricerca di 4 agenti in parallelo, tutte le 20 con URL sul dominio ufficiale. Il dato strategico c'è: Ryanair, easyJet, Wizz, Volotea e Norwegian scrivono nelle condizioni che lavorano SOLO il reclamo del passeggero: il nostro modello con loro è l'unico. Iberia e Transavia senza chiavi di nome (le sorelle Iberia Express e Transavia France sono società diverse: meglio nessun destinatario che quello sbagliato). |
+| 76 | **#27 Open-Meteo nel reclamo, "verifica la licenza prima"** | Verificata dal sorgente ufficiale del sito: l'API gratuita è SOLO non commerciale, e l'archivio storico a uso commerciale richiede il piano Professional (~99 USD/mese, non lo Standard da 29). Il modulo è PRONTO e cablato nella lettera (`lib/meteo/openmeteo.ts`, riga meteo dopo i fatti) ma SPENTO dietro OPENMETEO_COMMERCIALE=1, come da tua scelta col popup: si accende quando decidi di pagare il piano. |
+| 77 | **#27 Codeshare: vendi solo IsOperator** | Il fornitore marca `vettoreDaDeterminare` per ogni volo con codeshareStatus diverso da IsOperator: sopra soglia il motore dice incerto e la lettera non parte verso il vettore sbagliato. Il confronto scioperi usa il codice IATA del volo, non il nome del vettore. |
 
 ## ⏳ ANCORA DA FARE
 
 ### LA MEGA TO DO (dall'audit dei prompt, 8/08 notte)
 
 **Attività numerate restanti (dalla lista del 07/08 sera):**
-- **#22 Seconda fonte viva**: appena arriva la TUA chiave AviationStack si
-  accende l'incrocio e "due fonti" torna in vetrina. Il codice c'è già.
 - **#25 Osservatorio con dati veri**: alimentarlo dalle statistiche ritardi
   per aeroporto di AeroDataBox (endpoint esistente, verificare il tier),
-  così "i 10 voli più in ritardo" è vero dal numero 1.
-- **#27 I 7 pezzi del motore**: OpenFlights locale (riserva distanze) ·
-  fusi IANA (riserva) · **Open-Meteo storico nel reclamo** (l'asso: gratis,
-  senza chiave, nessuno in Italia lo fa) · scioperi MIT/ENAC · indirizzi
-  reclamo da 10 a 40 compagnie · **OCR carta d'imbarco con Mistral** (la
-  chiave c'è, l'OCR è DA COSTRUIRE: è questo il motivo per cui "sembra non
-  funzionare").
+  così "i 10 voli più in ritardo" è vero dal numero 1. È l'unico pezzo
+  numerato rimasto: #22 e #27 chiusi l'8/08 notte (righe 72-77).
+- **Scioperi di ottobre**: a inizio settembre, finita la franchigia estiva,
+  ricontrollare il cruscotto MIT e aggiungere le date nuove alla tabella.
 
 **Prodotto (dal documento, rimandati di proposito):**
 - **Onboarding dell'app mobile ancora al prodotto viaggi**: va riscritto
@@ -199,7 +205,9 @@ non altro codice.**
 2. Prodotti Polar + checkout link + segreto webhook + approvazione org.
 3. Chiavi su Netlify: SUPABASE_SECRET_KEY, RESEND_API_KEY,
    AERODATABOX_API_KEY, MISTRAL_API_KEY.
-4. Chiave AviationStack (l'hai scelta tu: free tier, 2 minuti).
+4. Riverificare gli scioperi sul cruscotto MIT dal tuo PC (la sandbox non
+   lo apre) · Open-Meteo Professional (~99 USD/mese) SOLO quando vorrai la
+   riga meteo nel reclamo: fino ad allora resta spenta per scelta.
 5. Fatturazione Gemini su Google AI Studio · UNSPLASH_ACCESS_KEY quando
    approvata · alla prossima fattura AeroDataBox chiedere la profondità
    storica dei piani a pagamento.

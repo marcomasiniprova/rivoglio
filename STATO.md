@@ -1,6 +1,7 @@
 # STATO — Rivoglio
 
-**Aggiornato:** 2026-08-08, notte (giro #21 recesso + #26 campi veri)
+**Aggiornato:** 2026-08-08, notte fonda (giro #27: seconda fonte documenti,
+20 compagnie, scioperi, meteo pronto ma spento)
 **RIVOGLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
 Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
 verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
@@ -15,11 +16,13 @@ social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
 - **Il motore EU261 decide, l'AI mai**: `lib/regole/eu261.ts`, versione
-  2026.08.2, tre stati (idoneo · incerto: MAI vendere · non idoneo).
+  2026.08.3, tre stati (idoneo · incerto: MAI vendere · non idoneo).
   Dal giro #26: senza quality "Live" sull'arrivo NESSUN verdetto (una stima
   non è un fatto), codeshare non risolto sopra soglia = incerto (la lettera
-  deve andare al vettore operativo). Golden set di 30 casi etichettati a
-  mano col PRIMO CASO REALE (FR4001 del 6/08, 155 min, non idoneo), eval
+  deve andare al vettore operativo). Dal giro #27: sciopero aereo noto nel
+  giorno del volo e ritardo sopra soglia = incerto (sotto soglia il no
+  resta un no). Golden set di 32 casi etichettati a mano col PRIMO CASO
+  REALE (FR4001 del 6/08, 155 min, non idoneo) e 2 trappole sciopero, eval
   bloccante: falsi positivi 0.
 - **La rinuncia al recesso (#21) è nel flusso**: spunta esplicita (art. 59
   Cod. Consumo, testo versionato in `lib/pratiche/recesso.ts`) prima del
@@ -27,20 +30,39 @@ social rifatta (era rimasta al prodotto viaggi).
   rotta di checkout NON lascia passare senza firma e il webhook la copia
   nella cronologia della pratica. Migrazione applicata sul Supabase vero
   (4 colonne verificate, `supabase/2026-08-08-recesso-e-live.sql`).
-- **La promessa "due fonti" tolta dalla vetrina**: finché AviationStack non
-  ha la chiave, landing e FAQ dicono "tracciamento reale del volo" (vero,
-  ora lo è anche nel motore). Si ripristina quando la seconda fonte è viva.
+- **La seconda fonte sono i documenti dell'utente (decisione di Valerio,
+  8/08)**: AviationStack free è morta (solo tempo reale, licenza personale).
+  Dentro la pratica, dopo il pagamento, c'è il caricamento della carta
+  d'imbarco o dell'email della compagnia: Mistral OCR trasforma l'immagine
+  in testo, l'estrazione dei campi è a regex, il confronto coi dati
+  verificati è deterministico. Concorde = evento in cronologia; discorde =
+  verifica in conferma umana, MAI un cambio di verdetto dal codice. Il FILE
+  NON SI SALVA (si legge, si registra l'esito, si scarta). La landing dice
+  la frase dettata: "Incrociamo i dati ufficiali del volo con i tuoi
+  documenti. Se non concordano, il caso è incerto e non paghi."
 - **Lo strato dei fatti**: AeroDataBox (dalla spec ufficiale, orario ruote a
-  terra, mai gonfiato) + AviationStack di riserva + demo marcata senza
-  chiave. Cache per volo+data, payload grezzo archiviato come prova.
+  terra, mai gonfiato) + demo marcata senza chiave. Cache per volo+data,
+  payload grezzo archiviato come prova. Distanze di riserva da
+  `lib/dati/aeroporti.json` (OpenFlights, 6.072 scali IATA, zero API).
+- **20 compagnie, scioperi e meteo (giro #27)**: `lib/lettera/compagnie.ts`
+  da 10 a 20 canali reclamo, riverificati l'8/08 da una squadra di ricerca
+  (entità legale, paese, NEB, indirizzo postale, fonti). FR, U2, W6, V7 e
+  DY dichiarano per iscritto che lavorano solo il reclamo inviato dal
+  passeggero: il modello di Rivoglio con loro è l'unico che funziona.
+  Tabella `scioperi` sul Supabase vero con 10 scioperi giugno-settembre
+  2026 (migrazione `20260809_scioperi`, fonti ENAC e testate; il cruscotto
+  MIT dalla sandbox è bloccato, da riverificare dal PC). Meteo storico
+  Open-Meteo nella lettera pronto ma SPENTO: l'archivio a uso commerciale
+  richiede il piano Professional, circa 99 USD/mese (verificato dal
+  sorgente ufficiale del sito); si accende con OPENMETEO_COMMERCIALE=1.
 - **Il funnel web-first**: check senza login/email/app; il reveal con
   l'importo che sale; email chiesta DOPO; Polar (checkout link + webhook con
   firma Standard Webhooks provata su 10 casi); lettera deterministica coi
   canali reclamo verificati di 10 compagnie; email T+0/2/15/30/60; garanzia
   90 giorni; tracker web; `/admin` = conferma umana (shadow mode acceso).
-- **Prove**: web 204/206 Playwright (2 = rete sandbox verso Supabase),
-  eval 33/33, mobile tsc/lint/jest 29/29. Una prova vieta per sempre
-  "hai diritto a" e il trattino lungo nei testi visibili.
+- **Prove**: web 208/210 Playwright (2 = rete sandbox verso Supabase),
+  eval 35/35 sui 32 casi d'oro, mobile tsc/lint/jest 29/29. Una prova
+  vieta per sempre "hai diritto a" e il trattino lungo nei testi visibili.
 - **Schema dati applicato sul Supabase vero** (voli, verifiche, pratiche,
   eventi + RLS) via Composio, come migrazione tracciata.
 - **SEO/GEO**: robots, sitemap, JSON-LD Organization+WebSite, llms.txt,
@@ -83,10 +105,12 @@ social rifatta (era rimasta al prodotto viaggi).
 3. **Chiavi su Netlify** (progetto `rivoglio`): SUPABASE_SECRET_KEY,
    RESEND_API_KEY, e ora anche AERODATABOX_API_KEY e MISTRAL_API_KEY (in
    locale ci sono, online no: senza la prima il sito vero gira in demo).
-4. **Chiave AviationStack** (free tier, hai scelto di crearla tu): accende
-   l'incrocio delle fonti e ci fa rimettere "due fonti" in vetrina. Alla
-   prossima fattura AeroDataBox chiedi la profondità storica dei piani a
-   pagamento. Poi 30 casi reali a mano per il golden set.
+4. **Scioperi e meteo**: riverifica le date scioperi sul cruscotto MIT
+   (scioperi.mit.gov.it, la sandbox non lo apre) e a inizio settembre
+   aggiungi quelli di ottobre. La riga meteo nel reclamo si accende solo
+   col piano Open-Meteo Professional (~99 USD/mese): decidi quando ci sono
+   incassi. Alla prossima fattura AeroDataBox chiedi la profondità storica.
+   Poi 30 casi reali a mano per il golden set.
 5. **Dominio** per Rivoglio (slot gratuito Hostinger da configurare) e
    account social `@rivoglio`.
 6. Legale su condizioni d'uso; commercialista sul regime fiscale (il
@@ -106,3 +130,8 @@ social rifatta (era rimasta al prodotto viaggi).
   DB: non usarle, non cancellarle.
 - Resend in prova spedisce SOLO a valerio@artecai.it finché il dominio non
   è verificato.
+- La tabella `scioperi` non ha API: si aggiorna a mano con una migrazione.
+  `compagnie` usa SOLO codici IATA; vuoto = sciopero generale, vale per
+  tutti i voli del giorno.
+- OPENMETEO_COMMERCIALE assente = modulo meteo muto per scelta: la lettera
+  esce senza riga meteo, nessun errore. Non "sistemarlo".

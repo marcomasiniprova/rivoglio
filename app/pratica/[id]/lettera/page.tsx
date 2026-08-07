@@ -9,6 +9,8 @@ import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { compagniaPerVettore } from "@/lib/lettera/compagnie";
 import { ALLEGATI, generaReclamo, testoEnac } from "@/lib/lettera/genera";
+import { METEO_ATTIVO, fraseMeteo, meteoStorico } from "@/lib/meteo/openmeteo";
+import { aeroporto } from "@/lib/voli/distanza";
 import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
 import type { Passeggero, TipoPratica } from "@/lib/pratiche/pratiche";
 
@@ -53,7 +55,17 @@ type RigaVolo = {
   km_ortodromica: number | null;
   fonte: string;
   fonti_discordanti: boolean;
+  /** Il payload archiviato del fornitore: qui dentro c'è l'IATA di arrivo. */
+  payload_grezzo: unknown;
 };
+
+/** L'aeroporto di arrivo, letto dal payload archiviato (AeroDataBox). */
+function iataArrivoDaPayload(payload: unknown): string | null {
+  const iata = (
+    payload as { arrival?: { airport?: { iata?: string | null } | null } | null } | null
+  )?.arrival?.airport?.iata;
+  return typeof iata === "string" && iata.trim().length === 3 ? iata.trim().toUpperCase() : null;
+}
 
 type RigaVerifica = {
   esito: "idoneo" | "incerto" | "non_idoneo";
@@ -150,7 +162,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
     ? ((await db
         .from("voli")
         .select(
-          "volo_iata, data_locale, vettore_operativo, vettore_marketing, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti",
+          "volo_iata, data_locale, vettore_operativo, vettore_marketing, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, payload_grezzo",
         )
         .eq("id", pratica.volo_id)
         .maybeSingle()) as { data: RigaVolo | null })
@@ -203,10 +215,30 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
     versioneRegole: verifica.versione_regole,
   };
 
+  /* La riga meteo che disinnesca la scusa "maltempo": SPENTA finché
+     Valerio non sottoscrive il piano commerciale di Open-Meteo
+     (OPENMETEO_COMMERCIALE=1). Ogni buco nella catena = niente riga,
+     la lettera non muore mai per il meteo. */
+  let meteo: string | null = null;
+  if (METEO_ATTIVO && volo.arrivo_effettivo_utc) {
+    const scalo = aeroporto(iataArrivoDaPayload(volo.payload_grezzo));
+    if (scalo) {
+      meteo = fraseMeteo(
+        await meteoStorico(
+          scalo.lat,
+          scalo.lon,
+          volo.arrivo_effettivo_utc.slice(0, 10),
+          volo.arrivo_effettivo_utc,
+        ),
+      );
+    }
+  }
+
   const lettera = generaReclamo(
     { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo },
     fatto,
     verdetto,
+    { meteo },
   );
 
   if (!lettera) {

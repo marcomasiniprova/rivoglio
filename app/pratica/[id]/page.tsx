@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, ArrowRight, FileText, Send, ShieldCheck } from "lucide-react";
 import Logo from "@/components/Logo";
+import CaricaDocumento from "@/components/pratica/CaricaDocumento";
 import { Button } from "@/components/ui/button";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
@@ -239,6 +240,9 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           <p className="mt-4 text-sm leading-relaxed text-fumo-2">{C.istruzioniInvio.perche}</p>
         </section>
       )}
+
+      {/* ------------------------------------------------ i documenti */}
+      {conLettera && <CaricaDocumento praticaId={pratica.id} />}
 
       {/* ------------------------------------------------ la cronologia */}
       <section className="rounded-2xl border border-bordo bg-white px-6 py-6">

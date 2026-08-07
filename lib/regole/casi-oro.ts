@@ -6,10 +6,11 @@ import type { FattoVolo, Verdetto } from "./eu261";
  * Se il motore e questo file discordano, si indaga: non si "aggiusta"
  * mai l'etichetta per far passare la prova.
  *
- * Distribuzione (da SPEC §4): 9 idonei, 11 non idonei, 10 incerti, con i
+ * Distribuzione (da SPEC §4): 9 idonei, 12 non idonei, 11 incerti, con i
  * confini cattivi dentro: 179/180 minuti, 1500/1501 km, 3500/3501 km,
  * 239/240 minuti sul lungo raggio, dati mancanti, fonti discordanti,
- * orario senza tracciamento Live, codeshare da risolvere. In coda il
+ * orario senza tracciamento Live, codeshare da risolvere, sciopero noto.
+ * In coda il
  * PRIMO CASO REALE: FR4001 del 6/08/2026 (il volo di Valerio).
  */
 
@@ -108,6 +109,16 @@ export const CASI_ORO: Caso[] = [
   {
     nome: "codeshare sotto soglia: il no resta un no",
     fatto: conRitardo(100, { vettoreDaDeterminare: true }),
+    atteso: { esito: "non_idoneo" },
+  },
+  {
+    nome: "TRAPPOLA: sopra soglia MA sciopero noto quel giorno",
+    fatto: conRitardo(300, { scioperoNoto: true }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    nome: "sciopero e sotto soglia: il no resta un no",
+    fatto: conRitardo(60, { scioperoNoto: true }),
     atteso: { esito: "non_idoneo" },
   },
   {

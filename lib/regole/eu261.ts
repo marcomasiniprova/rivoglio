@@ -16,7 +16,7 @@
  * i casi d'oro devono passare tutti.
  */
 
-export const VERSIONE_REGOLE = "2026.08.2";
+export const VERSIONE_REGOLE = "2026.08.3";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
 const SOGLIA_MINUTI = 180;
@@ -56,6 +56,14 @@ export type FattoVolo = {
    * chi ha OPERATO il volo: il reclamo andrebbe alla compagnia sbagliata.
    */
   vettoreDaDeterminare?: boolean;
+  /**
+   * Vero quando la data del volo coincide con uno sciopero del trasporto
+   * aereo noto (tabella `scioperi`, fonti pubbliche: CGS, MIT, ENAC).
+   * Regola v1 di Valerio (8/08): sciopero noto = incerto, non si vende.
+   * Distinguere personale di compagnia (non è circostanza straordinaria)
+   * da ATC esterno (lo è) richiede la verifica umana: shadow mode.
+   */
+  scioperoNoto?: boolean;
   fonte: string;
 };
 
@@ -155,6 +163,16 @@ export function valuta(f: FattoVolo): Verdetto {
         ? `Questo volo è arrivato in orario${ritardo < 0 ? " (in anticipo)" : ""}.`
         : `Questo volo è arrivato con ${ritardo} minuti di ritardo: sotto la soglia delle 3 ore (180 minuti) non spetta la compensazione.`;
     return nonIdoneo(ritardo, testo);
+  }
+
+  /* Sopra soglia con sciopero noto quel giorno: l'esito dipende da CHI
+     scioperava (personale di compagnia = si paga; ATC esterno = no).
+     Distinzione da umano, non da regola: incerto, non si vende. Sotto
+     soglia non si arriva qui: il no resta un no, sciopero o non sciopero. */
+  if (f.scioperoNoto === true) {
+    return incerto(
+      "Il ritardo supera le 3 ore, ma nel giorno di questo volo risulta uno sciopero del trasporto aereo: l'esito dipende da chi scioperava e lo verifichiamo a mano. Non ti facciamo pagare niente finché non è chiaro.",
+    );
   }
 
   /* Codeshare non risolto: il ritardo c'è, ma il reclamo deve andare al

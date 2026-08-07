@@ -23,6 +23,7 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { aerodatabox } from "./fornitori/aerodatabox";
 import { aviationstack } from "./fornitori/aviationstack";
 import { demo } from "./fornitori/demo";
+import { scioperoInData } from "@/lib/scioperi/scioperi";
 import { normalizzaData, normalizzaVolo } from "./normalizza";
 import type { FattoConPayload, FornitoreVoli } from "./tipi";
 
@@ -187,6 +188,18 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
         }
       }
     }
+  }
+
+  // ── Strato 2c: gli scioperi noti del giorno (tabella a mano) ─────────
+  /* Fail-open dichiarato: se il DB tace, niente flag e si procede; il
+     rischio residuo lo copre lo shadow mode (conferma umana). I voli
+     demo (ZZ*) non interrogano il DB: restano deterministici. */
+  if (!fatto.voloIata.startsWith("ZZ")) {
+    /* Alla tabella serve il codice IATA, non il nome del vettore: lo
+       prendiamo dal numero di volo (per i casi vendibili, IsOperator,
+       coincide col vettore operativo). */
+    const sciopero = await scioperoInData(fatto.dataLocale, fatto.voloIata.slice(0, 2));
+    if (sciopero) fatto = { ...fatto, scioperoNoto: true };
   }
 
   // ── Strato 3: le regole. Solo codice, mai AI. ────────────────────────
