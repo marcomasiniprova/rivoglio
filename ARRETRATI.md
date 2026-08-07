@@ -92,6 +92,16 @@ non altro codice.**
 | 39 | **"Le 3 fasi: SVILUPPO, DISTRIBUZIONE, MIGLIORAMENTO"** | `PIANO.md` riscritto con le tre fasi come le hai definite + artefatto visivo della fase SVILUPPO consegnato. |
 | 40 | **"UI come le 4 foto di riferimento"** | Direzione registrata in `BRAND.md` (luce e aria, vetro smerigliato, card pulite, stepper): cielo sull'hero, form col bordo che pulsa, reveal col contatore, schermate di conferma consegnate. |
 
+## ✅ CHIUSI l'8/08 — settimo giro: logo definitivo e rifiniture dal vivo
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 41 | **"Logo nuovo definitivo, posizionalo benissimo e migliora la qualità"** | Sfondo tolto col riempimento dai bordi, solo la lente estratta come componente connesso, upscalata a 1024px e affilata. Montata in nav, footer e card di condivisione via `components/Logo.tsx`; scritta accanto in due toni (Rivo scuro, glio verde) come nel lockup. Icone rifatte: `app/icon.png` 512, `apple-icon.png` 180, favicon.ico, manifest e JSON-LD aggiornati. Vecchio segno (sole e strada) eliminato. |
+| 42 | **"Nel footer l'immagine del telefono come il riferimento, senza sfondo"** | La tua foto ripulita (sfondo a righe tolto, tenuto solo il componente mano+telefono, 878x1257) in una card bianca sul footer scuro: titolo, testo, bottone verde e il telefono che entra dal bordo basso. Come la quarta immagine, coi nostri colori. |
+| 43 | **"La scritta Rivoglio in basso più grande e occupante"** | Maiuscola come nel lockup, fino a 15rem, taglio sul bordo basso, sfumatura menta. Occupa tutta la larghezza. |
+| 44 | **"FAQ: testo in disparte, centralo"** | Titolo centrato sopra le domande, lista in colonna da 760px. Prima era una griglia con la colonna laterale. |
+| 45 | **"Newsletter schiacciata piccolissima"** | Trovata la causa vera: `flex-1` sul campo email dentro un contenitore in colonna (sul telefono governa l'altezza, non la larghezza): campo a 27px contro i 52 del bottone. Ora `sm:flex-1`: 52px misurati, prova visiva fatta. |
+
 ## ⏳ ANCORA DA FARE
 
 ### Per Rivoglio (dal documento, rimandati di proposito)

@@ -108,7 +108,7 @@ export default function Osservatorio() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder={SEZIONE.campoEmail.segnaposto}
-                  className="h-13 w-full min-w-0 flex-1 rounded-bottone border border-white/15 bg-white/8 px-4 text-[16px] text-white outline-none transition-all duration-200 placeholder:text-white/30 focus:border-menta/60 focus:bg-white/14 focus:ring-4 focus:ring-menta/12"
+                  className="h-13 w-full min-w-0 sm:flex-1 rounded-bottone border border-white/15 bg-white/8 px-4 text-[16px] text-white outline-none transition-all duration-200 placeholder:text-white/30 focus:border-menta/60 focus:bg-white/14 focus:ring-4 focus:ring-menta/12"
                 />
                 <button
                   type="submit"

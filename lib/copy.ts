@@ -677,6 +677,14 @@ export const COPY = {
 
   footer: {
     frase: "Rivoglio è lo scanner dei rimborsi. Oggi i voli. Presto bagagli e treni.",
+    cartolina: {
+      titolo: "Il check è gratis.",
+      corsivo: "Il ritardo è già tuo.",
+      testo:
+        "Numero del volo e data: in 30 secondi sai se rientri nelle fasce del CE 261/2004. Senza account, senza carta.",
+      bottone: "Controlla il tuo volo",
+      altTelefono: "L'app di Rivoglio in mano: il check del volo sul telefono",
+    },
     colonne: {
       prodotto: {
         titolo: "Prodotto",

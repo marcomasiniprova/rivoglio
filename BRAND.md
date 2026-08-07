@@ -71,15 +71,26 @@ Gli stessi di Zentivo, misurati dal template dal vivo:
 
 ## Il marchio
 
-Tre forme sole: **il sole** (oro), **l'orizzonte** (menta), **la mezzeria**
-(verde mare). La mezzeria è quella che lo fa leggere come *strada* e non come
-collina: senza, il logo diventa un'alba qualunque.
+**Definitivo, scelto da Valerio l'8/08: la lente con l'aereo e le barre.**
+Una lente d'ingrandimento (il check), dentro un aereo in decollo e tre barre
+che salgono (la compensazione). Interno bianco, tratto verde in gradiente.
+Il vecchio segno a tre forme (sole, orizzonte, mezzeria) era dell'idea
+viaggi: non usarlo più.
+
+I file, generati dall'originale di Valerio (sfondo tolto, upscalato):
+- `public/marchio.png`: solo la lente, fondo trasparente. È quella che gira
+  nel sito (nav, footer, card di condivisione).
+- `public/marchio-completo.png`: lockup intero con la scritta RIVOGLIO e la
+  micro-tagline, trasparente. Per store, social e materiali.
+- `app/icon.png` (512) e `app/apple-icon.png` (180): lente su fondo bianco.
+- La scritta accanto alla lente nel sito è testo vero, in due toni come nel
+  lockup: "Rivo" scuro, "glio" verde.
 
 ### La regola che comanda su tutte
 **Deve reggere a 24 pixel.** È lì che verrà visto quasi sempre: favicon del
 browser, avatar del bot Telegram, icona sulla schermata Home del telefono.
-Prima di aggiungere qualsiasi dettaglio, rimpicciolisci a 24px e guarda.
-Se non si capisce più, il dettaglio non entra.
+L'interno bianco della lente è quello che la salva sui fondi scuri e nelle
+misure piccole: non riempirlo mai di colore.
 
 ### Cosa non fare
 - Non allungarlo né schiacciarlo: si ridimensiona sempre in proporzione.

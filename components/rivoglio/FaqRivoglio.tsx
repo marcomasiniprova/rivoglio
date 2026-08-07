@@ -17,16 +17,16 @@ const titoloCorsivo = SEZIONE.titolo.slice(stacco + 1);
 export default function FaqRivoglio() {
   return (
     <section id="domande" className="scroll-mt-24 px-5 py-24 sm:px-8 sm:py-28">
-      <div className="mx-auto grid max-w-[1000px] gap-12 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-20">
+      <div className="mx-auto max-w-[760px]">
         <Anima>
-          <h2 className="luce-testo text-[clamp(2rem,4.4vw,2.9rem)] leading-[1.06]">
+          <h2 className="luce-testo text-center text-[clamp(2rem,4.4vw,2.9rem)] leading-[1.06]">
             {titoloPrima}
             <br />
             <span className="corsivo text-verde-scuro">{titoloCorsivo}</span>
           </h2>
         </Anima>
 
-        <AnimaLista className="divide-y divide-bordo border-y border-bordo" passo={0.05}>
+        <AnimaLista className="mt-12 divide-y divide-bordo border-y border-bordo" passo={0.05}>
           {SEZIONE.voci.map((q) => (
             <Figlio key={q.domanda}>
               <details className="group py-5">

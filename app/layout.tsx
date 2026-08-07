@@ -63,7 +63,7 @@ const DATI_STRUTTURATI = {
       "@id": `${CASA.href}#organizzazione`,
       name: "Rivoglio",
       url: CASA.href,
-      logo: `${CASA.href}icona.svg`,
+      logo: `${CASA.href}icon.png`,
       description:
         "Lo scanner dei rimborsi: verifica gratuita dei voli in ritardo e reclamo pronto da inviare. CE 261/2004.",
     },

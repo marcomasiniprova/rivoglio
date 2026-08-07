@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Marchio } from "./Logo";
 import BadgeStore from "./BadgeStore";
@@ -70,6 +71,40 @@ export default function Footer() {
         className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(127,232,174,.55),transparent)]"
       />
       <div className="mx-auto max-w-[1240px]">
+        {/* La cartolina: card bianca sul fondo scuro, come i riferimenti
+            scelti da Valerio. A destra il telefono in mano (foto sua,
+            sfondo tolto): la mano entra dal bordo basso della card. */}
+        <div className="mb-20 overflow-hidden rounded-[2rem] bg-white text-inchiostro">
+          <div className="grid items-end gap-0 md:grid-cols-[1.1fr_0.9fr]">
+            <div className="px-7 py-10 sm:px-12 sm:py-14 md:pb-16 md:pt-16">
+              <h2 className="luce-testo text-[clamp(1.9rem,3.8vw,2.7rem)] leading-[1.06]">
+                {F.cartolina.titolo}
+                <br />
+                <span className="corsivo text-verde-scuro">{F.cartolina.corsivo}</span>
+              </h2>
+              <p className="mt-4 max-w-sm text-[15.5px] leading-relaxed text-fumo">
+                {F.cartolina.testo}
+              </p>
+              <Link
+                href="/#controllo"
+                className="riflesso mt-8 inline-flex h-13 items-center gap-2 rounded-bottone bg-verde px-7 text-[15.5px] font-semibold text-white shadow-[0_14px_32px_-14px_rgba(10,157,92,.65)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro"
+              >
+                {F.cartolina.bottone}
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <div className="relative flex items-end justify-center px-6 pt-2 md:pt-8">
+              <Image
+                src="/telefono-app.png"
+                alt={F.cartolina.altTelefono}
+                width={878}
+                height={1257}
+                className="h-[320px] w-auto object-contain object-bottom sm:h-[380px] md:h-[440px]"
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div className="max-w-xs">
             <Link href="/" className="inline-flex items-center gap-2.5">
@@ -171,8 +206,11 @@ export default function Footer() {
             sfuma verso il basso: è una firma, non un titolo. Il nowrap non
             è estetica, è necessario: andando a capo diventa una parola
             orfana enorme in mezzo allo schermo. */}
-        <div className="relative mt-8 select-none overflow-hidden" aria-hidden="true">
-          <p className="translate-y-[16%] whitespace-nowrap bg-[linear-gradient(180deg,rgba(127,232,174,.4)_0%,rgba(127,232,174,.04)_82%)] bg-clip-text text-center font-display text-[clamp(2.4rem,8.6vw,8.4rem)] font-medium leading-[0.84] tracking-[-0.06em] text-transparent">
+        {/* Più grande e più presente per volere di Valerio (8/08), maiuscolo
+            come nel lockup del marchio: occupa tutta la larghezza e viene
+            tagliato dal bordo basso, come nei riferimenti. */}
+        <div className="relative mt-10 select-none overflow-hidden" aria-hidden="true">
+          <p className="translate-y-[24%] whitespace-nowrap bg-[linear-gradient(180deg,rgba(127,232,174,.5)_0%,rgba(127,232,174,.05)_85%)] bg-clip-text text-center font-display text-[clamp(3.4rem,13.5vw,15rem)] font-medium uppercase leading-[0.8] tracking-[-0.05em] text-transparent">
             {COPY.comune.marchio}
           </p>
         </div>

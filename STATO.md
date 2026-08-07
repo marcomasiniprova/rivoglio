@@ -1,11 +1,17 @@
 # STATO — Rivoglio
 
-**Aggiornato:** 2026-08-08, notte fonda
-**RIVOGLIO È COSTRUITO.** Il prodotto definito dal documento di Valerio
-esiste da capo a fondo: check gratuito sul web col dato oggettivo, verdetto
-a tre stati dal motore deterministico, pagamento Polar, lettera di reclamo
-pronta, sequenza di follow-up, tracker, admin in shadow mode. Rifinito con
-impeccable, taste e seo. Tagline: *Riprenditi i soldi che ti devono.*
+**Aggiornato:** 2026-08-08, sera
+**RIVOGLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
+Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
+verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
+reclamo pronta, sequenza di follow-up, tracker, admin in shadow mode.
+Rifinito con impeccable, taste e seo. Tagline: *Riprenditi i soldi che ti
+devono.* Valerio ha messo online una copia su rivoglioo.netlify.app (suo
+account) e ha scelto il **logo definitivo: la lente con l'aereo e le barre**
+(vedi BRAND). L'8/08 sera: logo montato ovunque, footer con la cartolina
+bianca e il telefono in mano (foto sua, sfondo tolto), FAQ centrata,
+campo email dell'Osservatorio non più schiacciato sul telefono, immagine
+social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
 - **Il motore EU261 decide, l'AI mai**: `lib/regole/eu261.ts`, versione

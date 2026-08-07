@@ -1,34 +1,23 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /**
- * Il segno di Rivoglio.
- *
- * Vincolo: deve reggere a 24px, perché è lì che si vede quasi sempre
- * (favicon, avatar del bot Telegram, icona sulla schermata Home).
- * SOLO TRE FORME: sole, orizzonte, mezzeria. Un quarto elemento a 24px
- * diventa una macchia — provato con Playwright, non aggiungerlo.
+ * Il segno di Rivoglio: la lente con l'aereo e le barre.
+ * Definitivo, scelto da Valerio l'8/08. L'originale ad alta risoluzione
+ * è `public/marchio.png` (solo segno, fondo trasparente); il lockup
+ * completo con la scritta è `public/marchio-completo.png`.
+ * L'interno bianco della lente lo fa reggere anche sui fondi scuri.
  */
 export function Marchio({ className = "h-9 w-9" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden="true">
-      <rect width="32" height="32" rx="8.5" fill="var(--color-verde)" />
-      <circle cx="16" cy="13.2" r="5.1" fill="var(--color-sole)" />
-      <path
-        d="M4.5 24.2C9 20.6 23 20.6 27.5 24.2"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-      />
-      {/* la mezzeria fa leggere "strada" invece di "collina".
-          Provata a 24px: sotto strokeWidth 2 sparisce. Non ridurla. */}
-      <path
-        d="M12.4 21.9h3.1M18 22.3h3"
-        stroke="var(--color-verde)"
-        strokeWidth="2.1"
-        strokeLinecap="round"
-      />
-    </svg>
+    <Image
+      src="/marchio.png"
+      alt=""
+      aria-hidden="true"
+      width={96}
+      height={97}
+      className={`${className} shrink-0 object-contain`}
+    />
   );
 }
 
@@ -37,7 +26,7 @@ export default function Logo({ scuro = false }: { scuro?: boolean }) {
     <Link
       href="/"
       className="group flex shrink-0 items-center gap-2.5"
-      aria-label="Rivoglio, la tua fuga al prezzo giusto"
+      aria-label="Rivoglio, lo scanner dei rimborsi"
     >
       <Marchio className="h-9 w-9 shrink-0 transition-transform duration-500 group-hover:-rotate-6" />
       {/* Sotto i 420px il nome per esteso non ci sta accanto al bottone:
@@ -47,7 +36,9 @@ export default function Logo({ scuro = false }: { scuro?: boolean }) {
           scuro ? "text-white" : "text-inchiostro"
         }`}
       >
-        Rivoglio
+        {/* due toni come nel lockup: Rivo scuro, glio verde */}
+        Rivo
+        <span className={scuro ? "text-menta" : "text-verde"}>glio</span>
       </span>
     </Link>
   );

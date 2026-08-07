@@ -113,11 +113,12 @@ test.describe("Landing page", () => {
 
   test("il logo regge a 24px (è lì che si vede quasi sempre)", async ({ page }) => {
     await page.goto("/");
-    const logo = page.locator("header svg").first();
+    // il segno nuovo è un'immagine (la lente), non più un svg disegnato
+    const logo = page.locator("header img").first();
     await expect(logo).toBeVisible();
     await logo.evaluate((el) => {
-      (el as SVGElement).style.width = "24px";
-      (el as SVGElement).style.height = "24px";
+      (el as HTMLElement).style.width = "24px";
+      (el as HTMLElement).style.height = "24px";
     });
     await logo.screenshot({ path: "prove/schermate/logo-24px.png" });
   });

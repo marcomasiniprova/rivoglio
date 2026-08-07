@@ -25,8 +25,9 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#0a9d5c",
     categories: ["travel", "lifestyle"],
     icons: [
-      { src: "/icona.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
-      { src: "/icon", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: "/icon.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      // il fondo bianco attorno alla lente fa da zona sicura per il ritaglio
+      { src: "/icon.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }

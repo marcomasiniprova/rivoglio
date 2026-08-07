@@ -1,19 +1,24 @@
+import { readFile } from "node:fs/promises";
 import { ImageResponse } from "next/og";
-import { CONTO, ESEMPIO, euro } from "@/lib/esempio";
+import { COPY } from "@/lib/copy";
 
 /**
  * L'immagine che si vede quando qualcuno incolla il link su WhatsApp,
- * Telegram, Facebook o X. Prima non c'era: usciva un rettangolo grigio,
- * che su un prodotto di viaggi è il modo più veloce per non farsi cliccare.
- *
- * Dentro ci mettiamo il conto vero, gli stessi numeri di lib/esempio.ts:
- * l'anteprima vende esattamente quello che vende il sito.
+ * Telegram, Facebook o X. Vende esattamente quello che vende il sito:
+ * il verdetto col dato oggettivo, gli stessi numeri di COPY (il caso
+ * costruito di lib/copy.ts, quello marcato demo sulla landing).
  */
-export const alt = "Rivoglio: la tua fuga, al prezzo giusto";
+export const alt = "Rivoglio: riprenditi i soldi che ti devono";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default function Anteprima() {
+const E = COPY.datoOggettivo.esempio;
+
+/* Il segno nuovo (la lente): letto da disco, Next impacchetta l'asset. */
+const marchio = readFile(new URL("./marchio-og.png", import.meta.url));
+
+export default async function Anteprima() {
+  const segno = `data:image/png;base64,${(await marchio).toString("base64")}`;
   return new ImageResponse(
     (
       <div
@@ -28,21 +33,24 @@ export default function Anteprima() {
           fontFamily: "sans-serif",
         }}
       >
-        {/* marchio */}
+        {/* marchio: la lente su gettone bianco, il nome in due toni */}
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <svg width="56" height="56" viewBox="0 0 32 32">
-            <rect width="32" height="32" rx="8.5" fill="#0a9d5c" />
-            <circle cx="16" cy="13.2" r="5.1" fill="#f5c451" />
-            <path
-              d="M4.5 24.2C9 20.6 23 20.6 27.5 24.2"
-              fill="none"
-              stroke="#fff"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-            />
-          </svg>
-          <span style={{ color: "#fff", fontSize: 30, fontWeight: 600 }}>
-            Rivoglio
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 64,
+              height: 64,
+              borderRadius: 16,
+              background: "#fff",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={segno} alt="" width={46} height={46} />
+          </div>
+          <span style={{ color: "#fff", fontSize: 32, fontWeight: 600 }}>
+            Rivo<span style={{ color: "#7fe8ae" }}>glio</span>
           </span>
         </div>
 
@@ -51,33 +59,33 @@ export default function Anteprima() {
             <span
               style={{
                 color: "#fff",
-                fontSize: 68,
+                fontSize: 66,
                 fontWeight: 700,
                 lineHeight: 1.05,
                 letterSpacing: -2.5,
               }}
             >
-              La tua fuga,
+              Riprenditi i soldi
             </span>
             <span
               style={{
                 color: "#7fe8ae",
-                fontSize: 68,
+                fontSize: 66,
                 fontWeight: 700,
                 lineHeight: 1.05,
                 letterSpacing: -2.5,
               }}
             >
-              al prezzo giusto.
+              che ti devono.
             </span>
             <span style={{ color: "#a7d9c2", fontSize: 27, marginTop: 26, lineHeight: 1.4 }}>
-              Ti avviso quando esiste una fuga di due notti
+              Volo in ritardo negli ultimi 5 anni? Check gratuito
               <br />
-              sotto il tuo budget. Alloggio e auto, tutto compreso.
+              in 30 secondi, senza account. Reg. CE 261/2004.
             </span>
           </div>
 
-          {/* il conto vero */}
+          {/* il verdetto, com'è sul sito */}
           <div
             style={{
               display: "flex",
@@ -88,16 +96,20 @@ export default function Anteprima() {
               width: 400,
             }}
           >
-            <span style={{ fontSize: 19, color: "#0a9d5c", fontWeight: 600 }}>
-              SOTTO LA TUA SOGLIA
+            <span
+              style={{
+                fontSize: 19,
+                color: "#0a9d5c",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: 1,
+              }}
+            >
+              {E.occhiello}
             </span>
-            <span style={{ fontSize: 34, fontWeight: 700, marginTop: 12, letterSpacing: -1 }}>
-              {ESEMPIO.partenza} → {ESEMPIO.destinazione}
+            <span style={{ fontSize: 33, fontWeight: 700, marginTop: 12, letterSpacing: -1 }}>
+              {E.titolo}
             </span>
-            <span style={{ fontSize: 20, color: "#6b7280", marginTop: 6 }}>
-              {ESEMPIO.notti} notti · in {ESEMPIO.persone} · {ESEMPIO.kmAndata} km
-            </span>
-
             <div
               style={{
                 display: "flex",
@@ -107,8 +119,8 @@ export default function Anteprima() {
                 color: "#6b7280",
               }}
             >
-              <span>Alloggio</span>
-              <span style={{ color: "#0a0a0a" }}>{euro(ESEMPIO.alloggioPersona)}</span>
+              <span>{E.previstoEtichetta}</span>
+              <span style={{ color: "#0a0a0a", fontWeight: 600 }}>{E.previsto}</span>
             </div>
             <div
               style={{
@@ -119,8 +131,8 @@ export default function Anteprima() {
                 color: "#6b7280",
               }}
             >
-              <span>Auto a testa</span>
-              <span style={{ color: "#0a0a0a" }}>{euro(CONTO.autoPersona)}</span>
+              <span>{E.effettivoEtichetta}</span>
+              <span style={{ color: "#0a0a0a", fontWeight: 600 }}>{E.effettivo}</span>
             </div>
             <div
               style={{
@@ -132,9 +144,9 @@ export default function Anteprima() {
                 alignItems: "baseline",
               }}
             >
-              <span style={{ fontSize: 22, fontWeight: 600 }}>Totale a testa</span>
-              <span style={{ fontSize: 40, fontWeight: 700, color: "#0a9d5c" }}>
-                {euro(CONTO.totalePersona)}
+              <span style={{ fontSize: 22, fontWeight: 600 }}>La fascia</span>
+              <span style={{ fontSize: 44, fontWeight: 700, color: "#0a9d5c" }}>
+                {E.fascia}
               </span>
             </div>
           </div>
