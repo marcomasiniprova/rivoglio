@@ -13,9 +13,9 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Rivoglio",
-    short_name: "Viaggio",
+    short_name: "Rivoglio",
     description:
-      "Ti avviso quando esiste una micro-vacanza sotto il tuo budget, col prezzo totale: alloggio e viaggio.",
+      "Scopri in 30 secondi se una compagnia ti deve dei soldi. Il reclamo te lo prepariamo noi: lo invii tu e tieni il 100%.",
     lang: "it-IT",
     start_url: "/app",
     scope: "/",

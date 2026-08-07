@@ -1,30 +1,32 @@
 import { test, expect } from "@playwright/test";
+import { COPY } from "../lib/copy";
 
 /**
- * Prove sui pezzi aggiunti per «far vedere il prodotto»: la sezione con la
- * schermata vera dell'app, l'immagine social e il manifest che rende il sito
+ * Prove sulla vetrina tecnica del sito: il titolo che finisce nei tab e
+ * nelle ricerche, l'immagine social e il manifest che rende il sito
  * installabile sulla schermata Home.
+ *
+ * La vecchia sezione «com'è dentro» (l'app viaggi) non esiste più: al suo
+ * posto la landing mostra l'esempio di verdetto, marcato demo (regola 3).
  */
 
 test.describe("Vetrina", () => {
-  test("la sezione «com'è dentro» mostra tre posti calcolati davvero", async ({ page }) => {
-    await page.goto("/#dentro");
-    await expect(page.getByRole("heading", { name: /Ti faccio vedere lo schermo/i })).toBeVisible();
+  test("il titolo della pagina è quello di Rivoglio", async ({ page }) => {
+    await page.goto("/");
+    await expect(page).toHaveTitle(new RegExp(`${COPY.comune.marchio}.*${COPY.tagline}`));
+  });
 
-    const sezione = page.locator("#dentro");
-    await expect(sezione.getByText(/Con questi limiti, oggi ci arrivi/i)).toBeVisible();
-
-    // tre proposte, ognuna con ore, costo auto e quanto resta
-    const righe = sezione.locator("li", { hasText: /restano/ });
-    await expect(righe).toHaveCount(3);
-
-    // i numeri devono essere numeri, non trattini
-    const testo = await sezione.innerText();
-    expect(testo).toMatch(/auto \d+€/);
-    expect(testo).toMatch(/restano \d+€ per dormire/);
-
-    // e non deve promettere prezzi di alloggio che non abbiamo
-    expect(testo).toMatch(/non un'offerta/i);
+  test("l'esempio di verdetto in pagina è marcato come dimostrativo", async ({ page }) => {
+    // il caso costruito di DatoOggettivo: i conti tornano (22:55 → 02:47
+    // sono 3h52) e l'etichetta demo è visibile, mai un dato finto che
+    // sembra vero (regola CLAUDE.md #3)
+    await page.goto("/#dato-oggettivo");
+    const sezione = page.locator("#dato-oggettivo");
+    await expect(sezione.getByText(COPY.datoOggettivo.esempio.titolo)).toBeVisible();
+    // l'etichetta che non si tratta: il caso è costruito e lo si dice
+    await expect(sezione.getByText(COPY.comune.demo)).toBeVisible();
+    // e niente numero di volo o data: "Volo di esempio", non un volo vero
+    await expect(sezione.getByText(COPY.datoOggettivo.esempio.volo)).toBeVisible();
   });
 
   test("l'immagine social esiste ed è un png della misura giusta", async ({ request }) => {
@@ -44,12 +46,5 @@ test.describe("Vetrina", () => {
     expect(m.display).toBe("standalone");
     expect(m.theme_color).toBe("#0a9d5c");
     expect(m.icons.length).toBeGreaterThan(0);
-  });
-
-  test("dalla sezione si arriva alla lista d'attesa", async ({ page }) => {
-    await page.goto("/#dentro");
-    await page.locator("#dentro").getByRole("link", { name: /Provala per primo/i }).click();
-    await expect(page).toHaveURL(/#iscriviti/);
-    await expect(page.locator("#iscriviti-email")).toBeVisible();
   });
 });

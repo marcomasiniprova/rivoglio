@@ -1,0 +1,20 @@
+# Rivoglio
+
+> Lo scanner dei rimborsi. Verifica gratuita, in 30 secondi e senza account,
+> se un volo e atterrato con piu di 3 ore di ritardo (Regolamento CE 261/2004)
+> e in che fascia di compensazione rientra (250, 400 o 600 euro). Se il caso
+> e idoneo, prepara il reclamo formale in italiano con i riferimenti
+> normativi e il canale corretto della compagnia: l'utente lo invia dalla
+> propria email e tiene il 100% della compensazione. Prezzo fisso: 14,90
+> euro a pratica (24,90 famiglia), con garanzia di rimborso se la compagnia
+> non paga entro 90 giorni.
+
+Dettagli utili:
+- Il verdetto usa dati oggettivi di volo (orario effettivo di atterraggio),
+  mai stime: se il dato e incerto, Rivoglio non vende.
+- Il check e sempre gratuito e vale anche per voli passati: le finestre di
+  reclamo arrivano, a seconda della compagnia, fino a 5-6 anni (stima
+  dichiarata caso per caso).
+- Rivoglio genera documenti: non e un intermediario, non chiede la cessione
+  del credito, non trattiene percentuali.
+- Sito in italiano, mercato: Italia.

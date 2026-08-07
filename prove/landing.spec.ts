@@ -1,71 +1,106 @@
 import { test, expect } from "@playwright/test";
+import { COPY } from "../lib/copy";
+
+/**
+ * La landing di Rivoglio: lo scanner dei rimborsi (SPEC §1, §3).
+ * L'hero È il prodotto: il form volo+data, senza email e senza account.
+ * I testi vengono da lib/copy.ts: le prove agganciano quelli, non stringhe
+ * duplicate a mano che poi divergono.
+ */
 
 test.describe("Landing page", () => {
   test("il messaggio principale c'è e si legge", async ({ page }) => {
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { level: 1, name: /La tua fuga[\s\S]*Al prezzo giusto/i }),
+      page.getByRole("heading", { level: 1, name: /Hai preso un volo/i }),
     ).toBeVisible();
-    await expect(page.getByText(/40 milioni di italiani/i)).toBeVisible();
-    await expect(page.getByRole("link", { name: /3 destinazioni gratis/i }).first()).toBeVisible();
+    await expect(page.getByText(COPY.hero.sottotitolo).first()).toBeVisible();
+    // la rassicurazione del funnel: niente email, niente account (SPEC §3)
+    await expect(page.getByText(COPY.hero.form.rassicurazione).first()).toBeVisible();
   });
 
-  test("i numeri dell'esempio tornano: 78 + 27 = 105, sotto la soglia 120", async ({
+  test("l'hero ha il form volo+data, che è il prodotto", async ({ page }) => {
+    await page.goto("/");
+    const volo = page.getByLabel(COPY.hero.form.volo.etichetta).first();
+    const data = page.getByLabel(COPY.hero.form.data.etichetta).first();
+    await expect(volo).toBeVisible();
+    await expect(data).toBeVisible();
+    await expect(data).toHaveAttribute("type", "date");
+    await expect(
+      page.getByRole("button", { name: COPY.hero.form.bottone }).first(),
+    ).toBeVisible();
+  });
+
+  test("il form vuoto non parte: dice cosa manca, senza giro di rete", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: COPY.hero.form.bottone }).first().click();
+    await expect(page.getByText(COPY.hero.form.errori.voloMancante).first()).toBeVisible();
+    await expect(page).not.toHaveURL(/\/verifica\//);
+  });
+
+  test("i numeri dell'hero sono apribili: il 600€ e i 5 anni si spiegano", async ({
     page,
   }) => {
     await page.goto("/");
-    const testo = await page.locator("body").innerText();
 
-    // devono comparire tutti e tre, e la somma deve reggere
-    expect(testo).toContain("78€");
-    expect(testo).toContain("27€");
-    expect(testo).toContain("105€");
-    expect(testo).toContain("120€");
+    // "fino a 600€": il bottone apre la nota con le fasce del CE 261/2004
+    await page.getByRole("button", { name: COPY.hero.apriImporto }).click();
+    await expect(page.getByText(COPY.hero.notaImporto)).toBeVisible();
 
-    // il conto aperto deve mostrare il calcolo, non solo il risultato
-    expect(testo).toMatch(/145 km × 2/);
-    expect(testo).toMatch(/1,994/); // prezzo benzina MIMIT
+    // "ultimi 5 anni": la finestra è dichiarata come stima, mai come certezza
+    await page.getByRole("button", { name: COPY.hero.apriFinestra }).click();
+    await expect(page.getByText(COPY.hero.notaFinestra)).toBeVisible();
   });
 
-  test("il modulo di iscrizione rifiuta un'email sbagliata", async ({ page }) => {
-    await page.goto("/#iscriviti");
-    const campo = page.getByLabel("La tua email");
+  test("il confronto prezzi torna: 600 - 210 = 390, 600 - 14,90 = 585,10", async ({
+    page,
+  }) => {
+    await page.goto("/#prezzi");
+    const prezzi = page.locator("#prezzi");
+    const testo = await prezzi.innerText();
+
+    // i due prezzi chiusi in SPEC §5
+    expect(testo).toContain("14,90€");
+    expect(testo).toContain("24,90€");
+
+    // il conto del confronto coi portali a percentuale: la somma regge
+    expect(testo).toContain("210€");
+    expect(testo).toContain("390€");
+    expect(testo).toContain("585,10€");
+
+    // e la cifra si apre: il dettaglio dichiara da dove viene il 35-50%
+    await prezzi.getByText(COPY.comune.apriIlConto).first().click();
+    await expect(prezzi.getByText(COPY.prezzi.notaConfronto)).toBeVisible();
+  });
+
+  test("il modulo dell'Osservatorio c'è e rifiuta un'email sbagliata", async ({ page }) => {
+    await page.goto("/#osservatorio");
+    // il titolo è spezzato su due righe (corsivo): si aggancia il heading
+    await expect(page.getByRole("heading", { name: /Osservatorio/i })).toBeVisible();
+    const campo = page.locator("#osservatorio-email");
     await campo.fill("non-e-una-email");
     // il browser blocca da solo: il campo non è valido
     await expect(campo).toHaveJSProperty("validity.valid", false);
   });
 
-  test("il modulo di iscrizione accetta un'email valida e ringrazia", async ({ page }) => {
-    await page.goto("/#iscriviti");
-    await page.getByLabel("La tua email").fill(`prova+${Date.now()}@rivoglio.it`);
-    await page.getByLabel("Il tuo comune di partenza").fill("Bologna");
-    await page.getByRole("button", { name: /Avvisami/i }).click();
-    await expect(page.getByText("Ci sei.")).toBeVisible({ timeout: 10_000 });
+  // Nota sandbox: questa prova tocca Supabase vero via /api/iscriviti.
+  // Dove la rete verso *.supabase.co è chiusa (allowlist/CONNECT 403)
+  // fallisce per l'ambiente, non per il codice.
+  test("il modulo dell'Osservatorio accetta un'email valida e conferma", async ({ page }) => {
+    await page.goto("/#osservatorio");
+    await page.locator("#osservatorio-email").fill(`prova+${Date.now()}@rivoglio.it`);
+    await page.getByRole("button", { name: COPY.osservatorio.bottone }).click();
+    // la prima frase della conferma di COPY fa da titolo del pannello
+    await expect(page.getByText(/^Fatto\./).first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test("il costruttore risponde con tre posti veri e numeri coerenti", async ({ page }) => {
-    await page.goto("/#costruttore");
-    await page.getByRole("button", { name: /Dimmi dove posso andare/i }).click();
-
-    // le tre schede devono comparire (aggancio esplicito, non testo a caso)
-    const schede = page.locator("[data-scheda='proposta']");
-    await expect(schede.first()).toBeVisible({ timeout: 15_000 });
-    await expect(schede).toHaveCount(3);
-
-    // e il conto deve tornare: budget - auto = quel che resta
-    const testo = await page.locator("#costruttore").innerText();
-    expect(testo).toMatch(/\d+h\d{2}/); // ore di viaggio
-    expect(testo).toMatch(/\d+ km/); // distanza
-    expect(testo).toContain("non invento prezzi");
-  });
-
-  test("chi parte da un'isola riceve la spiegazione, non un risultato falso", async ({
-    page,
-  }) => {
-    await page.goto("/#costruttore");
-    await page.getByLabel("Da dove parti").selectOption("Palermo");
-    await page.getByRole("button", { name: /Dimmi dove posso andare/i }).click();
-    await expect(page.getByText(/Parti da un'isola/i)).toBeVisible({ timeout: 15_000 });
+  test("mai 'hai diritto a': il claim è un fatto, non una promessa", async ({ page }) => {
+    // SPEC §3: il claim onesto. La frase vietata non deve comparire mai.
+    await page.goto("/");
+    const testo = await page.locator("body").innerText();
+    expect(testo.toLowerCase()).not.toContain("hai diritto a");
+    // e niente trattino lungo nei testi visibili (regola BRAND)
+    expect(testo).not.toContain("—");
   });
 
   test("non si scorre in orizzontale (rottura classica sul telefono)", async ({ page }) => {

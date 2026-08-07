@@ -26,6 +26,7 @@ import { COPY } from "@/lib/copy";
 export const metadata: Metadata = {
   title: `${COPY.comune.marchio} | ${COPY.tagline}`,
   description: `${COPY.hero.titolo} ${COPY.hero.sottotitolo} ${COPY.hero.form.rassicurazione}`,
+  alternates: { canonical: "/" },
   openGraph: {
     title: COPY.comune.marchio,
     description: `${COPY.hero.titolo} ${COPY.hero.sottotitolo}`,

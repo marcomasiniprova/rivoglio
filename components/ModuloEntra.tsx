@@ -16,13 +16,13 @@ const VUOTO: Esito = {};
 const TITOLI: Record<Modo, { titolo: string; sotto: string; bottone: string }> = {
   accedi: {
     titolo: "Bentornato",
-    sotto: "Entra e guarda a che punto sono le tue ricerche.",
+    sotto: "Entra e guarda a che punto sono le tue pratiche.",
     bottone: "Entra",
   },
   registrati: {
     titolo: "Crea il tuo account",
-    sotto: "Ti regalo 3 destinazioni per provare. Nessuna carta, nessun abbonamento.",
-    bottone: "Crea account e prendi 3 crediti",
+    sotto: "L'account serve a seguire la pratica. Il check resta gratis, senza registrazione.",
+    bottone: "Crea l'account",
   },
   magico: {
     titolo: "Entra senza password",

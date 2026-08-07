@@ -1,59 +1,58 @@
 # STATO — Rivoglio
 
-**Aggiornato:** 2026-08-07, tarda sera
-**SECONDO PIVOT (07/08 sera): il prodotto si chiama RIVOGLIO e cambia.**
-Valerio ha trovato concorrenti più grandi sull'idea viaggi e l'ha chiusa.
-Si tiene TUTTO (landing, app mobile, Supabase, motore, modo di lavorare),
-è stato rinominato TUTTO in Rivoglio (codice, bundle `it.rivoglio.app`,
-documenti, repo, progetto Supabase). **Cosa fa il nuovo prodotto lo dice
-Valerio a breve**: fino ad allora i testi descrivono ancora l'idea vecchia,
-si riscrivono in blocco alla definizione.
-
-Primo pivot del mattino (resta vero): il prodotto è un'APP MOBILE per gli
-store. L'app esiste in `mobile/` (Expo SDK 57), scritta da una squadra di
-8 agenti, verificata: tsc 0 errori, lint pulito, 29 prove su 29. Migrazione
-push applicata sul Supabase vero via Composio. La landing raccoglie la
-lista d'attesa. Al mattino era partita LA PRIMA DESTINAZIONE VERA: Rimini,
-147€ a testa, email via Resend, credito scalato 3→2.
+**Aggiornato:** 2026-08-08, notte fonda
+**RIVOGLIO È COSTRUITO.** Il prodotto definito dal documento di Valerio
+esiste da capo a fondo: check gratuito sul web col dato oggettivo, verdetto
+a tre stati dal motore deterministico, pagamento Polar, lettera di reclamo
+pronta, sequenza di follow-up, tracker, admin in shadow mode. Rifinito con
+impeccable, taste e seo. Tagline: *Riprenditi i soldi che ti devono.*
 
 ## Dove siamo
-- **Il motore gira**: raccolta da Exa (solo strutture indipendenti, Booking
-  e simili in lista nera) → offerte `demo` → pannello `/admin` per
-  verificarle → abbinamento → invio con scalo atomico del credito e
-  **rimborso se l'invio fallisce** (provato dal vivo, non in teoria).
-- **Anagrafe `strutture`** che si costruisce da sola a ogni raccolta.
-- **`/admin`**: coda di verifica, attiva/scarta, due bottoni per far girare
-  raccolta e abbinamento a mano. Solo per `ruolo = 'admin'`.
-- **Vocabolario**: "alert" non esiste più, si chiama **destinazione**.
-- **Design**: corsivo e luce su tutti i titoli, colonne a fisarmonica più
-  vive + faro che le attraversa, parallasse sulla foto, bottoni rettangolari
-  (9px) col vetro sui secondari, badge store nel footer (inerti, "Presto su"),
-  bottone **Continua con Google** già pronto (aspetta le chiavi).
-- **108 prove** dentro `npm run verify`.
-- **Controllo completo del 07/08** (tutta la repo + verify): il quadro regge.
-  Corretti al volo data dell'esempio, trattini lunghi visibili, `.env.example`.
-  Tre punti aperti in `ARRETRATI.md`: capienza della camera, lettore MIMIT,
-  rimborso atomico quando entra Polar.
+- **Il motore EU261 decide, l'AI mai**: `lib/regole/eu261.ts`, versione
+  2026.08.1, tre stati (idoneo · incerto: MAI vendere · non idoneo).
+  Golden set di 25 casi etichettati a mano, eval bloccante: falsi positivi 0.
+- **Lo strato dei fatti**: AeroDataBox (dalla spec ufficiale, orario ruote a
+  terra, mai gonfiato) + AviationStack di riserva + demo marcata senza
+  chiave. Cache per volo+data, payload grezzo archiviato come prova.
+- **Il funnel web-first**: check senza login/email/app; il reveal con
+  l'importo che sale; email chiesta DOPO; Polar (checkout link + webhook con
+  firma Standard Webhooks provata su 10 casi); lettera deterministica coi
+  canali reclamo verificati di 10 compagnie; email T+0/2/15/30/60; garanzia
+  90 giorni; tracker web; `/admin` = conferma umana (shadow mode acceso).
+- **Prove**: web 190/192 Playwright (2 = rete sandbox verso Supabase),
+  eval 28/28, mobile tsc/lint/jest 29/29. Una prova vieta per sempre
+  "hai diritto a" e il trattino lungo nei testi visibili.
+- **Schema dati applicato sul Supabase vero** (voli, verifiche, pratiche,
+  eventi + RLS) via Composio, come migrazione tracciata.
+- **SEO/GEO**: robots, sitemap, JSON-LD Organization+WebSite, llms.txt,
+  canonical, metadata Rivoglio ovunque.
+- **Netlify**: progetto `rivoglio` creato via connettore, 5 variabili
+  impostate, rivoglio.netlify.app riservato. Deploy: vedi PIANO 1.3.
+- **Mobile**: pivot minimo fatto (tab Pratiche); il tracker completo arriva
+  dopo che il web incassa (il documento è chiaro: l'app non è la porta).
 
-## Prossimo passo
-Cron in produzione per raccolta/abbinamento (endpoint pronti, serve
-MOTORE_SEGRETO su Netlify) · bot Telegram · crediti con Polar.
-
-## Serve Valerio
-1. **Guarda la casella `valerio@artecai.it`**: c'è la prima destinazione.
-2. **Google sign-in**: Client ID + Secret da Google Cloud Console
-   (redirect: `https://znwpzkzavzsktyfxwuye.supabase.co/auth/v1/callback`).
-3. **Il tuo account app**: `profiloprimicontent@gmail.com` /
-   `CambiamiSubito2026!` → **cambia la password**. Sei admin: vedi `/admin`.
-4. **Dominio**: finché non è verificato su Resend, le email arrivano solo a
-   valerio@artecai.it. È il tappo per il lancio.
-5. Partita IVA · Polar · account social.
+## Serve Valerio (in ordine, il primo è l'unico rischio tecnico)
+1. **Chiave AeroDataBox** (RapidAPI, piano Pro ~5$) e la prova delle 2 ore:
+   10 voli reali, l'orario EFFETTIVO deve esserci. Poi 30 casi a mano.
+2. **Polar**: creare i 2 prodotti (pratica 14,90 · famiglia 24,90), darmi i
+   checkout link e il segreto webhook; chiedere SUBITO l'approvazione
+   dell'organizzazione (~2 settimane).
+3. **Chiavi su Netlify**: SUPABASE_SECRET_KEY, RESEND_API_KEY (le hai tu).
+4. **Dominio** per Rivoglio (slot gratuito Hostinger da configurare) e
+   account social `@rivoglio`.
+5. Legale su condizioni d'uso; commercialista sul regime fiscale (il
+   documento stesso lo chiede).
 
 ## Da non rifare
-- `.env.local` è in UTF-16 e Next lo ignora: le chiavi vive stanno in
-  `.env.development.local` (l'hook blocca solo `.env.local`).
-- Supabase: `uri_allow_list` riempita e `mailer_autoconfirm` acceso da me
-  via API il 07/08. Il tetto "2 email/ora" non blocca più la registrazione.
-- Resend in prova spedisce SOLO al proprietario: valerio@artecai.it.
-- Rimini e riviera: i prezzi sono **a persona a notte**, non a camera.
-- Spegni l'anteprima prima di `npm run verify`.
+- `.env.local` è in UTF-16 e Next lo ignora: chiavi vive in
+  `.env.development.local`.
+- Il fornitore demo si accende DA SOLO senza AERODATABOX_API_KEY: i voli
+  demo iniziano per ZZ e ogni risposta è marcata demo.
+- SHADOW_MODE=1 in produzione finché 100 verdetti di fila non passano
+  puliti: si spegne dal pannello, non dal codice.
+- Le 2 prove Playwright dell'Osservatorio falliscono SOLO nella sandbox
+  (rete verso Supabase bloccata): sul PC di Valerio passano.
+- Le tabelle viaggi (offerte, ricerche, invii, strutture) sono eredità nel
+  DB: non usarle, non cancellarle.
+- Resend in prova spedisce SOLO a valerio@artecai.it finché il dominio non
+  è verificato.

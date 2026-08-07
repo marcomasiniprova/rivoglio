@@ -1,17 +1,21 @@
 import { test, expect } from "@playwright/test";
+import { COPY } from "../lib/copy";
 
 /**
  * Prove sull'accesso.
  *
- * Nota: qui NON si prova il login vero, perché senza `.env.local` non c'è
- * nessun Supabase da interrogare. Si prova tutto il resto, che è la parte
- * che si rompe più spesso: la porta chiusa, il modulo giusto, il telefono.
+ * Nota: qui NON si prova il login vero, perché senza chiavi non c'è nessun
+ * Supabase da interrogare. Si prova tutto il resto, che è la parte che si
+ * rompe più spesso: la porta chiusa, il modulo giusto, il telefono.
+ *
+ * L'area riservata oggi è il tracker delle pratiche (SPEC §7): dalla
+ * landing non ci si arriva, il check è pubblico e senza account (SPEC §3).
  */
 
 test.describe("Accesso", () => {
   test("l'area riservata non si apre senza login", async ({ page }) => {
     await page.goto("/app");
-    // deve finire sulla pagina di accesso, non mostrare l'app
+    // deve finire sulla pagina di accesso, non mostrare le pratiche
     await expect(page).toHaveURL(/\/entra/);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
@@ -28,7 +32,6 @@ test.describe("Accesso", () => {
     await page.goto("/entra");
     await page.getByRole("tab", { name: /Sono nuovo/i }).click();
     await expect(page.getByRole("heading", { name: /Crea il tuo account/i })).toBeVisible();
-    await expect(page.getByText(/3 destinazioni per provare/i)).toBeVisible();
   });
 
   test("il link magico toglie la password", async ({ page }) => {
@@ -59,18 +62,22 @@ test.describe("Accesso", () => {
     expect(sfora).toBe(false);
   });
 
-  test("il pulsante principale della landing porta alla lista d'attesa", async ({ page }) => {
+  test("la CTA della barra porta al form del check, non a un login", async ({ page }) => {
+    // SPEC §3: il check vive sul web, senza login. L'unica azione della
+    // barra è il form volo+data.
     await page.goto("/");
-    // il bottone grosso dell'hero, non uno dei tanti in fondo alla pagina
-    await page.getByRole("link", { name: /Mettiti in lista: 3 destinazioni gratis/i }).click();
-    await expect(page).toHaveURL(/#iscriviti/);
-    await expect(page.locator("#iscriviti-email")).toBeVisible();
+    await page
+      .locator("header")
+      .getByRole("link", { name: COPY.nav.cta })
+      .click();
+    await expect(page).toHaveURL(/#controllo/);
+    await expect(page.getByLabel(COPY.hero.form.volo.etichetta).first()).toBeVisible();
   });
 
-  test("la landing non ha più nessun collegamento all'app web", async ({ page }) => {
-    // L'app sarà una mobile app negli store: dalla landing non si deve
-    // poter arrivare né a /entra né a /app. (Le pagine esistono ancora,
-    // ma solo per chi ne conosce l'indirizzo: servono al pannello admin.)
+  test("la landing non ha nessun collegamento all'area riservata", async ({ page }) => {
+    // Il funnel non chiede mai un account prima del reveal (SPEC §3):
+    // dalla landing non si deve poter arrivare né a /entra né a /app.
+    // Le pagine esistono, ma servono a chi ha già una pratica.
     await page.goto("/");
     await expect(page.locator('a[href^="/entra"]')).toHaveCount(0);
     await expect(page.locator('a[href^="/app"]')).toHaveCount(0);

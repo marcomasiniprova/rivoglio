@@ -79,9 +79,35 @@ non altro codice.**
 | 31 | **"Costruisci un team di agenti e fammi l'app"** | 8 agenti coordinati (backend, UI, copy, AI, 3 frontend, QA): app in `mobile/` con onboarding in 6 passi, tab Destinazioni/Ricerche/Profilo, dettaglio col conto aperto, punteggio preferenze. Esito verificato due volte: tsc 0 errori, lint pulito, **29 prove su 29**. |
 | 32 | **"Usa Composio"** | Usato per operare sul tuo Supabase vero (la sandbox non lo raggiunge): schema di `profili` verificato colonna per colonna e **migrazione `expo_push_token` applicata e riverificata** in produzione. |
 
+## ✅ CHIUSI il 07-08/08 — sesto giro: il pivot Rivoglio
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 33 | **"Elimina ogni traccia del vecchio nome, rinomina tutto in Rivoglio"** | Repo GitHub rinominata in `rivoglio` (remote ripuntato, push provato), progetto Supabase rinominato, bundle `it.rivoglio.app`, codice e documenti ripuliti. Via Composio, senza rifare nulla da zero. |
+| 34 | **"Esplora il documento e costruisci il prodotto"** | Documento (1432 righe) letto per intero, `SPEC.md` riscritto come bibbia. Costruito tutto: motore EU261 deterministico (`lib/regole/eu261.ts`, 3 stati, l'AI non decide mai), golden set 25 casi + eval bloccante falsi positivi 0, strato voli (AeroDataBox + AviationStack + demo marcata), check gratuito senza login, reveal, Polar (webhook firmato, provato 10/10), lettera coi canali verificati di 10 compagnie, follow-up T+0/2/15/30/60, tracker, `/admin` in shadow mode. Schema (voli, verifiche, pratiche, eventi) applicato sul Supabase vero. |
+| 35 | **"Web app Next + app mobile Expo"** | Web completa (16 pagine). Mobile: pivot minimo a tab Pratiche/Profilo; il tracker completo arriva dopo che il web incassa (il documento è chiaro: l'app non è la porta d'ingresso). |
+| 36 | **"Netlify col connettore collegato a te"** | Progetto `rivoglio` creato via connettore, 5 variabili impostate, `rivoglio.netlify.app` riservato. |
+| 37 | **"/impeccable, poi /taste-skill, poi /seo, prima del deploy"** | Fatti in quest'ordine. Impeccable: schermate desktop/mobile/reveal verificate, detector a 0. Taste: trattini lunghi 0, occhielli 7→4, CTA coerenti. SEO: robots, sitemap, JSON-LD, llms.txt, canonical, metadata Rivoglio (tutti provati con 200 sul server di sviluppo). |
+| 38 | **"Installa le skill di Emil Kowalski"** | 9 skill ufficiali in `.claude/skills/` (animate, apple-design, prototype, review-animations e le altre). |
+| 39 | **"Le 3 fasi: SVILUPPO, DISTRIBUZIONE, MIGLIORAMENTO"** | `PIANO.md` riscritto con le tre fasi come le hai definite + artefatto visivo della fase SVILUPPO consegnato. |
+| 40 | **"UI come le 4 foto di riferimento"** | Direzione registrata in `BRAND.md` (luce e aria, vetro smerigliato, card pulite, stepper): cielo sull'hero, form col bordo che pulsa, reveal col contatore, schermate di conferma consegnate. |
+
 ## ⏳ ANCORA DA FARE
 
-### Per l'app mobile (dal pivot del 07/08)
+### Per Rivoglio (dal documento, rimandati di proposito)
+- **Golden set da 25 a 100+ casi** man mano che passano voli veri (il
+  documento chiede di arricchirlo con casi reali etichettati a mano).
+- **Tracker mobile completo** (oggi tab minima): dopo i primi incassi web.
+- **Contatore rate-limit condiviso**: oggi il tetto 20/min per IP vive in
+  memoria del singolo processo; con più istanze serve Supabase o KV.
+- **Verticali di contenuto** (rotte per compagnia/aeroporto) e Osservatorio
+  come newsletter: fase DISTRIBUZIONE.
+- **Bagagli (settembre) e treni (ottobre)**: espansioni previste dal
+  documento, non si toccano ora.
+
+### [SUPERATI dal pivot del 07/08 sera — idea viaggi chiusa da Valerio]
+<details>
+<summary>Arretrati dell'idea viaggi (congelati, non cancellati)</summary>
 - **Il passo "avvisi" può essere scavalcato**: provato dal vivo nel browser,
   dopo la registrazione lo smistamento della radice porta subito alle tab
   prima che la schermata del permesso notifiche si veda. Da verificare su
@@ -122,15 +148,21 @@ non altro codice.**
   verrebbe sovrascritto. Oggi non può succedere (niente acquisti), va chiuso
   con una RPC come `consuma_credito` quando entra Polar.
 
+</details>
+
 ---
 
 ## 📌 COSE CHE VALGONO SEMPRE
 
-- **Obiettivo: €30-100k entro settembre/ottobre 2026.** Sprint di 2 mesi.
-- **Prezzi: crediti, 1 credito = 1 alert.** €3,99 / €12,99 / €24,99. **Chiuso.**
-- **Nome: Rivoglio**, per esteso. Tagline: *La tua fuga, al prezzo giusto.*
-- **Tutta Italia dal giorno 1.** Bianco e verde. Riferimento: Zentivo.
-- **Web app installabile, non nativa.** **Polar**, non Stripe.
-- **Ti servono:** partita IVA, dominio, account Polar, account social.
+- **Obiettivo: fare cassa entro ottobre 2026.** Ogni scelta si giudica così.
+- **Prodotto: Rivoglio**, lo scanner dei rimborsi EU261. Check gratis,
+  pratica 14,90€, famiglia 24,90€, garanzia 90 giorni. **Chiuso.**
+- **Nome: Rivoglio**, per esteso. Tagline: *Riprenditi i soldi che ti devono.*
+- **L'incerto non si vende MAI. I falsi positivi sono 0, bloccante.**
+- **Web-first**: il check e l'incasso stanno sul web; l'app mobile è il
+  tracker post-pagamento, non la porta d'ingresso.
+- Bianco e verde. **Polar**, non Stripe (niente partita IVA fino a 10k/mese:
+  da confermare col commercialista, il documento stesso lo chiede).
+- **Ti servono:** chiave AeroDataBox, prodotti Polar, dominio, account social.
 - **Come vuoi che lavori:** tutte le cose chieste in una seduta, domande mentre
   si lavora e non al posto di lavorare, aggiornandoti su dove siamo.

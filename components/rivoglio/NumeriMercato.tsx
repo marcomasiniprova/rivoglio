@@ -23,10 +23,7 @@ export default function NumeriMercato() {
     <section id="numeri" className="scroll-mt-24 px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-[1200px]">
         <Anima className="mx-auto max-w-2xl text-center">
-          <p className="text-[13px] font-medium uppercase tracking-[0.16em] text-verde">
-            {SEZIONE.occhiello}
-          </p>
-          <h2 className="luce-testo mt-3 text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.04]">
+          <h2 className="luce-testo text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.04]">
             {titoloPrima}
             {titoloCorsivo && (
               <>

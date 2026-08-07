@@ -11,7 +11,7 @@ import { demo as fornitoreDemo } from "@/lib/voli/fornitori/demo";
 import { normalizzaData, normalizzaVolo } from "@/lib/voli/normalizza";
 
 /**
- * /verifica/[id] — la pagina del risultato. Il momento che vale metà
+ * /verifica/[id]: la pagina del risultato. Il momento che vale metà
  * del progetto (SPEC §8): qui vive il reveal.
  *
  * È PUBBLICA e senza login, per scelta (SPEC §3: niente prima del

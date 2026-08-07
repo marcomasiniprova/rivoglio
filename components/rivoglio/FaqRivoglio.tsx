@@ -19,10 +19,7 @@ export default function FaqRivoglio() {
     <section id="domande" className="scroll-mt-24 px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto grid max-w-[1000px] gap-12 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-20">
         <Anima>
-          <p className="text-[13px] font-medium uppercase tracking-[0.16em] text-verde">
-            {SEZIONE.occhiello}
-          </p>
-          <h2 className="luce-testo mt-3 text-[clamp(2rem,4.4vw,2.9rem)] leading-[1.06]">
+          <h2 className="luce-testo text-[clamp(2rem,4.4vw,2.9rem)] leading-[1.06]">
             {titoloPrima}
             <br />
             <span className="corsivo text-verde-scuro">{titoloCorsivo}</span>

@@ -3,11 +3,9 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Logo from "@/components/Logo";
 import ModuloEntra from "@/components/ModuloEntra";
-import { CONTO, ESEMPIO, euro } from "@/lib/esempio";
-
 export const metadata: Metadata = {
   title: "Entra | Rivoglio",
-  description: "Entra nel tuo account e imposta le tue ricerche.",
+  description: "Entra nel tuo account e segui le tue pratiche.",
   robots: { index: false },
 };
 
@@ -38,7 +36,7 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
         </div>
 
         <p className="text-center text-xs leading-relaxed text-fumo-2">
-          Entrando accetti che ti scriviamo solo per le destinazioni che hai chiesto tu.
+          Entrando accetti che ti scriviamo solo per le tue pratiche.
           Niente pubblicità, niente liste vendute a nessuno.
         </p>
       </div>
@@ -57,48 +55,50 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
         />
         <div className="relative">
           <p className="text-[0.8rem] font-medium uppercase tracking-[0.18em] text-menta">
-            Cosa ricevi
+            Cosa ci fai dentro
           </p>
           <h2 className="mt-5 max-w-md font-display text-[2.6rem] leading-[1.05] tracking-[-0.04em] text-white">
-            Una notifica sola, quando il conto torna davvero.
+            La tua pratica, seguita passo per passo.
           </h2>
 
+          {/* Un esempio COSTRUITO e dichiarato tale (regola 3): niente voli
+              veri, niente dati che sembrano veri. */}
           <div className="mt-10 max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
-            <div className="flex items-center gap-2 text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde">
-              <span className="size-1.5 rounded-full bg-verde" />
-              Sotto la tua soglia
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde">
+                <span className="size-1.5 rounded-full bg-verde" />
+                Fascia 400€
+              </div>
+              <span className="rounded-pillola bg-nebbia-2 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-fumo">
+                Esempio
+              </span>
             </div>
-            <p className="mt-3 font-display text-xl tracking-[-0.03em]">
-              {ESEMPIO.partenza} → {ESEMPIO.destinazione}
-            </p>
-            <p className="mt-1 text-sm text-fumo">
-              {ESEMPIO.notti} notti · {ESEMPIO.persone} persone · {ESEMPIO.kmAndata} km
-            </p>
+            <p className="mt-3 font-display text-xl tracking-[-0.03em]">Volo di esempio</p>
+            <p className="mt-1 text-sm text-fumo">Arrivato con 3h52 di ritardo</p>
 
-            <dl className="mt-5 flex flex-col gap-2 border-t border-bordo pt-5 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-fumo">Alloggio a testa</dt>
-                <dd className="font-medium">{euro(ESEMPIO.alloggioPersona)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-fumo">Auto a testa</dt>
-                <dd className="font-medium">{euro(CONTO.autoPersona)}</dd>
-              </div>
-              <div className="flex justify-between border-t border-bordo pt-2">
-                <dt className="font-medium">Totale a testa</dt>
-                <dd className="font-display text-lg text-verde">{euro(CONTO.totalePersona)}</dd>
-              </div>
-            </dl>
-
-            <p className="mt-4 rounded-xl bg-menta-tenue px-3 py-2 text-center text-xs text-verde-notte">
-              Sotto la tua soglia di {euro(ESEMPIO.soglia)}. Ti restano{" "}
-              {euro(CONTO.avanzo)}.
-            </p>
+            <ol className="mt-5 flex flex-col gap-2.5 border-t border-bordo pt-5 text-sm">
+              <li className="flex items-center gap-2.5">
+                <span className="grid size-5 place-items-center rounded-full bg-menta text-[10px] font-semibold text-verde-notte">✓</span>
+                <span>Pagata, lettera pronta</span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <span className="grid size-5 place-items-center rounded-full bg-menta text-[10px] font-semibold text-verde-notte">✓</span>
+                <span>Inviata dalla tua email</span>
+              </li>
+              <li className="flex items-center gap-2.5 text-fumo">
+                <span className="grid size-5 place-items-center rounded-full border border-verde/40 text-[10px] font-semibold text-verde">3</span>
+                <span>Giorno 15: sollecito pronto da inviare</span>
+              </li>
+              <li className="flex items-center gap-2.5 text-fumo-2">
+                <span className="grid size-5 place-items-center rounded-full border border-bordo text-[10px]">4</span>
+                <span>Esito, o rimborso con la garanzia</span>
+              </li>
+            </ol>
           </div>
 
           <p className="mt-8 max-w-sm text-sm leading-relaxed text-menta/80">
-            Ogni numero è apribile: ti mostriamo km, consumo, pedaggi e da dove
-            arriva il prezzo del carburante. La trasparenza è il prodotto.
+            Il sollecito al giorno 15 è il pezzo che vale: è lì che la maggior
+            parte delle persone molla, e il nostro parte da solo.
           </p>
         </div>
       </aside>

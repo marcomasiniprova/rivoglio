@@ -21,8 +21,7 @@ export const TESTI = {
     // Etichetta di accessibilità dell'avanzamento: {passo} e {totale} sono numeri.
     passoDi: "Passo {passo} di {totale}",
     tab: {
-      destinazioni: "Destinazioni",
-      ricerche: "Ricerche",
+      pratiche: "Pratiche",
       profilo: "Profilo",
     },
   },
@@ -112,6 +111,43 @@ export const TESTI = {
       passwordCorta: "La password deve avere almeno 8 caratteri.",
     },
     bottoni: { entra: "Entra", registrati: "Non ho un account" },
+  },
+
+  // La tab principale dopo il pivot: le pratiche di rimborso. Stesse parole
+  // del sito (lib/copy.ts, sezione pratica): un solo vocabolario.
+  pratiche: {
+    titolo: { prima: "Le tue", corsivo: "pratiche." },
+    sottotitolo: "Ogni reclamo che hai aperto, con il punto in cui si trova.",
+    // {volo} è il codice del volo, {data} da dataBreve().
+    volo: "Volo {volo} del {data}",
+    // Quando il volo agganciato non è leggibile: si dice, non si inventa.
+    voloMancante: "Pratica senza volo agganciato",
+    // {data} da dataBreve(): quando è stata aperta la pratica.
+    aperta: "Aperta {data}",
+    // {importo} da euro(). La fonte sta in `fasciaFonte`: ogni numero è citato.
+    fascia: "Fascia da {importo}",
+    fasciaFonte: "Importo del Regolamento CE 261/2004, per passeggero",
+    fasciaDaConfermare: "Fascia da confermare",
+    /** Etichette degli stati della macchina (lib/pratiche del sito). */
+    stati: {
+      creata: "Creata",
+      pagata: "Pagata",
+      pronta: "Pronta da inviare",
+      inviata: "Inviata",
+      sollecito: "Sollecito",
+      enac: "ENAC",
+      esito_pagata: "Pagata dalla compagnia",
+      esito_rifiutata: "Rifiutata",
+      rimborsata: "Rimborsata",
+    },
+    // Il check vive sul sito, senza login (SPEC §3): l'app segue, non apre.
+    vuoto: {
+      titolo: "Non hai ancora nessuna pratica.",
+      testo:
+        "Si parte sempre dal check, sul sito: numero di volo e data, gratis. Se il volo rientra in una fascia, da lì apri la pratica e la segui qui.",
+      azione: "Controlla un volo sul sito",
+    },
+    errore: "Non riesco a leggere le tue pratiche. Riprova fra qualche minuto.",
   },
 
   destinazioni: {
@@ -218,23 +254,23 @@ export const TESTI = {
     crediti: {
       etichetta: "Crediti",
       spiegazione:
-        "1 credito = 1 destinazione segnalata. Le prime 3 te le abbiamo regalate.",
+        "I crediti vengono dalla prima versione dell'app. Per le pratiche non servono: il check del volo è gratis, sempre.",
       finiti:
-        "Crediti finiti: le segnalazioni sono ferme. Nessun addebito automatico, mai.",
+        "Crediti a zero. Non cambia niente: nessun addebito automatico, mai.",
     },
-    // Stato "Presto": si dice che l'acquisto non c'è ancora, senza bottoni finti.
+    // Niente bottoni finti: si dice dove si paga davvero, cioè sul sito.
     acquisto: {
-      titolo: "Compra crediti",
-      stato: "Presto",
+      titolo: "Pagamenti",
+      stato: "Sul sito",
       testo:
-        "L'acquisto dall'app non è ancora attivo, quindi qui non trovi bottoni finti. Quando arriva paghi una volta sola: niente abbonamento, e i crediti non scadono.",
+        "La pratica si apre e si paga sul sito, dopo il check gratis. Dall'app non compri niente: qui la segui, passo per passo.",
     },
     tetto: {
       etichetta: "Tetto settimanale",
-      // {n} è il numero massimo di destinazioni a settimana.
+      // {n} è il numero massimo di avvisi a settimana.
       valore: "{n} a settimana",
       spiegazione:
-        "È una promessa di spesa massima. Sopra questo numero di destinazioni a settimana non parte niente, e tu non spendi niente.",
+        "È una promessa di spesa massima. Sopra questo numero di avvisi a settimana non parte niente, e tu non spendi niente.",
       // Etichette di accessibilità del più e del meno.
       alza: "Alza il tetto",
       abbassa: "Abbassa il tetto",

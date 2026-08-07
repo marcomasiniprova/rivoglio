@@ -80,7 +80,7 @@ export function vestito({
       <p style="margin:0;font-family:${FONT};font-size:12.5px;line-height:1.6;color:${C.fumo2};">
         ${coda ?? "Ricevi questa email perché hai un account su Rivoglio."}
         <br>
-        Segnaliamo offerte di terzi e non vendiamo viaggi: si prenota sul sito della struttura.
+        Rivoglio genera documenti: il reclamo lo invii tu, dalla tua email. Non siamo un intermediario e non diamo consulenza legale.
         I costi di viaggio sono stime calcolate, non prezzi garantiti.
       </p>
     </td></tr>

@@ -38,16 +38,44 @@ const CASA = new URL(
 
 export const metadata: Metadata = {
   metadataBase: CASA,
-  title: "Rivoglio | La tua fuga, al prezzo giusto",
+  title: "Rivoglio | Riprenditi i soldi che ti devono.",
   description:
-    "Imposti da dove parti e quanto vuoi spendere. Ti segnalo una destinazione quando esiste una micro-vacanza di 1-3 notti sotto la tua soglia, col prezzo totale calcolato: alloggio e viaggio.",
+    "Scopri in 30 secondi se una compagnia ti deve dei soldi. Check gratuito col dato oggettivo del volo; se ti spetta, il reclamo te lo prepariamo noi e tieni il 100%.",
   openGraph: {
     title: "Rivoglio",
     description:
-      "40 milioni di italiani non partiranno ad agosto. Ti segnalo una destinazione quando esiste una fuga di due notti sotto il tuo budget.",
+      "Hai preso un volo negli ultimi 5 anni? Forse ti devono fino a 600€. Controllalo gratis in 30 secondi.",
     locale: "it_IT",
     type: "website",
   },
+};
+
+/**
+ * I dati strutturati (JSON-LD): dicono ai motori e alle AI chi siamo.
+ * Solo Organization e WebSite: FAQPage è riservato da Google a siti
+ * governativi e sanitari, HowTo è morto nel 2023. Niente forzature.
+ */
+const DATI_STRUTTURATI = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${CASA.href}#organizzazione`,
+      name: "Rivoglio",
+      url: CASA.href,
+      logo: `${CASA.href}icona.svg`,
+      description:
+        "Lo scanner dei rimborsi: verifica gratuita dei voli in ritardo e reclamo pronto da inviare. CE 261/2004.",
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${CASA.href}#sito`,
+      name: "Rivoglio",
+      url: CASA.href,
+      inLanguage: "it-IT",
+      publisher: { "@id": `${CASA.href}#organizzazione` },
+    },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -56,7 +84,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="it"
       className={`${geist.variable} ${poppins.variable} ${serif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-nebbia text-inchiostro">{children}</body>
+      <body className="min-h-full flex flex-col bg-nebbia text-inchiostro">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(DATI_STRUTTURATI) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

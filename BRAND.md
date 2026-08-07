@@ -11,9 +11,10 @@ questo file lo spiega. Se cambi un colore, cambialo lì e aggiorna qui.
 **Rivoglio** — scelto da Valerio il 07/08 (sera), col pivot di prodotto.
 Sempre per esteso, iniziale maiuscola, mai abbreviato.
 
-**La tagline:** da definire quando Valerio racconta il nuovo prodotto.
-Quella vecchia (*La tua fuga, al prezzo giusto*) era dell'idea viaggi: resta
-nei testi solo finché non c'è la nuova, poi si sostituisce ovunque.
+**La tagline:** *Riprenditi i soldi che ti devono.*
+Proposta dal giro di copy del 07/08 (notte), già nel titolo del sito e nei
+testi. Reversibile con una parola di Valerio: è una stringa in `lib/copy.ts`.
+Quella vecchia (*La tua fuga, al prezzo giusto*) era dell'idea viaggi.
 
 ---
 
