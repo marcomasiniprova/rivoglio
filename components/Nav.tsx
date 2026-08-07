@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Logo from "./Logo";
 
 const voci = [
@@ -29,23 +28,16 @@ export default function Nav() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-          {/* Sotto i 420px sparisce: accanto al bottone verde non ci sta. */}
-          <Link
-            href="/entra"
-            className="hidden whitespace-nowrap px-2 text-[13.5px] text-fumo transition-colors hover:text-inchiostro min-[420px]:inline sm:px-3 sm:text-[14.5px]"
-          >
-            Entra
-          </Link>
-
-          <Link
-            href="/entra?modo=registrati"
+          {/* L'app arriva sugli store: l'unico invito è la lista d'attesa. */}
+          <a
+            href="#iscriviti"
             className="group inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-bottone bg-white px-4 py-2.5 text-[13.5px] font-medium text-inchiostro shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:px-5 sm:py-3 sm:text-[14.5px]"
           >
-            Provalo gratis
+            Avvisami quando esce
             <span className="text-verde transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
               ↗
             </span>
-          </Link>
+          </a>
         </div>
       </header>
     </div>

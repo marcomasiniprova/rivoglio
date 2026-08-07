@@ -59,20 +59,20 @@ test.describe("Accesso", () => {
     expect(sfora).toBe(false);
   });
 
-  test("il pulsante principale della landing porta alla registrazione", async ({ page }) => {
+  test("il pulsante principale della landing porta alla lista d'attesa", async ({ page }) => {
     await page.goto("/");
     // il bottone grosso dell'hero, non uno dei tanti in fondo alla pagina
-    await page.getByRole("link", { name: /Provalo con 3 destinazioni gratis/i }).click();
-    // la prima compilazione di /entra in sviluppo può superare i 5s di default
-    await expect(page).toHaveURL(/\/entra\?modo=registrati/, { timeout: 20_000 });
-    await expect(page.getByRole("heading", { name: /Crea il tuo account/i })).toBeVisible();
+    await page.getByRole("link", { name: /Mettiti in lista: 3 destinazioni gratis/i }).click();
+    await expect(page).toHaveURL(/#iscriviti/);
+    await expect(page.locator("#iscriviti-email")).toBeVisible();
   });
 
-  test("nessun pulsante importante manda ancora alla lista d'attesa", async ({ page }) => {
+  test("la landing non ha più nessun collegamento all'app web", async ({ page }) => {
+    // L'app sarà una mobile app negli store: dalla landing non si deve
+    // poter arrivare né a /entra né a /app. (Le pagine esistono ancora,
+    // ma solo per chi ne conosce l'indirizzo: servono al pannello admin.)
     await page.goto("/");
-    // Ora che l'account esiste, i CTA devono portare a registrarsi.
-    // Resta solo il modulo in fondo, per chi non vuole ancora un account.
-    const versoListaAttesa = page.locator('a[href="#iscriviti"]');
-    await expect(versoListaAttesa).toHaveCount(0);
+    await expect(page.locator('a[href^="/entra"]')).toHaveCount(0);
+    await expect(page.locator('a[href^="/app"]')).toHaveCount(0);
   });
 });

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import TelefonoAlert from "./TelefonoAlert";
 import Macchina from "./Macchina";
 import SfondoColonne from "./SfondoColonne";
@@ -48,10 +47,10 @@ const cards = [
               />
             </svg>
           </span>
-          <p className="text-[13.5px] font-medium">Arriva su Telegram</p>
+          <p className="text-[13.5px] font-medium">Arriva come notifica</p>
         </div>
         <p className="mt-2.5 text-[11.5px] leading-relaxed text-fumo">
-          Notifica con suono, anche su iPhone. Nessuna app da installare.
+          Con suono, su iPhone e Android. Apri e il conto è già fatto.
         </p>
       </>
     ),
@@ -119,15 +118,15 @@ export default function Hero() {
 
         <Anima ritardo={0.32}>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/entra?modo=registrati"
+            <a
+              href="#iscriviti"
               className="riflesso group inline-flex w-full items-center justify-center gap-2 rounded-bottone bg-verde px-7 py-4 text-[16px] font-medium text-white shadow-[0_12px_28px_-12px_rgba(6,122,70,.75),0_2px_0_0_rgba(255,255,255,.22)_inset] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro hover:shadow-[0_18px_40px_-14px_rgba(6,122,70,.85),0_2px_0_0_rgba(255,255,255,.22)_inset] sm:w-auto"
             >
-              Provalo con 3 destinazioni gratis
+              Mettiti in lista: 3 destinazioni gratis
               <span className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
                 ↗
               </span>
-            </Link>
+            </a>
             <a
               href="#dentro"
               className="vetro-bottone inline-flex w-full items-center justify-center gap-2.5 rounded-bottone px-7 py-4 text-[16px] font-medium text-inchiostro transition-all duration-300 hover:-translate-y-0.5 sm:w-auto"

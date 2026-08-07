@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Car, Clock, Users, Wallet } from "lucide-react";
 import { costruisci } from "@/lib/costruttore";
 import { Anima } from "@/components/Anima";
@@ -38,9 +37,9 @@ export default function DentroApp() {
             Non ti chiedo di fidarti. <span className="corsivo text-verde-scuro">Ti faccio vedere lo schermo.</span>
           </h2>
           <p className="mt-5 max-w-xl text-[1.02rem] leading-relaxed text-fumo">
-            Questa è la schermata che vedi dopo l&apos;accesso. I tre posti qui sotto
-            sono calcolati adesso, mentre leggi, dallo stesso motore che gira
-            dentro l&apos;app.
+            Questa è la schermata che troverai nell&apos;app. I tre posti qui sotto
+            sono calcolati adesso, mentre leggi, dallo stesso motore che le
+            girerà dentro.
           </p>
         </Anima>
 
@@ -52,7 +51,7 @@ export default function DentroApp() {
               <span className="size-2.5 rounded-full bg-[#febc2e]" />
               <span className="size-2.5 rounded-full bg-[#28c840]" />
               <span className="ml-3 truncate rounded-pillola bg-white px-3 py-1 text-[11px] text-fumo-2 sm:text-xs">
-                viaggioancheio.it/app
+                Anteprima dell&apos;app
               </span>
             </div>
 
@@ -140,15 +139,15 @@ export default function DentroApp() {
 
         <Anima ritardo={0.2}>
           <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-            <Link
-              href="/entra?modo=registrati"
+            <a
+              href="#iscriviti"
               className="group inline-flex items-center gap-2 rounded-pillola bg-verde px-7 py-4 text-[15px] font-medium text-white shadow-[0_10px_30px_-10px_rgba(10,157,92,.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro"
             >
-              Provala tu, 3 destinazioni gratis
+              Provala per primo, 3 destinazioni gratis
               <span className="transition-transform duration-300 group-hover:translate-x-0.5">
                 →
               </span>
-            </Link>
+            </a>
             <p className="text-sm text-fumo">
               Nessuna carta. Nessun abbonamento. Si paga solo quando ti serve.
             </p>

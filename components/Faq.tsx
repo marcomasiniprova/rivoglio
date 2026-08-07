@@ -35,7 +35,7 @@ const domande = [
   },
   {
     d: "Serve installare un'app?",
-    r: "No. Viaggio Anche Io si usa dal browser, su telefono e computer, e puoi aggiungerlo alla schermata Home per avere la sua icona. Gli alert arrivano su Telegram o via email.",
+    r: "Sì. Viaggio Anche Io è un'app per iPhone e Android, in arrivo su App Store e Google Play. Le destinazioni ti arrivano come notifiche, con il conto già fatto. Lascia l'email qui sotto e ti avvisiamo il giorno in cui si può scaricare.",
   },
 ];
 

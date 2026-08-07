@@ -47,8 +47,9 @@ export default function Iscriviti() {
             Quest&apos;anno viaggi <span className="corsivo text-menta">anche tu.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-md text-[16.5px] leading-relaxed text-white/65">
-            Lascia la tua email: ti avviso appena apro le iscrizioni, e le prime 3
-            destinazioni te le regalo.
+            L&apos;app sta arrivando su App Store e Google Play. Lascia la tua email:
+            ti avviso il giorno in cui si può scaricare, e le prime 3 destinazioni
+            te le regalo.
           </p>
 
           {stato === "fatto" ? (

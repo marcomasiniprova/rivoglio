@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Anima } from "./Anima";
 import Parallasse from "./Parallasse";
 
@@ -59,21 +58,15 @@ export default function Invito() {
 
           <Anima ritardo={0.2}>
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/entra?modo=registrati"
+              <a
+                href="#iscriviti"
                 className="riflesso group inline-flex w-full items-center justify-center gap-2 rounded-bottone bg-white px-8 py-4 text-[16px] font-medium text-verde-notte shadow-[0_18px_40px_-16px_rgba(0,0,0,.6)] transition-all duration-300 hover:-translate-y-0.5 sm:w-auto"
               >
-                Inizia gratis
+                Mettiti in lista, gratis
                 <span className="transition-transform duration-300 group-hover:translate-x-0.5">
                   →
                 </span>
-              </Link>
-              <Link
-                href="/entra"
-                className="vetro-scuro inline-flex w-full items-center justify-center rounded-bottone px-8 py-4 text-[16px] font-medium text-white transition-all duration-300 hover:-translate-y-0.5 sm:w-auto"
-              >
-                Ho già un account
-              </Link>
+              </a>
             </div>
           </Anima>
 

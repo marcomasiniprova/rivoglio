@@ -29,8 +29,7 @@ const COLONNE: { titolo: string; voci: { testo: string; href: string }[] }[] = [
   {
     titolo: "Inizia",
     voci: [
-      { testo: "Crea un account", href: "/entra?modo=registrati" },
-      { testo: "Entra", href: "/entra" },
+      { testo: "Mettiti in lista", href: "/#iscriviti" },
       { testo: "Prova il costruttore", href: "/#costruttore" },
       { testo: "Domande", href: "/#domande" },
     ],

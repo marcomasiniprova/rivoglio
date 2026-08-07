@@ -46,9 +46,10 @@ test.describe("Vetrina", () => {
     expect(m.icons.length).toBeGreaterThan(0);
   });
 
-  test("dalla sezione si arriva alla registrazione", async ({ page }) => {
+  test("dalla sezione si arriva alla lista d'attesa", async ({ page }) => {
     await page.goto("/#dentro");
-    await page.locator("#dentro").getByRole("link", { name: /Provala tu/i }).click();
-    await expect(page).toHaveURL(/\/entra/);
+    await page.locator("#dentro").getByRole("link", { name: /Provala per primo/i }).click();
+    await expect(page).toHaveURL(/#iscriviti/);
+    await expect(page.locator("#iscriviti-email")).toBeVisible();
   });
 });

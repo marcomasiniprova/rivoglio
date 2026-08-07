@@ -2,15 +2,11 @@ import { Anima } from "./Anima";
 
 const canali = [
   {
-    t: "Telegram",
-    d: "Il canale migliore. Arriva come una notifica di sistema, con suono, anche su iPhone.",
+    t: "Notifica dell'app",
+    d: "Il canale principale. Arriva con suono, su iPhone e Android, solo quando esiste una destinazione sotto la tua soglia.",
     forte: true,
   },
-  { t: "Email", d: "Il canale di riserva: arriva sempre, senza installare nulla." },
-  {
-    t: "Notifica del browser",
-    d: "Su Android basta un tocco. Su iPhone serve aggiungere il sito alla schermata Home.",
-  },
+  { t: "Email", d: "Il canale di riserva: arriva sempre, anche se spegni le notifiche." },
 ];
 
 const fonti = [
@@ -26,8 +22,8 @@ export default function Canali() {
         <Anima>
           <h2 className="luce-testo text-[clamp(1.9rem,4vw,2.7rem)]">Come ti <span className="corsivo text-verde-scuro">arriva</span></h2>
           <p className="mt-4 text-[16px] leading-relaxed text-fumo">
-            Scegli tu il canale. Non c&apos;è nessuna app da scaricare: la notifica arriva
-            dove sei già.
+            Poche notifiche, buone. Ti disturbiamo solo quando il conto torna:
+            il resto del tempo, silenzio.
           </p>
           <div className="mt-7 space-y-3">
             {canali.map((c) => (

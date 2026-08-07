@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Anima } from "./Anima";
 
 /**
@@ -28,15 +27,15 @@ export default function Testimonial() {
             Puoi essere tu il primo.
           </p>
 
-          <Link
-            href="/entra?modo=registrati"
+          <a
+            href="#iscriviti"
             className="group mt-8 inline-flex items-center gap-2 rounded-pillola bg-inchiostro px-7 py-4 text-[15.5px] font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-notte hover:shadow-lg"
           >
-            Provalo per primo, gratis
+            Sarai fra i primi a provarla
             <span className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
               ↗
             </span>
-          </Link>
+          </a>
         </div>
       </Anima>
     </section>

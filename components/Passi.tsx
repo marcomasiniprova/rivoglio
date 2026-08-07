@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Anima } from "./Anima";
 
 const passi = [
@@ -34,18 +33,18 @@ export default function Passi() {
               <span className="corsivo text-verde-scuro">tre minuti.</span>
             </h2>
             <p className="mt-5 text-[16.5px] leading-relaxed text-fumo">
-              Nessuna app da installare, nessuna carta da lasciare. Le prime tre destinazioni sono
-              gratuiti.
+              Scarichi l&apos;app, imposti la ricerca una volta sola, e al resto pensa lei.
+              Le prime tre destinazioni sono gratuite, senza carta.
             </p>
-            <Link
-              href="/entra?modo=registrati"
+            <a
+              href="#iscriviti"
               className="group mt-7 inline-flex items-center gap-2 rounded-pillola bg-verde px-6 py-3.5 text-[15px] font-medium text-white shadow-[0_10px_30px_-12px_rgba(10,157,92,.7)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro hover:shadow-[0_16px_40px_-14px_rgba(10,157,92,.8)]"
             >
-              Provalo gratis
+              Mettiti in lista
               <span className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
                 ↗
               </span>
-            </Link>
+            </a>
           </Anima>
 
           <ol className="space-y-5">
