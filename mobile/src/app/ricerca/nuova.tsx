@@ -16,6 +16,7 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Bottone from "@/components/Bottone";
 import Chip from "@/components/Chip";
+import Titolo from "@/components/Titolo";
 import { creaRicerca } from "@/lib/dati";
 import { euro, oreLeggibili } from "@/lib/formati";
 import { COLORI, FONT, RAGGIO, SPAZIO, TINTE_TIPO } from "@/lib/tema";
@@ -158,7 +159,7 @@ export default function NuovaRicerca() {
       <ScrollView contentContainerStyle={stili.contenuto}>
         <View style={stili.testata}>
           <View style={stili.colonnaTitolo}>
-            <Titolo />
+            <Titolo prima={T.titolo.prima} corsivo={T.titolo.corsivo} />
             <Text style={stili.sottotitolo}>{T.sottotitolo}</Text>
           </View>
           <Pressable
@@ -262,15 +263,6 @@ export default function NuovaRicerca() {
   );
 }
 
-// Il titolo della modale usa lo stesso componente delle altre schermate.
-function Titolo() {
-  return (
-    <Text accessibilityRole="header" style={stili.titolo}>
-      {T.titolo.prima} <Text style={stili.titoloCorsivo}>{T.titolo.corsivo}</Text>
-    </Text>
-  );
-}
-
 const stili = StyleSheet.create({
   schermo: {
     flex: 1,
@@ -290,18 +282,6 @@ const stili = StyleSheet.create({
   colonnaTitolo: {
     flexShrink: 1,
     gap: SPAZIO.m,
-  },
-  titolo: {
-    fontFamily: FONT.display,
-    fontSize: 28,
-    lineHeight: 34,
-    letterSpacing: 28 * -0.04,
-    color: COLORI.inchiostro,
-  },
-  titoloCorsivo: {
-    fontFamily: FONT.corsivo,
-    fontSize: 30,
-    color: COLORI.verdeScuro,
   },
   sottotitolo: {
     fontFamily: FONT.testo,

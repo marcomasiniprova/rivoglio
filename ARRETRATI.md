@@ -70,7 +70,36 @@ non altro codice.**
 | 27 | **"Controlla che tutto sia a posto"** | Repo letta per intero (documenti, codice, prove). `npm run verify`: build, tipi e lint passano; prove 106/108 nella sandbox remota. Le 2 fallite sono la stessa prova (iscrizione con email valida) e falliscono solo perché la rete della sandbox blocca Supabase con un 403: sul tuo PC passano tutte e 108. |
 | 28 | Errori trovati dal controllo, corretti subito | **Data dell'esempio sulla landing**: diceva "ven 9 ago", ma il 9/8/2026 è domenica. Ora: ven 14 · dom 16 ago (calendario verificato). **Trattino lungo** tolto dai due testi visibili che lo avevano (versione testo dell'email destinazione, data dell'esempio). **`.env.example` completato**: mancavano EXA_API_KEY, MOTORE_SEGRETO e RESEND_HOOK_SECRET, e il commento mandava nella trappola di `.env.local` in UTF-16. |
 
+## ✅ CHIUSI il 07/08 — quinto giro: il pivot mobile (pomeriggio)
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 29 | **"Togli dalla landing ogni collegamento con l'app"** | Via "Entra" e ogni CTA verso `/entra` e `/app` da 11 componenti. Tutto porta alla lista d'attesa, la FAQ e i canali raccontano l'app in arrivo sugli store. Prova nuova: zero `href` verso l'app web in pagina. |
+| 30 | **"Che framework suggerisci? Fai ricerche online"** | Tre esperti con fonti: **Expo SDK 57** (riusa TypeScript e Supabase, EAS compila iOS senza Mac). Vincoli store verificati e scritti in `DECISIONI.md`. |
+| 31 | **"Costruisci un team di agenti e fammi l'app"** | 8 agenti coordinati (backend, UI, copy, AI, 3 frontend, QA): app in `mobile/` con onboarding in 6 passi, tab Destinazioni/Ricerche/Profilo, dettaglio col conto aperto, punteggio preferenze. Esito verificato due volte: tsc 0 errori, lint pulito, **29 prove su 29**. |
+| 32 | **"Usa Composio"** | Usato per operare sul tuo Supabase vero (la sandbox non lo raggiunge): schema di `profili` verificato colonna per colonna e **migrazione `expo_push_token` applicata e riverificata** in produzione. |
+
 ## ⏳ ANCORA DA FARE
+
+### Per l'app mobile (dal pivot del 07/08)
+- **Il passo "avvisi" può essere scavalcato**: provato dal vivo nel browser,
+  dopo la registrazione lo smistamento della radice porta subito alle tab
+  prima che la schermata del permesso notifiche si veda. Da verificare su
+  telefono e sistemare (vincolare lo smistamento mentre si è nel gruppo
+  benvenuto, o chiedere il permesso dal feed).
+- **Prova sul telefono vero** (Expo Go per il giro veloce, build di sviluppo
+  per le notifiche): serve il telefono di Valerio.
+- **Account store**: Apple Developer (99$/anno) e Play Console (25$ +
+  12 tester × 14 giorni). Sono il collo di bottiglia dei tempi.
+- **Canale push nel motore**: `lib/alert/invia.ts` oggi manda email;
+  aggiungere l'invio al token `expo_push_token` (API di Expo) come canale
+  primario quando esiste.
+- **Il dettaglio destinazione ricava persone e soglia dalla prima ricerca
+  attiva**: `invii` ha già `ricerca_id`, va selezionato in
+  `caricaDestinazioni` e usato per prendere la ricerca giusta.
+- Schermate vere dell'app nella landing (dall'export web appena stabile).
+- Benzina ferma (1,994) anche in 2 punti dell'app mobile: si sistema
+  insieme al lettore MIMIT.
 
 - Cron in produzione per raccolta/abbinamento (endpoint pronti, serve MOTORE_SEGRETO su Netlify)
 - Bot Telegram (il codice c'è, manca TELEGRAM_BOT_TOKEN)

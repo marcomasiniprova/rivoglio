@@ -66,44 +66,58 @@ export default function DettaglioDestinazione() {
   // La prima lettura si registra una volta sola, anche se si ricarica.
   const segnata = useRef(false);
 
-  const carica = useCallback(async () => {
-    if (!id) {
+  // Carica i dati e basta: gli stati si aggiornano solo nei callback della
+  // promessa, mai in modo sincrono dentro l'effetto (regola react-hooks).
+  const carica = useCallback(async (): Promise<Carico | null> => {
+    const [profilo, ricerche, destinazioni] = await Promise.all([
+      caricaProfilo(),
+      caricaRicerche(),
+      caricaDestinazioni(),
+    ]);
+    const destinazione = id ? (destinazioni.find((d) => d.id === id) ?? null) : null;
+    if (!profilo || !destinazione) return null;
+    // L'invio non porta con sé la sua ricerca: soglia e persone vengono
+    // dalla prima ricerca attiva, o dalla più recente.
+    const ricerca = ricerche.find((r) => r.attiva) ?? ricerche[0] ?? null;
+    return { destinazione, profilo, ricerca };
+  }, [id]);
+
+  const applica = useCallback((nuovo: Carico | null) => {
+    if (!nuovo) {
       setStato("errore");
       return;
     }
-    try {
-      const [profilo, ricerche, destinazioni] = await Promise.all([
-        caricaProfilo(),
-        caricaRicerche(),
-        caricaDestinazioni(),
-      ]);
-      const destinazione = destinazioni.find((d) => d.id === id) ?? null;
-      if (!profilo || !destinazione) {
-        setStato("errore");
-        return;
-      }
-      // L'invio non porta con sé la sua ricerca: soglia e persone vengono
-      // dalla prima ricerca attiva, o dalla più recente.
-      const ricerca = ricerche.find((r) => r.attiva) ?? ricerche[0] ?? null;
-      setCarico({ destinazione, profilo, ricerca });
-      setStato("pronto");
-      if (!segnata.current) {
-        segnata.current = true;
-        void segnaAperta(destinazione.id);
-      }
-    } catch (e) {
-      console.error("[destinazione] caricamento fallito:", e);
-      setStato("errore");
+    setCarico(nuovo);
+    setStato("pronto");
+    if (!segnata.current) {
+      segnata.current = true;
+      void segnaAperta(nuovo.destinazione.id);
     }
-  }, [id]);
+  }, []);
 
   useEffect(() => {
-    void carica();
-  }, [carica]);
+    let attivo = true;
+    carica()
+      .then((nuovo) => {
+        if (attivo) applica(nuovo);
+      })
+      .catch((e) => {
+        console.error("[destinazione] caricamento fallito:", e);
+        if (attivo) setStato("errore");
+      });
+    return () => {
+      attivo = false;
+    };
+  }, [carica, applica]);
 
   const riprova = () => {
     setStato("caricamento");
-    void carica();
+    carica()
+      .then(applica)
+      .catch((e) => {
+        console.error("[destinazione] caricamento fallito:", e);
+        setStato("errore");
+      });
   };
 
   const indietro = () => {

@@ -1,9 +1,13 @@
 # STATO — Viaggio Anche Io
 
-**Aggiornato:** 2026-08-07
-**Fase 1 al 75%. LA PRIMA DESTINAZIONE È PARTITA DAVVERO:** Rimini, 147€ a
-testa, Hotel Apollo (prezzo verificato sulla pagina), email consegnata via
-Resend a valerio@artecai.it, credito scalato 3→2, invio registrato.
+**Aggiornato:** 2026-08-07, sera
+**PIVOT: il prodotto è un'APP MOBILE per App Store e Google Play** (scelta
+di Valerio del 07/08). L'app esiste: è in `mobile/` (Expo SDK 57), scritta
+da una squadra di 8 agenti coordinati, verificata: tsc 0 errori, lint
+pulito, 29 prove su 29. Migrazione push applicata sul Supabase vero via
+Composio. La landing non porta più all'app web: raccoglie la lista d'attesa.
+Al mattino era partita LA PRIMA DESTINAZIONE VERA: Rimini, 147€ a testa,
+email via Resend, credito scalato 3→2.
 
 ## Dove siamo
 - **Il motore gira**: raccolta da Exa (solo strutture indipendenti, Booking
