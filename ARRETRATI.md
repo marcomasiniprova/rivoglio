@@ -149,14 +149,39 @@ non altro codice.**
 | 66 | **Email di supporto** | valerio@artecai.it nel footer (mailto), come da tua scelta. Si cambia con una riga quando c'è il dominio. |
 | 67 | **Newsletter "pareva non funzionare"** | Il salvataggio usa la chiave pubblica: l'iscrizione quasi certamente È salvata. A mancare è l'email di conferma: serve RESEND_API_KEY su Netlify, e finché il dominio non è verificato Resend spedisce solo a valerio@artecai.it. Intanto l'email di benvenuto è stata riscritta: era rimasta al prodotto viaggi ("fughe sotto soglia"), ora racconta l'Osservatorio. |
 
+## ✅ CHIUSI l'8/08 notte — tredicesimo giro: recesso, campi veri, audit
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 68 | **#21 Rinuncia al recesso** ("te ne ho parlato e non la vedo", il buco più costoso) | Spunta esplicita con testo versionato (art. 59 Cod. Consumo, `lib/pratiche/recesso.ts`) prima dei bottoni Polar; consenso registrato lato server in `verifiche` (quando + testo esatto); la rotta di checkout respinge chi non ha firmato, anche con l'URL diretto; il webhook copia la firma nella cronologia della pratica e segnala l'anomalia se manca. Migrazione applicata e verificata sul Supabase vero. |
+| 69 | **Punto 3: "due fonti indipendenti" promesse senza averle** | Le 4 frasi in vetrina (come funziona, card del dato, pricing, FAQ) ora dicono "tracciamento reale del volo": vero da oggi anche nel motore. La frase "due fonti" torna quando arriva la tua chiave AviationStack (#22). |
+| 70 | **#26 Motore sui campi veri** | Regola "senza Live niente vendita": quality senza "Live" sull'arrivo = NESSUN verdetto (nemmeno il no: 179 minuti stimati possono essere 185 veri). Codeshare non risolto sopra soglia = incerto (la lettera deve andare al vettore operativo). runwayTime/revisedTime già a posto. Golden set 25→30 casi, dentro il tuo FR4001 del 6/08 (155 min, non idoneo per 25 minuti). Versione regole 2026.08.2. Eval 33/33, falsi positivi 0. |
+| 71 | **"Leggi tutti i miei prompt, dimmi cosa è stato ignorato, mega to do list"** | Transcript completo riletto (34 messaggi, 17 prompt veri), audit consegnato in chat prompt per prompt, arretrati aggiornati qui sotto. |
+
 ## ⏳ ANCORA DA FARE
 
-### Per Rivoglio (dal documento, rimandati di proposito)
+### LA MEGA TO DO (dall'audit dei prompt, 8/08 notte)
+
+**Attività numerate restanti (dalla lista del 07/08 sera):**
+- **#22 Seconda fonte viva**: appena arriva la TUA chiave AviationStack si
+  accende l'incrocio e "due fonti" torna in vetrina. Il codice c'è già.
+- **#25 Osservatorio con dati veri**: alimentarlo dalle statistiche ritardi
+  per aeroporto di AeroDataBox (endpoint esistente, verificare il tier),
+  così "i 10 voli più in ritardo" è vero dal numero 1.
+- **#27 I 7 pezzi del motore**: OpenFlights locale (riserva distanze) ·
+  fusi IANA (riserva) · **Open-Meteo storico nel reclamo** (l'asso: gratis,
+  senza chiave, nessuno in Italia lo fa) · scioperi MIT/ENAC · indirizzi
+  reclamo da 10 a 40 compagnie · **OCR carta d'imbarco con Mistral** (la
+  chiave c'è, l'OCR è DA COSTRUIRE: è questo il motivo per cui "sembra non
+  funzionare").
+
+**Prodotto (dal documento, rimandati di proposito):**
 - **Onboarding dell'app mobile ancora al prodotto viaggi**: va riscritto
   per Rivoglio (check del volo, non micro-vacanze). Scoperto l'8/08 con
   l'anteprima web. Si fa insieme al tracker mobile completo.
-- **Golden set da 25 a 100+ casi** man mano che passano voli veri (il
-  documento chiede di arricchirlo con casi reali etichettati a mano).
+- **Golden set da 30 a 100+ casi** man mano che passano voli veri (il
+  documento chiede casi reali etichettati a mano; il primo, FR4001, è
+  dentro dall'8/08).
 - **Tracker mobile completo** (oggi tab minima): dopo i primi incassi web.
 - **Contatore rate-limit condiviso**: oggi il tetto 20/min per IP vive in
   memoria del singolo processo; con più istanze serve Supabase o KV.
@@ -164,6 +189,22 @@ non altro codice.**
   come newsletter: fase DISTRIBUZIONE.
 - **Bagagli (settembre) e treni (ottobre)**: espansioni previste dal
   documento, non si toccano ora.
+- **Design "mozzafiato" al livello delle reference**: la strada è tracciata
+  (art-director, gen-asset.ts, regole d'oro) ma è BLOCCATA dalle chiavi
+  immagini: Gemini ha quota 0 senza fatturazione, Unsplash è in
+  approvazione. Senza asset non si supera il livello attuale.
+
+**Tocca a Valerio (in ordine di soldi):**
+1. Deploy del sito (online c'è il vecchio) o riautorizzare il connettore.
+2. Prodotti Polar + checkout link + segreto webhook + approvazione org.
+3. Chiavi su Netlify: SUPABASE_SECRET_KEY, RESEND_API_KEY,
+   AERODATABOX_API_KEY, MISTRAL_API_KEY.
+4. Chiave AviationStack (l'hai scelta tu: free tier, 2 minuti).
+5. Fatturazione Gemini su Google AI Studio · UNSPLASH_ACCESS_KEY quando
+   approvata · alla prossima fattura AeroDataBox chiedere la profondità
+   storica dei piani a pagamento.
+6. Dominio (slot Hostinger) e social @rivoglio (li crei tu, tua scelta).
+7. Legale sulle condizioni d'uso · commercialista sul regime fiscale.
 
 ### [SUPERATI dal pivot del 07/08 sera — idea viaggi chiusa da Valerio]
 <details>

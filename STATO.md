@@ -1,6 +1,6 @@
 # STATO — Rivoglio
 
-**Aggiornato:** 2026-08-08, sera
+**Aggiornato:** 2026-08-08, notte (giro #21 recesso + #26 campi veri)
 **RIVOGLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
 Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
 verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
@@ -15,8 +15,21 @@ social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
 - **Il motore EU261 decide, l'AI mai**: `lib/regole/eu261.ts`, versione
-  2026.08.1, tre stati (idoneo · incerto: MAI vendere · non idoneo).
-  Golden set di 25 casi etichettati a mano, eval bloccante: falsi positivi 0.
+  2026.08.2, tre stati (idoneo · incerto: MAI vendere · non idoneo).
+  Dal giro #26: senza quality "Live" sull'arrivo NESSUN verdetto (una stima
+  non è un fatto), codeshare non risolto sopra soglia = incerto (la lettera
+  deve andare al vettore operativo). Golden set di 30 casi etichettati a
+  mano col PRIMO CASO REALE (FR4001 del 6/08, 155 min, non idoneo), eval
+  bloccante: falsi positivi 0.
+- **La rinuncia al recesso (#21) è nel flusso**: spunta esplicita (art. 59
+  Cod. Consumo, testo versionato in `lib/pratiche/recesso.ts`) prima del
+  rimando a Polar, registrata in `verifiche.rinuncia_recesso_il/testo`; la
+  rotta di checkout NON lascia passare senza firma e il webhook la copia
+  nella cronologia della pratica. Migrazione applicata sul Supabase vero
+  (4 colonne verificate, `supabase/2026-08-08-recesso-e-live.sql`).
+- **La promessa "due fonti" tolta dalla vetrina**: finché AviationStack non
+  ha la chiave, landing e FAQ dicono "tracciamento reale del volo" (vero,
+  ora lo è anche nel motore). Si ripristina quando la seconda fonte è viva.
 - **Lo strato dei fatti**: AeroDataBox (dalla spec ufficiale, orario ruote a
   terra, mai gonfiato) + AviationStack di riserva + demo marcata senza
   chiave. Cache per volo+data, payload grezzo archiviato come prova.
@@ -25,15 +38,16 @@ social rifatta (era rimasta al prodotto viaggi).
   firma Standard Webhooks provata su 10 casi); lettera deterministica coi
   canali reclamo verificati di 10 compagnie; email T+0/2/15/30/60; garanzia
   90 giorni; tracker web; `/admin` = conferma umana (shadow mode acceso).
-- **Prove**: web 190/192 Playwright (2 = rete sandbox verso Supabase),
-  eval 28/28, mobile tsc/lint/jest 29/29. Una prova vieta per sempre
+- **Prove**: web 204/206 Playwright (2 = rete sandbox verso Supabase),
+  eval 33/33, mobile tsc/lint/jest 29/29. Una prova vieta per sempre
   "hai diritto a" e il trattino lungo nei testi visibili.
 - **Schema dati applicato sul Supabase vero** (voli, verifiche, pratiche,
   eventi + RLS) via Composio, come migrazione tracciata.
 - **SEO/GEO**: robots, sitemap, JSON-LD Organization+WebSite, llms.txt,
   canonical, metadata Rivoglio ovunque.
-- **ONLINE: https://rivoglio.netlify.app** (deploy dell'8/08 sera, con
-  logo nuovo, footer nuovo e fix). Filiera provata: zip del ramo da GitHub
+- **ONLINE: https://rivoglio.netlify.app** ma col DEPLOY VECCHIO dell'8/08
+  (logo e footer sì; onda, pricing nuovo, scanner, 12 mesi, recesso NO:
+  i commit da `f4e05a5` in poi non sono deployati). Filiera provata: zip del ramo da GitHub
   scaricato sul workbench Composio (la sandbox blocca gli host Netlify),
   client Netlify lanciato da lì con l'URL firmato del connettore. Servono
   TUTTI E DUE i pezzi di `netlify.toml`: senza `[build]` l'upload viene
@@ -58,18 +72,24 @@ social rifatta (era rimasta al prodotto viaggi).
   deploy va riautorizzato su claude.ai (le modifiche dell'8/08 sera sono
   pushate ma NON ancora online).
 
-## Serve Valerio (in ordine, il primo è l'unico rischio tecnico)
-1. **Chiave AeroDataBox** (RapidAPI, piano Pro ~5$) e la prova delle 2 ore:
-   10 voli reali, l'orario EFFETTIVO deve esserci. Poi 30 casi a mano.
+## Serve Valerio (in ordine)
+1. **Deploy**: il sito online è vecchio. O rifai il giro manuale su Netlify,
+   o riautorizzi il connettore su claude.ai e lo faccio io.
 2. **Polar**: creare i 2 prodotti (pratica 14,90 · famiglia 24,90), darmi i
    checkout link e il segreto webhook; chiedere SUBITO l'approvazione
    dell'organizzazione (~2 settimane).
-3. **Chiavi su Netlify** (progetto `rivoglio`): SUPABASE_SECRET_KEY e
-   RESEND_API_KEY (le hai tu). Senza, il sito gira ma admin ed email no.
-4. **Dominio** per Rivoglio (slot gratuito Hostinger da configurare) e
+3. **Chiavi su Netlify** (progetto `rivoglio`): SUPABASE_SECRET_KEY,
+   RESEND_API_KEY, e ora anche AERODATABOX_API_KEY e MISTRAL_API_KEY (in
+   locale ci sono, online no: senza la prima il sito vero gira in demo).
+4. **Chiave AviationStack** (free tier, hai scelto di crearla tu): accende
+   l'incrocio delle fonti e ci fa rimettere "due fonti" in vetrina. Alla
+   prossima fattura AeroDataBox chiedi la profondità storica dei piani a
+   pagamento. Poi 30 casi reali a mano per il golden set.
+5. **Dominio** per Rivoglio (slot gratuito Hostinger da configurare) e
    account social `@rivoglio`.
-5. Legale su condizioni d'uso; commercialista sul regime fiscale (il
-   documento stesso lo chiede).
+6. Legale su condizioni d'uso; commercialista sul regime fiscale (il
+   documento stesso lo chiede). Fatturazione Google AI Studio per Gemini
+   e UNSPLASH_ACCESS_KEY quando l'approvazione arriva (per gli asset).
 
 ## Da non rifare
 - `.env.local` è in UTF-16 e Next lo ignora: chiavi vive in
