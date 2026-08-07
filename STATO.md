@@ -65,12 +65,14 @@ social rifatta (era rimasta al prodotto viaggi).
   tracker). Per vederla su iPhone: da maggio 2026 l'Expo Go dell'App Store
   è fermo all'SDK 54 (noi 57), quindi anteprima web (`npx expo start --web`
   dal PC) oppure TestFlight con l'account Apple Developer.
-- **Chiavi**: GEMINI_API_KEY e FIGMA_API_KEY in `.env.development.local`.
+- **Chiavi**: GEMINI, FIGMA, MISTRAL e AERODATABOX in
+  `.env.development.local`.
   Gemini: rete e chiave ok ma quota immagini 0 sul piano gratuito, serve
   la fatturazione su Google AI Studio. Manca UNSPLASH_ACCESS_KEY.
-- **Il connettore Netlify si è scollegato di nuovo**: per il prossimo
-  deploy va riautorizzato su claude.ai (le modifiche dell'8/08 sera sono
-  pushate ma NON ancora online).
+- **I deploy li fa Valerio a mano** (scelta sua; in alternativa si
+  riautorizza il connettore Netlify su claude.ai). ATTENZIONE: mai
+  trascinare cartelle su Netlify Drop, le azioni server muoiono; o si
+  collega il repo GitHub al progetto, o si rifà il giro col client.
 
 ## Serve Valerio (in ordine)
 1. **Deploy**: il sito online è vecchio. O rifai il giro manuale su Netlify,
