@@ -119,6 +119,17 @@ non altro codice.**
 | 51 | **"Rimetti la web app accessibile e togli il redirect"** | Decisione ribaltata e registrata in DECISIONI: `/app` aperta a TUTTI senza account, col check libero e illimitato (componente nuovo `CheckRapido`); l'elenco pratiche appare solo da collegati; `/admin` resta chiuso. Link "Entra" in nav e "La web app" nel footer. Prove aggiornate: 20/20. |
 | 52 | **"Voglio vedere la app mobile da iPhone"** | Anteprima web dell'app Expo esportata e fotografata (funziona). Scoperta onesta: **l'onboarding mobile è ancora al prodotto viaggi** ("La tua fuga, al prezzo giusto"): il pivot mobile era solo le tab. E da maggio 2026 l'Expo Go dell'App Store è fermo all'SDK 54 (noi siamo su 57): su iPhone la via nativa è TestFlight con l'account Apple Developer, oppure l'anteprima web. |
 
+## ✅ CHIUSI l'8/08 — decimo giro: il giro di design (Zentivo, pricing, scanner)
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 53 | **"Crawla Zentivo e spiegami le nuvole"** | Smontato dal workbench: le nuvole sono una striscia FOTOGRAFICA da 4320px dentro un Ticker di Framer (scorrimento orizzontale infinito) sopra un cielo fotografico da 4800x3928 e un velo sfumato. Asset + una sola animazione. Tu hai deciso: niente cielo, non ci rappresenta. |
+| 54 | **"Anima lo sfondo: colonne geometriche a onda calma"** | Rifatte: spigoli definiti, filo di bordo chiaro, zigzag di tono fra pari e dispari, UN'onda sola che viaggia da sinistra a destra (fase per indice, durata unica 8,4s). Via i respiri casuali. |
+| 55 | **"Pricing esattamente come la reference"** | L'agente art-director l'ha replicata coi nostri colori: occhiello a pillola, card bianche, la centrale (Una pratica 14,90) sollevata con nastro verde "La più scelta", spunte, bottoni pieni a tutta larghezza. Niente toggle (deciso da te). Il confronto col 35% è sotto, come striscia. |
+| 56 | **"Scanner cinematico nel check"** | Il teatro ora è una scansione: carta d'imbarco coi dati VERI inseriti, raggio verde che la percorre, righe che si accendono a ogni passo completato. I passi restano agganciati allo stato vero della richiesta. |
+| 57 | **"Ogni bottone animato e funzionante"** | Pressione fisica globale al click (scale 0.965) su tutti i bottoni del sito; "Entra" in nav ora è pillola di vetro; il sistema variants (pieno/scuro/vetro/contorno) c'era già e resta. "Esci" e i checkout NON erano rotti in codice: sul tuo rivoglioo statico le azioni server non esistono, sul progetto giusto funzionano. |
+| 58 | **"Testi grigi piccoli illeggibili"** | Alzati misura e contrasto dei peggiori: etichette e note del check (13→14,5px, da fumo-2 a fumo/inchiostro), crediti e disclaimer del footer (bianco dal 40-45% al 55-65%). |
+
 ## ⏳ ANCORA DA FARE
 
 ### Per Rivoglio (dal documento, rimandati di proposito)

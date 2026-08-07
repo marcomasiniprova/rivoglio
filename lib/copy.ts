@@ -209,8 +209,8 @@ export const COPY = {
     piani: {
       check: {
         nome: "Il check",
-        prezzo: "Gratis",
-        periodo: "sempre",
+        prezzo: "0€",
+        periodo: "per sempre",
         descrizione: "Scopri se il tuo volo rientra in una fascia di compensazione.",
         punti: [
           "Numero di volo e data, nient'altro",
@@ -221,6 +221,8 @@ export const COPY = {
       },
       pratica: {
         nome: "Una pratica",
+        /** Il nastro sulla card evidenziata, come nel riferimento approvato. */
+        nastro: "La più scelta",
         prezzo: "14,90€",
         periodo: "una volta sola",
         descrizione: "Il reclamo pronto da inviare, seguito fino all'esito.",
@@ -244,7 +246,8 @@ export const COPY = {
           "Fino a 5 passeggeri dello stesso volo",
           "Una famiglia di 4 in fascia 250€ chiede 1.000€ in tutto",
         ],
-        /** Apre il "1.000€". */
+        /** Apre il "1.000€". L'etichetta è sua: quella comune resta al confronto (la prova clicca la prima del blocco). */
+        apriNota: "Come nasce il 1.000€",
         nota: "Il conto: 4 passeggeri × 250€ a testa = 1.000€. La compensazione spetta a ogni passeggero, anche ai bambini con un posto pagato.",
         bottone: "Prepara la pratica famiglia",
       },

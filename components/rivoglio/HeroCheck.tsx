@@ -209,7 +209,7 @@ export default function HeroCheck() {
             {HERO.sottotitolo}
           </p>
           {/* Ogni numero è apribile: il 600€ e i 5 anni si spiegano qui. */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[13px]">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-[14px]">
             {(
               [
                 ["importo", HERO.apriImporto],
@@ -338,16 +338,84 @@ export default function HeroCheck() {
                     <span aria-hidden="true">→</span>
                   </button>
 
-                  <p className="mt-3 text-center text-[13px] text-fumo">
+                  <p className="mt-3 text-center text-[14.5px] text-fumo">
                     {HERO.form.rassicurazione}
                   </p>
                 </form>
               ) : (
-                /* IL TEATRO ONESTO: tre passi legati allo stato vero. */
+                /* LO SCANNER: il documento coi dati veri inseriti, il raggio
+                   che lo attraversa, le righe che si accendono a ogni passo
+                   completato. Il teatro resta onesto: i passi avanzano con
+                   lo stato vero della richiesta, qui cambia solo la scena. */
                 <div aria-live="polite" className="py-1">
-                  <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-fumo-2">
+                  <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-fumo">
                     {TEATRO.titolo}
                   </p>
+
+                  {/* la carta d'imbarco sotto scansione */}
+                  <div className="relative mt-4 overflow-hidden rounded-2xl border border-bordo bg-white">
+                    <div className="flex items-center justify-between border-b border-dashed border-bordo px-4 py-2.5">
+                      <span className="font-display text-[15px] font-medium tracking-[-0.01em]">
+                        {volo.trim().toUpperCase()}
+                      </span>
+                      <span className="numeri text-[13px] text-fumo">{data}</span>
+                    </div>
+                    <div className="space-y-2 px-4 py-3">
+                      {TEATRO.passi.map((testo, i) => {
+                        const fatto = i < passo;
+                        const attivo = i === passo;
+                        return (
+                          <div
+                            key={testo}
+                            className={`flex h-7 items-center justify-between rounded-lg px-2.5 transition-colors duration-500 ${
+                              fatto ? "bg-menta-tenue" : "bg-nebbia"
+                            }`}
+                          >
+                            <span
+                              className={`h-1.5 rounded-full transition-all duration-500 ${
+                                fatto
+                                  ? "w-2/3 bg-verde/45"
+                                  : attivo
+                                    ? "w-1/2 bg-verde/25"
+                                    : "w-1/3 bg-bordo"
+                              }`}
+                            />
+                            {fatto && (
+                              <motion.svg
+                                initial={{ scale: 0.4, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                viewBox="0 0 16 16"
+                                className="h-3.5 w-3.5 text-verde"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="m3.5 8.4 2.8 2.8 6-6.4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2.2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </motion.svg>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* il raggio che scansiona, su e giù, calmo */}
+                    <motion.div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-x-0 top-0 h-14"
+                      style={{
+                        background:
+                          "linear-gradient(180deg, transparent, rgba(10,157,92,.14) 42%, rgba(10,157,92,.42) 50%, rgba(10,157,92,.14) 58%, transparent)",
+                      }}
+                      initial={{ y: "-100%" }}
+                      animate={{ y: ["-100%", "480%", "-100%"] }}
+                      transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  </div>
+
                   <ol className="mt-4 space-y-3.5">
                     {TEATRO.passi.map((testo, i) => {
                       const fatto = i < passo;

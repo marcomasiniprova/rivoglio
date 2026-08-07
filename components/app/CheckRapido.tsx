@@ -88,7 +88,7 @@ export default function CheckRapido() {
     >
       <div className="grid gap-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
         <div>
-          <label htmlFor="app-volo" className="text-[13px] font-medium text-fumo">
+          <label htmlFor="app-volo" className="text-[14px] font-medium text-inchiostro/75">
             {FORM.volo.etichetta}
           </label>
           <input
@@ -102,7 +102,7 @@ export default function CheckRapido() {
           />
         </div>
         <div>
-          <label htmlFor="app-data" className="text-[13px] font-medium text-fumo">
+          <label htmlFor="app-data" className="text-[14px] font-medium text-inchiostro/75">
             {FORM.data.etichetta}
           </label>
           <input
@@ -128,7 +128,7 @@ export default function CheckRapido() {
           {errore}
         </p>
       )}
-      <p className="mt-4 text-[13px] text-fumo-2">{FORM.rassicurazione}</p>
+      <p className="mt-4 text-[14.5px] text-fumo">{FORM.rassicurazione}</p>
     </form>
   );
 }

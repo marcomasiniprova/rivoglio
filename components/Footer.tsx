@@ -118,7 +118,7 @@ export default function Footer() {
             {/* I badge degli store sono inerti finché l'app non c'è davvero:
                 vedi BadgeStore.tsx. Qui l'app è il tracker della pratica. */}
             <div className="mt-7">
-              <p className="text-[13px] font-medium text-white/50">{F.app.titolo}</p>
+              <p className="text-[13.5px] font-medium text-white/65">{F.app.titolo}</p>
               <div className="mt-3">
                 <BadgeStore />
               </div>
@@ -179,7 +179,7 @@ export default function Footer() {
               {/* Il disclaimer vive sotto la colonna Trasparenza: è lì che
                   uno lo cerca, non nascosto nella riga dei crediti. */}
               {c.titolo === F.colonne.trasparenza.titolo && (
-                <p className="mt-6 max-w-[26rem] text-[12px] leading-relaxed text-white/40">
+                <p className="mt-6 max-w-[26rem] text-[13px] leading-relaxed text-white/55">
                   {F.disclaimer}
                 </p>
               )}
@@ -187,7 +187,7 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-7 text-[13px] text-white/45 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-7 text-[13.5px] text-white/60 sm:flex-row sm:items-center sm:justify-between">
           <p>{F.copyright} · Fatto in Italia</p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             {F.colonne.legale.voci.map((v) => (
