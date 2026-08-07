@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { Anima } from "@/components/Anima";
@@ -37,6 +37,18 @@ function spezzaTitolo(titolo: string, taglio: string): [string, string] {
 }
 
 /**
+ * La forma canonica del numero di volo, per costruire il link demo:
+ * "zz 0250" → "ZZ250". Rispecchia lib/voli/normalizza.ts nel caso
+ * semplice (codice a due caratteri + numero); per il resto schiaccia
+ * spazi e trattini. Il giudizio vero resta comunque al server.
+ */
+function canonico(grezzo: string): string {
+  const pezzi = grezzo.trim().match(/^([A-Za-z0-9]{2})[\s-]*0*([0-9]{1,4})\s*([A-Za-z])?$/);
+  if (pezzi) return (pezzi[1] + pezzi[2] + (pezzi[3] ?? "")).toUpperCase();
+  return grezzo.replace(/[\s-]+/g, "").toUpperCase();
+}
+
+/**
  * I confini del campo data rispecchiano quelli del server
  * (lib/voli/normalizza.ts): fino a domani, indietro di 6 anni.
  * Calcolati al caricamento del modulo: il giudizio vero resta al server,
@@ -56,6 +68,8 @@ export default function HeroCheck() {
   const [volo, setVolo] = useState("");
   const [data, setData] = useState("");
   const [errore, setErrore] = useState<string | null>(null);
+  /** Verdetto arrivato ma non salvato (id nullo): si mostra qui, con onestà. */
+  const [avviso, setAvviso] = useState<{ testo: string; demo: boolean } | null>(null);
   const [fase, setFase] = useState<Fase>("campo");
   const [passo, setPasso] = useState(0);
   const inCorso = useRef(false);
@@ -79,6 +93,7 @@ export default function HeroCheck() {
 
     inCorso.current = true;
     setErrore(null);
+    setAvviso(null);
     setFase("teatro");
     setPasso(0); // passo 1 acceso: la richiesta è DAVVERO in volo
 
@@ -90,11 +105,32 @@ export default function HeroCheck() {
       });
       const dati = await r.json().catch(() => null);
 
-      if (!r.ok || !dati?.ok || !dati?.id) {
+      if (!r.ok || !dati?.ok) {
         setFase("campo");
         setErrore(
           typeof dati?.errore === "string" ? dati.errore : COPY.comune.erroreGenerico,
         );
+        inCorso.current = false;
+        return;
+      }
+
+      /* Verdetto arrivato ma senza id salvato (l'archivio non c'era):
+         se il dato è dimostrativo la pagina risultato sa ricalcolarlo da
+         sola con l'id "demo-VOLO-DATA", senza database. Se invece era un
+         dato vero, non c'è una pagina da aprire: il verdetto si mostra
+         qui, con onestà, invece di un errore finto. */
+      const destinazione = dati.id
+        ? `/verifica/${dati.id}`
+        : dati.demo === true
+          ? `/verifica/demo-${canonico(volo)}-${data}`
+          : null;
+
+      if (!destinazione) {
+        setFase("campo");
+        setAvviso({
+          testo: typeof dati.motivo === "string" ? dati.motivo : COPY.comune.erroreGenerico,
+          demo: dati.demo === true,
+        });
         inCorso.current = false;
         return;
       }
@@ -107,7 +143,7 @@ export default function HeroCheck() {
       await attesa(700);
       setPasso(2);
       await attesa(700);
-      router.push(`/verifica/${dati.id}`);
+      router.push(destinazione);
     } catch {
       setFase("campo");
       setErrore(COPY.comune.erroreGenerico);
@@ -274,6 +310,24 @@ export default function HeroCheck() {
                     >
                       {errore}
                     </motion.p>
+                  )}
+
+                  {avviso && (
+                    <motion.div
+                      role="status"
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-3 rounded-xl border border-bordo bg-nebbia p-4"
+                    >
+                      {avviso.demo && (
+                        <span className="mb-2 inline-block rounded-pillola border border-bordo bg-white px-2.5 py-0.5 text-[11px] font-medium text-fumo">
+                          {COPY.comune.demo}
+                        </span>
+                      )}
+                      <p className="text-[13.5px] leading-relaxed text-inchiostro/85">
+                        {avviso.testo}
+                      </p>
+                    </motion.div>
                   )}
 
                   <button

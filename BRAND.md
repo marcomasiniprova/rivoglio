@@ -109,3 +109,28 @@ Se non si capisce più, il dettaglio non entra.
 
 **Mai:** "imperdibile", "esclusivo", "rivoluzionario", "la soluzione definitiva",
 punti esclamativi a raffica, MAIUSCOLE per gridare.
+
+---
+
+## La direzione visiva scelta da Valerio (riferimenti del 07/08, sera)
+
+Quattro riferimenti caricati da Valerio (app legale AI, app pulizie con
+timeline, landing LinguistAI). Il linguaggio comune, che è il TARGET della
+rifinitura:
+
+- **Luce e aria**: fondi chiari con sfumature morbide di cielo, tanta aria
+  fra le sezioni. Per noi: il cielo sta bene con i voli, e si sposa col
+  verde del marchio (il verde resta il colore dei soldi e dell'azione).
+- **Vetro smerigliato**: card traslucide con sfocatura, chip che fluttuano
+  attorno agli elementi principali (già nel nostro DNA dalla nav a pillola).
+- **Card bianche pulite** con icone in chip tondi colorati, righe
+  informative con icona + testo, MAI muri di testo.
+- **Un solo bottone pieno che comanda** per schermata; il resto contorno o
+  fantasma.
+- **Stepper e timeline nitidi** (riferimento 3): è la forma del nostro
+  tracker della pratica: Pagata → Pronta → Inviata → Sollecito → Esito.
+- **Divisori a onda** fra sezioni chiare e scure (riferimento 4).
+- **Titoli grandi con UNA parola accentata** a colore o in corsivo: già
+  nostro, si tiene.
+- Confronto "vecchio modo contro noi" in due card affiancate
+  (riferimento 4): perfetto per "AirHelp 35% contro Rivoglio 14,90€".

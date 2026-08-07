@@ -488,71 +488,183 @@ export const COPY = {
       "Il mio volo {volo} è atterrato con {ritardo} di ritardo: fascia da {importo} secondo il Regolamento CE 261/2004. Controlla il tuo, è gratis:",
   },
 
-  /** Il tracker della pratica: stessi stati della macchina in lib/pratiche. */
+  /**
+   * L'area riservata e il tracker della pratica.
+   * Gli stati sono ESATTAMENTE quelli della macchina in lib/pratiche
+   * (schema supabase/2026-08-07-rivoglio.sql): se ne aggiungi uno lì,
+   * aggiungilo anche qui o il tracker mostra il codice grezzo.
+   */
   pratica: {
+    /* ---- la testata dell'area riservata (/app/layout) ---- */
+    testata: {
+      esci: "Esci",
+      piede: "Rivoglio · lo scanner dei rimborsi",
+    },
+
+    /* ---- l'elenco delle pratiche (/app) ---- */
+    elenco: {
+      titolo: "Le tue pratiche",
+      sottotitolo: "Ogni reclamo che hai aperto, con il punto in cui si trova.",
+      voloTemplate: "Volo {volo} del {data}",
+      /** Quando il volo agganciato non è leggibile: si dice, non si inventa. */
+      voloMancante: "Pratica del {data}",
+      fasciaTemplate: "Fascia da {importo}",
+      /** Cita la fonte dell'importo: ogni numero mostrato è apribile o citato. */
+      fasciaFonte: "Importo del Regolamento CE 261/2004, per passeggero",
+      famiglia: "Famiglia, fino a 5 passeggeri",
+      prossimoPassoEtichetta: "Prossimo passo",
+      apri: "Apri la pratica",
+      vuoto: {
+        titolo: "Non hai ancora nessuna pratica.",
+        testo:
+          "Si parte sempre dal check: numero di volo e data, gratis. Se il volo rientra in una fascia, da lì apri la pratica.",
+        cta: "Controlla un volo",
+      },
+      errore: "Non riesco a leggere le tue pratiche. Riprova tra qualche minuto.",
+    },
+
+    /* ---- il tracker (/pratica/[id]) ---- */
     titolo: "La tua pratica",
-    sottotitoloTemplate: "Volo {volo} del {data} · fascia da {importo}",
+    sottotitoloTemplate: "Volo {volo} del {data}",
+    torna: "Le tue pratiche",
+    statoEtichetta: "Dove siamo",
+    prossimoPassoEtichetta: "Il prossimo passo",
     stati: {
       creata: {
         nome: "Creata",
-        descrizione: "La pratica esiste. Completa il pagamento e generiamo il reclamo.",
+        descrizione: "La pratica è aperta ma il pagamento non risulta ancora arrivato.",
+        prossimoPasso:
+          "Completa il pagamento dal link che ti abbiamo mandato via email. Appena arriva, qui trovi la lettera pronta.",
       },
       pagata: {
         nome: "Pagata",
-        descrizione:
-          "Pagamento ricevuto. Carica un documento del volo e la lettera è pronta.",
+        descrizione: "Pagamento ricevuto. La lettera di reclamo è pronta da copiare.",
+        prossimoPasso:
+          "Apri la lettera, inviala dalla tua email e poi torna qui a premere \"Ho inviato il reclamo\".",
       },
-      documenti: {
-        nome: "Documenti",
-        descrizione:
-          "Carica la carta d'imbarco o l'email di conferma. Basta una foto leggibile.",
+      pronta: {
+        nome: "Pronta da inviare",
+        descrizione: "La lettera di reclamo è pronta, con i dati verificati del volo.",
+        prossimoPasso:
+          "Apri la lettera, inviala dalla tua email e poi torna qui a premere \"Ho inviato il reclamo\".",
       },
       inviata: {
         nome: "Inviata",
-        descrizione:
-          "Reclamo inviato alla compagnia. Se al giorno 15 non è arrivata risposta, qui trovi il sollecito già pronto.",
+        descrizione: "Hai inviato il reclamo alla compagnia. Ora la palla è a loro.",
+        prossimoPasso:
+          "Niente da fare per ora. Se al giorno 15 non è arrivata risposta, ti mandiamo il sollecito già pronto.",
       },
       sollecito: {
         nome: "Sollecito",
         descrizione:
           "Giorno 15, nessuna risposta: il sollecito è pronto. È il passaggio che la maggior parte delle persone salta. Tu no.",
+        prossimoPasso:
+          "Invia il sollecito che ti abbiamo mandato via email, sempre dalla tua casella.",
       },
       enac: {
         nome: "ENAC",
-        descrizione:
-          "La compagnia rifiuta o tace: contro-risposta e reclamo ENAC pronti da inviare.",
+        descrizione: "La compagnia rifiuta o tace: contro-risposta e reclamo ENAC sono pronti.",
+        prossimoPasso:
+          "Presenta il reclamo ENAC seguendo i passi nell'email che ti abbiamo mandato. È gratuito.",
       },
-      esito: {
-        nome: "Esito",
-        descrizione:
-          "Pratica chiusa. Dicci com'è andata: ogni esito rende più preciso il check di tutti.",
+      esito_pagata: {
+        nome: "Pagata dalla compagnia",
+        descrizione: "La compagnia ha pagato. La compensazione è arrivata a te, per intero.",
+        prossimoPasso:
+          "Niente da fare: la pratica è chiusa. Se un altro volo ti è andato storto, il check resta gratis.",
+      },
+      esito_rifiutata: {
+        nome: "Rifiutata",
+        descrizione: "La compagnia ha rifiutato la richiesta.",
+        prossimoPasso:
+          "Vale la garanzia: se entro la data indicata qui sotto non ricevi nulla, ti rimborsiamo la pratica per intero.",
+      },
+      rimborsata: {
+        nome: "Rimborsata",
+        descrizione: "Ti abbiamo rimborsato la pratica per intero, come da garanzia.",
+        prossimoPasso: "Niente da fare: la pratica è chiusa.",
       },
     },
+
+    /* ---- la linea del tempo, dagli eventi in pratiche_eventi ---- */
+    lineaTempo: {
+      titolo: "La cronologia",
+      vuota: "Ancora nessun evento registrato.",
+      /** Etichette per `tipo`: le transizioni di stato e le email del cron. */
+      eventi: {
+        creata: "Pratica aperta",
+        pagata: "Pagamento ricevuto",
+        pronta: "Lettera pronta",
+        inviata: "Reclamo inviato alla compagnia",
+        sollecito: "Sollecito pronto",
+        enac: "Reclamo ENAC pronto",
+        esito_pagata: "La compagnia ha pagato",
+        esito_rifiutata: "La compagnia ha rifiutato",
+        rimborsata: "Pratica rimborsata",
+        email_t0: "Email di conferma inviata",
+        email_t2: "Promemoria d'invio inviato",
+        email_t15: "Email col sollecito inviata",
+        email_t30: "Email col reclamo ENAC inviata",
+        email_t60: "Email di controllo esito inviata",
+      },
+      notaOrari: "Date e orari in ora italiana.",
+    },
+
     azioni: {
-      copiaTesto: "Copia il testo dell'email",
-      stampa: "Stampa la lettera",
-      caricaDocumento: "Carica il documento",
-      confermaInvio: "L'ho inviata",
-      segnalaEsito: "Com'è andata?",
+      apriLettera: "Apri la lettera",
+      confermaInvio: "Ho inviato il reclamo",
+      confermaInvioInCorso: "Un attimo.",
+      confermaInvioFatta: "Registrato. Ricarico la pagina.",
+      confermaInvioErrore: "Non sono riuscito a salvare. Riprova tra poco.",
+      confermaInvioNota:
+        "Premilo solo dopo aver spedito davvero l'email: da quel giorno partono i tempi del sollecito.",
     },
+
     istruzioniInvio: {
       titolo: "Come si invia, in 2 minuti",
       passi: [
-        "Copia il testo del reclamo qui sotto",
+        "Apri la lettera e copia il testo del reclamo",
         "Incollalo in una email dalla tua casella e aggiungi gli allegati indicati",
         "Invia all'indirizzo della compagnia che trovi nella lettera",
-        "Torna qui e premi \"L'ho inviata\": da lì partono i promemoria",
+        "Torna qui e premi \"Ho inviato il reclamo\": da lì partono i promemoria",
       ],
       perche:
         "Il reclamo parte dalla tua email, a tuo nome. Le compagnie rispondono al passeggero, non a un intermediario.",
     },
-    esiti: {
-      pagato: "La compagnia ha pagato",
-      rifiutato: "La compagnia ha rifiutato",
-      niente: "Nessuna risposta",
+
+    fascia: {
+      template: "Fascia da {importo}",
+      perPasseggero: "a passeggero",
+      /** Apre l'importo della fascia: stesso conto di risultato.idoneo. */
+      comeNasce: {
+        titolo: "Come nasce questa cifra",
+        testo:
+          "Il Regolamento CE 261/2004 fissa gli importi per distanza: 250€ fino a 1.500 km, 400€ fino a 3.500 km, 600€ oltre (ridotto a 300€ se sul lungo raggio il ritardo resta tra 3 e 4 ore).",
+      },
     },
-    garanziaPromemoria:
-      "Garanzia attiva: se entro il giorno 90 non ricevi nulla, il rimborso parte da noi.",
+
+    garanzia: {
+      titolo: "La garanzia",
+      /** {data} = garanzia_fino_al della pratica. */
+      template:
+        "Se entro il {data} la compagnia non ti ha pagato, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
+      senzaData:
+        "Se entro 90 giorni la compagnia non ti ha pagato, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
+    },
+
+    scadenza: {
+      titolo: "Fino a quando puoi chiedere",
+      /** La scadenza è SEMPRE una stima dichiarata (SPEC §4). */
+      template: "Secondo la nostra stima, fino al {data}.",
+      avvertenza:
+        "È una stima prudente: i termini dipendono dal paese della compagnia e dal giudice competente. Non è un parere legale.",
+    },
+
+    /* ---- guasti onesti ---- */
+    errori: {
+      configurazione:
+        "Manca un pezzo di configurazione dal nostro lato e la pratica non si può leggere. Riprova tra poco; se il problema resta, rispondi a una email della pratica e la sistemiamo noi.",
+    },
   },
 
   /** L'invito breve che chiude la pagina, subito prima del footer. */
