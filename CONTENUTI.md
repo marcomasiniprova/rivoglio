@@ -1,116 +1,100 @@
 # CONTENUTI — come ti trovano
 
-*Il pezzo [3] del `PIANO.md`, quello che era a zero.*
-Senza questo, prodotto e vetrina non li vede nessuno e l'incasso è zero.
+*Riscritto il 2026-08-07 (notte) per Rivoglio, dal documento di Valerio.
+Senza questo, il check non lo fa nessuno e l'incasso è zero.*
 
 ---
 
-## Il vincolo onesto da cui partire
+## L'angolo, uno solo
 
-**Non hai ancora offerte reali da mostrare.** Quindi non puoi fare i video
-classici del settore ("guarda che affare a 89€"), perché sarebbero inventati e
-la regola #2 lo vieta.
+> Non vendi un'app. Vendi 250-600€ a testa che le compagnie devono già.
+> Il check è gratis e dà un dato verificabile in 20 secondi.
 
-Ma hai una cosa che gli altri non hanno: **il costruttore calcola numeri veri**
-(distanza, ore, benzina, pedaggi) e li mostra aperti. Quello è il contenuto.
+I due ganci che reggono tutto:
+1. **Retroattivo**: *"Hai preso un Ryanair negli ultimi 5 anni? Forse ti
+   devono 250€. Controlla gratis in 30 secondi."*
+2. **Il confronto**: *"Famiglia di 4, volo cancellato: 1.600€. Con AirHelp
+   ne perdi 560 di commissione. Con Rivoglio 24,90."* Questo, in un video
+   di 15 secondi, è tutta la strategia.
 
-> Non vendere l'offerta che non hai. Vendi il **calcolo** che nessun altro mostra.
+**Cosa non si fa MAI:** promettere "hai diritto a X" (si dice: fascia +
+verifica), numeri inventati, urgenza finta, gamification.
 
 ---
 
-## Il formato ripetibile
+## I formati ripetibili
 
-Un solo formato, ripetuto ogni giorno. La ripetizione è il punto: la gente deve
-riconoscere il video dal primo secondo.
+### 1. Il tabellone (il più forte, costo zero)
+Vai in aeroporto (Malpensa, Orio, Fiumicino). Filmi il tabellone partenze
+con i voli in ritardo. *"Ognuna di queste persone ha fino a 400€ e non lo
+sa."* Poi lo schermo del check. Replicabile all'infinito, ogni giorno.
 
-**«Da [città] con [budget]€, dove arrivi davvero?»** · 25-40 secondi · verticale
+### 2. Disruption-jacking ⭐ (la leva più sottovalutata)
+Quando un volo salta DAVVERO: video entro 2 ore citando quel numero di
+volo. *"Il volo FR1234 di stasera è stato cancellato. Se eri a bordo,
+questa tratta rientra nella fascia 250€. Ecco come controllarlo gratis."*
+Meno views, intento 10-20 volte più alto. Si pesca dal nostro stesso
+database (i voli in ritardo li vediamo passare).
 
-| Sec | Cosa si vede | Cosa si dice |
+### 3. Il check dal vivo
+Schermo del telefono: numero volo + data, il teatro dei 3 passi, il reveal
+con l'importo che sale. 20 secondi. Con voli veri di chi ce li manda.
+
+### 4. Lo screenshot loop (il canale che non paghi)
+Il risultato del check si condivide con un tocco. Il tuo migliore creator
+è l'utente che scopre di avere 400€. La card di condivisione È il marketing.
+
+Cadenza: **3 contenuti al giorno per 60 giorni** = 180 video. Ne bastano
+8-10 che sfondano.
+
+---
+
+## A chi chiedere (creator), in ordine
+
+| Priorità | Categoria | Perché |
 |---|---|---|
-| 0-3 | Schermo del telefono, dito che imposta Bologna e 120€ | *"Da Bologna, centoventi euro a testa. Dove arrivi davvero?"* |
-| 3-8 | Si preme il bottone, appaiono le tre schede | *"Non quanto costa l'hotel. Quanto costa arrivarci."* |
-| 8-20 | Zoom su una scheda, si legge il conto riga per riga | *"Ferrara: quarantadue minuti, cinquantacinque chilometri. Nove euro di benzina e pedaggi a testa. Ti restano centoundici euro per dormire."* |
-| 20-30 | Le altre due schede | *"Abetone in un'ora. Mantova in un'ora e venti."* |
-| 30-35 | Logo + indirizzo | *"Il conto te lo faccio vedere tutto. Rivoglio."* |
+| 🥇 | Risparmio / finanza personale | Mentalità già allineata: "recupera i tuoi soldi" |
+| 🥈 | Avvocati su TikTok/IG | Nicchia enorme in Italia, autorevolezza istantanea |
+| 🥉 | Pagine consumatori / diritti | Pubblico adulto che paga |
+| 4 | Pagine rage/meme su Ryanair, pendolari, aeroporti | Volume puro, costo minimo |
+| 5 | Avgeek, piloti, spotter | Credibilità tecnica |
+| ❌ | Travel vlogger | Vendono sogni, noi rabbia risolta. Pubblico sbagliato |
 
-**Perché funziona:** è un calcolo vero fatto sotto gli occhi di chi guarda, non
-una promessa. Ed è infinitamente ripetibile: 46 città di partenza × 4 budget ×
-4 tipi di voglia = centinaia di video tutti diversi e tutti veri.
-
----
-
-## 12 aperture da provare
-
-Le prime due righe decidono tutto. Da alternare, non usarne una sola.
-
-1. «Da Bologna con centoventi euro, dove arrivi davvero?»
-2. «Quaranta milioni di italiani quest'anno non partono. Facciamo un conto.»
-3. «Nessuno ti dice quanto costa **arrivarci**. Solo quanto costa dormire.»
-4. «Due notti fuori a meno di una cena in centro. Ti faccio vedere.»
-5. «Ho calcolato quanto costa scappare da Milano per un weekend. Il totale vero.»
-6. «Il tuo budget è centoventi euro. La benzina se ne mangia venti. Restano cento.»
-7. «Agosto costa un rene. Ma un'ora da casa tua c'è questo.»
-8. «Se hai due giorni liberi e centocinquanta euro, fai questo.»
-9. «Perché nessun sito di viaggi ti mostra il conto della benzina?»
-10. «Da [città] in un'ora e mezza: tre posti che non ti aspetti.»
-11. «Non è un'offerta. È un calcolo. Guarda.»
-12. «Quanto ti resta per dormire, dopo l'auto? Nessuno te lo dice.»
+Micro-creator 200-800€ a post; con 5.000€ ~15-20 collaborazioni.
+Realistico: 20-40k utenti in due mesi, non 100k.
 
 ---
 
-## Tre script pronti
+## La newsletter: "L'Osservatorio dei Disservizi"
 
-### 1 · «Il conto che nessuno ti fa» (30s, il video di lancio)
-> Ogni sito di viaggi ti dice quanto costa la camera.
-> Nessuno ti dice quanto costa **arrivarci**.
-> *(mostra il costruttore)* Bologna, centoventi euro a testa, due notti, in due.
-> Ferrara: quarantadue minuti. Nove euro di benzina e pedaggi a testa.
-> Ti restano centoundici euro per dormire.
-> Il conto lo apro tutto: chilometri, litri, prezzo medio della benzina di oggi.
-> Se un numero non ha una fonte, non te lo scrivo.
+Settimanale, il lunedì, generata dai NOSTRI dati (il DB si scrive la
+newsletter da solo):
+- I 10 voli italiani più in ritardo della settimana + quanto spettava a chi
+  c'era sopra
+- Un caso vero: "Marco ha recuperato 400€ da Ryanair. Ecco come."
+- Una regola spiegata in 3 righe
+- Alert scioperi e disservizi in arrivo
 
-### 2 · «Le isole» (25s, il video onesto che si condivide)
-> Se vivi in Sicilia o in Sardegna, questo servizio all'inizio ti serve poco.
-> In auto non raggiungi la penisola, e i traghetti ancora non li calcolo.
-> Potevo non dirtelo e prenderti l'iscrizione lo stesso.
-> Preferisco dirtelo adesso.
-> Quando la copertura sulle isole ci sarà, sarai il primo a saperlo.
-
-### 3 · «Perché non ci sono recensioni» (20s)
-> Sul mio sito non troverai recensioni.
-> Perché non ho ancora clienti, e le facce sorridenti si comprano a due euro.
-> Quando le prime persone lo useranno, ci saranno le loro parole vere.
-> Nome e città.
+È contenuto che la gente inoltra. Costo marginale zero. Parte su Brevo
+(300 email/giorno gratis) quando ci sono i primi iscritti.
 
 ---
 
-## Ritmo e canali
+## Dove si pubblica e come
 
-| | |
-|---|---|
-| **Frequenza** | 1 video corto al giorno per 60 giorni. La costanza batte la qualità del singolo pezzo. |
-| **Canali** | TikTok e Instagram Reels lo stesso video. YouTube Shorts come terzo, costa zero. |
-| **Orari** | 12:30-13:30 e 19:00-21:00, quando gli italiani scrollano. |
-| **Nome utente** | `@rivoglio` su tutti e tre. Prendilo adesso anche se non pubblichi. |
-| **In biografia** | Un link solo, alla landing. Niente aggregatori di link. |
+- **TikTok / Reels / Shorts**: stesso video su tutti e tre, 3 al giorno.
+- **Commenti**: sotto ogni post virale su ritardi e caos aeroporti si
+  risponde con valore (il dato, la regola), non con il link a freddo.
+- **Gruppi Facebook**: "Reclami Ryanair" e simili, decine con 50k+ membri.
+  MAI spam: risposte utili a chi chiede già.
+- **Reddit**: r/italy, r/ItaliaPersonalFinance. Il post "ho costruito una
+  cosa" funziona una volta sola: si usa bene.
+- **Zero ads.** AirHelp brucia budget su Google: non si compete lì.
 
-## Cosa NON fare
+## Le misure che contano (e basta)
 
-- **Mai inventare un'offerta.** Un solo prezzo falso e sei un altro account di
-  affiliazione qualsiasi.
-- **Mai comprare follower.** Il pubblico gonfiato non compra crediti.
-- **Mai promettere sconti che non controlli.**
-- Niente musica trend a caso sopra un calcolo: qui la voce deve sentirsi.
+1. Quanti completano il check (il messaggio funziona?)
+2. Quanti idonei pagano (la fiducia funziona?)
+3. Quante pratiche vengono PAGATE dalle compagnie (il prodotto funziona?)
 
----
-
-## Come si misura (senza perdere tempo)
-
-Tre numeri soli, una volta a settimana:
-
-1. **Visualizzazioni** per video → funziona l'apertura?
-2. **Click sul link in biografia** → funziona il video?
-3. **Iscrizioni** → funziona la landing?
-
-Se le visualizzazioni salgono ma i click no, il problema è la chiusura del video.
-Se i click salgono ma le iscrizioni no, il problema è la landing.
+Views e follower non sono in questa lista.

@@ -148,12 +148,38 @@ struttura né di sviluppo:
 - Il registro qui sopra NON si riscrive: le decisioni superate restano
   marcate `[SUPERATA]`, come da regola del file. La storia è storia.
 
+## Chiuse il 07/08 (notte) — RIVOGLIO È DEFINITO: lo scanner dei rimborsi
+
+**Il documento completo di Valerio definisce il prodotto.** SPEC.md riscritta
+da lì. Le scelte strutturali, chiuse:
+
+| Decisione | Perché |
+|---|---|
+| **Prodotto: check gratuito del volo sul web, pratica a pagamento.** Verticale 1: voli (CE 261/2004). Bagagli a settembre, treni gratis (calamita) a ottobre. | Mercato validato (AirHelp: 3M richieste processate), <10% riscuote, nessun prodotto self-service in Italia. |
+| **Funnel web-first: il check NON chiede mai login, email o download prima del verdetto.** L'app mobile è il tracker post-pagamento, mai la porta. | Vale un 3,5x di conversione (conti nel documento). Ogni richiesta prima del reveal costa il 40% degli utenti. |
+| **Il motore decide, l'AI mai.** Rules engine deterministico versionato (`lib/regole/eu261.ts`, 2026.08.1), TRE stati: idoneo, incerto (mai vendere), non idoneo. Eval con soglia bloccante: falsi positivi = 0. | Un falso positivo è uno che paga per niente: vale 50 falsi negativi. Il 261 è un albero di if, non interpretazione. |
+| **Shadow mode al lancio**: ogni idoneo aspetta la conferma umana in `/admin` prima che si possa pagare. Si spegne dopo 100 verdetti di fila senza correzioni. | Dal documento (fase C). Ogni correzione è un caso nuovo per il golden set. |
+| **Prezzi: check gratis / 1 pratica 14,90€ / famiglia stesso volo (fino a 5) 24,90€.** Nessun altro SKU. | Meno scelte, più conversione. La famiglia è il margine. |
+| **Garanzia 90 giorni: "Se la compagnia non paga, non paghi neanche tu."** | I conti del documento: con garanzia il netto è uguale ma tieni recensioni e marchio. Non si toglie. |
+| **Lettera deterministica in v1, senza LLM.** Modello rigido con i dati del volo, artt. 5-7 CE 261/2004. L'utente la invia DALLA SUA email: Rivoglio è un generatore di documenti, non un intermediario. | Zero allucinazioni normative possibili. Ryanair è ostile agli intermediari: l'invio in proprio è un vantaggio, si vende. |
+| **Dati volo: AeroDataBox primario, AviationStack riserva, cache per volo+data, payload grezzo archiviato sempre.** OpenSky VIETATO (licenza non commerciale). | Il fatto oggettivo è il prodotto. Doppia fonte discordante >15 min = incerto. |
+| **Pagamenti: Polar (Merchant of Record), account di Valerio già aperto.** Checkout link + webhook. ⚠️ Polar solleva dall'IVA UE ma NON dal dichiarare il reddito: il documento stesso dice di sentire un commercialista. Non è validato qui il "10k/mese senza partita IVA". | Partenza immediata senza OSS. Tetto pratico ~15-20k€/mese, poi Stripe. |
+| **Deploy su Netlify** (progetto `rivoglio`, sito rivoglio.netlify.app, creato via connettore il 07/08). Il documento suggeriva Vercel: Valerio ha scelto Netlify, che è già in DECISIONI dal 06/08. | Scelta di Valerio, connettore diretto disponibile. |
+| **Design system tenuto** (verde, Geist/Poppins, corsivo): il verde è il colore dei soldi che tornano. Il documento suggeriva font nuovi: non si rifà quello che funziona. | Pivot di prodotto, non di struttura. |
+| **Niente gamification, mai.** Niente streak, badge, reward variabili. | Prodotto sui diritti: la ricompensa deve essere prevedibile e verificabile. La fiducia è l'unica moneta. |
+| Tabelle viaggi (offerte, ricerche, invii, strutture) = eredità: restano nel DB, il prodotto non le usa. Il motore viaggi resta nel codice, spento. | Nessun dato si butta. |
+
 ## Decisioni ancora aperte
 Vivono in `SPEC.md` → "Domande aperte". Appena chiuse, scendono qui.
-- **Cosa fa Rivoglio**: la definizione del nuovo prodotto (Valerio, a breve).
-  Da lì: nuova SPEC, nuovi testi, nuova tagline, nuovo logo se serve.
-- **Dominio per Rivoglio**: `rivoglio.it` da verificare e prendere (c'è lo
-  slot gratuito su Hostinger da configurare).
-- **Account store**: quando Valerio apre Apple Developer (99$/anno) e Play
-  Console (25$) e chi sono i 12 tester del test chiuso Google. Il bundle id
-  `it.rivoglio.app` è già pronto per il nome nuovo.
+- **Chiave AeroDataBox + la prova delle 2 ore** (Valerio): 10 voli reali,
+  l'orario effettivo di atterraggio deve esserci. È l'unica cosa che può
+  ancora far saltare il progetto.
+- **Polar: i due checkout link** (pratica 14,90, famiglia 24,90) e il
+  segreto del webhook, dall'account di Valerio. E l'approvazione
+  dell'organizzazione va richiesta SUBITO: ci vogliono ~2 settimane.
+- **Dominio per Rivoglio**: `rivoglio.it` da verificare e prendere (slot
+  gratuito Hostinger da configurare).
+- **Account store** (per il tracker mobile, dopo): Apple 99$/anno, Play 25$
+  + 12 tester × 14 giorni. Bundle `it.rivoglio.app` già pronto.
+- **Legale**: condizioni d'uso e disclaimer da far leggere a un avvocato
+  prima del lancio; commercialista sul regime fiscale.

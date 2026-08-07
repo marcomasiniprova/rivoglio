@@ -1,9 +1,11 @@
 # PIANO — Rivoglio
 
 *Se leggi un file solo, leggi questo. Risponde a una domanda: **a che punto siamo?***
+*Riscritto il 2026-08-07 (notte) col prodotto definito: lo scanner dei rimborsi.*
 
-**Obiettivo: €30-100k entro settembre/ottobre 2026.** Sprint, non maratona.
-Ogni scelta si giudica così: avvicina il primo utente pagante o no?
+**Obiettivo: cassa entro settembre/ottobre 2026.** Realistico dal documento:
+10-25k€ agosto-settembre se la distribuzione gira. Ogni scelta si giudica
+così: avvicina il primo pagante?
 
 ---
 
@@ -11,126 +13,98 @@ Ogni scelta si giudica così: avvicina il primo utente pagante o no?
 
 ```
   FASE 1               FASE 2                  FASE 3
-  COSTRUISCI     →     DISTRIBUISCI      →     MANTIENI
-  prodotto vero        traffico e vendite      utenti e crescita
-
-  █████████░░░ 75%     ██░░░░░░░░░░ 15%        ░░░░░░░░░░░░ 0%
+  COSTRUISCI     →     DISTRIBUISCI      →     I VERTICALI
+  il check e la        3 video al giorno,      bagagli (set),
+  pratica, provati     ogni giorno             treni gratis (ott)
 ```
 
-Le fasi si **sovrappongono**: la distribuzione non aspetta che il prodotto sia
-finito, altrimenti arrivi a settembre con un'app perfetta e zero persone che la
-conoscono. Appena c'è qualcosa da mostrare, si comincia a mostrarlo.
+La FASE 2 parte APPENA il check è online: il documento è chiaro, la
+distribuzione è il 65% dell'energia e il collo di bottiglia vero.
 
 ---
 
 # FASE 1 — COSTRUISCI
 
-**Fatta quando:** uno sconosciuto si registra, imposta una ricerca, riceve un
-alert vero e può comprare crediti. End to end, senza che io tocchi niente.
+**Fatta quando:** uno sconosciuto fa il check, vede il dato oggettivo, paga,
+riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 
-## 1.1 La vetrina (landing) — 95%
-
-| | Stato |
-|---|---|
-| 13 sezioni in stile Zentivo, in verde | ✅ |
-| Colori, caratteri, logo, marchio | ✅ |
-| Movimento: scroll, testo rivelato, macchina da scrivere | ✅ |
-| Costruttore di micro-vacanze provabile senza iscriversi | ✅ |
-| Telefono e sfondo sistemati | ✅ |
-| Iscritti salvati su Supabase (non più su file) | ✅ |
-| Link "Entra" e "Provalo gratis" verso l'app | ✅ |
-| Schermate vere dell'app dentro la landing | ⏳ appena `.env.local` esiste |
-| Immagine di anteprima per i social (og:image) | ⏳ |
-
-## 1.2 Il motore e il pannello (web) — il retrobottega, resta e serve
+## 1.1 Il motore (lo strato che decide)
 
 | | Stato |
 |---|---|
-| Database, schema, RLS, buco sui crediti chiuso | ✅ |
-| Motore che abbina offerte e ricerche (a lotti, limite 10s) | ✅ **provato dal vivo il 07/08** |
-| Invio destinazioni via email (Resend) con scalo e rimborso del credito | ✅ |
-| Pannello `/admin`: verifica offerte, raccolta e abbinamento a mano | ✅ |
-| Cron in produzione (endpoint pronti, serve MOTORE_SEGRETO su Netlify) | ⏳ |
-| Invio come notifica push all'app (canale nuovo in `lib/alert/invia.ts`) | ⏳ |
-| La web app utente (`/app`, `/entra`) esiste ma non è più linkata: il prodotto è l'app mobile | ✅ |
+| Rules engine EU261 versionato, 3 stati, zero AI (`lib/regole/eu261.ts`) | ✅ 07/08 |
+| Golden set etichettato a mano + eval (falsi positivi 0, bloccante) | ✅ 25 casi, 28/28 verdi |
+| Schema dati: voli (cache+payload grezzo), verifiche, pratiche, eventi + RLS | ✅ applicato sul Supabase vero |
+| Fornitori dati volo (AeroDataBox, AviationStack, demo marcata) | 🔨 in build |
+| **Prova delle 2 ore: chiave AeroDataBox su 10 voli reali** | ⏳ **serve Valerio: è l'unico rischio che resta** |
+| Golden set esteso a 500 casi reali (gruppi FB, amici) | ⏳ dopo la prova |
 
-## 1.2bis L'APP MOBILE — il prodotto (pivot del 07/08)
-
-Expo SDK 57, React Native, stessa Supabase. Contratti in `mobile/PROGETTO.md`.
+## 1.2 Le superfici web
 
 | | Stato |
 |---|---|
-| Impalcatura, marchio, icone dal logo, caratteri del sito | ✅ 07/08 |
-| Motore di calcolo portato (viaggio, costruttore, destinazioni) | ✅ 07/08 |
-| Fondamenta: Supabase, sessione, dati, notifiche, componenti, testi | 🔨 in corso 07/08 |
-| Onboarding in 6 passi (valore prima dell'account) + accesso | 🔨 in corso 07/08 |
-| Tab: Destinazioni, Ricerche, Profilo + dettaglio col conto aperto | 🔨 in corso 07/08 |
-| Punteggio preferenze (il seme dell'AI: impara da cosa apri) | 🔨 in corso 07/08 |
-| Prova su telefono vero (Expo Go / build di sviluppo) | ⏳ serve Valerio |
-| Account store: Apple 99$/anno, Play 25$ + **12 tester × 14 giorni** | ⏳ **serve Valerio, è il collo di bottiglia dei tempi** |
-| Build EAS + submission | ⏳ dopo gli account |
-| Acquisto crediti in-app (IAP Apple/Google, non Polar dentro l'app) | ⏳ v2, si parte coi 3 gratis |
+| Landing check-first (hero col campo volo+data, garanzia, prezzi, FAQ oneste) | 🔨 in build |
+| Pagina risultato: reveal, dato oggettivo, card condivisibile, cattura email | 🔨 in build |
+| Checkout Polar (pratica 14,90 / famiglia 24,90) + webhook | 🔨 in build (servono i 2 link e il segreto da Valerio) |
+| Lettera di reclamo deterministica + canali compagnie verificati | 🔨 in build |
+| Sequenza email T+0/2/15/30/60 (Resend) + cron follow-up | 🔨 in build |
+| Tracker pratica (web) + area utente | 🔨 in build |
+| `/admin` shadow mode (conferma umana dei verdetti) | 🔨 in build |
+| Prove Playwright del flusso in modalità demo | 🔨 in build |
 
-## 1.3 Da dove arrivano le offerte — ❓ **decisione tua, parcheggiata**
+## 1.3 Deploy e conti
 
-Senza questa, il motore gira a vuoto. Le opzioni verificate stanno in
-`DECISIONI.md`. **È il pezzo che decide se il prodotto esiste o no.**
+| | Stato |
+|---|---|
+| Netlify: progetto `rivoglio` creato, variabili impostate, rivoglio.netlify.app | ✅ 07/08 via connettore |
+| Primo deploy di produzione | ⏳ appena il QA è verde |
+| Polar: account aperto (Valerio) | ✅ · ⏳ prodotti, webhook, richiesta approvazione organizzazione (2 settimane, farla SUBITO) |
+| Chiavi su Netlify: SUPABASE_SECRET_KEY, RESEND_API_KEY, AERODATABOX, POLAR | ⏳ **serve Valerio** (le ha lui) |
+| Dominio di Rivoglio (slot Hostinger gratuito da configurare) | ⏳ **serve Valerio** |
+| Legale: condizioni d'uso + disclaimer da avvocato; commercialista sul fiscale | ⏳ prima del lancio vero |
+
+## 1.4 L'app mobile (il tracker, NON la porta)
+
+| | Stato |
+|---|---|
+| App Expo rinominata, icone, motore, 29 prove | ✅ (base del 07/08) |
+| Pivot minimo: tab "Le tue pratiche" | 🔨 in build |
+| Tracker completo + notifiche push sulle pratiche | ⏳ dopo che il web incassa (da documento: app = retention, novembre) |
+| Store (Apple 99$, Play 25$ + 12 tester × 14 giorni) | ⏳ serve Valerio, non è il collo di bottiglia ora |
 
 ---
 
-# FASE 2 — DISTRIBUISCI
-
-Il piano operativo per esteso sta in **`DISTRIBUZIONE.md`**: canali, formati,
-imbuto TOFU/MOFU/BOFU, calendario, cosa faccio io e cosa serve da te.
-
-In due righe: **video verticali con un personaggio AI che prova l'app** come
-motore principale, blog quotidiano per la ricerca, presenza vera (non spam) in
-gruppi e community, contatto agli influencer. Tutto porta a una pagina sola:
-imposta la tua ricerca, prendi 3 alert gratis.
+# FASE 2 — DISTRIBUISCI (piano in `DISTRIBUZIONE.md` e `CONTENUTI.md`)
 
 | | Stato |
 |---|---|
-| Formato video, 12 aperture, 3 script pronti (`CONTENUTI.md`) | ✅ |
-| Piano completo di distribuzione (`DISTRIBUZIONE.md`) | ✅ |
-| Account social `@rivoglio` | ⏳ **serve Valerio** |
-| Dominio per Rivoglio: da prendere (slot gratuito su Hostinger da configurare) | ⏳ **serve Valerio** |
-| Higgsfield / Seedance collegati | ⏳ **serve Valerio** |
-| Primo video pubblicato | ⏳ |
-| Blog sul sito (`/diario`) + primi 10 pezzi | ⏳ |
+| Formati video (tabellone, disruption-jacking, check dal vivo, screenshot loop) | ✅ scritti |
+| Account `@rivoglio` su TikTok/IG/YouTube | ⏳ **serve Valerio, subito** |
+| Primi 10 video girati (si può PRIMA del lancio) | ⏳ Valerio |
+| Newsletter "Osservatorio dei Disservizi" (Brevo) | ⏳ coi primi iscritti |
 
----
+# FASE 3 — I VERTICALI (la retention vera)
 
-# FASE 3 — MANTIENI
-
-Si apre quando esistono utenti paganti. Prima è teoria.
-
-- Supporto: una casella che leggo io, risposte pronte, tempi dichiarati
-- Misure che contano: quanti si registrano → quanti impostano una ricerca →
-  quanti ricevono un alert → quanti comprano di nuovo
-- Il numero che decide tutto: **chi ricompra crediti dopo il primo pacchetto**
-- Miglioramenti guidati da quello che chiedono gli utenti, non da quello che
-  mi sembra bello
+Bagagli a settembre (Montreal, scontrino 300-1.900€, la Cassazione 2026 sul
+PIR è un argomento che nessuno usa) · treni gratis a ottobre (calamita) ·
+bollette 2027. Niente gamification, mai: si torna perché "mi devono dei
+soldi" succede 3-4 volte l'anno, non per gli streak.
 
 ---
 
 ## Cosa blocca cosa
 
 ```
- account Play (25$) ──→ test chiuso: 12 tester × 14 giorni ──→ produzione   ← IL PIÙ LENTO: si apre OGGI
- account Apple (99$/anno) ──→ review 1-2 settimane ──→ App Store
- dominio di Rivoglio ──→ Resend verificato ──→ email a tutti (oggi solo a valerio@artecai.it)
- fonte offerte ──→ EXA_API_KEY su Netlify + cron ──→ destinazioni vere
- incasso: 3 crediti gratis al lancio; acquisti = IAP negli store (v2)
+ chiave AeroDataBox ──→ prova 10 voli veri ──→ il check dà dati VERI (oggi: demo)
+ Polar: 2 checkout link + webhook secret ──→ si incassa
+ chiavi su Netlify ──→ deploy completo (admin, email, motore)
+ dominio ──→ Resend verificato ──→ email a chiunque + link puliti nei video
+ account social ──→ FASE 2
 ```
 
-**Le cose più urgenti non sono codice: i due account developer e i 12
-tester per Google.** Ogni giorno senza account Play è un giorno in più di
-attesa a valle.
-
----
+**L'unico rischio tecnico rimasto è la prova AeroDataBox.** Tutto il resto
+è esecuzione.
 
 ## Prossimo pezzo di codice
-Chiudere l'app mobile (QA, prova su telefono), poi il canale push nel motore
-di invio e il cron in produzione.
-
-Le cose chieste e non ancora fatte stanno in `ARRETRATI.md`.
+Chiudere il QA della build, deploy, poi: bagagli (settembre) e il tracker
+mobile completo. Le cose chieste e non fatte: `ARRETRATI.md`.
