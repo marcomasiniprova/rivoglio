@@ -1,164 +1,220 @@
 # SPEC — Rivoglio
 
-*Scritta il 2026-08-06. Le scelte qui dentro sono chiuse: vedi `DECISIONI.md`.*
+*Riscritta il 2026-08-07 (sera) dal documento completo di Valerio
+(`RIVOGLIO_DOCUMENTO_COMPLETO.md`). Le scelte chiuse stanno in `DECISIONI.md`.
+La SPEC vecchia (micro-vacanze) è superata: resta solo nella storia di git.*
 
-## 1. Il problema
+## 1. Il prodotto, in una riga
 
-40 milioni di italiani non partono ad agosto 2026, e il motivo dichiarato è il
-prezzo. Chi resta a casa non ha smesso di volerci andare: ha smesso di **cercare**,
-perché cercare costa tempo, i prezzi hanno sorprese e non sai mai se stai
-spendendo troppo.
+> Scopri in 30 secondi se una compagnia ti deve dei soldi. Se sì, il reclamo
+> te lo preparo io. Tu lo mandi e tieni il 100%.
 
-**L'utente:** 25-45 anni, vive ovunque in Italia, budget stretto, vorrebbe
-staccare 1-3 notti ma non ha voglia di passare due sere fra dieci siti.
+Rivoglio è lo scanner dei rimborsi. Verticale numero 1: **voli**
+(Reg. CE 261/2004). Poi bagagli (settembre), treni gratis come calamita
+(ottobre), bollette e altro (2027). Il nome è neutro apposta: il marchio è
+"l'app italiana che ti recupera i soldi che ti devono", non "app rimborsi voli".
 
-**La frase che dice:** *"Vorrei scappare due notti, ma non ho tempo di cercare
-e ho paura di spendere troppo."*
+## 2. Perché funziona (numeri veri, fonti nel documento)
 
-## 2. La promessa
+- 229,7 milioni di passeggeri negli aeroporti italiani nel 2025.
+- Meno del 10% di chi subisce un disservizio ottiene la compensazione (ReFly).
+- Il 52% delle richieste viene rifiutato illegittimamente (AirHelp).
+- 3,2 miliardi di euro di compensazioni non pagate in Europa (Euronews).
+- **Retroattivo**: ITA/Aeroitalia 2 anni; vettori esteri (Ryanair, Wizz)
+  finestre più lunghe, 5-6 anni **come stima da dichiarare caso per caso**.
+- Concorrenza: AirHelp 35-50% di commissione, agenzie no-win-no-fee lente.
+  Nessuno in Italia ha un prodotto self-service a prezzo fisso.
+- Riforma UE chiusa il 13/07/2026: soglia 3h e importi INVARIATI, in vigore
+  ~agosto 2027 con onere della prova sulla compagnia. Rischio regolatorio morto.
 
-> Dimmi da dove parti e quanto vuoi spendere. Al resto ci penso io.
+## 3. Il funnel (la parte che vale un 3,5x, non toccarla)
 
-Imposti **una volta sola**: da dove parti, quanto vuoi spendere a persona,
-quante notti, quante ore di viaggio al massimo. Poi non cerchi mai più.
-Quando esiste una micro-vacanza che rispetta i tuoi criteri, **ti arriva**.
+**Il check vive sul WEB, senza login, senza download, senza email.**
+L'app mobile è il posto dove segui la pratica DOPO aver pagato, mai la porta.
 
-Il valore non è "trovo offerte" — quello lo fa Booking. È **"non devo più
-guardare"**.
-
-## 3. Cosa promettiamo sul prezzo — e cosa no
-
-Ogni alert mostra il **prezzo totale a persona = alloggio + viaggio in auto**.
-
-- **Alloggio:** prezzo reale, dalla fonte. Mai stimato.
-- **Auto:** stima calcolata e **dichiarata come stima**. Distanza reale su strada,
-  carburante al prezzo medio MIMIT del giorno, pedaggi. Diviso per i passeggeri.
-- **Treno:** nessun prezzo. Solo un link "controlla il treno".
-  Motivo in `DECISIONI.md`: Trenitalia e Italo non hanno API ufficiale.
-
-**Il conto è sempre apribile.** L'utente deve poter vedere:
-`231 km × 2 = 462 km ÷ 15 km/l × €1,994 = €61 benzina + €18 pedaggi ÷ 2 = €40 a testa`.
-La trasparenza non è una funzione in più: è il motivo per cui uno si fida.
-
-## 4. Come si guadagna
-
-**Crediti. Nessun abbonamento, nessun rinnovo automatico.**
-
-| | |
-|---|---|
-| 5 crediti | €3,99 |
-| 20 crediti | €12,99 |
-| 50 crediti | €24,99 |
-
-- **1 credito = 1 alert ricevuto.** Si scala quando l'alert **parte**, non quando
-  viene generato.
-- **3 crediti gratis all'iscrizione.** Provi il prodotto con alert veri prima di
-  pagare. *(Decisione mia, reversibile: è un numero nel database.)*
-- **I crediti non scadono.** Una scadenza fa sentire l'utente fregato.
-- **Tetto settimanale scelto dall'utente** (es. max 3 alert/settimana). Sopra il
-  tetto l'alert non parte e non si scala niente. Così l'utente sa sempre quanto
-  può spendere al massimo.
-- **Crediti finiti** → un ultimo messaggio gratuito che avvisa. Non consuma nulla.
-
-## 5. Cosa fa, in ordine di priorità
-
-1. **Landing page** — la vetrina che converte. Si costruisce **per prima**:
-   va online e raccoglie iscritti mentre il motore è ancora in costruzione.
-2. **Iscrizione + imposta la ricerca** — comune di partenza (o CAP), budget max
-   a persona, notti, ore di viaggio max, tipo (mare/monte/città/terme), periodo,
-   quante persone, tetto settimanale.
-3. **Consegna dell'alert** — Telegram (principale), push web, email.
-4. **Scheda offerta** — mappa, dettaglio, e il conto del viaggio aperto.
-5. **Acquisto crediti** — Stripe.
-6. **Pannello admin** — dove entrano le offerte.
-
-## 6. Cosa NON fa — e perché conta
-
-**Non prenotiamo. Mandiamo al sito che prenota.** Non è pigrizia: se vendessimo
-trasporto + alloggio insieme diventeremmo un **pacchetto turistico** ai sensi del
-Codice del Turismo, con obblighi di garanzia, assicurazione e responsabilità sul
-viaggio. Noi *segnaliamo*. La stima auto è dichiarata come stima, non è un
-servizio venduto. *(Da confermare con un commercialista prima di scalare.)*
-
-Fuori dalla v1: app nativa, WhatsApp, voli, estero, prenotazione interna,
-recensioni, social login.
-
-## 7. Architettura — 5 pezzi che non si toccano fra loro
-
-| Pezzo | Firma | Perché è separato |
+| Passo | Cosa si chiede | Cosa NON si chiede |
 |---|---|---|
-| **Fonti** | `cerca(zona, date) → Offerta[]` | La fonte prezzi **non è ancora decisa** (scelta di Valerio: si decide per ultima). Ogni fonte è un modulo con la stessa firma. Oggi: `manuale`. Domani: SerpAPI, partner. Aggiungerne una non tocca nient'altro |
-| **Catalogo** | tabella `offerte` | Il punto unico dove vivono le offerte, da qualunque fonte arrivino |
-| **Calcolo viaggio** | `viaggio(da, a, persone) → {km, ore, costo}` | Funzione pura: stessi input, stesso output. **Qui un bug significa prezzi sbagliati agli utenti** → test obbligatori |
-| **Motore di match** | `abbina(ricerche[], offerte[]) → Coppia[]` | Funzione pura. **Qui un bug manda l'offerta sbagliata alla persona sbagliata** → test obbligatori |
-| **Consegna** | `invia(utente, coppia) → esito` | Tre uscite dietro un'unica firma: telegram, push, email. Aggiungerne una (WhatsApp, SMS) = un file nuovo, zero modifiche altrove |
+| 1 | Numero volo + data. Basta. | email, login, upload, download |
+| 2 | Verifica con teatro onesto (3 passi reali, 8-10s) | |
+| 3a | NON IDONEO: risposta chiara, gratis, saluto pulito | |
+| 3b | IDONEO: il reveal. "Atterrato alle 02:47 invece delle 22:55. 3h52 di ritardo. Fascia 250€." | |
+| 4 | ORA l'email ("ti salvo la pratica") | |
+| 5 | Pagamento (Polar) | |
+| 6 | ORA i documenti (carta d'imbarco) | |
+| 7 | ORA l'app ("segui la pratica") | |
+
+Regola d'oro: ogni cosa chiesta PRIMA del reveal costa il 40% degli utenti;
+dopo, il 5%.
+
+**Il claim onesto che converte** (mai "hai diritto a", mai vaghezza):
+"Il tuo volo è atterrato con 3h47 di ritardo. Questa tratta rientra nella
+fascia da 400€. Verifichiamo se ci sono cause escludenti. Ecco cosa serve
+per chiederli."
+
+## 4. Il motore — architettura a 7 strati
 
 ```
-Fonte ──→ offerte ─┐
-                   ├──→ Motore di match ──→ Consegna ──→ 📱 utente
-Utente ─→ ricerche ┘           ↑
-                        Calcolo viaggio
+[0] INGESTIONE      volo+data a mano · OCR solo scorciatoia (dopo, non v1)
+[1] NORMALIZZAZIONE "FR8321" | "Ryanair 8321" → codice IATA canonico
+[2] VERIFICA FATTI  API voli (doppia fonte + cache + payload grezzo)   ⚠️ ZERO AI
+[3] REGOLE          CE 261/2004 come codice versionato                 ⚠️ ZERO AI
+[4] CLASSIFICAZIONE causa dichiarata dalla compagnia (suggerimento, mai verdetto)
+[5] GENERAZIONE     lettera su modello rigido (v1: deterministico, senza LLM)
+[6] ORCHESTRAZIONE  follow-up, solleciti, escalation ENAC, garanzia
 ```
 
-**Il senso della forma:** la casella non ancora decisa (la fonte) è isolata
-dietro un innesto. Rimandarla non costa niente e non blocca nessun altro pezzo.
+**La regola tatuata: l'AI non decide MAI l'eleggibilità.** Il 261 è un albero
+di if. Un falso positivo (uno che paga e non aveva diritto) vale 50 falsi
+negativi: la metrica bloccante degli eval è falsi positivi = 0.
 
-## 8. Modello dati
+### Strato 2 — verifica fattuale
+- Fonte primaria **AeroDataBox**, riserva AviationStack. Se discordano di
+  più di 15 minuti → INCERTO, non si vende.
+- **Cache per volo+data**: un volo con 180 passeggeri = 1 chiamata API.
+- **`payload_grezzo` immutabile e archiviato sempre**: è la prova se una
+  compagnia contesta fra 6 mesi.
+- `vettore_operativo` ≠ vettore che vende il biglietto: il reclamo va
+  all'operativo. È l'errore n.1 dei reclami respinti.
+- OpenSky Network VIETATO: licenza non commerciale.
 
-- **utenti** — email, telefono?, chat_telegram?, comune, lat, lng, **crediti**,
-  tetto_settimanale, creato_il
-- **ricerche** — utente_id, budget_max_persona, notti_min, notti_max,
-  ore_viaggio_max, tipi[], periodo_da, periodo_a, persone, attiva
-- **offerte** — struttura, comune, lat, lng, check_in, check_out,
-  prezzo_alloggio, link, **fonte**, verificata_il, scade_il, tipo, stato
-- **invii** — utente_id, ricerca_id, offerta_id, canale, inviato_il,
-  credito_consumato, aperto_il, cliccato_il
-- **transazioni** — utente_id, stripe_id, crediti, importo, creato_il
+### Strato 3 — regole (fasce)
+| Caso | Condizione | Importo |
+|---|---|---|
+| Ritardo all'arrivo | ≥ 3h, distanza ≤ 1500 km | 250€ |
+| | ≥ 3h, ≤ 3500 km | 400€ |
+| | 3-4h, > 3500 km | 300€ (riduzione 50%) |
+| | ≥ 4h, > 3500 km | 600€ |
+| Cancellazione | preavviso < 14 giorni | stessa scala + biglietto (v1.1) |
+| Negato imbarco | | stessa scala (v1.1) |
 
-`invii` serve a due cose: non mandare due volte la stessa offerta alla stessa
-persona, e sapere quali offerte funzionano davvero.
+**Tre stati, mai due**: IDONEO (si vende) · INCERTO (non si vende MAI, si
+spiega) · NON_IDONEO (gratis, risposta chiara). Ogni verdetto salva
+`ruleset_version` (parte da `2026.08.1`): quando la riforma entra in vigore
+si crea la v2 e i casi vecchi restano valutati con le regole del loro tempo.
+Prescrizione: data di scadenza STIMATA per caso, con avvertenza esplicita.
 
-## 9. Vincoli tecnici — scoperti, non da riscoprire
+### Eval-driven development (non training)
+- Golden dataset di casi etichettati a mano (40% non idonei, 35% idonei,
+  25% casi limite: confini 1500/3500 km, 179/180/181 min, lungo raggio 3-4h,
+  cancellato, dato mancante, fonti discordanti).
+- `npm run eval` in verify: **precisione su IDONEO 100%, falsi positivi 0 =
+  soglia bloccante**. Un commit che ne introduce uno non passa.
+- **Shadow mode al lancio**: il motore emette il verdetto ma un umano lo
+  conferma dal pannello `/admin` prima che l'utente possa pagare. Si spegne
+  dopo 100 verdetti consecutivi senza correzioni. Ogni discrepanza diventa
+  un caso nel golden set.
+- Feedback permanente: ogni rifiuto della compagnia → caso etichettato.
+  Dopo 6 mesi il golden set con esiti veri è il fossato.
 
-- **Funzioni Netlify: 10 secondi.** Il matcher non può passare tutti gli utenti
-  in un colpo. Lavora **a lotti**, con un puntatore a dove è arrivato.
-- **Netlify Starter gratuito: 300 crediti/mese**, uso commerciale permesso.
-- **iOS non riceve push web** se il sito non è aggiunto alla schermata Home.
-  Per questo Telegram è il canale principale, non un'alternativa.
-- **Isole.** Chi vive in Sicilia o Sardegna non raggiunge in auto nessuna offerta
-  continentale. Senza offerte locali quegli iscritti non ricevono **mai** niente.
-  Vanno gestiti esplicitamente: o offerte lì, o si dice chiaramente che la
-  copertura nella loro zona è ancora sottile.
-- **Prezzo carburante:** letto dall'osservatorio MIMIT, **mai scritto fisso**.
-- **Comuni + coordinate:** elenco ISTAT.
+## 5. Cosa compra l'utente (pricing chiuso)
+
+| Prodotto | Prezzo | Nota |
+|---|---|---|
+| Check | **Gratis, sempre** | è l'amo e il marketing. Costo ~0,0005$ l'uno |
+| 1 pratica | **14,90€** | |
+| Famiglia (stesso volo, fino a 5) | **24,90€** | il margine vero: una famiglia di 4 recupera 1.000€+ |
+
+Niente altri SKU al lancio. Meno scelte = più conversione.
+
+**La garanzia (obbligatoria, non si discute):** "Se la compagnia non paga,
+non paghi neanche tu." Rimborso integrale se entro 90 giorni non arriva
+nulla. Costa ~35% del lordo e RENDE: conversione +37%, chargeback quasi
+zero, recensioni vive. È ciò che permette di vendere un fatto certo su un
+esito incerto senza essere disonesti.
+
+**Cosa vendiamo davvero** (e lo scriviamo nell'app): il dato oggettivo che
+da solo non trovi, il secondo e terzo colpo (il sollecito al giorno 15 è il
+prodotto vero: è lì che il 60% molla), la garanzia. Scriviamo anche che può
+fare tutto gratis da solo, e come. Non vendiamo ignoranza.
+
+## 6. La pratica: cosa succede dopo il pagamento
+
+1. Documenti: carta d'imbarco / email di conferma (upload).
+2. **Lettera generata**: reclamo formale in italiano con riferimenti al
+   CE 261/2004, dati oggettivi del volo, indirizzo/canale corretto della
+   compagnia OPERATIVA, lista allegati. Pagina stampabile + testo email
+   pronto da copiare. **L'utente invia dalla SUA email, in proprio.**
+3. Sequenza (email Resend, cron una volta al giorno):
+   - T+0 pratica pronta + istruzioni + "conferma quando l'hai inviata"
+   - T+2gg se non confermata: "L'hai inviata? Ci vogliono 2 minuti"
+   - T+15gg sollecito pronto ← il momento in cui il 60% mollerebbe
+   - T+30gg se rifiuto: contro-risposta + reclamo ENAC
+   - T+60/90gg "com'è andata?" → se nulla, rimborso proattivo (garanzia)
+   - stagionale: "hai volato quest'estate? Controlla gratis"
+4. Tracker della pratica: sul web e nell'app mobile.
+
+**Perimetro legale (il modello pulito):** Rivoglio è un GENERATORE DI
+DOCUMENTI. Niente mandato, niente incasso per conto terzi, niente moduli
+giudiziari in v1. Ryanair è ostile agli intermediari: che l'utente invii da
+solo È un vantaggio tecnico, si vende esplicitamente. Condizioni d'uso e
+disclaimer da far leggere a un legale prima del lancio.
+
+## 7. Architettura tecnica (cosa si riusa, cosa è nuovo)
+
+**Si riusa tutto l'impianto:** Next 16 + Tailwind 4 + Motion su Netlify ·
+Supabase (auth, RLS, profili) · Resend · pannello `/admin` · app mobile
+Expo (diventa il tracker) · il modo di lavorare (verify, prove, documenti).
+
+**Nuovo:**
+- `lib/regole/eu261.ts` — il rules engine versionato + eval.
+- `lib/voli/` — fornitori dati volo intercambiabili (aerodatabox,
+  aviationstack, demo marcata) dietro un tipo unico `FattoVolo`.
+- Tabelle: `voli` (cache fatti + payload grezzo), `verifiche` (ogni check),
+  `pratiche` (stato macchina: creata → pagata → documenti → inviata →
+  sollecito → enac → esito), `pratiche_eventi` (cronologia).
+- `/api/verifica` (check pubblico, senza auth, con throttling),
+  `/api/polar/webhook` (pagamento → pratica), `/api/motore/segui`
+  (cron follow-up, protetto da MOTORE_SEGRETO).
+- Pagina risultato con reveal (contatore che sale, card condivisibile),
+  area `/pratica/[id]`, admin shadow-mode.
+- Polar checkout: 2 prodotti (pratica, famiglia). MoR: gestisce lui l'IVA UE.
+  ~5,3% + 0,40€ a vendita italiana.
+
+**Tabelle di viaggio (offerte, ricerche, invii, strutture) = eredità:**
+restano nel database, non si cancellano dati, ma il prodotto non le usa più.
+
+**Email marketing separata dalle transazionali:** Resend per le
+transazionali; la newsletter "L'Osservatorio dei Disservizi" (settimanale,
+generata dai nostri dati: i 10 voli più in ritardo della settimana) su
+Brevo quando parte.
+
+## 8. Frontend: il livello da raggiungere
+
+Design system esistente (verde, Geist/Poppins, corsivo): si tiene, il verde
+è il colore dei soldi che tornano. Le 6 animazioni che devono essere
+perfette e basta:
+1. Hero col campo volo+data che attira (bordo che pulsa).
+2. Ingresso del testo a scaglioni.
+3. La verifica: 3 passi con avanzamento REALE (cerco il volo → confronto
+   gli orari → calcolo), 8-10 secondi di teatro onesto, mai finto.
+4. **IL REVEAL**: l'importo che sale col contatore. Vale metà del progetto.
+5. La card condivisibile con un tocco (screenshot loop = il canale virale).
+6. Scorrimento morbido della landing.
+Regola: 60fps su un iPhone 12, `prefers-reduced-motion` rispettato.
+
+## 9. Costi (verificati nel documento)
+
+AeroDataBox $5-32/mese · AviationStack riserva gratis · Supabase Pro (c'è) ·
+Netlify gratis · Resend gratis (3k/mese) · Polar ~5,3%+0,40€ · Mistral solo
+quando entrerà l'OCR. Totale ≈ 30-45€/mese.
 
 ## 10. Come si verifica che funzioni
 
-`.claude/verify.cmd` (→ `verify.ps1`) deve passare. Blocca se:
-1. manca un file di contesto;
-2. un file di segreti è tracciato da git;
-3. `npm run verify` fallisce → build + test su **calcolo viaggio** e
-   **motore di match**, i due punti dove un errore diventa un utente arrabbiato;
-4. un'offerta senza fonte verificata non è marcata `demo`.
+1. `npm run verify` con dentro `npm run eval`: falsi positivi 0 o non passa.
+2. Shadow mode: verdetti confermati a mano in `/admin` finché 100 di fila
+   non richiedono correzioni.
+3. **La prova che decide tutto (di Valerio, 2 ore):** chiave AeroDataBox su
+   10 voli reali degli ultimi 2 anni → l'orario EFFETTIVO di atterraggio
+   deve esserci. Poi 30 casi reali a mano: meno di 3 idonei = fermare tutto.
+4. Prova end-to-end: check vero → pagamento vero (sandbox Polar) → lettera
+   → email T+0 ricevuta.
 
-**Prova finale, a mano:** mi iscrivo con la mia email, imposto una ricerca,
-carico un'offerta che la soddisfa, e l'alert **mi arriva davvero** con il conto
-giusto. Finché non succede, non è finito.
+## 11. Fuori dalla v1 (non discutibile)
 
-## 11. Il piano dei 7 giorni
+Moduli per il Giudice di Pace · mandati e incassi per conto terzi · vendere
+sui casi INCERTO · OCR come fondamento (solo scorciatoia dopo) · bagagli e
+treni (settembre/ottobre) · gamification di qualunque tipo · ads a pagamento.
 
-| Giorno | Cosa esce |
-|---|---|
-| 1-2 | **Landing page completa** + raccolta iscritti. Online. |
-| 3 | Supabase: schema, iscrizione, form "imposta la tua ricerca" |
-| 4 | Calcolo viaggio + motore di match, **con i test** |
-| 5 | Consegna: Telegram + email + push |
-| 6 | Stripe crediti + pannello admin + prime offerte vere |
-| 7 | Deploy, prova end-to-end vera, primo video |
+## 12. Domande aperte
 
-## 12. Domande ancora aperte
-
-1. **Fonte prezzi offerte** — rimandata di proposito a fine progetto.
-   Opzioni già studiate in `DECISIONI.md`.
-2. **Dominio** — `rivoglio.it` da verificare e comprare (Valerio).
-3. **Stripe** — account da aprire (Valerio: servono dati fiscali e IBAN).
+Vivono in `DECISIONI.md` → "Decisioni ancora aperte".

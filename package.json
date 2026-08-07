@@ -10,7 +10,8 @@
     "tipi": "tsc --noEmit",
     "prove": "playwright test",
     "prove:occhi": "playwright test --headed",
-    "verify": "npm run build && npm run tipi && npm run lint && npm run prove"
+    "verify": "npm run build && npm run tipi && npm run lint && npm run prove",
+    "eval": "playwright test prove/eu261.spec.ts --project=desktop"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
