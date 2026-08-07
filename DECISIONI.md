@@ -8,7 +8,7 @@ con la data e si marca la vecchia `[SUPERATA]`.
 |---|---|---|
 | 2026-08-06 | Struttura repo a 4 file (CLAUDE.md / STATO.md / SPEC.md / DECISIONI.md) + `.claude/` | Contesto pulito: solo CLAUDE.md e STATO.md caricati sempre, il resto letto su richiesta |
 | 2026-08-06 | Nessuno stack scelto prima della spec approvata | Scegliere la tecnologia prima di sapere cosa si costruisce fa buttare lavoro |
-| 2026-08-06 | **Web app, non app nativa** (iOS/Android) | Apple chiede €99/anno + In-App Purchase obbligatorio sugli abbonamenti digitali (15-30% di commissione); Google Play $25 + review. Con Stripe su web la commissione è ~1,5% + €0,25. Un alert non ha bisogno di un'app: email/Telegram/push arrivano lo stesso. La web app è online in giornata a €0. Reversibile: l'app nativa si aggiunge dopo, quando gli abbonati la pagano |
+| 2026-08-06 | `[SUPERATA il 07/08: si fa la mobile app negli store]` **Web app, non app nativa** (iOS/Android) | Apple chiede €99/anno + In-App Purchase obbligatorio sugli abbonamenti digitali (15-30% di commissione); Google Play $25 + review. Con Stripe su web la commissione è ~1,5% + €0,25. Un alert non ha bisogno di un'app: email/Telegram/push arrivano lo stesso. La web app è online in giornata a €0. Reversibile: l'app nativa si aggiunge dopo, quando gli abbonati la pagano |
 | 2026-08-06 | **Ingestione offerte = innesto sostituibile** (`source` adapter) | La scelta della fonte prezzi è rimandata (Valerio, 06/08). Il resto del prodotto non deve dipenderne: le offerte entrano in una tabella `offerte` con un campo `fonte`, e ogni fonte è un modulo separato che si può aggiungere o togliere senza toccare il motore di match né gli alert |
 | 2026-08-06 | **Nome: `Viaggio Anche Io`**, per esteso ovunque | Scelto da Valerio. Nasce dal dato di partenza: 40 milioni di italiani non partono ad agosto — "anche io" è la rivendicazione di chi ci va lo stesso, col suo budget. Avevo obiettato sulla lunghezza (14 lettere) e proposto il marchio corto `Anche Io` + payoff: **Valerio ha confermato la forma estesa. Chiuso.** |
 | 2026-08-06 | **Tono: amico diretto, si dà del tu** | Pubblico 25-45 che arriva dai social. Voce: *"Dimmi da dove parti e quanto vuoi spendere. Al resto ci penso io."* Frasi corte, zero gergo, zero superlativi pubblicitari |
@@ -19,7 +19,7 @@ con la data e si marca la vecchia `[SUPERATA]`.
 | 2026-08-06 | **Si costruisce la landing page per prima**, prima del motore | Deciso da Valerio. Va online e raccoglie iscritti mentre il resto è in costruzione: puoi iniziare i video al giorno 2 invece che al giorno 7. Riferimento visivo dato da Valerio: stile Monex — fondo chiaro, accento verde menta, titoli grandi, angoli arrotondati, mockup telefono con card che fluttuano, CTA a pillola |
 
 | 2026-08-06 | **Obiettivo: cassa entro ottobre 2026**, non prodotto perenne | Valerio punta a €30-100k in ~8 settimane e poi mette in pausa fino all'anno prossimo. Ogni scelta si giudica su "avvicina il primo pagante?" — niente architettura per scalare a milioni |
-| 2026-08-06 | **Web app installabile (PWA), niente App Store** | Apple: €99/anno + 15-30% di commissione sugli abbonamenti digitali + revisione di giorni o settimane. Con 8 settimane di tempo è insostenibile. Le notifiche arrivano su Telegram, che è già un'app installata: la sensazione di "app vera" si ha lo stesso |
+| 2026-08-06 | `[SUPERATA il 07/08: si fa la mobile app negli store]` **Web app installabile (PWA), niente App Store** | Apple: €99/anno + 15-30% di commissione sugli abbonamenti digitali + revisione di giorni o settimane. Con 8 settimane di tempo è insostenibile. Le notifiche arrivano su Telegram, che è già un'app installata: la sensazione di "app vera" si ha lo stesso |
 | 2026-08-06 | **Landing e app sono lo stesso progetto**: `/` pubblica, `/app` dietro login | Un solo dominio, un solo codice, uno stile solo. Serve in più: Supabase Auth + RLS (regole a livello di database, così un bug nel codice non può esporre i dati di un altro utente) |
 | 2026-08-06 | **Pagamenti: Polar (Merchant of Record), non Stripe** | Valerio **non ha ancora la partita IVA**. Polar diventa il venditore legale, incassa a nome proprio, gestisce l'IVA europea e gira il netto. ⚠️ NON risolve come ricevere legalmente il denaro in Italia: serve comunque un commercialista |
 | 2026-08-06 | **Prezzi confermati: 5/€3,99 · 20/€12,99 · 50/€24,99** | Gli ho mostrato il conto (con ordine medio ~€10 servono ~3.000 clienti per €30k, cioè ~1.070 iscritti al giorno per 8 settimane) e ho proposto una scala più alta. **Valerio ha scelto di restare così avendo i numeri sotto gli occhi. Chiuso: non si riapre** |
@@ -44,7 +44,7 @@ Verificato il 2026-08-06. Se serve rimetterlo in discussione, prima rileggi qui.
 
 | Decisione | Perché |
 |---|---|
-| **Web app ora, store dopo il primo incasso.** Scelta di Valerio. | Apple: 99€/anno, 15-30% su ogni credito venduto, più una revisione che su uno sprint di 8 settimane può costarne 2. Il pacchetto per gli store (Capacitor) entra in FASE 3, dopo che l'incasso esiste. Nel frattempo il manifest la rende installabile sulla schermata Home: sul telefono è indistinguibile da un'app scaricata. |
+| `[SUPERATA il 07/08]` **Web app ora, store dopo il primo incasso.** Scelta di Valerio. | Apple: 99€/anno, 15-30% su ogni credito venduto, più una revisione che su uno sprint di 8 settimane può costarne 2. Il pacchetto per gli store (Capacitor) entra in FASE 3, dopo che l'incasso esiste. Nel frattempo il manifest la rende installabile sulla schermata Home: sul telefono è indistinguibile da un'app scaricata. |
 | **Accesso: email+password come strada principale, link magico come alternativa.** | La password funziona a ogni accesso senza dipendere dalla consegna di un'email. Con la posta interna di Supabase limitata a 2 email l'ora, un login basato solo sul link magico si sarebbe piantato al terzo utente. |
 | **I pulsanti principali della landing portano a registrarsi, non alla lista d'attesa.** | La lista d'attesa aveva senso quando non esisteva il prodotto. Ora esiste: mandare la gente su un modulo email invece che dentro l'app butta via l'unica cosa che convince, cioè provarla. Il modulo resta in fondo per chi non vuole ancora un account. |
 | **`shadcn init` non si lancia su questo progetto.** | Riscrive `globals.css` con i suoi token e cancella il sistema di colori costruito sul verde. I componenti si copiano a mano: è lo stesso codice, senza il danno. |
@@ -107,6 +107,31 @@ e rende il blog quotidiano più importante dei video, non meno.
 | **Le email di consegna vanno a `valerio@artecai.it`** finché il dominio non è verificato su Resend. | Resend in modalità prova spedisce solo al proprietario dell'account. Il login dell'app resta sul gmail. |
 | I prezzi della riviera romagnola sono **a persona a notte**, non a camera. | Verificato su Hotel Apollo: "€ 60,00 al giorno / persona". Il raccoglitore assume prezzo-camera: la verifica umana corregge. |
 
+## Chiuse il 07/08 — il pivot: mobile app negli store
+
+**Scelta di Valerio (07/08, con immagini di riferimento):** il prodotto è
+un'**app mobile su App Store e Google Play**, non la web app. Conseguenze
+decise insieme al pivot:
+
+| Decisione | Perché / dettagli |
+|---|---|
+| **La landing non porta più all'app web.** Ogni CTA va alla lista d'attesa, i badge store restano "Presto su". | Richiesta esplicita di Valerio. La landing vende l'app in arrivo e raccoglie email. |
+| **La web app resta viva ma non linkata**: serve il pannello `/admin` per verificare le offerte. Il motore server (raccolta, abbinamento, invio) resta dov'è. | Il backend non cambia: cambia la superficie utente. |
+| **Framework: Expo SDK 57 (React Native) + expo-router + supabase-js.** | Ricerca del 07/08 con fonti: si riusa il TypeScript e il Supabase già scritti, EAS compila per iOS senza Mac (30 build/mese gratis), notifiche native con expo-notifications. Flutter = riscrivere tutto in Dart senza benefici per questo caso. In `mobile/PROGETTO.md` i contratti. |
+| **Niente NativeWind**: stile con StyleSheet e token in `mobile/src/lib/tema.ts`, stessi valori del sito. | NativeWind stabile vuole Tailwind 3, il sito usa la 4: la configurazione non si condivide comunque. Meno pezzi mobili. |
+| **Le notifiche push native sostituiscono Telegram come canale principale.** Bot Telegram rimandato (scelta di Valerio: "per adesso no"). | Il motivo per cui esisteva Telegram (l'iPhone non riceve push web) sparisce con l'app nativa. |
+| **Permesso notifiche chiesto DOPO la creazione della prima ricerca**, mai al primo avvio, con schermata di spiegazione prima del prompt nativo. Chi rifiuta riceve via email. | Ricerca onboarding 07/08 (pattern Hopper): al primo avvio è la prima causa di rifiuto del permesso. |
+| **Onboarding in 6 passi, valore prima dell'account**: benvenuto → conto di esempio (marcato demo) → criteri senza account → aggancio → registrazione → avvisi. | Ricerca 07/08: le app che mostrano il valore prima della registrazione convertono di più. Il nostro aha è il conto aperto. |
+| **Crediti dentro l'app = acquisti in-app di Apple e Google, quando si accenderanno.** Polar può vendere solo sul web: non ha acquisti in-app. | Verificato il 07/08: i crediti sono beni digitali consumabili, guideline Apple 3.1.1 e Play Billing obbligatori (15% sotto il milione col programma small business). Le vie UE del DMA esistono ma con commissioni comunque dovute e obblighi di rendicontazione: non per la v1. **V1 senza acquisti**: si parte coi 3 crediti gratis. |
+| **Dominio comprato da Valerio: `ancheioviaggio.it`** (07/08). | ⚠️ Non coincide col marchio "Viaggio Anche Io" (viaggioancheio). Che nome tiene il prodotto è una **decisione aperta**, vedi sotto. Fino a risposta, il marchio resta "Viaggio Anche Io". |
+
+### Vincoli store VERIFICATI il 07/08 — non riaprire
+- **Apple Developer individuale**: 99 USD/anno, si apre da privato senza partita IVA, approvazione 24-48h, review app tipica 24-72h. Prima app: 1-2 settimane realistiche con un rifiuto messo in conto.
+- **Google Play personale**: 25 USD una tantum, verifica documento. **Test chiuso obbligatorio per i nuovi account personali: 12 tester per 14 giorni consecutivi**, poi review di produzione (7-14 giorni). Totale realistico: 4-6 settimane. È il collo di bottiglia dei tempi.
+- **Sign in with Apple**: obbligatorio (guideline 4.8) se offriamo "Continua con Google" nell'app.
+- **EAS Build gratuito**: 30 build/mese (max 15 iOS), coda lenta nelle ore di punta USA. Le notifiche remote NON si provano su Expo Go né sul simulatore iOS: serve una build di sviluppo su un iPhone vero.
+
 ## Decisioni ancora aperte
 Vivono in `SPEC.md` → "Domande aperte". Appena chiuse, scendono qui.
-- Nessuna aperta al 07/08/2026.
+- **Nome contro dominio**: marchio "Viaggio Anche Io" ma dominio `ancheioviaggio.it`. Si rinomina il prodotto o si tiene il nome sul dominio diverso? (chiesta a Valerio il 07/08)
+- **Account store**: quando Valerio apre Apple Developer (99$/anno) e Play Console (25$) e chi sono i 12 tester del test chiuso Google.

@@ -42,23 +42,34 @@ alert vero e può comprare crediti. End to end, senza che io tocchi niente.
 | Schermate vere dell'app dentro la landing | ⏳ appena `.env.local` esiste |
 | Immagine di anteprima per i social (og:image) | ⏳ |
 
-## 1.2 L'app — 45%
+## 1.2 Il motore e il pannello (web) — il retrobottega, resta e serve
 
 | | Stato |
 |---|---|
 | Database, schema, RLS, buco sui crediti chiuso | ✅ |
-| **Accesso**: email+password, link magico, conferma via email | ✅ |
-| **Porta chiusa**: `proxy.ts` respinge chi non è collegato | ✅ |
-| **`/app`**: imposti partenza, budget, ore, notti, persone, voglia | ✅ |
-| **Anteprima onesta**: dove arrivi oggi con quel budget | ✅ |
-| Metti in pausa / riaccendi / cancelli una ricerca | ✅ |
-| Errori di Supabase tradotti in italiano | ✅ |
-| Contatore crediti in testa all'app | ✅ |
 | Motore che abbina offerte e ricerche (a lotti, limite 10s) | ✅ **provato dal vivo il 07/08** |
-| Invio destinazioni: email fatto (Resend), Telegram pronto (manca il token del bot) | ✅/⏳ |
-| Acquisto crediti con Polar | ⏳ |
+| Invio destinazioni via email (Resend) con scalo e rimborso del credito | ✅ |
 | Pannello `/admin`: verifica offerte, raccolta e abbinamento a mano | ✅ |
-| Installabile sulla schermata Home (PWA + manifest) | ✅ |
+| Cron in produzione (endpoint pronti, serve MOTORE_SEGRETO su Netlify) | ⏳ |
+| Invio come notifica push all'app (canale nuovo in `lib/alert/invia.ts`) | ⏳ |
+| La web app utente (`/app`, `/entra`) esiste ma non è più linkata: il prodotto è l'app mobile | ✅ |
+
+## 1.2bis L'APP MOBILE — il prodotto (pivot del 07/08)
+
+Expo SDK 57, React Native, stessa Supabase. Contratti in `mobile/PROGETTO.md`.
+
+| | Stato |
+|---|---|
+| Impalcatura, marchio, icone dal logo, caratteri del sito | ✅ 07/08 |
+| Motore di calcolo portato (viaggio, costruttore, destinazioni) | ✅ 07/08 |
+| Fondamenta: Supabase, sessione, dati, notifiche, componenti, testi | 🔨 in corso 07/08 |
+| Onboarding in 6 passi (valore prima dell'account) + accesso | 🔨 in corso 07/08 |
+| Tab: Destinazioni, Ricerche, Profilo + dettaglio col conto aperto | 🔨 in corso 07/08 |
+| Punteggio preferenze (il seme dell'AI: impara da cosa apri) | 🔨 in corso 07/08 |
+| Prova su telefono vero (Expo Go / build di sviluppo) | ⏳ serve Valerio |
+| Account store: Apple 99$/anno, Play 25$ + **12 tester × 14 giorni** | ⏳ **serve Valerio, è il collo di bottiglia dei tempi** |
+| Build EAS + submission | ⏳ dopo gli account |
+| Acquisto crediti in-app (IAP Apple/Google, non Polar dentro l'app) | ⏳ v2, si parte coi 3 gratis |
 
 ## 1.3 Da dove arrivano le offerte — ❓ **decisione tua, parcheggiata**
 
@@ -82,7 +93,7 @@ imposta la tua ricerca, prendi 3 alert gratis.
 | Formato video, 12 aperture, 3 script pronti (`CONTENUTI.md`) | ✅ |
 | Piano completo di distribuzione (`DISTRIBUZIONE.md`) | ✅ |
 | Account social `@viaggioancheio` | ⏳ **serve Valerio** |
-| Dominio `viaggioancheio.it` | ⏳ **serve Valerio** |
+| Dominio: comprato `ancheioviaggio.it` (07/08). ⚠️ diverso dal marchio: decisione aperta in `DECISIONI.md` | ✅/❓ |
 | Higgsfield / Seedance collegati | ⏳ **serve Valerio** |
 | Primo video pubblicato | ⏳ |
 | Blog sul sito (`/diario`) + primi 10 pezzi | ⏳ |
@@ -105,20 +116,21 @@ Si apre quando esistono utenti paganti. Prima è teoria.
 ## Cosa blocca cosa
 
 ```
- dominio ──→ Resend verificato ──→ email che partono davvero ──→ lancio
-                                          ↑
-              (oggi Supabase manda 2 email l'ora: al terzo iscritto ti fermi)
-
- partita IVA ──→ Polar ──→ incassare
- fonte offerte ──→ alert veri (senza, il motore gira a vuoto)
+ account Play (25$) ──→ test chiuso: 12 tester × 14 giorni ──→ produzione   ← IL PIÙ LENTO: si apre OGGI
+ account Apple (99$/anno) ──→ review 1-2 settimane ──→ App Store
+ dominio ancheioviaggio.it ──→ Resend verificato ──→ email a tutti (oggi solo a valerio@artecai.it)
+ fonte offerte ──→ EXA_API_KEY su Netlify + cron ──→ destinazioni vere
+ incasso: 3 crediti gratis al lancio; acquisti = IAP negli store (v2)
 ```
 
-**Le due cose più urgenti non sono tecniche: partita IVA e dominio.**
+**Le cose più urgenti non sono codice: i due account developer e i 12
+tester per Google.** Ogni giorno senza account Play è un giorno in più di
+attesa a valle.
 
 ---
 
 ## Prossimo pezzo di codice
-Motore di abbinamento offerte ↔ ricerche, a lotti per stare nei 10 secondi
-delle funzioni Netlify. Poi l'invio su Telegram.
+Chiudere l'app mobile (QA, prova su telefono), poi il canale push nel motore
+di invio e il cron in produzione.
 
 Le cose chieste e non ancora fatte stanno in `ARRETRATI.md`.
