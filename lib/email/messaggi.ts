@@ -48,7 +48,7 @@ export function benvenutoLista(a: string, comune?: string | null): Promise<Esito
         p(
           `<strong style="color:${C.inchiostro}">Una cosa che nessuno ti dice:</strong> il prezzo della camera non è il prezzo della vacanza. Noi ti mostriamo il totale, benzina e pedaggi compresi, con il calcolo aperto.`,
         ),
-      coda: "Ricevi questa email perché hai lasciato il tuo indirizzo su viaggioancheio.it.",
+      coda: "Ricevi questa email perché hai lasciato il tuo indirizzo su rivoglio.it.",
     }),
     testo: `Ci sei.\n\nTi ho segnato${dove}. Quando esiste una fuga di 1-3 notti sotto la tua soglia, te lo dico io.\nNel frattempo non ti mando niente.\n\nCrea il tuo account: ${casa()}/entra?modo=registrati`,
   });
@@ -97,7 +97,7 @@ export function conferma(a: string, link: string): Promise<Esito> {
         p(
           `Se non hai chiesto tu questa registrazione, ignora questa email: senza il clic non succede niente.`,
         ),
-      coda: "Ricevi questa email perché qualcuno ha usato questo indirizzo per registrarsi su viaggioancheio.it.",
+      coda: "Ricevi questa email perché qualcuno ha usato questo indirizzo per registrarsi su rivoglio.it.",
     }),
     testo: `Un clic e sei dentro.\n\nConferma il tuo indirizzo: ${link}\n\nSe non hai chiesto tu questa registrazione, ignora questa email.`,
   });
@@ -236,7 +236,7 @@ export function ricevuta(
          </table>` +
         p("I crediti sono già sul tuo account e non scadono.") +
         bottone("Torna alle tue ricerche", `${casa()}/app`),
-      coda: "Ricevi questa email perché hai acquistato crediti su Viaggio Anche Io.",
+      coda: "Ricevi questa email perché hai acquistato crediti su Rivoglio.",
     }),
     testo: `Crediti aggiunti.\n\nCrediti: ${t.crediti}\nImporto: ${t.importo}€\nRiferimento: ${t.riferimento}\n\nI crediti non scadono.\n${casa()}/app`,
   });

@@ -10,7 +10,7 @@ con la data e si marca la vecchia `[SUPERATA]`.
 | 2026-08-06 | Nessuno stack scelto prima della spec approvata | Scegliere la tecnologia prima di sapere cosa si costruisce fa buttare lavoro |
 | 2026-08-06 | `[SUPERATA il 07/08: si fa la mobile app negli store]` **Web app, non app nativa** (iOS/Android) | Apple chiede €99/anno + In-App Purchase obbligatorio sugli abbonamenti digitali (15-30% di commissione); Google Play $25 + review. Con Stripe su web la commissione è ~1,5% + €0,25. Un alert non ha bisogno di un'app: email/Telegram/push arrivano lo stesso. La web app è online in giornata a €0. Reversibile: l'app nativa si aggiunge dopo, quando gli abbonati la pagano |
 | 2026-08-06 | **Ingestione offerte = innesto sostituibile** (`source` adapter) | La scelta della fonte prezzi è rimandata (Valerio, 06/08). Il resto del prodotto non deve dipenderne: le offerte entrano in una tabella `offerte` con un campo `fonte`, e ogni fonte è un modulo separato che si può aggiungere o togliere senza toccare il motore di match né gli alert |
-| 2026-08-06 | **Nome: `Viaggio Anche Io`**, per esteso ovunque | Scelto da Valerio. Nasce dal dato di partenza: 40 milioni di italiani non partono ad agosto — "anche io" è la rivendicazione di chi ci va lo stesso, col suo budget. Avevo obiettato sulla lunghezza (14 lettere) e proposto il marchio corto `Anche Io` + payoff: **Valerio ha confermato la forma estesa. Chiuso.** |
+| 2026-08-06 | `[SUPERATA il 07/08 sera: il nome è Rivoglio]` **Nome: `Viaggio Anche Io`**, per esteso ovunque | Scelto da Valerio. Nasce dal dato di partenza: 40 milioni di italiani non partono ad agosto — "anche io" è la rivendicazione di chi ci va lo stesso, col suo budget. Avevo obiettato sulla lunghezza (14 lettere) e proposto il marchio corto `Anche Io` + payoff: **Valerio ha confermato la forma estesa. Chiuso.** |
 | 2026-08-06 | **Tono: amico diretto, si dà del tu** | Pubblico 25-45 che arriva dai social. Voce: *"Dimmi da dove parti e quanto vuoi spendere. Al resto ci penso io."* Frasi corte, zero gergo, zero superlativi pubblicitari |
 | 2026-08-06 | **Tutta Italia dal giorno 1**, partenza per comune/CAP e non da un menù di città | Deciso da Valerio. Non costa quanto sembra: un'offerta è un punto sulla mappa, non appartiene a una città — un agriturismo in Toscana serve chi parte da Milano, Bologna, Firenze e Roma insieme. In più le iscrizioni dicono dove sta davvero la domanda. **Buco noto: le isole** (vedi SPEC §9) |
 | 2026-08-06 | **Pricing: crediti. 1 credito = 1 alert ricevuto.** 5/€3,99 · 20/€12,99 · 50/€24,99. Nessun abbonamento | Deciso da Valerio. Avevo obiettato due cose — l'incentivo si inverte (guadagni mandandone di più, l'utente ne vuole meno e migliori) e l'utente non sa quanto spenderà — e avevo proposto di vendere la "caccia da 30 giorni". **Valerio ha scelto i crediti avendo le obiezioni sotto gli occhi. Chiuso, si implementa così.** Mitigazione concordata dentro il suo modello: **tetto di alert/settimana scelto dall'utente** |
@@ -123,7 +123,7 @@ decise insieme al pivot:
 | **Permesso notifiche chiesto DOPO la creazione della prima ricerca**, mai al primo avvio, con schermata di spiegazione prima del prompt nativo. Chi rifiuta riceve via email. | Ricerca onboarding 07/08 (pattern Hopper): al primo avvio è la prima causa di rifiuto del permesso. |
 | **Onboarding in 6 passi, valore prima dell'account**: benvenuto → conto di esempio (marcato demo) → criteri senza account → aggancio → registrazione → avvisi. | Ricerca 07/08: le app che mostrano il valore prima della registrazione convertono di più. Il nostro aha è il conto aperto. |
 | **Crediti dentro l'app = acquisti in-app di Apple e Google, quando si accenderanno.** Polar può vendere solo sul web: non ha acquisti in-app. | Verificato il 07/08: i crediti sono beni digitali consumabili, guideline Apple 3.1.1 e Play Billing obbligatori (15% sotto il milione col programma small business). Le vie UE del DMA esistono ma con commissioni comunque dovute e obblighi di rendicontazione: non per la v1. **V1 senza acquisti**: si parte coi 3 crediti gratis. |
-| **Dominio comprato da Valerio: `ancheioviaggio.it`** (07/08). | ⚠️ Non coincide col marchio "Viaggio Anche Io" (viaggioancheio). Che nome tiene il prodotto è una **decisione aperta**, vedi sotto. Fino a risposta, il marchio resta "Viaggio Anche Io". |
+| `[SUPERATA il 07/08 sera dal pivot Rivoglio]` **Dominio comprato da Valerio: `ancheioviaggio.it`** (07/08). | Era il dominio dell'idea viaggi. Col nome nuovo non serve più: il dominio per Rivoglio è da prendere. Nel Hostinger di Valerio c'è uno slot dominio gratuito ancora da configurare (verificato via Composio il 07/08). |
 
 ### Vincoli store VERIFICATI il 07/08 — non riaprire
 - **Apple Developer individuale**: 99 USD/anno, si apre da privato senza partita IVA, approvazione 24-48h, review app tipica 24-72h. Prima app: 1-2 settimane realistiche con un rifiuto messo in conto.
@@ -131,7 +131,29 @@ decise insieme al pivot:
 - **Sign in with Apple**: obbligatorio (guideline 4.8) se offriamo "Continua con Google" nell'app.
 - **EAS Build gratuito**: 30 build/mese (max 15 iOS), coda lenta nelle ore di punta USA. Le notifiche remote NON si provano su Expo Go né sul simulatore iOS: serve una build di sviluppo su un iPhone vero.
 
+## Chiusa il 07/08 (sera) — IL PIVOT: da Viaggio Anche Io a Rivoglio
+
+**Scelta di Valerio.** Ha trovato concorrenti più grandi che fanno la stessa
+identica cosa: l'idea viaggi è chiusa. Il pivot è di PRODOTTO, non di
+struttura né di sviluppo:
+
+- **Si tiene TUTTO**: landing Next, app mobile Expo, Supabase (stesso
+  progetto, stesse tabelle), motore, pannello, componenti, prove, documenti,
+  modo di lavorare. Niente si rifà da zero.
+- **Nome nuovo: Rivoglio.** Rinominato ovunque: codice web e mobile, bundle
+  (`it.rivoglio.app`), pacchetti, documenti, repo GitHub e progetto Supabase.
+- **Cosa fa il nuovo prodotto lo definisce Valerio a breve.** Fino ad allora
+  i testi descrivono ancora l'idea vecchia: si riscrivono in blocco alla
+  definizione, non a pezzi prima.
+- Il registro qui sopra NON si riscrive: le decisioni superate restano
+  marcate `[SUPERATA]`, come da regola del file. La storia è storia.
+
 ## Decisioni ancora aperte
 Vivono in `SPEC.md` → "Domande aperte". Appena chiuse, scendono qui.
-- **Nome contro dominio**: marchio "Viaggio Anche Io" ma dominio `ancheioviaggio.it`. Si rinomina il prodotto o si tiene il nome sul dominio diverso? (chiesta a Valerio il 07/08)
-- **Account store**: quando Valerio apre Apple Developer (99$/anno) e Play Console (25$) e chi sono i 12 tester del test chiuso Google.
+- **Cosa fa Rivoglio**: la definizione del nuovo prodotto (Valerio, a breve).
+  Da lì: nuova SPEC, nuovi testi, nuova tagline, nuovo logo se serve.
+- **Dominio per Rivoglio**: `rivoglio.it` da verificare e prendere (c'è lo
+  slot gratuito su Hostinger da configurare).
+- **Account store**: quando Valerio apre Apple Developer (99$/anno) e Play
+  Console (25$) e chi sono i 12 tester del test chiuso Google. Il bundle id
+  `it.rivoglio.app` è già pronto per il nome nuovo.

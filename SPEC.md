@@ -1,4 +1,4 @@
-# SPEC — Viaggio Anche Io
+# SPEC — Rivoglio
 
 *Scritta il 2026-08-06. Le scelte qui dentro sono chiuse: vedi `DECISIONI.md`.*
 
@@ -160,5 +160,5 @@ giusto. Finché non succede, non è finito.
 
 1. **Fonte prezzi offerte** — rimandata di proposito a fine progetto.
    Opzioni già studiate in `DECISIONI.md`.
-2. **Dominio** — `viaggioancheio.it` da verificare e comprare (Valerio).
+2. **Dominio** — `rivoglio.it` da verificare e comprare (Valerio).
 3. **Stripe** — account da aprire (Valerio: servono dati fiscali e IBAN).

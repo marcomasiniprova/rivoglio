@@ -143,8 +143,8 @@ Visualizzazioni e follower non sono in questa lista. Non pagano niente.
 
 | | Perché |
 |---|---|
-| Dominio `viaggioancheio.it` | senza, non pubblichi e le email non partono |
-| Account `@viaggioancheio` su TikTok, Instagram, YouTube | i video devono uscire da qualche parte |
+| Dominio `rivoglio.it` | senza, non pubblichi e le email non partono |
+| Account `@rivoglio` su TikTok, Instagram, YouTube | i video devono uscire da qualche parte |
 | Account Reddit con un po' di storia | uno nuovo che promuove viene bannato subito |
 | Higgsfield / Seedance | i video del personaggio |
 | Partita IVA + Polar | incassare |
@@ -165,7 +165,7 @@ invio ti mostro cosa esce e aspetto un ok secco. Due motivi concreti, nessuno
 dei due è prudenza:
 
 1. **L'account è tuo.** Un ban su Reddit o Instagram non si annulla, e in Italia
-   con `@viaggioancheio` non hai un secondo tentativo.
+   con `@rivoglio` non hai un secondo tentativo.
 2. **Un messaggio mandato non si richiama.** Se scrivo a un creator con il tono
    sbagliato, quel contatto è bruciato per sempre.
 

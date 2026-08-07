@@ -1,13 +1,20 @@
-# STATO — Viaggio Anche Io
+# STATO — Rivoglio
 
-**Aggiornato:** 2026-08-07, sera
-**PIVOT: il prodotto è un'APP MOBILE per App Store e Google Play** (scelta
-di Valerio del 07/08). L'app esiste: è in `mobile/` (Expo SDK 57), scritta
-da una squadra di 8 agenti coordinati, verificata: tsc 0 errori, lint
-pulito, 29 prove su 29. Migrazione push applicata sul Supabase vero via
-Composio. La landing non porta più all'app web: raccoglie la lista d'attesa.
-Al mattino era partita LA PRIMA DESTINAZIONE VERA: Rimini, 147€ a testa,
-email via Resend, credito scalato 3→2.
+**Aggiornato:** 2026-08-07, tarda sera
+**SECONDO PIVOT (07/08 sera): il prodotto si chiama RIVOGLIO e cambia.**
+Valerio ha trovato concorrenti più grandi sull'idea viaggi e l'ha chiusa.
+Si tiene TUTTO (landing, app mobile, Supabase, motore, modo di lavorare),
+è stato rinominato TUTTO in Rivoglio (codice, bundle `it.rivoglio.app`,
+documenti, repo, progetto Supabase). **Cosa fa il nuovo prodotto lo dice
+Valerio a breve**: fino ad allora i testi descrivono ancora l'idea vecchia,
+si riscrivono in blocco alla definizione.
+
+Primo pivot del mattino (resta vero): il prodotto è un'APP MOBILE per gli
+store. L'app esiste in `mobile/` (Expo SDK 57), scritta da una squadra di
+8 agenti, verificata: tsc 0 errori, lint pulito, 29 prove su 29. Migrazione
+push applicata sul Supabase vero via Composio. La landing raccoglie la
+lista d'attesa. Al mattino era partita LA PRIMA DESTINAZIONE VERA: Rimini,
+147€ a testa, email via Resend, credito scalato 3→2.
 
 ## Dove siamo
 - **Il motore gira**: raccolta da Exa (solo strutture indipendenti, Booking

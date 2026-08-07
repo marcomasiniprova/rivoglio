@@ -1,4 +1,4 @@
-# PIANO — Viaggio Anche Io
+# PIANO — Rivoglio
 
 *Se leggi un file solo, leggi questo. Risponde a una domanda: **a che punto siamo?***
 
@@ -92,8 +92,8 @@ imposta la tua ricerca, prendi 3 alert gratis.
 |---|---|
 | Formato video, 12 aperture, 3 script pronti (`CONTENUTI.md`) | ✅ |
 | Piano completo di distribuzione (`DISTRIBUZIONE.md`) | ✅ |
-| Account social `@viaggioancheio` | ⏳ **serve Valerio** |
-| Dominio: comprato `ancheioviaggio.it` (07/08). ⚠️ diverso dal marchio: decisione aperta in `DECISIONI.md` | ✅/❓ |
+| Account social `@rivoglio` | ⏳ **serve Valerio** |
+| Dominio per Rivoglio: da prendere (slot gratuito su Hostinger da configurare) | ⏳ **serve Valerio** |
 | Higgsfield / Seedance collegati | ⏳ **serve Valerio** |
 | Primo video pubblicato | ⏳ |
 | Blog sul sito (`/diario`) + primi 10 pezzi | ⏳ |
@@ -118,7 +118,7 @@ Si apre quando esistono utenti paganti. Prima è teoria.
 ```
  account Play (25$) ──→ test chiuso: 12 tester × 14 giorni ──→ produzione   ← IL PIÙ LENTO: si apre OGGI
  account Apple (99$/anno) ──→ review 1-2 settimane ──→ App Store
- dominio ancheioviaggio.it ──→ Resend verificato ──→ email a tutti (oggi solo a valerio@artecai.it)
+ dominio di Rivoglio ──→ Resend verificato ──→ email a tutti (oggi solo a valerio@artecai.it)
  fonte offerte ──→ EXA_API_KEY su Netlify + cron ──→ destinazioni vere
  incasso: 3 crediti gratis al lancio; acquisti = IAP negli store (v2)
 ```

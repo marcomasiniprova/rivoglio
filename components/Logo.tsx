@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 /**
- * Il segno di Viaggio Anche Io.
+ * Il segno di Rivoglio.
  *
  * Vincolo: deve reggere a 24px, perché è lì che si vede quasi sempre
  * (favicon, avatar del bot Telegram, icona sulla schermata Home).
@@ -37,7 +37,7 @@ export default function Logo({ scuro = false }: { scuro?: boolean }) {
     <Link
       href="/"
       className="group flex shrink-0 items-center gap-2.5"
-      aria-label="Viaggio Anche Io, la tua fuga al prezzo giusto"
+      aria-label="Rivoglio, la tua fuga al prezzo giusto"
     >
       <Marchio className="h-9 w-9 shrink-0 transition-transform duration-500 group-hover:-rotate-6" />
       {/* Sotto i 420px il nome per esteso non ci sta accanto al bottone:
@@ -47,7 +47,7 @@ export default function Logo({ scuro = false }: { scuro?: boolean }) {
           scuro ? "text-white" : "text-inchiostro"
         }`}
       >
-        Viaggio Anche Io
+        Rivoglio
       </span>
     </Link>
   );

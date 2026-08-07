@@ -38,11 +38,11 @@ const CASA = new URL(
 
 export const metadata: Metadata = {
   metadataBase: CASA,
-  title: "Viaggio Anche Io | La tua fuga, al prezzo giusto",
+  title: "Rivoglio | La tua fuga, al prezzo giusto",
   description:
     "Imposti da dove parti e quanto vuoi spendere. Ti segnalo una destinazione quando esiste una micro-vacanza di 1-3 notti sotto la tua soglia, col prezzo totale calcolato: alloggio e viaggio.",
   openGraph: {
-    title: "Viaggio Anche Io",
+    title: "Rivoglio",
     description:
       "40 milioni di italiani non partiranno ad agosto. Ti segnalo una destinazione quando esiste una fuga di due notti sotto il tuo budget.",
     locale: "it_IT",

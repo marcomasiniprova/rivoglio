@@ -46,9 +46,9 @@ test("giro completo: registrazione, partenza, ricerca", async ({ page }, info) =
   const p = (nome: string) => `${CARTELLA}/${info.project.name}-${nome}.png`;
 
   /* Supabase rifiuta ogni dominio senza record MX: example.com,
-     viaggioancheio.it e qualsiasi dominio inventato vengono respinti con
+     rivoglio.it e qualsiasi dominio inventato vengono respinti con
      "Email address is invalid". Serve un dominio con posta vera. */
-  const email = `viaggioancheio.prova.${Date.now()}@gmail.com`;
+  const email = `rivoglio.prova.${Date.now()}@gmail.com`;
 
   // 1. la porta
   await page.goto("/entra?modo=registrati");

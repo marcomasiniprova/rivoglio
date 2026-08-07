@@ -13,7 +13,7 @@ import { Resend } from "resend";
  * ⚠️ FINCHÉ NON C'È IL DOMINIO: Resend consente di spedire solo verso
  * l'indirizzo del proprietario dell'account, usando `onboarding@resend.dev`
  * come mittente. Serve per provare, non per lanciare. Appena
- * `viaggioancheio.it` è verificato su Resend, si cambia MITTENTE qui sotto
+ * `rivoglio.it` è verificato su Resend, si cambia MITTENTE qui sotto
  * e parte tutto.
  */
 
@@ -24,10 +24,10 @@ export const POSTA_ATTIVA = Boolean(CHIAVE);
 
 /**
  * Il mittente. `resend.dev` è il dominio di prova di Resend.
- * Quando il dominio è verificato diventa "Viaggio Anche Io <ciao@viaggioancheio.it>".
+ * Quando il dominio è verificato diventa "Rivoglio <ciao@rivoglio.it>".
  */
 export const MITTENTE =
-  process.env.RESEND_MITTENTE ?? "Viaggio Anche Io <onboarding@resend.dev>";
+  process.env.RESEND_MITTENTE ?? "Rivoglio <onboarding@resend.dev>";
 
 /** Dove torna la gente che clicca. */
 export function casa() {

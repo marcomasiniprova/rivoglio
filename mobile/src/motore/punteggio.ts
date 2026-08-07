@@ -1,7 +1,7 @@
 import type { Tipo } from "./destinazioni";
 
 /**
- * Il seme dell'intelligenza di Viaggio Anche Io.
+ * Il seme dell'intelligenza di Rivoglio.
  *
  * Cosa fa DAVVERO: un punteggio deterministico su preferenze osservate.
  * Conta quali tipi di destinazione apri e quali ignori, ne ricava un peso

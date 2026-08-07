@@ -9,7 +9,7 @@ import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Iniziamo | Viaggio Anche Io",
+  title: "Iniziamo | Rivoglio",
   robots: { index: false },
 };
 

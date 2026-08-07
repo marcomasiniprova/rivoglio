@@ -6,7 +6,7 @@ import ModuloEntra from "@/components/ModuloEntra";
 import { CONTO, ESEMPIO, euro } from "@/lib/esempio";
 
 export const metadata: Metadata = {
-  title: "Entra | Viaggio Anche Io",
+  title: "Entra | Rivoglio",
   description: "Entra nel tuo account e imposta le tue ricerche.",
   robots: { index: false },
 };

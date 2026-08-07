@@ -31,7 +31,7 @@ riconoscere il video dal primo secondo.
 | 3-8 | Si preme il bottone, appaiono le tre schede | *"Non quanto costa l'hotel. Quanto costa arrivarci."* |
 | 8-20 | Zoom su una scheda, si legge il conto riga per riga | *"Ferrara: quarantadue minuti, cinquantacinque chilometri. Nove euro di benzina e pedaggi a testa. Ti restano centoundici euro per dormire."* |
 | 20-30 | Le altre due schede | *"Abetone in un'ora. Mantova in un'ora e venti."* |
-| 30-35 | Logo + indirizzo | *"Il conto te lo faccio vedere tutto. Viaggio Anche Io."* |
+| 30-35 | Logo + indirizzo | *"Il conto te lo faccio vedere tutto. Rivoglio."* |
 
 **Perché funziona:** è un calcolo vero fatto sotto gli occhi di chi guarda, non
 una promessa. Ed è infinitamente ripetibile: 46 città di partenza × 4 budget ×
@@ -91,7 +91,7 @@ Le prime due righe decidono tutto. Da alternare, non usarne una sola.
 | **Frequenza** | 1 video corto al giorno per 60 giorni. La costanza batte la qualità del singolo pezzo. |
 | **Canali** | TikTok e Instagram Reels lo stesso video. YouTube Shorts come terzo, costa zero. |
 | **Orari** | 12:30-13:30 e 19:00-21:00, quando gli italiani scrollano. |
-| **Nome utente** | `@viaggioancheio` su tutti e tre. Prendilo adesso anche se non pubblichi. |
+| **Nome utente** | `@rivoglio` su tutti e tre. Prendilo adesso anche se non pubblichi. |
 | **In biografia** | Un link solo, alla landing. Niente aggregatori di link. |
 
 ## Cosa NON fare

@@ -12,7 +12,7 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Viaggio Anche Io",
+    name: "Rivoglio",
     short_name: "Viaggio",
     description:
       "Ti avviso quando esiste una micro-vacanza sotto il tuo budget, col prezzo totale: alloggio e viaggio.",

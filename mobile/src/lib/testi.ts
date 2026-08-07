@@ -10,7 +10,7 @@
 
 export const TESTI = {
   comune: {
-    marchio: "Viaggio Anche Io",
+    marchio: "Rivoglio",
     tagline: "La tua fuga, al prezzo giusto.",
     avanti: "Avanti",
     indietro: "Torna indietro",

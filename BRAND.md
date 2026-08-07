@@ -1,4 +1,4 @@
-# BRAND — Viaggio Anche Io
+# BRAND — Rivoglio
 
 *Le regole del marchio. Se una cosa è scritta qui, non si improvvisa.*
 I valori vivono in `app/globals.css` dentro `@theme`: **quello è l'originale**,
@@ -8,12 +8,12 @@ questo file lo spiega. Se cambi un colore, cambialo lì e aggiorna qui.
 
 ## Il nome
 
-**Viaggio Anche Io** — sempre per esteso, sempre con le tre iniziali maiuscole.
-Mai "VAI", mai "Viaggio", mai abbreviato.
+**Rivoglio** — scelto da Valerio il 07/08 (sera), col pivot di prodotto.
+Sempre per esteso, iniziale maiuscola, mai abbreviato.
 
-**La tagline:** *La tua fuga, al prezzo giusto.*
-Sotto il nome o accanto. È di Valerio ed è la frase che spiega il prodotto meglio
-di qualsiasi altra: dice sia il desiderio (fuga) sia l'obiezione (prezzo).
+**La tagline:** da definire quando Valerio racconta il nuovo prodotto.
+Quella vecchia (*La tua fuga, al prezzo giusto*) era dell'idea viaggi: resta
+nei testi solo finché non c'è la nuova, poi si sostituisce ovunque.
 
 ---
 

@@ -128,7 +128,7 @@ non altro codice.**
 
 - **Obiettivo: €30-100k entro settembre/ottobre 2026.** Sprint di 2 mesi.
 - **Prezzi: crediti, 1 credito = 1 alert.** €3,99 / €12,99 / €24,99. **Chiuso.**
-- **Nome: Viaggio Anche Io**, per esteso. Tagline: *La tua fuga, al prezzo giusto.*
+- **Nome: Rivoglio**, per esteso. Tagline: *La tua fuga, al prezzo giusto.*
 - **Tutta Italia dal giorno 1.** Bianco e verde. Riferimento: Zentivo.
 - **Web app installabile, non nativa.** **Polar**, non Stripe.
 - **Ti servono:** partita IVA, dominio, account Polar, account social.

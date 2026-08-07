@@ -33,7 +33,7 @@ export default function TelefonoAlert() {
             <span className="grid h-6 w-6 place-items-center rounded-md bg-verde text-[10px] font-bold text-white">
               V
             </span>
-            <span className="text-[12px] font-medium text-fumo">Viaggio Anche Io</span>
+            <span className="text-[12px] font-medium text-fumo">Rivoglio</span>
             <span className="ml-auto text-[11px] text-fumo-2">ora</span>
           </div>
 

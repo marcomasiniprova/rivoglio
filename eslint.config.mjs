@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // Skill di terzi (impeccable, taste): non è codice nostro, non lo controlliamo.
     ".claude/**",
     "prove/report/**",
+    // L'app mobile è un progetto TypeScript a sé: ha il suo `expo lint`.
+    "mobile/**",
   ]),
 ]);
 

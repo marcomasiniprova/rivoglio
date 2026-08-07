@@ -54,7 +54,7 @@ const Contesto = createContext<Sessione>({ utente: null, pronto: false });
 /** Stesso id e stessa email del profilo dimostrativo di dati.ts. */
 const UTENTE_DEMO: User = {
   id: "demo",
-  email: "demo@viaggioancheio.it",
+  email: "demo@rivoglio.it",
   aud: "authenticated",
   app_metadata: {},
   user_metadata: {},

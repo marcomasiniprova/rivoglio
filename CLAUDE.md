@@ -1,12 +1,17 @@
 @STATO.md
 
-# Viaggio Anche Io — regole di progetto
+# Rivoglio — regole di progetto
 
 ## Cos'è e qual è l'obiettivo
-Ti avviso quando esiste una micro-vacanza (1-3 notti, entro X ore da casa tua)
-sotto il budget che decidi tu. Alloggio reale + auto calcolata. Tutta Italia.
-Si paga a crediti: 1 credito = 1 alert. **Obiettivo di Valerio: fare cassa entro
-ottobre 2026.** Ogni scelta si giudica così: avvicina il primo utente pagante?
+**PIVOT del 07/08 (sera): il prodotto si sta ridefinendo.** Valerio ha trovato
+concorrenti più grandi sulla stessa idea e ha chiuso l'idea viaggi. Il nome
+nuovo è **Rivoglio**; cosa fa il prodotto lo definisce lui a breve. Restano
+IDENTICI: la struttura (landing Next + app mobile Expo + Supabase + motore),
+il modo di lavorare e tutto il codice. Cambia cosa costruiamo, non come.
+La descrizione vecchia (micro-vacanze sotto budget, crediti, 1 credito =
+1 destinazione) resta l'impianto tecnico finché non arriva la nuova.
+**Obiettivo di Valerio: fare cassa entro ottobre 2026.** Ogni scelta si
+giudica così: avvicina il primo utente pagante?
 Mappa: `PIANO.md`. Arretrati: `ARRETRATI.md`. Cosa costruiamo: `SPEC.md`.
 Scelte chiuse: `DECISIONI.md`. Marchio: `BRAND.md`. Social: `CONTENUTI.md`.
 
@@ -40,7 +45,7 @@ Scelte chiuse: `DECISIONI.md`. Marchio: `BRAND.md`. Social: `CONTENUTI.md`.
 Dai del tu, ma **professionale, non da amici al bar**. Frasi corte, zero gergo,
 zero superlativi. **MAI il trattino lungo (—): è il segno più riconoscibile del
 testo scritto da un'AI.** Usa punti e virgole. Ogni numero mostrato dev'essere
-apribile: **la trasparenza è il prodotto.** Marchio per esteso: Viaggio Anche Io.
+apribile: **la trasparenza è il prodotto.** Marchio per esteso: Rivoglio.
 Tagline: *La tua fuga, al prezzo giusto.*
 
 ## Stack (fissato)

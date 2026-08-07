@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Bottone: struttura shadcn/ui, vestito con i colori di Viaggio Anche Io.
+ * Bottone: struttura shadcn/ui, vestito con i colori di Rivoglio.
  * Le varianti sono le nostre, non quelle di default: qui il verde è il marchio.
  */
 const varianti = cva(

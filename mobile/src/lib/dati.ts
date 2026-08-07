@@ -141,7 +141,7 @@ function demo(): StatoDemo {
   statoDemo = {
     profilo: {
       id: "demo",
-      email: "demo@viaggioancheio.it",
+      email: "demo@rivoglio.it",
       comune: partenza.nome,
       lat: partenza.lat,
       lng: partenza.lng,

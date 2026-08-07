@@ -37,7 +37,7 @@ test.describe("Landing page", () => {
 
   test("il modulo di iscrizione accetta un'email valida e ringrazia", async ({ page }) => {
     await page.goto("/#iscriviti");
-    await page.getByLabel("La tua email").fill(`prova+${Date.now()}@viaggioancheio.it`);
+    await page.getByLabel("La tua email").fill(`prova+${Date.now()}@rivoglio.it`);
     await page.getByLabel("Il tuo comune di partenza").fill("Bologna");
     await page.getByRole("button", { name: /Avvisami/i }).click();
     await expect(page.getByText("Ci sei.")).toBeVisible({ timeout: 10_000 });

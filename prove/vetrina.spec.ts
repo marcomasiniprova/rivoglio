@@ -39,7 +39,7 @@ test.describe("Vetrina", () => {
     const r = await request.get("/manifest.webmanifest");
     expect(r.status()).toBe(200);
     const m = await r.json();
-    expect(m.name).toBe("Viaggio Anche Io");
+    expect(m.name).toBe("Rivoglio");
     // senza standalone si apre dentro il browser e non sembra un'app
     expect(m.display).toBe("standalone");
     expect(m.theme_color).toBe("#0a9d5c");

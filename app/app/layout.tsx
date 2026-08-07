@@ -8,7 +8,7 @@ import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 
 export const metadata: Metadata = {
-  title: "La tua area | Viaggio Anche Io",
+  title: "La tua area | Rivoglio",
   robots: { index: false },
 };
 
@@ -57,7 +57,7 @@ export default async function LayoutApp({ children }: LayoutProps<"/app">) {
       <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-10 sm:px-8 sm:py-14">{children}</main>
 
       <footer className="border-t border-bordo px-5 py-6 text-center text-xs text-fumo-2">
-        Viaggio Anche Io · un credito si consuma solo quando ti segnalo una destinazione
+        Rivoglio · un credito si consuma solo quando ti segnalo una destinazione
       </footer>
     </div>
   );

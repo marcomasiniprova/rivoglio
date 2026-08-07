@@ -19,7 +19,7 @@ import { notti } from "@/lib/offerte/tipi";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Pannello | Viaggio Anche Io",
+  title: "Pannello | Rivoglio",
   robots: { index: false },
 };
 

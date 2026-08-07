@@ -9,7 +9,7 @@ import { CONTO, ESEMPIO, euro } from "@/lib/esempio";
  * Dentro ci mettiamo il conto vero, gli stessi numeri di lib/esempio.ts:
  * l'anteprima vende esattamente quello che vende il sito.
  */
-export const alt = "Viaggio Anche Io: la tua fuga, al prezzo giusto";
+export const alt = "Rivoglio: la tua fuga, al prezzo giusto";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -42,7 +42,7 @@ export default function Anteprima() {
             />
           </svg>
           <span style={{ color: "#fff", fontSize: 30, fontWeight: 600 }}>
-            Viaggio Anche Io
+            Rivoglio
           </span>
         </div>
 

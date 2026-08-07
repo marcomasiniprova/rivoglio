@@ -68,7 +68,7 @@ export function vestito({
     <tr><td style="padding-bottom:22px;">
       <a href="${sito}" style="text-decoration:none;font-family:${FONT};font-size:17px;font-weight:600;color:${C.inchiostro};">
         <span style="display:inline-block;width:26px;height:26px;background:${C.verde};border-radius:7px;vertical-align:middle;"></span>
-        <span style="vertical-align:middle;margin-left:8px;">Viaggio Anche Io</span>
+        <span style="vertical-align:middle;margin-left:8px;">Rivoglio</span>
       </a>
     </td></tr>
 
@@ -78,7 +78,7 @@ export function vestito({
 
     <tr><td style="padding:24px 8px 0;">
       <p style="margin:0;font-family:${FONT};font-size:12.5px;line-height:1.6;color:${C.fumo2};">
-        ${coda ?? "Ricevi questa email perché hai un account su Viaggio Anche Io."}
+        ${coda ?? "Ricevi questa email perché hai un account su Rivoglio."}
         <br>
         Segnaliamo offerte di terzi e non vendiamo viaggi: si prenota sul sito della struttura.
         I costi di viaggio sono stime calcolate, non prezzi garantiti.
