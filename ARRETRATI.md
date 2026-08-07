@@ -102,6 +102,15 @@ non altro codice.**
 | 44 | **"FAQ: testo in disparte, centralo"** | Titolo centrato sopra le domande, lista in colonna da 760px. Prima era una griglia con la colonna laterale. |
 | 45 | **"Newsletter schiacciata piccolissima"** | Trovata la causa vera: `flex-1` sul campo email dentro un contenitore in colonna (sul telefono governa l'altezza, non la larghezza): campo a 27px contro i 52 del bottone. Ora `sm:flex-1`: 52px misurati, prova visiva fatta. |
 
+## ✅ CHIUSI l'8/08 — ottavo giro: la squadra del design
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 46 | **"Installa questi MCP"** | `.mcp.json` nel repo (vale per ogni sessione futura, anche sul tuo PC): playwright (gli occhi), context7 (documentazione vera di GSAP/Motion/Lenis), shadcn (componenti veri), figma (serve FIGMA_API_KEY), blender (gira solo dove c'è Blender aperto + uv, non nella sandbox). |
+| 47 | **"Installa la skill art-director"** | `.claude/skills/art-director/SKILL.md`, identica al tuo file, più il subagente `art-director` in `.claude/agents/` che la segue fase per fase. |
+| 48 | **"Scrivi gen-asset.ts"** | `scripts/gen-asset.ts` + `npm run asset`: Gemini per le scene, Unsplash per le foto (col credito), WebP sotto 1MB in `/public/assets/`. Servono GEMINI_API_KEY e UNSPLASH_ACCESS_KEY. |
+| 49 | **"Salva le regole d'oro"** | In CLAUDE.md: realismo = asset, orchestrazione = codice; le hero belle sono immagini; una sezione per volta; loop visivo con gli occhi; vietati i pattern slop. |
+
 ## ⏳ ANCORA DA FARE
 
 ### Per Rivoglio (dal documento, rimandati di proposito)

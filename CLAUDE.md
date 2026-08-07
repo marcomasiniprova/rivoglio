@@ -3,13 +3,12 @@
 # Rivoglio — regole di progetto
 
 ## Cos'è e qual è l'obiettivo
-**PIVOT del 07/08 (sera): il prodotto si sta ridefinendo.** Valerio ha trovato
-concorrenti più grandi sulla stessa idea e ha chiuso l'idea viaggi. Il nome
-nuovo è **Rivoglio**; cosa fa il prodotto lo definisce lui a breve. Restano
-IDENTICI: la struttura (landing Next + app mobile Expo + Supabase + motore),
-il modo di lavorare e tutto il codice. Cambia cosa costruiamo, non come.
-La descrizione vecchia (micro-vacanze sotto budget, crediti, 1 credito =
-1 destinazione) resta l'impianto tecnico finché non arriva la nuova.
+**Rivoglio è lo scanner dei rimborsi aerei (Reg. CE 261/2004)**, definito
+dal documento di Valerio del 07/08 e COSTRUITO: check gratuito sul web,
+verdetto a tre stati dal motore deterministico (l'AI non decide MAI),
+pratica 14,90 / famiglia 24,90 con Polar, lettera pronta che l'utente
+invia da sé (non siamo intermediari), garanzia 90 giorni, admin in shadow
+mode. Online: **rivoglio.netlify.app**. L'idea viaggi è morta il 07/08.
 **Obiettivo di Valerio: fare cassa entro ottobre 2026.** Ogni scelta si
 giudica così: avvicina il primo utente pagante?
 Mappa: `PIANO.md`. Arretrati: `ARRETRATI.md`. Cosa costruiamo: `SPEC.md`.
@@ -47,6 +46,29 @@ zero superlativi. **MAI il trattino lungo (—): è il segno più riconoscibile 
 testo scritto da un'AI.** Usa punti e virgole. Ogni numero mostrato dev'essere
 apribile: **la trasparenza è il prodotto.** Marchio per esteso: Rivoglio.
 Tagline: *La tua fuga, al prezzo giusto.*
+
+## Come si costruisce l'interfaccia (regole d'oro dell'8/08)
+- **Skill `art-director` SEMPRE** per ogni superficie visiva; con
+  un'immagine di riferimento allegata è OBBLIGATORIA, fase per fase
+  (intervista → scomposizione → asset → piano → una sezione → loop visivo).
+- **Regola d'oro:** se l'effetto richiede realismo (luce, materiali,
+  profondità) è un **ASSET**; se richiede orchestrazione (timing,
+  sequenza, reazione) è **CODICE**.
+- **Le hero belle sono immagini, non codice.** Procura gli asset prima:
+  senza asset non si arriva al livello dei riferimenti, mai.
+- **Una sezione per volta.** "Fammi la landing" in un colpo produce slop.
+- **Gli occhi:** dev server + screenshot Playwright (1440 e 390), confronto
+  col riferimento, minimo 5 giri. Le sezioni whileInView vanno scrollate
+  piano e attese 2s prima dello scatto.
+- Vietati i pattern slop: la lista è nella skill, vale sempre.
+
+## ASSET
+Per generare immagini usa `scripts/gen-asset.ts` (`npm run asset`):
+Gemini per le scene, `--unsplash` per le foto reali. Chiavi
+GEMINI_API_KEY e UNSPLASH_ACCESS_KEY in `.env.development.local`
+(qui `.env.local` è rotto, vedi STATO). Output sempre in
+`/public/assets/`, WebP, max 1MB. **Prima di generare, mostra il prompt
+a Valerio e aspetta l'ok.**
 
 ## Stack (fissato)
 Next 16 + React 19 + Tailwind 4 + **Motion** su **Netlify** · **Supabase** ·

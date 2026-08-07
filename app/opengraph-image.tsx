@@ -46,7 +46,6 @@ export default async function Anteprima() {
               background: "#fff",
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={segno} alt="" width={46} height={46} />
           </div>
           <span style={{ color: "#fff", fontSize: 32, fontWeight: 600 }}>
