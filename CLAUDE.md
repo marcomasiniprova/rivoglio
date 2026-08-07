@@ -29,6 +29,33 @@ Scelte chiuse: `DECISIONI.md`. Marchio: `BRAND.md`. Social: `CONTENUTI.md`.
 - **Copia i migliori.** Prima di inventare guarda i concorrenti e le app grandi.
 - **Trattalo come se fosse tuo**, non come un compito da consegnare.
 
+## PROTOCOLLO CONTESTO
+*Io segnalo i reset del contesto: Valerio non se ne accorge da solo.*
+
+0. **Metodo:** batch di TUTTI i fix, poi UN solo verify alla fine (mai
+   fix → verify → fix → verify: raddoppia i tempi morti). Per trovare
+   un punto nel codice: `rg`, non leggere file interi. Schermate solo
+   alla consegna, non a ogni ritocco.
+1. Dopo ogni task completato E verificato E committato, chiudo la
+   risposta con esattamente:
+   --- CHECKPOINT: task chiuso. Consigliato /clear. Prossimo task? ---
+2. Se Valerio chiede qualcosa che non c'entra col task corrente (file
+   diversi, layer diverso, feature diversa), NON inizio. Rispondo solo:
+   "Questo è un task nuovo. /clear prima, poi ripeti la richiesta."
+3. Se noto uno di questi sintomi, mi fermo e lo segnalo:
+   - sto per rileggere un file già letto in questa sessione
+   - sto riproponendo un approccio già scartato
+   - sto richiedendo un'informazione già data
+   - un fix richiede più di 3 tentativi
+   Output: --- SINTOMO DEGRADO: [quale]. Consigliato /compact ---
+4. Prima di ogni /clear che consiglio, aggiorno HANDOFF.md con: stato
+   attuale, decisioni prese, file toccati, cosa resta da fare. Poi
+   dico che l'ho scritto.
+5. Distinzione: /compact <focus> = stesso task, sessione lunga, la
+   storia serve ancora. /clear = task chiuso o pivot totale.
+6. Un task = una unità committabile. "Costruire la SaaS" NON è un
+   task. "Fixare il salvataggio iscritti" è un task.
+
 ## Le 6 regole
 1. **Prova o non è fatto.** Output reale: comando rieseguito o schermata
    guardata. `npm run verify` deve passare prima di dire finito.
@@ -45,21 +72,22 @@ Dai del tu, ma **professionale, non da amici al bar**. Frasi corte, zero gergo,
 zero superlativi. **MAI il trattino lungo (—): è il segno più riconoscibile del
 testo scritto da un'AI.** Usa punti e virgole. Ogni numero mostrato dev'essere
 apribile: **la trasparenza è il prodotto.** Marchio per esteso: Rivoglio.
-Tagline: *La tua fuga, al prezzo giusto.*
+Tagline: *Riprenditi i soldi che ti devono.*
 
 ## Come si costruisce l'interfaccia (regole d'oro dell'8/08)
 - **Skill `art-director` SEMPRE** per ogni superficie visiva; con
   un'immagine di riferimento allegata è OBBLIGATORIA, fase per fase
-  (intervista → scomposizione → asset → piano → una sezione → loop visivo).
+  (intervista → scomposizione → asset → piano → una sezione → giro visivo).
 - **Regola d'oro:** se l'effetto richiede realismo (luce, materiali,
   profondità) è un **ASSET**; se richiede orchestrazione (timing,
   sequenza, reazione) è **CODICE**.
 - **Le hero belle sono immagini, non codice.** Procura gli asset prima:
   senza asset non si arriva al livello dei riferimenti, mai.
 - **Una sezione per volta.** "Fammi la landing" in un colpo produce slop.
-- **Gli occhi:** dev server + screenshot Playwright (1440 e 390), confronto
-  col riferimento, minimo 5 giri. Le sezioni whileInView vanno scrollate
-  piano e attese 2s prima dello scatto.
+- **Gli occhi:** UN giro in batch alla consegna: schermate Playwright
+  (1440 e 390), elenco dei difetti, fix tutti insieme, UNA controprova.
+  Le sezioni whileInView vanno scrollate piano e attese 2s prima dello
+  scatto.
 - Vietati i pattern slop: la lista è nella skill, vale sempre.
 
 ## ASSET

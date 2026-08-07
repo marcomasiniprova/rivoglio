@@ -138,13 +138,14 @@ Non hai finito quando il codice compila. Hai finito quando il render regge.
 ```
 1. Avvia il dev server
 2. Screenshot con Playwright MCP (1440px desktop E 390px mobile)
-3. GUARDA lo screenshot accanto al riferimento
-4. Elenca i 5 difetti visivi peggiori, in ordine di gravità
-5. Correggili
-6. Ripeti dal punto 2
+3. GUARDA gli screenshot accanto al riferimento
+4. Elenca TUTTI i difetti visivi, in ordine di gravità
+5. Correggili TUTTI in un solo batch
+6. UNA controprova (screenshot finali). Poi fermati.
 
-MINIMO 5 GIRI COMPLETI. Non fermarti prima.
-Non chiedere niente all'utente durante il loop: vai fino in fondo.
+UN giro solo, in batch: il fix -> schermata -> fix a ripetizione è il
+pattern più costoso che esista (bandito da Valerio l'8/08).
+Non chiedere niente all'utente durante il giro: vai fino in fondo.
 ```
 
 A ogni giro, valuta su questi 8 assi (0-10) e **mostra la tabella**:
@@ -160,7 +161,7 @@ A ogni giro, valuta su questi 8 assi (0-10) e **mostra la tabella**:
 | Movimento | serve al contenuto o è decorazione? |
 | Aderenza al riferimento | quanto ci somiglia davvero? |
 
-Se un asse resta sotto 7 dopo 5 giri: **dillo apertamente all'utente**, spiega perché, proponi cosa serve per risolverlo (di solito: un asset migliore, non più codice).
+Se un asse resta sotto 7 dopo la controprova: **dillo apertamente all'utente**, spiega perché, proponi cosa serve per risolverlo (di solito: un asset migliore, non più codice).
 
 ---
 
@@ -210,5 +211,5 @@ Poi fermati e aspetta.
 
 Prima di consegnare, guarda il render e **togli una cosa**. Quasi sempre migliora.
 
-E ricorda l'ordine dei fattori: **prima l'intervista, poi gli asset, poi il codice, poi il loop visivo.**
+E ricorda l'ordine dei fattori: **prima l'intervista, poi gli asset, poi il codice, poi il giro visivo in batch.**
 Saltare uno di questi quattro passaggi è l'unico modo garantito di produrre una brutta copia.
