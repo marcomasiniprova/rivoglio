@@ -36,6 +36,21 @@ function spezzaTitolo(titolo: string, taglio: string): [string, string] {
   return [titolo.slice(0, i).trimEnd(), titolo.slice(i)];
 }
 
+/**
+ * I confini del campo data rispecchiano quelli del server
+ * (lib/voli/normalizza.ts): fino a domani, indietro di 6 anni.
+ * Calcolati al caricamento del modulo: il giudizio vero resta al server,
+ * qui servono solo a non far scegliere date assurde dal calendario.
+ */
+function confiniData(): { minData: string; maxData: string } {
+  const giorno = 24 * 60 * 60 * 1000;
+  const max = new Date(Date.now() + giorno).toISOString().slice(0, 10);
+  const min = new Date();
+  min.setUTCFullYear(min.getUTCFullYear() - 6);
+  return { minData: min.toISOString().slice(0, 10), maxData: max };
+}
+const { minData, maxData } = confiniData();
+
 export default function HeroCheck() {
   const router = useRouter();
   const [volo, setVolo] = useState("");
@@ -47,16 +62,6 @@ export default function HeroCheck() {
 
   const [titoloPrima, titoloCorsivo] = spezzaTitolo(HERO.titolo, "negli ultimi");
   const [notaAperta, setNotaAperta] = useState<"importo" | "finestra" | null>(null);
-
-  /* I confini del campo data rispecchiano quelli del server
-     (lib/voli/normalizza.ts): fino a domani, indietro di 6 anni. */
-  const { minData, maxData } = useMemo(() => {
-    const giorno = 24 * 60 * 60 * 1000;
-    const max = new Date(Date.now() + giorno).toISOString().slice(0, 10);
-    const min = new Date();
-    min.setUTCFullYear(min.getUTCFullYear() - 6);
-    return { minData: min.toISOString().slice(0, 10), maxData: max };
-  }, []);
 
   async function invia(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
