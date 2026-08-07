@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowRight, FileText, Plane } from "lucide-react";
+import CheckRapido from "@/components/app/CheckRapido";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
@@ -50,12 +50,33 @@ function classiStato(stato: StatoPratica): string {
 }
 
 export default async function PaginaPratiche() {
-  /* Il layout reindirizza già chi non è collegato, ma React costruisce layout
-     e pagina insieme: senza questo controllo la pagina interroga Supabase lo
-     stesso e riempie i log di errori che poi nascondono quelli veri. */
-  if (!SUPABASE_CONFIGURATO) redirect("/entra");
-  const utente = await utenteCollegato();
-  if (!utente) redirect("/entra");
+  /* Dall'8/08 la web app è aperta a tutti (decisione di Valerio): chi
+     arriva senza account trova il check, libero e illimitato. L'elenco
+     pratiche resta solo per chi è collegato (la RLS fa il resto). */
+  const utente = SUPABASE_CONFIGURATO ? await utenteCollegato() : null;
+  if (!utente) {
+    const O = COPY.appOspite;
+    return (
+      <div className="flex flex-col gap-8">
+        <div>
+          <h1 className="font-display text-[2.3rem] leading-none tracking-[-0.04em] sm:text-[2.8rem]">
+            {O.titolo}
+          </h1>
+          <p className="mt-3 max-w-xl text-[0.98rem] leading-relaxed text-fumo">{O.testo}</p>
+        </div>
+        <CheckRapido />
+        <p className="text-sm leading-relaxed text-fumo">
+          {O.nota}{" "}
+          <Link
+            href="/entra?poi=/app"
+            className="font-medium text-verde hover:text-verde-scuro"
+          >
+            {O.entra}
+          </Link>
+        </p>
+      </div>
+    );
+  }
 
   const supabase = await supabaseServer();
   const { data, error } = await supabase

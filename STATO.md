@@ -43,8 +43,20 @@ social rifatta (era rimasta al prodotto viaggi).
   Il `rivoglioo.netlify.app` di Valerio è su un ALTRO account Netlify,
   fuori dal connettore e senza le 5 variabili: da dismettere o aggiornare
   a mano, il sito buono è rivoglio.netlify.app.
-- **Mobile**: pivot minimo fatto (tab Pratiche); il tracker completo arriva
-  dopo che il web incassa (il documento è chiaro: l'app non è la porta).
+- **La web app è APERTA A TUTTI dall'8/08** (decisione di Valerio, ribaltata
+  la scelta del pivot): `/app` senza account col check libero (CheckRapido),
+  link "Entra" in nav e "La web app" nel footer. `/admin` resta chiuso.
+- **Mobile**: pivot minimo fatto (tab Pratiche); **l'onboarding è ancora al
+  prodotto viaggi** (visto con l'anteprima web dell'8/08, da rifare col
+  tracker). Per vederla su iPhone: da maggio 2026 l'Expo Go dell'App Store
+  è fermo all'SDK 54 (noi 57), quindi anteprima web (`npx expo start --web`
+  dal PC) oppure TestFlight con l'account Apple Developer.
+- **Chiavi**: GEMINI_API_KEY e FIGMA_API_KEY in `.env.development.local`.
+  Gemini: rete e chiave ok ma quota immagini 0 sul piano gratuito, serve
+  la fatturazione su Google AI Studio. Manca UNSPLASH_ACCESS_KEY.
+- **Il connettore Netlify si è scollegato di nuovo**: per il prossimo
+  deploy va riautorizzato su claude.ai (le modifiche dell'8/08 sera sono
+  pushate ma NON ancora online).
 
 ## Serve Valerio (in ordine, il primo è l'unico rischio tecnico)
 1. **Chiave AeroDataBox** (RapidAPI, piano Pro ~5$) e la prova delle 2 ore:

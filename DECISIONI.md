@@ -115,8 +115,8 @@ decise insieme al pivot:
 
 | Decisione | Perché / dettagli |
 |---|---|
-| **La landing non porta più all'app web.** Ogni CTA va alla lista d'attesa, i badge store restano "Presto su". | Richiesta esplicita di Valerio. La landing vende l'app in arrivo e raccoglie email. |
-| **La web app resta viva ma non linkata**: serve il pannello `/admin` per verificare le offerte. Il motore server (raccolta, abbinamento, invio) resta dov'è. | Il backend non cambia: cambia la superficie utente. |
+| ~~**La landing non porta più all'app web.**~~ **[RIBALTATA da Valerio l'8/08]**: la web app torna linkata dal sito (voce "Entra" in nav, "La web app" nel footer) e `/app` è aperta a TUTTI senza account, col check libero e illimitato; l'elenco pratiche appare solo da collegati. Niente redirect verso la home o verso /entra. | Richiesta esplicita di Valerio dell'8/08: "rimettila accessibile dal sito, ognuno quante analisi vuole". |
+| **La web app resta viva**: serve il pannello `/admin` (che resta chiuso da login) e il tracker delle pratiche. Il motore server (raccolta, abbinamento, invio) resta dov'è. | Il backend non cambia: cambia la superficie utente. |
 | **Framework: Expo SDK 57 (React Native) + expo-router + supabase-js.** | Ricerca del 07/08 con fonti: si riusa il TypeScript e il Supabase già scritti, EAS compila per iOS senza Mac (30 build/mese gratis), notifiche native con expo-notifications. Flutter = riscrivere tutto in Dart senza benefici per questo caso. In `mobile/PROGETTO.md` i contratti. |
 | **Niente NativeWind**: stile con StyleSheet e token in `mobile/src/lib/tema.ts`, stessi valori del sito. | NativeWind stabile vuole Tailwind 3, il sito usa la 4: la configurazione non si condivide comunque. Meno pezzi mobili. |
 | **Le notifiche push native sostituiscono Telegram come canale principale.** Bot Telegram rimandato (scelta di Valerio: "per adesso no"). | Il motivo per cui esisteva Telegram (l'iPhone non riceve push web) sparisce con l'app nativa. |

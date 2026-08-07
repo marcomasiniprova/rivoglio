@@ -111,9 +111,20 @@ non altro codice.**
 | 48 | **"Scrivi gen-asset.ts"** | `scripts/gen-asset.ts` + `npm run asset`: Gemini per le scene, Unsplash per le foto (col credito), WebP sotto 1MB in `/public/assets/`. Servono GEMINI_API_KEY e UNSPLASH_ACCESS_KEY. |
 | 49 | **"Salva le regole d'oro"** | In CLAUDE.md: realismo = asset, orchestrazione = codice; le hero belle sono immagini; una sezione per volta; loop visivo con gli occhi; vietati i pattern slop. |
 
+## ✅ CHIUSI l'8/08 — nono giro: chiavi, web app aperta, anteprima mobile
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 50 | **Chiavi Gemini e Figma** | Salvate in `.env.development.local` (non tracciato). Provata la filiera Gemini dal vivo: la rete passa e la chiave è valida, ma il modello immagini ha **quota 0 sul piano gratuito**: per generare asset va attivata la fatturazione su Google AI Studio. Figma pronta per l'MCP (variabile FIGMA_API_KEY). |
+| 51 | **"Rimetti la web app accessibile e togli il redirect"** | Decisione ribaltata e registrata in DECISIONI: `/app` aperta a TUTTI senza account, col check libero e illimitato (componente nuovo `CheckRapido`); l'elenco pratiche appare solo da collegati; `/admin` resta chiuso. Link "Entra" in nav e "La web app" nel footer. Prove aggiornate: 20/20. |
+| 52 | **"Voglio vedere la app mobile da iPhone"** | Anteprima web dell'app Expo esportata e fotografata (funziona). Scoperta onesta: **l'onboarding mobile è ancora al prodotto viaggi** ("La tua fuga, al prezzo giusto"): il pivot mobile era solo le tab. E da maggio 2026 l'Expo Go dell'App Store è fermo all'SDK 54 (noi siamo su 57): su iPhone la via nativa è TestFlight con l'account Apple Developer, oppure l'anteprima web. |
+
 ## ⏳ ANCORA DA FARE
 
 ### Per Rivoglio (dal documento, rimandati di proposito)
+- **Onboarding dell'app mobile ancora al prodotto viaggi**: va riscritto
+  per Rivoglio (check del volo, non micro-vacanze). Scoperto l'8/08 con
+  l'anteprima web. Si fa insieme al tracker mobile completo.
 - **Golden set da 25 a 100+ casi** man mano che passano voli veri (il
   documento chiede di arricchirlo con casi reali etichettati a mano).
 - **Tracker mobile completo** (oggi tab minima): dopo i primi incassi web.

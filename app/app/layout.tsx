@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 import { LogOut } from "lucide-react";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -9,32 +9,44 @@ import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { COPY } from "@/lib/copy";
 
 /**
- * La cornice dell'area riservata: marchio, uscita, e in mezzo le pratiche.
- * Niente contatori: qui non c'è nulla da consumare, solo pratiche da seguire.
+ * La cornice della web app: marchio, uscita (o ingresso), in mezzo il check
+ * e le pratiche. Dall'8/08 la pagina è APERTA anche a chi non è collegato
+ * (decisione di Valerio): niente redirect, chi entra senza account trova
+ * il check libero; l'elenco pratiche appare solo da collegati.
  */
 export const metadata: Metadata = {
-  title: "Le tue pratiche | Rivoglio",
+  title: "La web app | Rivoglio",
   robots: { index: false },
 };
 
 export default async function LayoutApp({ children }: LayoutProps<"/app">) {
-  // Il proxy già respinge chi non è collegato. Questo è il secondo
-  // controllo: se un giorno il matcher cambia, l'area resta chiusa lo stesso.
-  if (!SUPABASE_CONFIGURATO) redirect("/entra");
-  const utente = await utenteCollegato();
-  if (!utente) redirect("/entra");
+  const utente = SUPABASE_CONFIGURATO ? await utenteCollegato() : null;
 
   return (
     <div className="flex min-h-dvh flex-col bg-nebbia">
       <header className="sticky top-0 z-40 border-b border-bordo bg-white/85 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5 sm:px-8">
           <Logo />
-          <form action={esci}>
-            <Button type="submit" variant="fantasma" size="sm" title={COPY.pratica.testata.esci}>
-              <LogOut className="size-4" aria-hidden="true" />
-              {COPY.pratica.testata.esci}
-            </Button>
-          </form>
+          {utente ? (
+            <form action={esci}>
+              <Button
+                type="submit"
+                variant="fantasma"
+                size="sm"
+                title={COPY.pratica.testata.esci}
+              >
+                <LogOut className="size-4" aria-hidden="true" />
+                {COPY.pratica.testata.esci}
+              </Button>
+            </form>
+          ) : (
+            <Link
+              href="/entra?poi=/app"
+              className="text-[14px] font-medium text-verde transition-colors hover:text-verde-scuro"
+            >
+              {COPY.nav.entra}
+            </Link>
+          )}
         </div>
       </header>
 

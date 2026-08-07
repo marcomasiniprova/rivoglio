@@ -13,11 +13,24 @@ import { COPY } from "../lib/copy";
  */
 
 test.describe("Accesso", () => {
-  test("l'area riservata non si apre senza login", async ({ page }) => {
+  test("la web app senza login mostra il check libero, non un redirect", async ({
+    page,
+  }) => {
+    // decisione dell'8/08: /app è aperta a tutti, quante analisi si vogliono
     await page.goto("/app");
-    // deve finire sulla pagina di accesso, non mostrare le pratiche
+    await expect(page).toHaveURL(/\/app/);
+    await expect(
+      page.getByRole("heading", { name: COPY.appOspite.titolo }),
+    ).toBeVisible();
+    await expect(page.getByLabel(COPY.hero.form.volo.etichetta)).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: COPY.hero.form.bottone }),
+    ).toBeVisible();
+  });
+
+  test("l'admin resta chiuso senza login", async ({ page }) => {
+    await page.goto("/admin");
     await expect(page).toHaveURL(/\/entra/);
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
   test("la pagina di accesso mostra il modulo giusto", async ({ page }) => {
@@ -74,12 +87,12 @@ test.describe("Accesso", () => {
     await expect(page.getByLabel(COPY.hero.form.volo.etichetta).first()).toBeVisible();
   });
 
-  test("la landing non ha nessun collegamento all'area riservata", async ({ page }) => {
-    // Il funnel non chiede mai un account prima del reveal (SPEC §3):
-    // dalla landing non si deve poter arrivare né a /entra né a /app.
-    // Le pagine esistono, ma servono a chi ha già una pratica.
+  test("la landing porta alla web app (decisione dell'8/08)", async ({ page }) => {
+    // Valerio l'8/08 ha ribaltato la scelta di prima: la web app va
+    // linkata dal sito. In nav c'è "Entra" verso /app, nel footer la
+    // voce "La web app". Il check resta comunque senza account.
     await page.goto("/");
-    await expect(page.locator('a[href^="/entra"]')).toHaveCount(0);
-    await expect(page.locator('a[href^="/app"]')).toHaveCount(0);
+    await expect(page.locator('header a[href="/app"]').first()).toBeVisible();
+    await expect(page.locator('footer a[href="/app"]').first()).toHaveCount(1);
   });
 });

@@ -44,6 +44,17 @@ export const COPY = {
       { testo: "Domande", ancora: "#domande" },
     ],
     cta: "Controlla il tuo volo",
+    entra: "Entra",
+  },
+
+  /** La web app per chi arriva senza account (decisione dell'8/08:
+      accessibile a tutti, quante analisi si vogliono). */
+  appOspite: {
+    titolo: "Controlla un volo",
+    testo:
+      "Gratis, senza account, tutte le volte che vuoi. Se il volo è idoneo, dal risultato apri la pratica.",
+    entra: "Hai già una pratica? Entra",
+    nota: "Con un account le tue pratiche restano qui, pronte da seguire.",
   },
 
   hero: {
@@ -690,6 +701,7 @@ export const COPY = {
         titolo: "Prodotto",
         voci: [
           { testo: "Il check gratuito", ancora: "#controllo" },
+          { testo: "La web app", ancora: "/app" },
           { testo: "Come funziona", ancora: "#come-funziona" },
           { testo: "Prezzi", ancora: "#prezzi" },
           { testo: "Osservatorio", ancora: "#osservatorio" },

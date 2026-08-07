@@ -24,7 +24,14 @@ export default function Nav() {
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {/* la porta della web app: dall'8/08 è di nuovo linkata dal sito */}
+          <a
+            href="/app"
+            className="px-1 text-[14px] font-medium text-fumo transition-colors hover:text-inchiostro"
+          >
+            {COPY.nav.entra}
+          </a>
           <a
             href="#controllo"
             className="riflesso group inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-bottone bg-verde px-4 py-2.5 text-[13.5px] font-medium text-white shadow-[0_10px_24px_-10px_rgba(6,122,70,.7),0_1px_0_0_rgba(255,255,255,.22)_inset] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro sm:px-5 sm:py-3 sm:text-[14.5px]"

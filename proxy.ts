@@ -2,8 +2,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { CHIAVE_PUBBLICA, SUPABASE_CONFIGURATO, URL_SUPABASE } from "@/lib/supabase/chiavi";
 
-/** Pagine che esistono solo per chi è collegato. */
-const RISERVATE = ["/app", "/admin"];
+/** Pagine che esistono solo per chi è collegato. La web app (/app) NON
+ * è più qui: dall'8/08 il check è aperto a tutti (decisione di Valerio),
+ * la pagina mostra da sola l'elenco pratiche a chi è collegato. */
+const RISERVATE = ["/admin"];
 
 /**
  * Fa due cose a ogni richiesta:
