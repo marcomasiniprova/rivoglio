@@ -43,7 +43,7 @@ export default function FaqRivoglio() {
                     </svg>
                   </span>
                 </summary>
-                <p className="mt-3 max-w-2xl pr-12 text-[15.5px] leading-relaxed text-fumo">
+                <p className="faq-risposta mt-3 max-w-2xl pr-12 text-[15.5px] leading-relaxed text-fumo">
                   {q.risposta}
                 </p>
               </details>

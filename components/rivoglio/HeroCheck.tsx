@@ -143,6 +143,8 @@ export default function HeroCheck() {
       await attesa(700);
       setPasso(2);
       await attesa(700);
+      /* il verdetto sa che la scansione c'è già stata qui */
+      sessionStorage.setItem("rivoglio-scan-fatto", "1");
       router.push(destinazione);
     } catch {
       setFase("campo");

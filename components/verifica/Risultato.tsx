@@ -2,7 +2,13 @@
 
 import { useEffect, useId, useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
-import { animate, useMotionValue, useReducedMotion } from "motion/react";
+import {
+  AnimatePresence,
+  animate,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+} from "motion/react";
 import { Anima } from "@/components/Anima";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -583,11 +589,98 @@ function NonIdoneo({ dati }: { dati: DatiVerifica }) {
 
 /* ============================================================ ingresso */
 
+/**
+ * La scansione d'apertura: la carta del volo attraversata dal raggio,
+ * poi il verdetto. Solo quando NON si arriva dal check della hero (lì
+ * la scansione c'è già stata: due teatri di fila sono una presa in giro).
+ * Il flag lo scrive chi lancia il check; qui si legge e si consuma.
+ * Con prefers-reduced-motion il verdetto appare subito.
+ */
+function ScansioneIngresso({ dati }: { dati: DatiVerifica }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="relative mx-auto max-w-md overflow-hidden rounded-2xl border border-bordo bg-white shadow-[0_24px_60px_-30px_rgba(5,46,31,0.35)]"
+    >
+      <div className="flex items-center justify-between border-b border-dashed border-bordo px-5 py-3">
+        <span className="font-display text-[16px] font-medium tracking-[-0.01em]">
+          {dati.volo}
+        </span>
+        <span className="numeri text-[13.5px] text-fumo">{dataIt(dati.dataVolo)}</span>
+      </div>
+      <div className="space-y-2.5 px-5 py-4">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex h-8 items-center rounded-lg bg-nebbia px-3">
+            <span
+              className="h-1.5 rounded-full bg-verde/30"
+              style={{ width: `${62 - i * 14}%` }}
+            />
+          </div>
+        ))}
+      </div>
+      <motion.div
+        className="pointer-events-none absolute inset-x-0 top-0 h-16"
+        style={{
+          background:
+            "linear-gradient(180deg, transparent, rgba(10,157,92,.16) 42%, rgba(10,157,92,.5) 50%, rgba(10,157,92,.16) 58%, transparent)",
+        }}
+        initial={{ y: "-100%" }}
+        animate={{ y: ["-100%", "420%"] }}
+        transition={{ duration: 0.62, repeat: 1, repeatType: "mirror", ease: "easeInOut" }}
+      />
+    </div>
+  );
+}
+
 export default function Risultato({ dati }: { dati: DatiVerifica }) {
+  /* true = scansione in corso; parte spenta e si accende SOLO se serve
+     (arrivo diretto, niente flag dal check, movimento non ridotto). */
+  const [scansione, setScansione] = useState(false);
+  useEffect(() => {
+    const dalCheck = sessionStorage.getItem("rivoglio-scan-fatto") === "1";
+    sessionStorage.removeItem("rivoglio-scan-fatto");
+    const fermo = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (dalCheck || fermo) return;
+    // la decisione vive SOLO nel browser (sessionStorage): partire spenti
+    // e accendersi dopo l'idratazione è il comportamento voluto, non un tic
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setScansione(true);
+    const t = setTimeout(() => setScansione(false), 1350);
+    return () => clearTimeout(t);
+  }, []);
+
   // Un "idoneo" senza importo non deve mai vendere: si tratta da incerto.
-  if (dati.esito === "idoneo" && dati.importo !== null) {
-    return <Idoneo dati={dati} importo={dati.importo} />;
-  }
-  if (dati.esito === "non_idoneo") return <NonIdoneo dati={dati} />;
-  return <Incerto dati={dati} />;
+  const verdetto =
+    dati.esito === "idoneo" && dati.importo !== null ? (
+      <Idoneo dati={dati} importo={dati.importo} />
+    ) : dati.esito === "non_idoneo" ? (
+      <NonIdoneo dati={dati} />
+    ) : (
+      <Incerto dati={dati} />
+    );
+
+  /* La scansione è un VELO sopra il verdetto, non un sostituto: il
+     verdetto resta montato da subito, così niente stato perso se uno
+     (o una prova) inizia a scrivere nel primo istante. */
+  return (
+    <div className="relative">
+      {verdetto}
+      <AnimatePresence>
+        {scansione && (
+          <motion.div
+            key="scansione"
+            className="absolute inset-0 z-20 bg-nebbia pt-10"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            <p className="mb-5 text-center text-[13px] font-medium uppercase tracking-[0.14em] text-fumo">
+              {COPY.comeFunziona.verifica.titolo}
+            </p>
+            <ScansioneIngresso dati={dati} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }

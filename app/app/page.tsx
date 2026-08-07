@@ -134,7 +134,7 @@ export default async function PaginaPratiche() {
         </div>
       ) : (
         <section className="flex flex-col gap-4">
-          {pratiche.map((p) => {
+          {pratiche.map((p, indice) => {
             const stato = COPY.pratica.stati[p.stato] ?? null;
             const volo = p.volo_id ? voli.get(p.volo_id) : undefined;
             const titolo = volo
@@ -145,7 +145,8 @@ export default async function PaginaPratiche() {
               <Link
                 key={p.id}
                 href={`/pratica/${p.id}`}
-                className="group block rounded-3xl border border-bordo bg-white px-6 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-verde/40 hover:shadow-[0_18px_36px_-24px_rgba(5,46,31,0.35)]"
+                style={{ "--n": indice } as React.CSSProperties}
+                className="pratica-entra group block rounded-3xl border border-bordo bg-white px-6 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-verde/40 hover:shadow-[0_18px_36px_-24px_rgba(5,46,31,0.35)]"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <span

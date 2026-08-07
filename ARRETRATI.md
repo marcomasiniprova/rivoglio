@@ -130,6 +130,13 @@ non altro codice.**
 | 57 | **"Ogni bottone animato e funzionante"** | Pressione fisica globale al click (scale 0.965) su tutti i bottoni del sito; "Entra" in nav ora è pillola di vetro; il sistema variants (pieno/scuro/vetro/contorno) c'era già e resta. "Esci" e i checkout NON erano rotti in codice: sul tuo rivoglioo statico le azioni server non esistono, sul progetto giusto funzionano. |
 | 58 | **"Testi grigi piccoli illeggibili"** | Alzati misura e contrasto dei peggiori: etichette e note del check (13→14,5px, da fumo-2 a fumo/inchiostro), crediti e disclaimer del footer (bianco dal 40-45% al 55-65%). |
 
+## ✅ CHIUSI l'8/08 — undicesimo giro: micro-animazioni alla Emil
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 59 | **Scanner anche sulla pagina del verdetto** | Arrivando con un link diretto la pagina si apre con la carta del volo scansionata dal raggio (1,3s), poi il reveal. Chi arriva dal check NON lo rivede (flag in sessione: due teatri di fila sono una presa in giro). Con reduced-motion si salta. |
+| 60 | **Giro Emil Kowalski di micro-animazioni** | Curve condivise registrate (--curva-fuori, --curva-dentro-fuori, dalle tabelle della skill animate). FAQ: la risposta entra scivolando (0,25s) e l'altezza si anima dove il browser lo sa fare. Card pratiche: ingresso in fila a 50ms. Tutto transform e opacity, tutto con la variante reduced-motion. |
+
 ## ⏳ ANCORA DA FARE
 
 ### Per Rivoglio (dal documento, rimandati di proposito)

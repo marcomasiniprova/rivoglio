@@ -14,11 +14,20 @@ export const contentType = "image/png";
 
 const E = COPY.datoOggettivo.esempio;
 
-/* Il segno nuovo (la lente): letto da disco, Next impacchetta l'asset. */
-const marchio = readFile(new URL("./marchio-og.png", import.meta.url));
+/* Il segno nuovo (la lente): letto da disco al momento, Next impacchetta
+   l'asset. Dentro la funzione e con ripiego: una promessa a livello di
+   modulo restava appesa nei contesti doppi del dev server. */
+async function leggiMarchio(): Promise<string | null> {
+  try {
+    const dati = await readFile(new URL("./marchio-og.png", import.meta.url));
+    return `data:image/png;base64,${dati.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
 
 export default async function Anteprima() {
-  const segno = `data:image/png;base64,${(await marchio).toString("base64")}`;
+  const segno = await leggiMarchio();
   return new ImageResponse(
     (
       <div
@@ -46,7 +55,7 @@ export default async function Anteprima() {
               background: "#fff",
             }}
           >
-            <img src={segno} alt="" width={46} height={46} />
+            {segno && <img src={segno} alt="" width={46} height={46} />}
           </div>
           <span style={{ color: "#fff", fontSize: 32, fontWeight: 600 }}>
             Rivo<span style={{ color: "#7fe8ae" }}>glio</span>

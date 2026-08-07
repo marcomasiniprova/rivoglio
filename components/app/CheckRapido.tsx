@@ -71,6 +71,8 @@ export default function CheckRapido() {
         setErrore(typeof dati.motivo === "string" ? dati.motivo : COPY.comune.erroreGenerico);
         return;
       }
+      /* il verdetto sa che la scansione c'è già stata qui */
+      sessionStorage.setItem("rivoglio-scan-fatto", "1");
       router.push(destinazione);
     } catch {
       setErrore(COPY.comune.erroreGenerico);
