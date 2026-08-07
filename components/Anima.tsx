@@ -94,7 +94,7 @@ export function Contatore({
   decimali = 0,
   prefisso = "",
   suffisso = "",
-  durata = 1600,
+  durata = 2600,
 }: {
   a: number;
   decimali?: number;
@@ -124,7 +124,7 @@ export function Contatore({
     const avanza = (ora: number) => {
       const t = Math.min((ora - inizio) / durata, 1);
       // stessa curva del resto del sito: parte veloce, si posa piano
-      setValore(a * (1 - Math.pow(1 - t, 3)));
+      setValore(a * (1 - Math.pow(1 - t, 5)));
       if (t < 1) frame = requestAnimationFrame(avanza);
     };
     frame = requestAnimationFrame(avanza);

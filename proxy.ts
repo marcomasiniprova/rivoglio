@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { CHIAVE_PUBBLICA, SUPABASE_CONFIGURATO, URL_SUPABASE } from "@/lib/supabase/chiavi";
 
 /** Pagine che esistono solo per chi è collegato. */
-const RISERVATE = ["/app"];
+const RISERVATE = ["/app", "/admin"];
 
 /**
  * Fa due cose a ogni richiesta:

@@ -15,8 +15,8 @@ export default function Testimonial() {
             Trasparenza
           </span>
 
-          <h2 className="mt-5 text-[clamp(1.9rem,4.4vw,2.8rem)]">
-            Qui non trovi recensioni.
+          <h2 className="luce-testo mt-5 text-[clamp(1.9rem,4.4vw,2.8rem)]">
+            Qui non trovi <span className="corsivo text-verde-scuro">recensioni.</span>
           </h2>
 
           <p className="mx-auto mt-5 max-w-lg text-[16.5px] leading-relaxed text-fumo">

@@ -63,7 +63,8 @@ test.describe("Accesso", () => {
     await page.goto("/");
     // il bottone grosso dell'hero, non uno dei tanti in fondo alla pagina
     await page.getByRole("link", { name: /Provalo con 3 destinazioni gratis/i }).click();
-    await expect(page).toHaveURL(/\/entra\?modo=registrati/);
+    // la prima compilazione di /entra in sviluppo può superare i 5s di default
+    await expect(page).toHaveURL(/\/entra\?modo=registrati/, { timeout: 20_000 });
     await expect(page.getByRole("heading", { name: /Crea il tuo account/i })).toBeVisible();
   });
 

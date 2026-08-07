@@ -49,14 +49,26 @@ non altro codice.**
 
 ---
 
-## ⏳ ANCORA DA FARE — l'app vera
+## ✅ CHIUSI il 07/08 — terzo giro
 
-- Motore che abbina offerte e ricerche (a lotti, limite 10s Netlify) ← **il prossimo pezzo**
-- Invio degli alert (Telegram, poi email)
-- Acquisto crediti con Polar
-- Pannello admin per caricare le offerte
-- Installabile sulla schermata Home (PWA + manifest)
-- Schermate vere dell'app dentro la landing (appena `.env.local` esiste)
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 18 | **Auth rotta ("link scaduto")** | Erano il rimbalzo di Supabase senza token + la lista redirect vuota. Sistemati entrambi, autoconferma accesa: registrazione immediata, provata dal vivo. |
+| 19 | **Email su Resend, non Supabase** | 8 email (benvenuto, conferma, link, ricerca, destinazione, crediti, ricevuta) + gancio Send Email. |
+| 20 | **Vocabolario italiano** | "alert" → **destinazione**, in 20 file: landing, app, email, prove. |
+| 21 | **Bottoni rettangolari + vetro** | Raggio 9px ovunque, vetro sui secondari, riflesso al passaggio. |
+| 22 | **Badge App Store / Google Play** | Nel footer, disegnati a mano, inerti con "Presto su" (un badge cliccabile verso il nulla è pratica ingannevole). |
+| 23 | **Corsivo + luce in tutte le sezioni** | 12 titoli col serif corsivo e ombre a due aloni. |
+| 24 | **Sfondo hero vivo** | Colonne a fisarmonica più ampie + faro di luce che le attraversa. Parallasse sulla foto di Manarola. |
+| 25 | **Google sign-in** | Bottone con la G ufficiale, flusso già collegato a /auth/conferma. Si accende con Client ID + Secret. |
+| 26 | **Il motore (blocco B)** | Raccolta Exa → anagrafe `strutture` → pannello `/admin` → abbinamento → **prima destinazione partita davvero** (Rimini, 147€, credito 3→2, rimborso provato sul fallimento). |
+
+## ⏳ ANCORA DA FARE
+
+- Cron in produzione per raccolta/abbinamento (endpoint pronti, serve MOTORE_SEGRETO su Netlify)
+- Bot Telegram (il codice c'è, manca TELEGRAM_BOT_TOKEN)
+- Acquisto crediti con Polar (serve partita IVA)
+- Schermate vere dell'app dentro la landing al posto del telefono disegnato
 
 ---
 

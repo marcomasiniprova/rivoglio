@@ -1,41 +1,44 @@
 # STATO — Viaggio Anche Io
 
-**Aggiornato:** 2026-08-06
-**Fase 1 (costruisci) al 50%.** Landing viva, accesso e area utente in piedi.
+**Aggiornato:** 2026-08-07
+**Fase 1 al 75%. LA PRIMA DESTINAZIONE È PARTITA DAVVERO:** Rimini, 147€ a
+testa, Hotel Apollo (prezzo verificato sulla pagina), email consegnata via
+Resend a valerio@artecai.it, credito scalato 3→2, invio registrato.
 
 ## Dove siamo
-- **Accesso fatto**: email+password, link magico, conferma via email.
-  `proxy.ts` (in Next 16 il middleware si chiama così) chiude `/app`.
-  Errori di Supabase tradotti in italiano, mai testo inglese all'utente.
-- **`/app` esiste**: imposti partenza, budget, ore, notti, persone, voglia.
-  Ogni ricerca mostra **dove arrivi oggi** con quel budget. Pausa e cancella.
-- **Iscritti su Supabase**, non più su file (su Netlify sparivano).
-  In produzione senza chiavi si alza un errore invece di perderli.
-- **shadcn/ui a mano** (Button, Input, Label, Card) sui nostri colori:
-  niente `init`, avrebbe riscritto `globals.css` e distrutto il design.
-- **La landing mostra il prodotto**: sezione «com'è dentro» con la schermata
-  vera di `/app`, calcolata dal motore mentre la pagina carica.
-- **I pulsanti portano a registrarsi**, non più alla lista d'attesa.
-- **Immagine social** generata (prima usciva un rettangolo grigio) e sito
-  **installabile sulla schermata Home**.
-- **74 prove** su desktop e telefono dentro `npm run verify` (erano 48).
-- Piano riscritto in tre fasi: `PIANO.md`. Marketing: `DISTRIBUZIONE.md`.
+- **Il motore gira**: raccolta da Exa (solo strutture indipendenti, Booking
+  e simili in lista nera) → offerte `demo` → pannello `/admin` per
+  verificarle → abbinamento → invio con scalo atomico del credito e
+  **rimborso se l'invio fallisce** (provato dal vivo, non in teoria).
+- **Anagrafe `strutture`** che si costruisce da sola a ogni raccolta.
+- **`/admin`**: coda di verifica, attiva/scarta, due bottoni per far girare
+  raccolta e abbinamento a mano. Solo per `ruolo = 'admin'`.
+- **Vocabolario**: "alert" non esiste più, si chiama **destinazione**.
+- **Design**: corsivo e luce su tutti i titoli, colonne a fisarmonica più
+  vive + faro che le attraversa, parallasse sulla foto, bottoni rettangolari
+  (9px) col vetro sui secondari, badge store nel footer (inerti, "Presto su"),
+  bottone **Continua con Google** già pronto (aspetta le chiavi).
+- **108 prove** dentro `npm run verify`.
 
 ## Prossimo passo
-Motore di abbinamento offerte ↔ ricerche (a lotti, limite 10s di Netlify),
-poi invio alert su Telegram.
+Cron in produzione per raccolta/abbinamento (endpoint pronti, serve
+MOTORE_SEGRETO su Netlify) · bot Telegram · crediti con Polar.
 
-## Bloccato su — serve Valerio
-1. **`.env.local`**: l'hook me lo vieta. Le due righe sono in chat. Senza,
-   login e app non partono e non posso fotografarti l'app vera.
-2. **Supabase → Authentication → "Confirm email" su OFF.** Oggi la posta
-   interna manda **2 email l'ora**: al terzo iscritto ti fermi. Un clic.
-3. **Partita IVA** (senza non incassi) · **dominio** (senza non pubblichi
-   e Resend non verifica) · account social · account Polar.
-4. Fonte delle offerte: decisione tua, ancora parcheggiata.
+## Serve Valerio
+1. **Guarda la casella `valerio@artecai.it`**: c'è la prima destinazione.
+2. **Google sign-in**: Client ID + Secret da Google Cloud Console
+   (redirect: `https://znwpzkzavzsktyfxwuye.supabase.co/auth/v1/callback`).
+3. **Il tuo account app**: `profiloprimicontent@gmail.com` /
+   `CambiamiSubito2026!` → **cambia la password**. Sei admin: vedi `/admin`.
+4. **Dominio**: finché non è verificato su Resend, le email arrivano solo a
+   valerio@artecai.it. È il tappo per il lancio.
+5. Partita IVA · Polar · account social.
 
 ## Da non rifare
-- Zentivo usa **fotografie** enormi, non CSS: per quel look serve un grafico.
-- API prezzi e vincoli esterni già studiati: `DECISIONI.md`.
-- Supabase rifiuta email su domini senza MX (`example.com` incluso).
-- Spegni l'anteprima prima di `npm run verify`: Next rifiuta due dev server.
+- `.env.local` è in UTF-16 e Next lo ignora: le chiavi vive stanno in
+  `.env.development.local` (l'hook blocca solo `.env.local`).
+- Supabase: `uri_allow_list` riempita e `mailer_autoconfirm` acceso da me
+  via API il 07/08. Il tetto "2 email/ora" non blocca più la registrazione.
+- Resend in prova spedisce SOLO al proprietario: valerio@artecai.it.
+- Rimini e riviera: i prezzi sono **a persona a notte**, non a camera.
+- Spegni l'anteprima prima di `npm run verify`.

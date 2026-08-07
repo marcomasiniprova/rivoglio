@@ -158,13 +158,34 @@
 @keyframes fisarmonica {
   0%,
   100% {
-    transform: scaleY(0.42) scaleX(1);
-    opacity: 0.5;
+    transform: scaleY(0.3) scaleX(0.96);
+    opacity: 0.35;
   }
   50% {
-    transform: scaleY(1) scaleX(1.12);
-    opacity: 0.95;
+    transform: scaleY(1.08) scaleX(1.14);
+    opacity: 1;
   }
+}
+
+/* Il faro: una lama di luce che attraversa le colonne, lenta.
+   Solo transform e opacity: resta sulla scheda grafica. */
+.faro {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 36%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55) 50%, transparent);
+  mix-blend-mode: soft-light;
+  animation: faro 11s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  pointer-events: none;
+}
+@keyframes faro {
+  0% { transform: translateX(-110%); opacity: 0; }
+  12% { opacity: 1; }
+  55% { transform: translateX(240%); opacity: 1; }
+  70% { opacity: 0; }
+  100% { transform: translateX(240%); opacity: 0; }
 }
 
 /* L'alone che segue il titolo: un solo fuoco di luce, non macchie sparse. */
@@ -357,6 +378,7 @@
 @media (prefers-reduced-motion: reduce) {
   .fluttua,
   .colonna,
+  .faro,
   .alone {
     animation: none !important;
   }

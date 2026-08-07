@@ -14,7 +14,7 @@ Ogni scelta si giudica così: avvicina il primo utente pagante o no?
   COSTRUISCI     →     DISTRIBUISCI      →     MANTIENI
   prodotto vero        traffico e vendite      utenti e crescita
 
-  ██████░░░░░░ 50%     ██░░░░░░░░░░ 15%        ░░░░░░░░░░░░ 0%
+  █████████░░░ 75%     ██░░░░░░░░░░ 15%        ░░░░░░░░░░░░ 0%
 ```
 
 Le fasi si **sovrappongono**: la distribuzione non aspetta che il prodotto sia
@@ -54,11 +54,11 @@ alert vero e può comprare crediti. End to end, senza che io tocchi niente.
 | Metti in pausa / riaccendi / cancelli una ricerca | ✅ |
 | Errori di Supabase tradotti in italiano | ✅ |
 | Contatore crediti in testa all'app | ✅ |
-| Motore che abbina offerte e ricerche (a lotti, limite 10s) | ⏳ |
-| Invio alert: Telegram, poi email | ⏳ |
+| Motore che abbina offerte e ricerche (a lotti, limite 10s) | ✅ **provato dal vivo il 07/08** |
+| Invio destinazioni: email fatto (Resend), Telegram pronto (manca il token del bot) | ✅/⏳ |
 | Acquisto crediti con Polar | ⏳ |
-| Pannello per caricare le offerte | ⏳ |
-| Installabile sulla schermata Home (PWA + manifest) | ⏳ |
+| Pannello `/admin`: verifica offerte, raccolta e abbinamento a mano | ✅ |
+| Installabile sulla schermata Home (PWA + manifest) | ✅ |
 
 ## 1.3 Da dove arrivano le offerte — ❓ **decisione tua, parcheggiata**
 

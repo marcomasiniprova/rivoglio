@@ -28,14 +28,14 @@ export default function DentroApp() {
   if (!esito.ok) return null;
 
   return (
-    <section id="dentro" className="px-5 py-24 sm:py-32">
-      <div className="mx-auto max-w-[1120px]">
+    <section id="dentro" className="px-5 py-28 sm:py-40">
+      <div className="mx-auto max-w-[1200px]">
         <Anima>
           <p className="text-[0.78rem] font-medium uppercase tracking-[0.2em] text-verde">
             Ecco com&apos;è dentro
           </p>
           <h2 className="mt-5 max-w-2xl font-display text-[2.3rem] leading-[1.05] tracking-[-0.04em] sm:text-[3.1rem]">
-            Non ti chiedo di fidarti. Ti faccio vedere lo schermo.
+            Non ti chiedo di fidarti. <span className="corsivo text-verde-scuro">Ti faccio vedere lo schermo.</span>
           </h2>
           <p className="mt-5 max-w-xl text-[1.02rem] leading-relaxed text-fumo">
             Questa è la schermata che vedi dopo l&apos;accesso. I tre posti qui sotto

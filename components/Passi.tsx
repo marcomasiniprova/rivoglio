@@ -25,13 +25,13 @@ const passi = [
 export default function Passi() {
   return (
     <section className="px-5 py-24 sm:px-8 sm:py-28">
-      <div className="mx-auto max-w-[1120px]">
+      <div className="mx-auto max-w-[1200px]">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,420px)_1fr] lg:gap-20">
           <Anima>
-            <h2 className="text-[clamp(2.1rem,5vw,3.3rem)]">
-              Attiva in tre
+            <h2 className="luce-testo text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.02]">
+              Attiva in
               <br />
-              minuti.
+              <span className="corsivo text-verde-scuro">tre minuti.</span>
             </h2>
             <p className="mt-5 text-[16.5px] leading-relaxed text-fumo">
               Nessuna app da installare, nessuna carta da lasciare. Le prime tre destinazioni sono

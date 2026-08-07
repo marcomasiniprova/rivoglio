@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Anima } from "./Anima";
+import Parallasse from "./Parallasse";
 
 /**
  * L'ultima cosa che si vede prima del footer.
@@ -20,12 +21,13 @@ export default function Invito() {
   return (
     <section className="px-4 pb-4 sm:px-6 sm:pb-6">
       <div className="relative mx-auto max-w-[1320px] overflow-hidden rounded-[1.75rem] sm:rounded-[2.5rem]">
-        {/* la fotografia */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url("${FOTO}")` }}
-        />
+        {/* la fotografia, con parallasse: si muove più piano dello scroll */}
+        <Parallasse className="absolute inset-0 overflow-hidden">
+          <div
+            className="h-full w-full bg-cover bg-center"
+            style={{ backgroundImage: `url("${FOTO}")` }}
+          />
+        </Parallasse>
         {/* Due veli, non uno. Il primo scurisce tutto, il secondo è un alone
             centrale sotto al testo. Con un velo solo il paragrafo cadeva
             sopra le case chiare della foto e scendeva sotto 4.5:1: si vedeva

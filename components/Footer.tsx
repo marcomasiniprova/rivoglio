@@ -84,7 +84,9 @@ const SOCIAL: Social[] = [
 
 export default function Footer() {
   return (
-    <footer className="mt-auto bg-verde-notte px-5 pt-20 text-white/70 sm:px-8">
+    <footer className="relative mt-auto bg-verde-notte px-5 pt-20 text-white/70 sm:px-8">
+      {/* la lama di luce che separa il footer dal resto */}
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(127,232,174,.55),transparent)]" />
       <div className="mx-auto max-w-[1240px]">
         <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div className="max-w-xs">
@@ -143,7 +145,7 @@ export default function Footer() {
 
           {COLONNE.map((c) => (
             <nav key={c.titolo} aria-label={c.titolo}>
-              <p className="text-[13px] font-medium uppercase tracking-[0.16em] text-white/40">
+              <p className="text-[13px] font-medium uppercase tracking-[0.16em] text-menta/50">
                 {c.titolo}
               </p>
               <ul className="mt-5 space-y-3">
@@ -151,7 +153,7 @@ export default function Footer() {
                   <li key={v.testo}>
                     <Link
                       href={v.href}
-                      className="text-[14.5px] transition-colors duration-200 hover:text-menta"
+                      className="inline-block text-[14.5px] transition-all duration-200 hover:translate-x-0.5 hover:text-menta"
                     >
                       {v.testo}
                     </Link>
@@ -163,7 +165,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-7 text-[13px] text-white/45 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Viaggio Anche Io</p>
+          <p>© {new Date().getFullYear()} Viaggio Anche Io · Fatto in Italia</p>
           <p className="max-w-2xl leading-relaxed">
             Segnaliamo offerte di terzi e non vendiamo viaggi: si prenota sul sito della
             struttura, con le sue condizioni. I costi di viaggio sono stime calcolate, non

@@ -97,6 +97,16 @@ mezzo. Conseguenza da tenere a mente: **serve un flusso costante di utenti
 nuovi**, perché sui vecchi non si può contare. Questo sposta peso sulla FASE 2
 e rende il blog quotidiano più importante dei video, non meno.
 
+## Chiuse il 07/08 — vocabolario e primo invio
+
+| Decisione | Perché |
+|---|---|
+| **"Alert" → "destinazione"**, ovunque. Scelta di Valerio. | "Alert" è gergo da centrale operativa. "Ottieni la tua prossima destinazione" è italiano vero. I "crediti" restano crediti. |
+| **Vetro sui bottoni secondari, pieno sul principale.** | Su fondo chiaro il vetro perde contrasto proprio dove serve cliccare. |
+| **Badge store solo nel footer, inerti, "Presto su".** | Un badge cliccabile verso un'app inesistente è pratica ingannevole (AGCM). |
+| **Le email di consegna vanno a `valerio@artecai.it`** finché il dominio non è verificato su Resend. | Resend in modalità prova spedisce solo al proprietario dell'account. Il login dell'app resta sul gmail. |
+| I prezzi della riviera romagnola sono **a persona a notte**, non a camera. | Verificato su Hotel Apollo: "€ 60,00 al giorno / persona". Il raccoglitore assume prezzo-camera: la verifica umana corregge. |
+
 ## Decisioni ancora aperte
 Vivono in `SPEC.md` → "Domande aperte". Appena chiuse, scendono qui.
 - Nessuna aperta al 07/08/2026.

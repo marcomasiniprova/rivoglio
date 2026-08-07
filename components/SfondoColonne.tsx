@@ -14,6 +14,8 @@ const QUANTE = 26;
 export default function SfondoColonne() {
   return (
     <div className="colonne" aria-hidden="true">
+      {/* la lama di luce che attraversa le colonne ogni 11 secondi */}
+      <span className="faro" />
       {Array.from({ length: QUANTE }, (_, i) => {
         // il centro respira più ampio e più lento: dà profondità
         const distanzaDalCentro = Math.abs(i - (QUANTE - 1) / 2) / ((QUANTE - 1) / 2);

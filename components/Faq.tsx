@@ -44,10 +44,10 @@ export default function Faq() {
     <section id="domande" className="px-5 py-24 sm:px-8 sm:py-28">
       <div className="mx-auto grid max-w-[1000px] gap-12 lg:grid-cols-[minmax(0,320px)_1fr] lg:gap-20">
         <Anima>
-          <h2 className="text-[clamp(2rem,4.4vw,2.9rem)]">
+          <h2 className="luce-testo text-[clamp(2rem,4.4vw,2.9rem)] leading-[1.02]">
             Le domande
             <br />
-            più frequenti.
+            <span className="corsivo text-verde-scuro">più frequenti.</span>
           </h2>
           <p className="mt-5 text-[15.5px] leading-relaxed text-fumo">
             Se manca la tua, scrivici e la aggiungiamo.

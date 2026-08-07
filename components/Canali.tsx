@@ -22,9 +22,9 @@ const fonti = [
 export default function Canali() {
   return (
     <section className="px-5 py-24 sm:px-8 sm:py-28">
-      <div className="mx-auto grid max-w-[1120px] gap-14 lg:grid-cols-2 lg:gap-20">
+      <div className="mx-auto grid max-w-[1200px] gap-14 lg:grid-cols-2 lg:gap-20">
         <Anima>
-          <h2 className="text-[clamp(1.9rem,4vw,2.7rem)]">Come ti arriva</h2>
+          <h2 className="luce-testo text-[clamp(1.9rem,4vw,2.7rem)]">Come ti <span className="corsivo text-verde-scuro">arriva</span></h2>
           <p className="mt-4 text-[16px] leading-relaxed text-fumo">
             Scegli tu il canale. Non c&apos;è nessuna app da scaricare: la notifica arriva
             dove sei già.
@@ -54,7 +54,7 @@ export default function Canali() {
         </Anima>
 
         <Anima ritardo={0.12}>
-          <h2 className="text-[clamp(1.9rem,4vw,2.7rem)]">Da dove arrivano i dati</h2>
+          <h2 className="luce-testo text-[clamp(1.9rem,4vw,2.7rem)]">Da dove arrivano <span className="corsivo text-verde-scuro">i dati</span></h2>
           <p className="mt-4 text-[16px] leading-relaxed text-fumo">
             Fonti pubbliche e verificabili. Nessun numero senza origine.
           </p>

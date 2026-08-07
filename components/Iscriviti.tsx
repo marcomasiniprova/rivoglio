@@ -35,16 +35,16 @@ export default function Iscriviti() {
 
   return (
     <section id="iscriviti" className="px-5 pb-28 pt-4 sm:px-8">
-      <div className="relative mx-auto max-w-[1120px] overflow-hidden rounded-[2rem] bg-verde-notte px-6 py-16 text-center text-white sm:px-14 sm:py-20">
+      <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-[2rem] bg-verde-notte px-6 py-20 text-center text-white sm:px-14 sm:py-28">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -bottom-40 left-1/2 h-[460px] w-[760px] -translate-x-1/2 rounded-full opacity-25 blur-[100px]"
-          style={{ background: "var(--color-menta)" }}
+          style={{ background: "var(--color-menta)", animation: "respiro 12s ease-in-out infinite" }}
         />
 
         <div className="relative">
-          <h2 className="text-[clamp(2.1rem,5vw,3.4rem)]">
-            Quest&apos;anno viaggi anche tu.
+          <h2 className="luce-testo-chiaro text-[clamp(2.1rem,5vw,3.4rem)] leading-[1.02]">
+            Quest&apos;anno viaggi <span className="corsivo text-menta">anche tu.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-md text-[16.5px] leading-relaxed text-white/65">
             Lascia la tua email: ti avviso appena apro le iscrizioni, e le prime 3

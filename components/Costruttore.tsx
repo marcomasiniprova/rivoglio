@@ -55,15 +55,15 @@ export default function Costruttore() {
 
   return (
     <section id="costruttore" className="px-5 py-24 sm:px-8 sm:py-28">
-      <div className="mx-auto max-w-[1120px]">
+      <div className="mx-auto max-w-[1200px]">
         <div className="mx-auto max-w-2xl text-center">
           <span className="inline-block rounded-pillola bg-menta-tenue px-3.5 py-1.5 text-[12.5px] font-medium text-verde-scuro">
             Provalo adesso, senza iscriverti
           </span>
-          <h2 className="mt-5 text-[clamp(2.1rem,5vw,3.3rem)]">
+          <h2 className="luce-testo mt-5 text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.02]">
             Dove arrivi
             <br />
-            con quello che hai.
+            <span className="corsivo text-verde-scuro">con quello che hai.</span>
           </h2>
           <p className="mx-auto mt-5 max-w-lg text-[16.5px] leading-relaxed text-fumo">
             Dimmi da dove parti e quanto puoi spendere. Ti dico dove ci arrivi davvero,

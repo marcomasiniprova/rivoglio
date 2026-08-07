@@ -13,7 +13,7 @@ const voci = [
 export default function Nav() {
   return (
     <div className="sticky top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
-      <header className="mx-auto flex h-[60px] max-w-[1120px] items-center justify-between gap-3 rounded-pillola border border-white/60 bg-white/60 pl-3 pr-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] sm:pl-6">
+      <header className="mx-auto flex h-[60px] max-w-[1200px] items-center justify-between gap-3 rounded-pillola border border-white/60 bg-white/60 pl-3 pr-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] sm:pl-6">
         <Logo />
 
         <nav className="hidden items-center gap-8 lg:flex">

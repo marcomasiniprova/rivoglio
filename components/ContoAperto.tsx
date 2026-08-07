@@ -19,16 +19,16 @@ export default function ContoAperto() {
 
   return (
     <section id="conto" className="px-5 py-24 sm:px-8 sm:py-28">
-      <div className="mx-auto max-w-[1120px] overflow-hidden rounded-[2rem] bg-verde-notte px-6 py-16 text-white sm:px-14">
+      <div className="mx-auto max-w-[1200px] overflow-hidden rounded-[2rem] bg-verde-notte px-6 py-16 text-white sm:px-14">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <Anima>
             <span className="inline-block rounded-pillola bg-white/10 px-3.5 py-1.5 text-[12.5px] font-medium text-menta">
               Il conto aperto
             </span>
-            <h2 className="mt-5 text-[clamp(2.1rem,5vw,3.3rem)]">
+            <h2 className="luce-testo mt-5 text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.02]">
               Ti faccio vedere
               <br />
-              come l&apos;ho calcolato.
+              <span className="corsivo text-verde-scuro">come l&apos;ho calcolato.</span>
             </h2>
             <p className="mt-6 max-w-lg text-[16.5px] leading-relaxed text-white/65">
               Chiunque può scrivere «offerta imperdibile». Io ti mostro il conto riga per

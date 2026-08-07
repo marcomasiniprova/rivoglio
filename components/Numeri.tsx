@@ -44,7 +44,7 @@ const numeri = [
 export default function Numeri() {
   return (
     <section className="px-5 py-24 sm:px-8 sm:py-28">
-      <div className="mx-auto max-w-[1120px]">
+      <div className="mx-auto max-w-[1200px]">
         <Anima className="mx-auto max-w-2xl text-center">
           <h2 className="text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.02]">
             Ogni numero
