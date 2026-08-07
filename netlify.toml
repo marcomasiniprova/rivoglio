@@ -1,0 +1,6 @@
+# Senza questo file, un deploy via API (zip) viene pubblicato com'è,
+# senza build: sorgenti serviti come statici e home 404 (successo il 7/08).
+# Con la build attiva Netlify riconosce Next e monta da solo il runtime.
+[build]
+  command = "npm run build"
+  publish = ".next"
