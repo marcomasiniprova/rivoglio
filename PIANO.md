@@ -60,7 +60,7 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | | Stato |
 |---|---|
 | Netlify: progetto `rivoglio` creato, variabili impostate, rivoglio.netlify.app | ✅ 07/08 via connettore |
-| Primo deploy di produzione | ⏳ **serve Valerio: riautorizzare il connettore Netlify su claude.ai** (si è scollegato; la sandbox non raggiunge Netlify e i link firmati del connettore scadono in minuti: filiera pronta e provata fino a Netlify) |
+| Primo deploy di produzione | ✅ 8/08: **https://rivoglio.netlify.app** (via workbench + connettore; netlify.toml con build e plugin Next). Il rivoglioo.netlify.app di Valerio è un altro account, senza variabili: da dismettere |
 | Polar: account aperto (Valerio) | ✅ · ⏳ prodotti, webhook, richiesta approvazione organizzazione (2 settimane, farla SUBITO) |
 | Chiavi su Netlify: SUPABASE_SECRET_KEY, RESEND_API_KEY, AERODATABOX, POLAR | ⏳ **serve Valerio** (le ha lui) |
 | Dominio di Rivoglio (slot Hostinger gratuito da configurare) | ⏳ **serve Valerio** |

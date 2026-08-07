@@ -32,13 +32,17 @@ social rifatta (era rimasta al prodotto viaggi).
   eventi + RLS) via Composio, come migrazione tracciata.
 - **SEO/GEO**: robots, sitemap, JSON-LD Organization+WebSite, llms.txt,
   canonical, metadata Rivoglio ovunque.
-- **Netlify**: progetto `rivoglio` creato via connettore, 5 variabili
-  impostate, rivoglio.netlify.app riservato. **Il primo deploy non è
-  partito**: la rete della sandbox blocca gli host Netlify, e la strada di
-  riserva (workbench Composio, provata fino a Netlify) si è fermata perché
-  il connettore Netlify si è scollegato a metà sessione e i suoi link
-  firmati scadono in pochi minuti. Riautorizzato il connettore, il deploy
-  è questione di minuti: la filiera è pronta e provata.
+- **ONLINE: https://rivoglio.netlify.app** (deploy dell'8/08 sera, con
+  logo nuovo, footer nuovo e fix). Filiera provata: zip del ramo da GitHub
+  scaricato sul workbench Composio (la sandbox blocca gli host Netlify),
+  client Netlify lanciato da lì con l'URL firmato del connettore. Servono
+  TUTTI E DUE i pezzi di `netlify.toml`: senza `[build]` l'upload viene
+  pubblicato com'è (sorgenti esposti, home 404); senza `[[plugins]]`
+  la build gira ma pubblica `.next` cruda senza server. Ora: 1 function
+  (Next.js Server Handler), sorgenti non esposti, API viva.
+  Il `rivoglioo.netlify.app` di Valerio è su un ALTRO account Netlify,
+  fuori dal connettore e senza le 5 variabili: da dismettere o aggiornare
+  a mano, il sito buono è rivoglio.netlify.app.
 - **Mobile**: pivot minimo fatto (tab Pratiche); il tracker completo arriva
   dopo che il web incassa (il documento è chiaro: l'app non è la porta).
 
@@ -48,9 +52,8 @@ social rifatta (era rimasta al prodotto viaggi).
 2. **Polar**: creare i 2 prodotti (pratica 14,90 · famiglia 24,90), darmi i
    checkout link e il segreto webhook; chiedere SUBITO l'approvazione
    dell'organizzazione (~2 settimane).
-3. **Netlify**: riautorizzare il connettore su claude.ai (si è scollegato:
-   serve per il primo deploy) e caricare le chiavi SUPABASE_SECRET_KEY e
-   RESEND_API_KEY (le hai tu).
+3. **Chiavi su Netlify** (progetto `rivoglio`): SUPABASE_SECRET_KEY e
+   RESEND_API_KEY (le hai tu). Senza, il sito gira ma admin ed email no.
 4. **Dominio** per Rivoglio (slot gratuito Hostinger da configurare) e
    account social `@rivoglio`.
 5. Legale su condizioni d'uso; commercialista sul regime fiscale (il
