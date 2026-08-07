@@ -1,6 +1,11 @@
 # Senza questo file, un deploy via API (zip) viene pubblicato com'è,
 # senza build: sorgenti serviti come statici e home 404 (successo il 7/08).
-# Con la build attiva Netlify riconosce Next e monta da solo il runtime.
+# E senza il plugin dichiarato, la build gira ma pubblica la cartella
+# .next cruda, senza il server: il plugin va nominato, non è automatico
+# sui deploy via zip.
 [build]
   command = "npm run build"
   publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
