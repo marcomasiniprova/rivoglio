@@ -27,7 +27,12 @@ impeccable, taste e seo. Tagline: *Riprenditi i soldi che ti devono.*
 - **SEO/GEO**: robots, sitemap, JSON-LD Organization+WebSite, llms.txt,
   canonical, metadata Rivoglio ovunque.
 - **Netlify**: progetto `rivoglio` creato via connettore, 5 variabili
-  impostate, rivoglio.netlify.app riservato. Deploy: vedi PIANO 1.3.
+  impostate, rivoglio.netlify.app riservato. **Il primo deploy non è
+  partito**: la rete della sandbox blocca gli host Netlify, e la strada di
+  riserva (workbench Composio, provata fino a Netlify) si è fermata perché
+  il connettore Netlify si è scollegato a metà sessione e i suoi link
+  firmati scadono in pochi minuti. Riautorizzato il connettore, il deploy
+  è questione di minuti: la filiera è pronta e provata.
 - **Mobile**: pivot minimo fatto (tab Pratiche); il tracker completo arriva
   dopo che il web incassa (il documento è chiaro: l'app non è la porta).
 
@@ -37,7 +42,9 @@ impeccable, taste e seo. Tagline: *Riprenditi i soldi che ti devono.*
 2. **Polar**: creare i 2 prodotti (pratica 14,90 · famiglia 24,90), darmi i
    checkout link e il segreto webhook; chiedere SUBITO l'approvazione
    dell'organizzazione (~2 settimane).
-3. **Chiavi su Netlify**: SUPABASE_SECRET_KEY, RESEND_API_KEY (le hai tu).
+3. **Netlify**: riautorizzare il connettore su claude.ai (si è scollegato:
+   serve per il primo deploy) e caricare le chiavi SUPABASE_SECRET_KEY e
+   RESEND_API_KEY (le hai tu).
 4. **Dominio** per Rivoglio (slot gratuito Hostinger da configurare) e
    account social `@rivoglio`.
 5. Legale su condizioni d'uso; commercialista sul regime fiscale (il
