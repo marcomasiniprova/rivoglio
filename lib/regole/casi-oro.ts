@@ -6,9 +6,11 @@ import type { FattoVolo, Verdetto } from "./eu261";
  * Se il motore e questo file discordano, si indaga: non si "aggiusta"
  * mai l'etichetta per far passare la prova.
  *
- * Distribuzione (da SPEC §4): ~36% idonei, ~36% non idonei, ~28% incerti,
- * con i confini cattivi dentro: 179/180 minuti, 1500/1501 km, 3500/3501 km,
- * 239/240 minuti sul lungo raggio, dati mancanti, fonti discordanti.
+ * Distribuzione (da SPEC §4): 9 idonei, 11 non idonei, 10 incerti, con i
+ * confini cattivi dentro: 179/180 minuti, 1500/1501 km, 3500/3501 km,
+ * 239/240 minuti sul lungo raggio, dati mancanti, fonti discordanti,
+ * orario senza tracciamento Live, codeshare da risolvere. In coda il
+ * PRIMO CASO REALE: FR4001 del 6/08/2026 (il volo di Valerio).
  */
 
 type Caso = {
@@ -30,6 +32,9 @@ function fatto(sovrascrivi: Partial<FattoVolo>): FattoVolo {
     arrivoEffettivoUtc: "2026-07-15T20:00:00Z",
     stato: "atterrato",
     kmOrtodromica: 900,
+    // Il caso base è tracciato (quality Live): i casi sul dato non
+    // verificato lo sovrascrivono apposta.
+    orarioVerificato: true,
     fonte: "casi-oro",
     ...sovrascrivi,
   };
@@ -83,6 +88,45 @@ export const CASI_ORO: Caso[] = [
     atteso: { esito: "incerto" },
   },
   { nome: "orari illeggibili", fatto: fatto({ arrivoPrevistoUtc: "boh", arrivoEffettivoUtc: "mah" }), atteso: { esito: "incerto" } },
+
+  // ------- I campi veri di AeroDataBox (attività #26, 07-08/08) -------
+  {
+    nome: "TRAPPOLA: ritardo enorme MA orario senza tracciamento Live",
+    fatto: conRitardo(400, { orarioVerificato: false }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    nome: "TRAPPOLA: 179 minuti senza Live: nemmeno il no si dà su una stima",
+    fatto: conRitardo(179, { orarioVerificato: false }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    nome: "TRAPPOLA: sopra soglia MA codeshare da risolvere",
+    fatto: conRitardo(300, { vettoreDaDeterminare: true, vettoreMarketing: "AZ" }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    nome: "codeshare sotto soglia: il no resta un no",
+    fatto: conRitardo(100, { vettoreDaDeterminare: true }),
+    atteso: { esito: "non_idoneo" },
+  },
+  {
+    nome: "REALE: FR4001 del 6/08/2026 (BGY-ACE), 155 minuti: per 25 minuti niente fascia",
+    fatto: {
+      voloIata: "FR4001",
+      dataLocale: "2026-08-06",
+      vettoreOperativo: "FR",
+      arrivoPrevistoUtc: "2026-08-06T16:00:00Z",
+      // revisedTime della risposta vera; arrival.quality = ["Basic","Live"]
+      arrivoEffettivoUtc: "2026-08-06T18:35:00Z",
+      stato: "atterrato",
+      kmOrtodromica: 2758.85,
+      orarioVerificato: true,
+      vettoreDaDeterminare: false, // codeshareStatus: "IsOperator"
+      fonte: "aerodatabox",
+    },
+    atteso: { esito: "non_idoneo" },
+  },
 ];
 
 export type { Verdetto };

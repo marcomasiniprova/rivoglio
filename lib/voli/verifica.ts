@@ -51,6 +51,9 @@ type RigaVolo = {
   km_ortodromica: number | null;
   fonte: string;
   fonti_discordanti: boolean;
+  /** NULL = riga scritta prima della regola "senza Live niente vendita". */
+  orario_verificato: boolean | null;
+  vettore_da_determinare: boolean | null;
 };
 
 function fattoDaRiga(riga: RigaVolo): FattoVolo {
@@ -64,6 +67,8 @@ function fattoDaRiga(riga: RigaVolo): FattoVolo {
     stato: riga.stato,
     kmOrtodromica: riga.km_ortodromica,
     fontiDiscordanti: riga.fonti_discordanti,
+    orarioVerificato: riga.orario_verificato ?? undefined,
+    vettoreDaDeterminare: riga.vettore_da_determinare ?? undefined,
     fonte: riga.fonte,
   };
 }
@@ -97,14 +102,20 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
       const { data: riga } = await sb
         .from("voli")
         .select(
-          "id, volo_iata, data_locale, vettore_operativo, vettore_marketing, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti",
+          "id, volo_iata, data_locale, vettore_operativo, vettore_marketing, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, orario_verificato, vettore_da_determinare",
         )
         .eq("volo_iata", volo.valore)
         .eq("data_locale", data.valore)
         .maybeSingle<RigaVolo>();
       /* Uno "sconosciuto" in cache non fa fede: magari il volo è atterrato
-         dopo l'ultima chiamata. Si richiede al fornitore e si aggiorna. */
-      if (riga && riga.stato !== "sconosciuto") {
+         dopo l'ultima chiamata. E un "atterrato" senza il tracciamento
+         verificato (o scritto prima che la colonna esistesse) si richiede:
+         il Live può essersi consolidato nel frattempo. Si aggiorna. */
+      if (
+        riga &&
+        riga.stato !== "sconosciuto" &&
+        !(riga.stato === "atterrato" && riga.orario_verificato !== true)
+      ) {
         fatto = fattoDaRiga(riga);
         voloId = riga.id;
       }
@@ -160,6 +171,8 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
                 km_ortodromica: fatto.kmOrtodromica,
                 fonte: fatto.fonte,
                 fonti_discordanti: fatto.fontiDiscordanti ?? false,
+                orario_verificato: fatto.orarioVerificato ?? null,
+                vettore_da_determinare: fatto.vettoreDaDeterminare ?? false,
                 payload_grezzo: fatto.payloadGrezzo ?? null,
                 recuperato_il: new Date().toISOString(),
               },

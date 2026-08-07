@@ -67,6 +67,8 @@ export const demo: FornitoreVoli = {
       arrivoEffettivoUtc: effettivo,
       stato: sagoma.stato,
       kmOrtodromica: sagoma.km ?? null,
+      // La demo simula un dato tracciato (è comunque marcata demo ovunque).
+      orarioVerificato: sagoma.stato === "atterrato" ? true : undefined,
       fonte: "demo",
       payloadGrezzo: { demo: true, copre: sagoma.copre },
     };

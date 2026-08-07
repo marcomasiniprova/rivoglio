@@ -16,7 +16,7 @@
  * i casi d'oro devono passare tutti.
  */
 
-export const VERSIONE_REGOLE = "2026.08.1";
+export const VERSIONE_REGOLE = "2026.08.2";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
 const SOGLIA_MINUTI = 180;
@@ -43,6 +43,19 @@ export type FattoVolo = {
   kmOrtodromica: number | null;
   /** Vero se due fonti indipendenti discordano di più di 15 minuti. */
   fontiDiscordanti?: boolean;
+  /**
+   * Vero SOLO quando l'orario effettivo è certificato dal tracciamento del
+   * fornitore (AeroDataBox: "Live" dentro arrival.quality). Qualunque altro
+   * valore, undefined compreso, vale "non verificato": su un orario che può
+   * essere una stima non si dà NESSUN verdetto (regola del 07/08, dal test
+   * reale di Valerio: senza Live niente vendita).
+   */
+  orarioVerificato?: boolean;
+  /**
+   * Vero quando il numero è venduto in codeshare e il fornitore non sa dire
+   * chi ha OPERATO il volo: il reclamo andrebbe alla compagnia sbagliata.
+   */
+  vettoreDaDeterminare?: boolean;
   fonte: string;
 };
 
@@ -122,6 +135,15 @@ export function valuta(f: FattoVolo): Verdetto {
     );
   }
 
+  /* "Senza Live niente vendita": un orario non certificato dal tracciamento
+     può essere una stima. Su una stima non si dà nessun verdetto, nemmeno
+     un "no": 179 minuti stimati possono essere 185 veri. */
+  if (f.orarioVerificato !== true) {
+    return incerto(
+      "L'orario di arrivo di questo volo non è confermato dal tracciamento. Non diamo verdetti su dati non verificati: riprova più tardi, il controllo resta gratuito.",
+    );
+  }
+
   const ritardo = minutiRitardo(f.arrivoPrevistoUtc, f.arrivoEffettivoUtc);
   if (ritardo === null) {
     return incerto("Gli orari di questo volo non sono leggibili. Non diamo verdetti su dati rotti.");
@@ -133,6 +155,16 @@ export function valuta(f: FattoVolo): Verdetto {
         ? `Questo volo è arrivato in orario${ritardo < 0 ? " (in anticipo)" : ""}.`
         : `Questo volo è arrivato con ${ritardo} minuti di ritardo: sotto la soglia delle 3 ore (180 minuti) non spetta la compensazione.`;
     return nonIdoneo(ritardo, testo);
+  }
+
+  /* Codeshare non risolto: il ritardo c'è, ma il reclamo deve andare al
+     vettore OPERATIVO e il dato non dice chi è. Meglio un incerto onesto
+     che una lettera alla compagnia sbagliata. Sotto soglia, invece, il
+     "no" resta un no: lì il vettore non cambia niente. */
+  if (f.vettoreDaDeterminare) {
+    return incerto(
+      "Il ritardo supera le 3 ore, ma questo numero di volo è venduto in codeshare: il reclamo deve andare alla compagnia che ha operato, e va determinata con certezza. Lo verifichiamo a mano, non ti facciamo pagare niente.",
+    );
   }
 
   if (f.kmOrtodromica === null || !Number.isFinite(f.kmOrtodromica) || f.kmOrtodromica <= 0) {

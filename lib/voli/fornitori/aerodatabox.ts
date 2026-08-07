@@ -28,6 +28,8 @@ type MovimentoAdb = {
   revisedTime?: OrarioAdb;
   predictedTime?: OrarioAdb;
   runwayTime?: OrarioAdb;
+  /** ["Basic"] = solo orari di tabella; con "Live" il volo era tracciato. */
+  quality?: string[] | null;
 } | null;
 
 type VoloAdb = {
@@ -120,21 +122,30 @@ export const aerodatabox: FornitoreVoli = {
        non è verificabile: stato sconosciuto, non si vende. */
     if (stato === "atterrato" && !effettivo) stato = "sconosciuto";
 
+    /* "Senza Live niente vendita" (regola del 07/08, dal test reale):
+       arrival.quality con "Live" = il volo era tracciato e l'orario è un
+       fatto; senza, revisedTime può essere una stima e il motore dirà
+       incerto. Il fatto esce comunque: il payload resta come prova. */
+    const qualita = volo.arrival?.quality;
+    const tracciato = Array.isArray(qualita) && qualita.includes("Live");
+
     const compagnia = volo.airline?.iata ?? volo.airline?.name ?? voloIata.slice(0, 2);
 
     return {
       voloIata,
       dataLocale,
       /* Con IsCodeshared questo endpoint NON dice chi ha operato davvero:
-         si tiene la compagnia del numero come miglior dato disponibile e la
-         si segna anche come vettore marketing, così a valle si vede che il
-         codeshare va risolto prima di scrivere il reclamo (payload_grezzo
-         conserva comunque tutta la risposta). */
+         si tiene la compagnia del numero come miglior dato disponibile, la
+         si segna anche come vettore marketing e si alza vettoreDaDeterminare:
+         il motore fermerà la vendita finché l'operativo non è certo
+         (payload_grezzo conserva comunque tutta la risposta). */
       vettoreOperativo: compagnia,
       vettoreMarketing: volo.codeshareStatus === "IsCodeshared" ? compagnia : null,
+      vettoreDaDeterminare: volo.codeshareStatus === "IsCodeshared",
       arrivoPrevistoUtc: utcIso(volo.arrival?.scheduledTime),
       arrivoEffettivoUtc: stato === "atterrato" ? effettivo : null,
       stato,
+      orarioVerificato: stato === "atterrato" ? tracciato : undefined,
       kmOrtodromica:
         typeof volo.greatCircleDistance?.km === "number" ? volo.greatCircleDistance.km : null,
       fonte: "aerodatabox",
