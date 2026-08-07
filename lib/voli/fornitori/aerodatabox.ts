@@ -1,0 +1,144 @@
+/**
+ * AeroDataBox, il fornitore PRIMARIO (SPEC §4 e §9: 5-32$/mese).
+ *
+ * Endpoint usato (docs: doc.aerodatabox.com, spec OpenAPI "Flight API"
+ * v1.14, operazione GetFlight_FlightOnSpecificDate):
+ *
+ *   GET https://aerodatabox.p.rapidapi.com/flights/number/{volo}/{dataLocale}
+ *       ?dateLocalRole=Departure&withAircraftImage=false&withLocation=false
+ *   header X-RapidAPI-Key:  la chiave (env AERODATABOX_API_KEY)
+ *   header X-RapidAPI-Host: aerodatabox.p.rapidapi.com
+ *
+ * Risponde un ARRAY di voli (lo stesso numero può coprire più tratte nello
+ * stesso giorno). Campi che ci servono, dalla spec:
+ * - arrival.scheduledTime / revisedTime / runwayTime: oggetti {utc, local}
+ * - status: Unknown | Expected | EnRoute | ... | Arrived | Canceled | Diverted | CanceledUncertain
+ * - codeshareStatus: Unknown | IsOperator | IsCodeshared
+ * - airline: {name, iata, icao} · greatCircleDistance: {km, ...} · isCargo
+ */
+
+import type { FattoConPayload, FattoVolo, FornitoreVoli } from "../tipi";
+
+const HOST = "aerodatabox.p.rapidapi.com";
+
+type OrarioAdb = { utc?: string | null; local?: string | null } | null;
+
+type MovimentoAdb = {
+  scheduledTime?: OrarioAdb;
+  revisedTime?: OrarioAdb;
+  predictedTime?: OrarioAdb;
+  runwayTime?: OrarioAdb;
+} | null;
+
+type VoloAdb = {
+  greatCircleDistance?: { km?: number } | null;
+  departure?: MovimentoAdb;
+  arrival?: MovimentoAdb;
+  number?: string;
+  status?: string;
+  codeshareStatus?: string;
+  isCargo?: boolean;
+  airline?: { name?: string; iata?: string | null; icao?: string | null } | null;
+};
+
+/**
+ * Gli orari UTC di AeroDataBox arrivano come "2026-08-14 22:55Z" (spazio,
+ * non "T"): non tutti i motori JS li leggono. Qui si riportano alla forma
+ * ISO e si butta via tutto ciò che non è una data leggibile.
+ */
+function utcIso(orario: OrarioAdb | undefined): string | null {
+  const s = orario?.utc?.trim();
+  if (!s) return null;
+  const iso = s.includes("T") ? s : s.replace(" ", "T");
+  return Number.isFinite(Date.parse(iso)) ? iso : null;
+}
+
+function statoDa(statusAdb: string | undefined): FattoVolo["stato"] {
+  switch (statusAdb) {
+    case "Arrived":
+      return "atterrato";
+    case "Canceled":
+      return "cancellato";
+    case "Diverted":
+      return "dirottato";
+    default:
+      /* Tutto il resto (Expected, EnRoute, Delayed, Unknown e anche
+         CanceledUncertain) è un volo NON concluso o non confermato:
+         per noi è "sconosciuto" e il motore risponderà incerto.
+         Mai indovinare uno stato che l'API non certifica. */
+      return "sconosciuto";
+  }
+}
+
+export const aerodatabox: FornitoreVoli = {
+  nome: "aerodatabox",
+
+  async cerca(voloIata: string, dataLocale: string): Promise<FattoConPayload | null> {
+    const chiave = process.env.AERODATABOX_API_KEY;
+    if (!chiave) return null;
+
+    // dataLocale in FattoVolo è la data di PARTENZA in ora locale: dateLocalRole=Departure.
+    const url =
+      `https://${HOST}/flights/number/${encodeURIComponent(voloIata)}/${dataLocale}` +
+      `?dateLocalRole=Departure&withAircraftImage=false&withLocation=false`;
+
+    let corpo: VoloAdb[];
+    try {
+      const risposta = await fetch(url, {
+        headers: { "X-RapidAPI-Key": chiave, "X-RapidAPI-Host": HOST },
+        signal: AbortSignal.timeout(8_000), // le funzioni Netlify muoiono a 10s
+        cache: "no-store",
+      });
+      // 204/404: il volo su quella data non esiste per loro. Non è un errore.
+      if (risposta.status === 204 || risposta.status === 404) return null;
+      if (!risposta.ok) {
+        console.warn(`[aerodatabox] risposta ${risposta.status} per ${voloIata} ${dataLocale}`);
+        return null;
+      }
+      corpo = (await risposta.json()) as VoloAdb[];
+    } catch (e) {
+      // Rete giù o timeout: nessuna eccezione verso l'alto, diventerà "incerto".
+      console.warn(`[aerodatabox] chiamata fallita per ${voloIata} ${dataLocale}:`, e);
+      return null;
+    }
+    if (!Array.isArray(corpo) || corpo.length === 0) return null;
+
+    /* Più risultati per lo stesso numero: fuori i cargo, e se c'è la voce
+       in cui la compagnia del numero è anche l'operatore si prende quella. */
+    const candidati = corpo.filter((v) => !v.isCargo);
+    const volo = candidati.find((v) => v.codeshareStatus === "IsOperator") ?? candidati[0];
+    if (!volo) return null;
+
+    let stato = statoDa(volo.status);
+    const effettivo = utcIso(volo.arrival?.runwayTime) ?? utcIso(volo.arrival?.revisedTime);
+
+    /* runwayTime = ruote a terra, revisedTime = orario aggiornato/effettivo.
+       Si preferisce runwayTime perché è SEMPRE precedente all'apertura porte
+       (il momento che conta per la Corte UE): il ritardo calcolato così è
+       sottostimato, mai gonfiato. Zero falsi positivi prima di tutto.
+       Se l'API dice "Arrived" ma non porta un orario effettivo, il fatto
+       non è verificabile: stato sconosciuto, non si vende. */
+    if (stato === "atterrato" && !effettivo) stato = "sconosciuto";
+
+    const compagnia = volo.airline?.iata ?? volo.airline?.name ?? voloIata.slice(0, 2);
+
+    return {
+      voloIata,
+      dataLocale,
+      /* Con IsCodeshared questo endpoint NON dice chi ha operato davvero:
+         si tiene la compagnia del numero come miglior dato disponibile e la
+         si segna anche come vettore marketing, così a valle si vede che il
+         codeshare va risolto prima di scrivere il reclamo (payload_grezzo
+         conserva comunque tutta la risposta). */
+      vettoreOperativo: compagnia,
+      vettoreMarketing: volo.codeshareStatus === "IsCodeshared" ? compagnia : null,
+      arrivoPrevistoUtc: utcIso(volo.arrival?.scheduledTime),
+      arrivoEffettivoUtc: stato === "atterrato" ? effettivo : null,
+      stato,
+      kmOrtodromica:
+        typeof volo.greatCircleDistance?.km === "number" ? volo.greatCircleDistance.km : null,
+      fonte: "aerodatabox",
+      payloadGrezzo: corpo,
+    };
+  },
+};
