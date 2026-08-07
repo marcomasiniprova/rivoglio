@@ -9,21 +9,24 @@ così: avvicina il primo pagante?
 
 ---
 
-## Le tre fasi
+## Le tre fasi (definite da Valerio il 07/08)
 
 ```
   FASE 1               FASE 2                  FASE 3
-  COSTRUISCI     →     DISTRIBUISCI      →     I VERTICALI
-  il check e la        3 video al giorno,      bagagli (set),
-  pratica, provati     ogni giorno             treni gratis (ott)
+  SVILUPPO       →     DISTRIBUZIONE     →     MIGLIORAMENTO
+  si finisce TUTTO     3 contenuti al          iterazione e
+  il prodotto          giorno, ogni giorno     mantenimento
 ```
 
-La FASE 2 parte APPENA il check è online: il documento è chiaro, la
-distribuzione è il 65% dell'energia e il collo di bottiglia vero.
+FASE 1 = il prodotto completo e provato (check, pratica, lettera, follow-up,
+tracker). FASE 2 = distribuzione, parte appena il check è online (65%
+dell'energia, dal documento). FASE 3 = miglioramento continuo, iterazione
+sui dati veri e mantenimento: i verticali nuovi (bagagli, treni), il golden
+set che cresce coi rifiuti veri, le correzioni da feedback.
 
 ---
 
-# FASE 1 — COSTRUISCI
+# FASE 1 — SVILUPPO
 
 **Fatta quando:** uno sconosciuto fa il check, vede il dato oggettivo, paga,
 riceve la lettera, la invia e la sequenza di follow-up parte da sola.
@@ -74,7 +77,7 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 
 ---
 
-# FASE 2 — DISTRIBUISCI (piano in `DISTRIBUZIONE.md` e `CONTENUTI.md`)
+# FASE 2 — DISTRIBUZIONE (piano in `DISTRIBUZIONE.md` e `CONTENUTI.md`)
 
 | | Stato |
 |---|---|
@@ -83,12 +86,20 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | Primi 10 video girati (si può PRIMA del lancio) | ⏳ Valerio |
 | Newsletter "Osservatorio dei Disservizi" (Brevo) | ⏳ coi primi iscritti |
 
-# FASE 3 — I VERTICALI (la retention vera)
+# FASE 3 — MIGLIORAMENTO, ITERAZIONE E MANTENIMENTO
 
-Bagagli a settembre (Montreal, scontrino 300-1.900€, la Cassazione 2026 sul
-PIR è un argomento che nessuno usa) · treni gratis a ottobre (calamita) ·
-bollette 2027. Niente gamification, mai: si torna perché "mi devono dei
-soldi" succede 3-4 volte l'anno, non per gli streak.
+Si apre quando la FASE 1 è chiusa e la 2 gira. Dentro ci sta:
+- **I verticali nuovi** (la retention vera): bagagli a settembre (Montreal,
+  scontrino 300-1.900€, la Cassazione 2026 sul PIR è un argomento che
+  nessuno usa) · treni gratis a ottobre (calamita) · bollette 2027.
+- **Iterazione sui dati veri**: ogni rifiuto delle compagnie diventa un caso
+  etichettato nel golden set; shadow mode che si spegne a 100 verdetti
+  puliti; correzioni guidate da quello che chiedono gli utenti.
+- **Mantenimento**: regole aggiornate quando la riforma UE entra in vigore
+  (~agosto 2027, ruleset v2), canali compagnie riverificati, costi API
+  sotto controllo.
+Niente gamification, mai: si torna perché "mi devono dei soldi" succede
+3-4 volte l'anno, non per gli streak.
 
 ---
 

@@ -1,14 +1,11 @@
 import Logo from "./Logo";
+import { COPY } from "@/lib/copy";
 
-const voci = [
-  { href: "#funzioni", testo: "Come funziona" },
-  { href: "#conto", testo: "Il conto aperto" },
-  { href: "#dentro", testo: "Com'è dentro" },
-  { href: "#prezzi", testo: "Prezzi" },
-  { href: "#domande", testo: "Domande" },
-];
-
-/** Barra a pillola fluttuante, come Zentivo. */
+/**
+ * Barra a pillola fluttuante, come Zentivo. Voci e CTA vengono da COPY.nav.
+ * La CTA porta al form del check (#controllo): è l'unica azione del sito,
+ * quindi è l'unico bottone pieno della barra.
+ */
 export default function Nav() {
   return (
     <div className="sticky top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
@@ -16,10 +13,10 @@ export default function Nav() {
         <Logo />
 
         <nav className="hidden items-center gap-8 lg:flex">
-          {voci.map((v) => (
+          {COPY.nav.voci.map((v) => (
             <a
-              key={v.href}
-              href={v.href}
+              key={v.ancora}
+              href={v.ancora}
               className="text-[15px] text-fumo transition-colors hover:text-inchiostro"
             >
               {v.testo}
@@ -28,14 +25,16 @@ export default function Nav() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-          {/* L'app arriva sugli store: l'unico invito è la lista d'attesa. */}
           <a
-            href="#iscriviti"
-            className="group inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-bottone bg-white px-4 py-2.5 text-[13.5px] font-medium text-inchiostro shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md sm:px-5 sm:py-3 sm:text-[14.5px]"
+            href="#controllo"
+            className="riflesso group inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-bottone bg-verde px-4 py-2.5 text-[13.5px] font-medium text-white shadow-[0_10px_24px_-10px_rgba(6,122,70,.7),0_1px_0_0_rgba(255,255,255,.22)_inset] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro sm:px-5 sm:py-3 sm:text-[14.5px]"
           >
-            Avvisami quando esce
-            <span className="text-verde transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
-              ↗
+            {COPY.nav.cta}
+            <span
+              aria-hidden="true"
+              className="transition-transform duration-300 group-hover:translate-x-0.5"
+            >
+              →
             </span>
           </a>
         </div>

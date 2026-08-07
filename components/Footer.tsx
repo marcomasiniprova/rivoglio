@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { Marchio } from "./Logo";
 import BadgeStore from "./BadgeStore";
+import { COPY } from "@/lib/copy";
 
 /**
- * Il footer.
+ * Il footer di Rivoglio.
  *
  * Struttura presa dai SaaS di riferimento: colonne di link in alto, riga
  * di crediti in basso, e il nome del marchio scritto enorme che chiude la
- * pagina. Quel nome gigante non è decorazione: è l'ultima cosa che resta
- * in testa dopo che uno ha scrollato tutto.
+ * pagina. Testi e colonne vengono da COPY.footer; la colonna Trasparenza
+ * porta con sé il disclaimer legale, perché è lì che uno va a cercarlo.
  *
  * Le icone dei social sono disegnate qui a mano, tutte con la stessa
  * costruzione. Le librerie di icone generiche hanno tolto i marchi per
@@ -16,33 +17,11 @@ import BadgeStore from "./BadgeStore";
  * segno più veloce che un sito è stato assemblato invece che costruito.
  */
 
-const COLONNE: { titolo: string; voci: { testo: string; href: string }[] }[] = [
-  {
-    titolo: "Prodotto",
-    voci: [
-      { testo: "Come funziona", href: "/#funzioni" },
-      { testo: "Com'è dentro", href: "/#dentro" },
-      { testo: "Il conto aperto", href: "/#conto" },
-      { testo: "Prezzi", href: "/#prezzi" },
-    ],
-  },
-  {
-    titolo: "Inizia",
-    voci: [
-      { testo: "Mettiti in lista", href: "/#iscriviti" },
-      { testo: "Prova il costruttore", href: "/#costruttore" },
-      { testo: "Domande", href: "/#domande" },
-    ],
-  },
-  {
-    titolo: "Trasparenza",
-    voci: [
-      { testo: "Come calcoliamo l'auto", href: "/#conto" },
-      { testo: "Da dove arrivano i prezzi", href: "/#conto" },
-      { testo: "Cosa non facciamo", href: "/#domande" },
-    ],
-  },
-];
+const F = COPY.footer;
+const COLONNE = [F.colonne.prodotto, F.colonne.trasparenza, F.colonne.domande] as const;
+
+/** Le ancore di pagina diventano assolute: il footer appare anche fuori dalla home. */
+const casa = (ancora: string) => (ancora.startsWith("#") ? `/${ancora}` : ancora);
 
 type Social = {
   nome: string;
@@ -60,7 +39,8 @@ const SOCIAL: Social[] = [
     nome: "Instagram",
     href: "https://instagram.com/rivoglio",
     // disegnata a contorno, non a pieno: a pieno diventa una macchia
-    contorno: "M7.2 3h9.6A4.2 4.2 0 0 1 21 7.2v9.6a4.2 4.2 0 0 1-4.2 4.2H7.2A4.2 4.2 0 0 1 3 16.8V7.2A4.2 4.2 0 0 1 7.2 3Z",
+    contorno:
+      "M7.2 3h9.6A4.2 4.2 0 0 1 21 7.2v9.6a4.2 4.2 0 0 1-4.2 4.2H7.2A4.2 4.2 0 0 1 3 16.8V7.2A4.2 4.2 0 0 1 7.2 3Z",
     cerchio: { cx: 12, cy: 12, r: 3.9 },
     punto: { cx: 17.2, cy: 6.9, r: 1.15 },
   },
@@ -85,26 +65,28 @@ export default function Footer() {
   return (
     <footer className="relative mt-auto bg-verde-notte px-5 pt-20 text-white/70 sm:px-8">
       {/* la lama di luce che separa il footer dal resto */}
-      <div aria-hidden="true" className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(127,232,174,.55),transparent)]" />
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(127,232,174,.55),transparent)]"
+      />
       <div className="mx-auto max-w-[1240px]">
         <div className="grid gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div className="max-w-xs">
             <Link href="/" className="inline-flex items-center gap-2.5">
               <Marchio className="h-9 w-9" />
               <span className="font-display text-[17px] font-medium tracking-[-0.03em] text-white">
-                Rivoglio
+                {COPY.comune.marchio}
               </span>
             </Link>
-            <p className="mt-5 text-[14.5px] leading-relaxed">
-              Ti avviso quando esiste una fuga di 1-3 notti sotto il tuo budget, col conto
-              totale già fatto. Da qualsiasi comune d&apos;Italia.
-            </p>
+            <p className="mt-5 text-[14.5px] leading-relaxed">{F.frase}</p>
 
-            {/* I badge degli store stanno SOLO qui, non nella hero: qui si
-                leggono come "arriveranno", lassù si leggerebbero come
-                "ci sono già". Non sono cliccabili: vedi BadgeStore.tsx. */}
+            {/* I badge degli store sono inerti finché l'app non c'è davvero:
+                vedi BadgeStore.tsx. Qui l'app è il tracker della pratica. */}
             <div className="mt-7">
-              <BadgeStore />
+              <p className="text-[13px] font-medium text-white/50">{F.app.titolo}</p>
+              <div className="mt-3">
+                <BadgeStore />
+              </div>
             </div>
 
             <div className="mt-6 flex gap-2.5">
@@ -151,7 +133,7 @@ export default function Footer() {
                 {c.voci.map((v) => (
                   <li key={v.testo}>
                     <Link
-                      href={v.href}
+                      href={casa(v.ancora)}
                       className="inline-block text-[14.5px] transition-all duration-200 hover:translate-x-0.5 hover:text-menta"
                     >
                       {v.testo}
@@ -159,17 +141,30 @@ export default function Footer() {
                   </li>
                 ))}
               </ul>
+              {/* Il disclaimer vive sotto la colonna Trasparenza: è lì che
+                  uno lo cerca, non nascosto nella riga dei crediti. */}
+              {c.titolo === F.colonne.trasparenza.titolo && (
+                <p className="mt-6 max-w-[26rem] text-[12px] leading-relaxed text-white/40">
+                  {F.disclaimer}
+                </p>
+              )}
             </nav>
           ))}
         </div>
 
         <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-7 text-[13px] text-white/45 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Rivoglio · Fatto in Italia</p>
-          <p className="max-w-2xl leading-relaxed">
-            Segnaliamo offerte di terzi e non vendiamo viaggi: si prenota sul sito della
-            struttura, con le sue condizioni. I costi di viaggio sono stime calcolate, non
-            prezzi garantiti.
-          </p>
+          <p>{F.copyright} · Fatto in Italia</p>
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            {F.colonne.legale.voci.map((v) => (
+              <Link
+                key={v.testo}
+                href={casa(v.ancora)}
+                className="transition-colors hover:text-menta"
+              >
+                {v.testo}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Il nome enorme che chiude la pagina. Sta su UNA riga sola e
@@ -178,7 +173,7 @@ export default function Footer() {
             orfana enorme in mezzo allo schermo. */}
         <div className="relative mt-8 select-none overflow-hidden" aria-hidden="true">
           <p className="translate-y-[16%] whitespace-nowrap bg-[linear-gradient(180deg,rgba(127,232,174,.4)_0%,rgba(127,232,174,.04)_82%)] bg-clip-text text-center font-display text-[clamp(2.4rem,8.6vw,8.4rem)] font-medium leading-[0.84] tracking-[-0.06em] text-transparent">
-            Rivoglio
+            {COPY.comune.marchio}
           </p>
         </div>
       </div>
