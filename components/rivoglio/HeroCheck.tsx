@@ -1,46 +1,25 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Anima } from "@/components/Anima";
 import SfondoColonne from "@/components/SfondoColonne";
-import CartaImbarcoScan from "@/components/rivoglio/CartaImbarcoScan";
+import SchedaCheck from "@/components/check/SchedaCheck";
 import { COPY } from "@/lib/copy";
 
 /**
- * L'hero di Rivoglio: il gancio e IL FORM volo+data, che è il prodotto.
+ * L'hero di Rivoglio: il gancio, e dentro LA SCHEDA DEL CHECK, che dall'8/08
+ * è lo standard unico di tutto il prodotto (components/check/SchedaCheck):
+ * tratta predefinita, numero per chi lo sa, foto della carta d'imbarco, e
+ * il teatro onesto coi sei passi veri e il biglietto che si compila.
  *
- * Il campo è il protagonista: un bordo che pulsa lo indica finché l'utente
- * non ci entra (al focus si ferma: ha già vinto, pulsare ancora è rumore).
- * Solo transform e opacity, come tutto il movimento del sito.
- *
- * Il TEATRO ONESTO (SPEC §3 e §8): durante l'attesa si mostrano i tre passi
- * VERI della verifica. Il primo è acceso mentre la richiesta è davvero in
- * volo verso /api/verifica; il secondo e il terzo si completano quando la
- * risposta è arrivata, cioè quando il confronto orari e il calcolo sono
- * DAVVERO stati fatti dal server. Niente barre finte che avanzano a caso.
+ * Qui restano solo le cose da hero: titolo con la luce, note apribili sui
+ * numeri (ogni numero è apribile: la trasparenza è il prodotto), colonne
+ * animate dietro, punti di fiducia sotto.
  */
 
 const HERO = COPY.hero;
-const TEATRO = COPY.comeFunziona.verifica;
 const CURVA = [0.16, 1, 0.3, 1] as const;
-
-type Fase = "campo" | "teatro";
-
-const attesa = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-/**
- * L'ANALISI PROFONDA (scelta di Valerio, 8/08): il check non deve
- * sembrare un giochino da mezzo secondo, perché non lo è: dietro ci sono
- * l'interrogazione degli archivi di volo, la distanza della tratta, la
- * tabella scioperi e il regolamento. I sei passi scorrono con questo
- * ritmo e la sequenza non si taglia MAI, nemmeno se il server risponde
- * subito: si va al verdetto solo quando entrambe le cose sono finite,
- * il lavoro vero e il racconto.
- */
-const PASSO_MS = 2400;
-const PAUSA_FINALE_MS = 900;
 
 /** Spezza il titolo per dare il corsivo alla parte finale, senza duplicare il testo in COPY. */
 function spezzaTitolo(titolo: string, taglio: string): [string, string] {
@@ -49,166 +28,9 @@ function spezzaTitolo(titolo: string, taglio: string): [string, string] {
   return [titolo.slice(0, i).trimEnd(), titolo.slice(i)];
 }
 
-/**
- * La forma canonica del numero di volo, per costruire il link demo:
- * "zz 0250" → "ZZ250". Rispecchia lib/voli/normalizza.ts nel caso
- * semplice (codice a due caratteri + numero); per il resto schiaccia
- * spazi e trattini. Il giudizio vero resta comunque al server.
- */
-function canonico(grezzo: string): string {
-  const pezzi = grezzo.trim().match(/^([A-Za-z0-9]{2})[\s-]*0*([0-9]{1,4})\s*([A-Za-z])?$/);
-  if (pezzi) return (pezzi[1] + pezzi[2] + (pezzi[3] ?? "")).toUpperCase();
-  return grezzo.replace(/[\s-]+/g, "").toUpperCase();
-}
-
-/**
- * I confini del campo data rispecchiano quelli del server
- * (lib/voli/normalizza.ts): fino a domani, indietro di 6 anni.
- * Calcolati al caricamento del modulo: il giudizio vero resta al server,
- * qui servono solo a non far scegliere date assurde dal calendario.
- */
-function confiniData(): { minData: string; maxData: string } {
-  const giorno = 24 * 60 * 60 * 1000;
-  const max = new Date(Date.now() + giorno).toISOString().slice(0, 10);
-  const min = new Date();
-  min.setUTCFullYear(min.getUTCFullYear() - 6);
-  return { minData: min.toISOString().slice(0, 10), maxData: max };
-}
-const { minData, maxData } = confiniData();
-
 export default function HeroCheck() {
-  const router = useRouter();
-  const [volo, setVolo] = useState("");
-  const [data, setData] = useState("");
-  const [errore, setErrore] = useState<string | null>(null);
-  /** Verdetto arrivato ma non salvato (id nullo): si mostra qui, con onestà. */
-  const [avviso, setAvviso] = useState<{ testo: string; demo: boolean } | null>(null);
-  const [fase, setFase] = useState<Fase>("campo");
-  const [passo, setPasso] = useState(0);
-  /* I dati VERI del volo, appena il server risponde: il biglietto sotto
-     scansione si compila con questi, campo per campo, al passo giusto. */
-  const [letto, setLetto] = useState<{
-    tratta: string | null;
-    previsto: string | null;
-    effettivo: string | null;
-  }>({ tratta: null, previsto: null, effettivo: null });
-  const inCorso = useRef(false);
-
-  /** "2026-08-06T18:35:00+00:00" → "18:35" (UTC, come sul verdetto). */
-  const oraDa = (iso: string | null | undefined): string | null => {
-    if (!iso) return null;
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return null;
-    return d.toLocaleTimeString("it-IT", {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "UTC",
-    });
-  };
-
-  /* Il taglio segue la headline dei 12 mesi: "nell'ultimo anno?" va in
-     corsivo con la luce, come il titolo dell'Osservatorio. */
   const [titoloPrima, titoloCorsivo] = spezzaTitolo(HERO.titolo, "nell'ultimo");
   const [notaAperta, setNotaAperta] = useState<"importo" | "finestra" | null>(null);
-
-  async function invia(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (inCorso.current) return;
-
-    // Validazione locale: i casi banali non meritano un giro di rete.
-    if (!volo.trim()) {
-      setErrore(HERO.form.errori.voloMancante);
-      return;
-    }
-    if (!data) {
-      setErrore(HERO.form.errori.dataMancante);
-      return;
-    }
-
-    inCorso.current = true;
-    setErrore(null);
-    setAvviso(null);
-    setFase("teatro");
-    setPasso(0); // passo 1 acceso: la richiesta è DAVVERO in volo
-    setLetto({ tratta: null, previsto: null, effettivo: null });
-
-    /* La sequenza dei passi parte SUBITO e vive per conto suo: la
-       richiesta al server corre in parallelo. Alla fine si aspettano a
-       vicenda (vedi sotto), così nessuno dei due viene tagliato. */
-    const sequenza = (async () => {
-      for (let i = 1; i < TEATRO.passi.length; i++) {
-        await attesa(PASSO_MS);
-        setPasso(i);
-      }
-      await attesa(PASSO_MS);
-      setPasso(TEATRO.passi.length); // tutti fatti: scatta il timbro
-      await attesa(PAUSA_FINALE_MS);
-    })();
-
-    try {
-      const r = await fetch("/api/verifica", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ volo: volo.trim(), data }),
-      });
-      const dati = await r.json().catch(() => null);
-
-      /* Appena i dati veri ci sono, il biglietto li riceve: li mostrerà
-         al passo giusto della sequenza, non tutti in un colpo. */
-      if (dati?.ok && dati.dato) {
-        setLetto({
-          tratta:
-            dati.dato.da && dati.dato.a ? `${dati.dato.da} → ${dati.dato.a}` : null,
-          previsto: oraDa(dati.dato.previsto),
-          effettivo: oraDa(dati.dato.effettivo),
-        });
-      }
-
-      if (!r.ok || !dati?.ok) {
-        /* Un errore non fa aspettare: si torna subito al campo. Il
-           racconto serve mentre si lavora, non a chi deve correggere. */
-        setFase("campo");
-        setErrore(
-          typeof dati?.errore === "string" ? dati.errore : COPY.comune.erroreGenerico,
-        );
-        inCorso.current = false;
-        return;
-      }
-
-      /* Verdetto arrivato ma senza id salvato (l'archivio non c'era):
-         se il dato è dimostrativo la pagina risultato sa ricalcolarlo da
-         sola con l'id "demo-VOLO-DATA", senza database. Se invece era un
-         dato vero, non c'è una pagina da aprire: il verdetto si mostra
-         qui, con onestà, invece di un errore finto. */
-      const destinazione = dati.id
-        ? `/verifica/${dati.id}`
-        : dati.demo === true
-          ? `/verifica/demo-${canonico(volo)}-${data}`
-          : null;
-
-      if (!destinazione) {
-        setFase("campo");
-        setAvviso({
-          testo: typeof dati.motivo === "string" ? dati.motivo : COPY.comune.erroreGenerico,
-          demo: dati.demo === true,
-        });
-        inCorso.current = false;
-        return;
-      }
-
-      /* Il verdetto c'è. Si aspetta che anche l'analisi finisca di
-         raccontarsi: chi arriva al risultato deve aver visto tutti i
-         passi, non un lampo. */
-      await sequenza;
-      /* il verdetto sa che la scansione c'è già stata qui */
-      sessionStorage.setItem("rivoglio-scan-fatto", "1");
-      router.push(destinazione);
-    } catch {
-      setFase("campo");
-      setErrore(COPY.comune.erroreGenerico);
-      inCorso.current = false;
-    }
-  }
 
   return (
     <section
@@ -306,226 +128,11 @@ export default function HeroCheck() {
           </AnimatePresence>
         </Anima>
 
-        {/* IL FORM: il protagonista della pagina. */}
+        {/* LA SCHEDA DEL CHECK: il protagonista della pagina. */}
         <Anima ritardo={0.3}>
           <div className="hc-pulsa mx-auto mt-9 max-w-2xl">
             <div className="vetro rounded-[1.75rem] p-5 text-left sm:p-7">
-              {fase === "campo" ? (
-                <form onSubmit={invia} noValidate>
-                  <div className="grid gap-4 sm:grid-cols-[1.15fr_1fr]">
-                    <div className="flex flex-col gap-1.5">
-                      <label
-                        htmlFor="hc-volo"
-                        className="text-[13px] font-medium text-inchiostro/70"
-                      >
-                        {HERO.form.volo.etichetta}
-                      </label>
-                      <input
-                        id="hc-volo"
-                        name="volo"
-                        type="text"
-                        autoComplete="off"
-                        autoCapitalize="characters"
-                        spellCheck={false}
-                        value={volo}
-                        onChange={(e) => setVolo(e.target.value)}
-                        placeholder={HERO.form.volo.segnaposto}
-                        className="h-14 w-full min-w-0 rounded-bottone border border-bordo bg-white px-4 font-display text-[19px] font-medium tracking-[-0.01em] text-inchiostro outline-none transition-all duration-200 placeholder:font-sans placeholder:text-[16px] placeholder:font-normal placeholder:text-fumo-2 focus:border-verde/60 focus:ring-4 focus:ring-verde/12"
-                      />
-                      <p className="text-[12px] leading-snug text-fumo">
-                        {HERO.form.volo.aiuto}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-col gap-1.5">
-                      <label
-                        htmlFor="hc-data"
-                        className="text-[13px] font-medium text-inchiostro/70"
-                      >
-                        {HERO.form.data.etichetta}
-                      </label>
-                      <input
-                        id="hc-data"
-                        name="data"
-                        type="date"
-                        min={minData}
-                        max={maxData}
-                        value={data}
-                        onChange={(e) => setData(e.target.value)}
-                        /* Il calendario si apre toccando TUTTO il campo,
-                           non solo l'iconcina: senza, su Chrome e Edge il
-                           click sul campo sembrava morto (visto da
-                           Valerio l'8/08). Safari non ha showPicker: il
-                           try lo lascia al suo comportamento nativo. */
-                        onClick={(e) => {
-                          try {
-                            e.currentTarget.showPicker();
-                          } catch {
-                            /* niente: il browser fa da sé */
-                          }
-                        }}
-                        className="h-14 w-full min-w-0 cursor-pointer rounded-bottone border border-bordo bg-white px-4 text-[16px] text-inchiostro outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/12"
-                      />
-                      <p className="text-[12px] leading-snug text-fumo">
-                        {HERO.form.data.aiuto}
-                      </p>
-                    </div>
-                  </div>
-
-                  {errore && (
-                    <motion.p
-                      role="alert"
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-3 text-[14px] font-medium text-red-600"
-                    >
-                      {errore}
-                    </motion.p>
-                  )}
-
-                  {avviso && (
-                    <motion.div
-                      role="status"
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-3 rounded-xl border border-bordo bg-nebbia p-4"
-                    >
-                      {avviso.demo && (
-                        <span className="mb-2 inline-block rounded-pillola border border-bordo bg-white px-2.5 py-0.5 text-[11px] font-medium text-fumo">
-                          {COPY.comune.demo}
-                        </span>
-                      )}
-                      <p className="text-[13.5px] leading-relaxed text-inchiostro/85">
-                        {avviso.testo}
-                      </p>
-                    </motion.div>
-                  )}
-
-                  <button
-                    type="submit"
-                    className="riflesso mt-4 inline-flex h-14 w-full items-center justify-center gap-2 rounded-bottone bg-verde text-[16.5px] font-medium text-white shadow-[0_12px_28px_-12px_rgba(6,122,70,.75),0_2px_0_0_rgba(255,255,255,.22)_inset] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro hover:shadow-[0_18px_40px_-14px_rgba(6,122,70,.85),0_2px_0_0_rgba(255,255,255,.22)_inset]"
-                  >
-                    {HERO.form.bottone}
-                    <span aria-hidden="true">→</span>
-                  </button>
-
-                  <p className="mt-3 text-center text-[14.5px] text-fumo">
-                    {HERO.form.rassicurazione}
-                  </p>
-                </form>
-              ) : (
-                /* LO SCANNER: il documento coi dati veri inseriti, il raggio
-                   che lo attraversa, le righe che si accendono a ogni passo
-                   completato. Il teatro resta onesto: i passi avanzano con
-                   lo stato vero della richiesta, qui cambia solo la scena. */
-                <div aria-live="polite" className="py-1">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-fumo">
-                      {TEATRO.titolo}
-                    </p>
-                    {/* L'avanzamento: quanti passi sono chiusi sul totale.
-                        Una percentuale finta salirebbe anche a server fermo. */}
-                    <p className="numeri text-[13px] font-medium text-verde-scuro">
-                      {Math.min(passo, TEATRO.passi.length)}/{TEATRO.passi.length}
-                    </p>
-                  </div>
-
-                  {/* la barra: si riempie a passo chiuso, non a caso */}
-                  <div className="mt-2 h-1 overflow-hidden rounded-full bg-bordo">
-                    <motion.div
-                      className="h-full rounded-full bg-verde"
-                      initial={{ width: "0%" }}
-                      animate={{
-                        width: `${(Math.min(passo, TEATRO.passi.length) / TEATRO.passi.length) * 100}%`,
-                      }}
-                      transition={{ duration: 0.8, ease: CURVA }}
-                    />
-                  </div>
-
-                  {/* la carta d'imbarco sotto scansione, coi dati veri.
-                      I 6 passi diventano i 4 stati della carta: si legge il
-                      volo, poi gli orari, e alla fine arriva il timbro. */}
-                  <div className="mt-4">
-                    <CartaImbarcoScan
-                      tratta={letto.tratta}
-                      arrivoPrevisto={letto.previsto}
-                      arrivoEffettivo={letto.effettivo}
-                      volo={volo.trim().toUpperCase()}
-                      dataTesto={data}
-                      passo={Math.min(3, Math.floor(passo / 2))}
-                    />
-                  </div>
-
-                  <ol className="mt-4 space-y-3">
-                    {TEATRO.passi.map((testo, i) => {
-                      const fatto = i < passo;
-                      const attivo = i === passo;
-                      return (
-                        <li key={testo} className="flex items-start gap-3.5">
-                          <span
-                            className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${
-                              fatto
-                                ? "border-verde bg-verde text-white"
-                                : attivo
-                                  ? "border-verde/50 bg-white text-verde"
-                                  : "border-bordo bg-white text-fumo-2"
-                            }`}
-                          >
-                            {fatto ? (
-                              <svg viewBox="0 0 16 16" className="h-4 w-4" aria-hidden="true">
-                                <path
-                                  d="m3.5 8.4 2.8 2.8 6-6.4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            ) : attivo ? (
-                              <motion.span
-                                className="h-2.5 w-2.5 rounded-full bg-verde"
-                                animate={{ opacity: [1, 0.25, 1], scale: [1, 0.8, 1] }}
-                                transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
-                              />
-                            ) : (
-                              <span className="h-2.5 w-2.5 rounded-full bg-bordo" />
-                            )}
-                          </span>
-                          <span className="min-w-0">
-                            <span
-                              className={`block text-[15.5px] transition-colors duration-300 ${
-                                fatto || attivo ? "font-medium text-inchiostro" : "text-fumo-2"
-                              }`}
-                            >
-                              {testo}
-                            </span>
-                            {/* Il dettaglio compare SOLO sul passo in corso:
-                                dice cosa sta facendo il server proprio ora. */}
-                            <AnimatePresence initial={false}>
-                              {attivo && TEATRO.dettagli[i] && (
-                                <motion.span
-                                  key="dettaglio"
-                                  initial={{ opacity: 0, y: -3 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0 }}
-                                  transition={{ duration: 0.35 }}
-                                  className="mt-0.5 block text-[13px] leading-snug text-fumo"
-                                >
-                                  {TEATRO.dettagli[i]}
-                                </motion.span>
-                              )}
-                            </AnimatePresence>
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ol>
-                  <p className="mt-4 border-t border-bordo/70 pt-3 text-[12.5px] leading-relaxed text-fumo">
-                    {TEATRO.nota}
-                  </p>
-                </div>
-              )}
+              <SchedaCheck />
             </div>
           </div>
         </Anima>

@@ -59,6 +59,50 @@ export const COPY = {
     nota: "Con un account le tue pratiche restano qui, pronte da seguire.",
   },
 
+  /* ---- LO STANDARD DEL CHECK: identico su landing, web app e app ----
+     Tre modi di dire qual è il volo: tratta (predefinito), numero, foto
+     della carta d'imbarco. Le stesse parole dell'app (mobile testi.ts). */
+  check: {
+    modo: {
+      tratta: "Non so il numero",
+      numero: "So il numero",
+    },
+    tratta: {
+      da: { etichetta: "Da dove sei partito", segnaposto: "Città o aeroporto" },
+      a: { etichetta: "Dove sei arrivato", segnaposto: "Città o aeroporto" },
+      data: { etichetta: "Che giorno", aiuto: "Il giorno della partenza." },
+      bottone: "Cerca il volo",
+      errori: {
+        partenza: "Scegli da dove sei partito.",
+        arrivo: "Scegli dove sei arrivato.",
+        stessoScalo: "Partenza e arrivo sono lo stesso aeroporto.",
+        data: "Scegli il giorno del volo.",
+      },
+      elenco: {
+        titolo: "Qual era il tuo?",
+        sottotitolo: "Gli orari sono quelli di partenza previsti. Scegli il tuo volo.",
+        arrivo: "arrivo",
+        cancellato: "cancellato",
+        demo: "Elenco dimostrativo: manca la chiave del fornitore dati.",
+        nessuno:
+          "Nessun volo trovato su questa tratta in quel giorno. Può essere l'aeroporto sbagliato (molte città ne hanno più di uno) o il giorno sbagliato. Prova a cambiare, oppure passa al numero del volo.",
+      },
+      nessunoScalo: "Nessun aeroporto con questo nome. Prova con la città, per esempio Roma.",
+      cambia: "Cambia",
+    },
+    carta: {
+      titolo: "Hai la carta d'imbarco?",
+      testo: "Caricala e compilo io volo e data. Poi controlli quello che ho letto.",
+      bottone: "Carica la foto",
+      attesa: "Sto leggendo la carta d'imbarco",
+      privacy: "La foto non viene salvata: la leggo e la butto.",
+      // {volo} e {data} vengono riempiti con quello che è stato letto.
+      letto: "Letto dalla carta d'imbarco: volo {volo} del {data}. Controlla che sia giusto.",
+      lettoSoloVolo: "Dalla carta d'imbarco ho letto il volo {volo}. La data mettila tu.",
+      lettoSoloData: "Dalla carta d'imbarco ho letto il giorno {data}. Il volo scrivilo tu.",
+    },
+  },
+
   /* ---- LA WEB APP: le stesse sezioni dell'app sul telefono ----
      Un solo prodotto, due schermi (scelta di Valerio, 8/08). */
   appWeb: {

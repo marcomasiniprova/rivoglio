@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     "prove/report/**",
     // L'app mobile è un progetto TypeScript a sé: ha il suo `expo lint`.
     "mobile/**",
+    // Il bundle generato dell'anteprima app: codice compilato, non nostro.
+    "public/app-anteprima/**",
   ]),
 ]);
 
