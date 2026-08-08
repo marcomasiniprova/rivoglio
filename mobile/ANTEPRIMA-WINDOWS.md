@@ -33,7 +33,7 @@ accorga del comando nuovo).
 ### Passo 1.2 — Scarica il progetto
 
 ```powershell
-cd $HOME\Documents
+cd $HOME
 ```
 
 ```powershell
@@ -41,7 +41,12 @@ git clone -b claude/saas-app-repo-analysis-ghehqa https://github.com/marcomasini
 ```
 
 `$HOME` è la tua cartella utente: non devi scrivere il tuo nome, ci pensa
-Windows. Alla fine avrai il progetto in `C:\Users\valer\Documents\rivoglio`.
+Windows. Alla fine avrai il progetto in `C:\Users\valer\rivoglio`.
+
+> **Perché non dentro Documenti:** quella cartella di solito è
+> sincronizzata da OneDrive, e Git non riesce a crearci dentro la
+> cartella di lavoro (`could not create work tree dir`). La cartella
+> utente non ha questo problema.
 
 Se compare una finestra di GitHub che chiede l'accesso, entra col tuo
 account: la repository è privata e serve il permesso.
@@ -59,7 +64,7 @@ account: la repository è privata e serve il permesso.
 Serve a vedere schermate, testi e colori. Node.js ce l'hai già installato.
 
 ```powershell
-cd $HOME\Documents\rivoglio\mobile
+cd $HOME\rivoglio\mobile
 ```
 
 ```powershell
@@ -107,7 +112,7 @@ sullo schermo. **Lascialo acceso.**
 ### 3.4 Avvia l'app
 
 ```powershell
-cd $HOME\Documents\rivoglio\mobile
+cd $HOME\rivoglio\mobile
 ```
 
 ```powershell
@@ -128,7 +133,7 @@ Scorciatoie mentre gira: `r` ricarica, `m` apre il menu di sviluppo,
 Due righe, ogni volta che ti dico che ho pushato:
 
 ```powershell
-cd $HOME\Documents\rivoglio
+cd $HOME\rivoglio
 ```
 
 ```powershell
