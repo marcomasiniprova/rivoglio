@@ -93,6 +93,34 @@ export const TESTI = {
     },
   },
 
+  /* ---- GLI AVVISI: il server ricontrolla, il telefono suona ----
+     Regola dettata da Valerio: mai il numero di volo, mai una promessa.
+     Si parla di tratta e di ore, e si dice cosa succede davvero. */
+  avvisi: {
+    ospite: {
+      titolo: "Ti avviso io quando c'è un esito",
+      testo:
+        "I voli che salvi li ricontrollo il giorno dopo e ti scrivo solo se rientrano in una fascia. Per farlo devo sapere che sono i tuoi: serve l'email. Il check resta libero.",
+      azione: "Entra e attiva gli avvisi",
+    },
+    da_attivare: {
+      titolo: "Ti avviso io quando c'è un esito",
+      testo:
+        "Ricontrollo i tuoi voli il giorno dopo la partenza e ti scrivo solo se rientrano in una fascia. Niente altro: nessuna pubblicità, nessun promemoria inutile.",
+      azione: "Attiva le notifiche",
+    },
+    negato: {
+      titolo: "Notifiche spente dal telefono",
+      testo:
+        "Le hai bloccate nelle impostazioni del telefono. Puoi riaccenderle da lì quando vuoi. Intanto i tuoi voli restano salvati: li ricontrolli da qui.",
+    },
+    attivi: {
+      titolo: "Avvisi attivi",
+      testo:
+        "Ricontrollo i tuoi voli la mattina dopo la partenza. Ti scrivo solo se rientrano in una fascia, e ti dico la tratta e il ritardo.",
+    },
+  },
+
   /* ---- IL VERDETTO: tre esiti, mai una promessa ---- */
   verdetto: {
     idoneo: {

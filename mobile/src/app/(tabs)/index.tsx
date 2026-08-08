@@ -7,7 +7,7 @@
  * - il verdetto lo dà il motore sul server, mai l'app (lib/api.ts);
  * - niente promesse: "forse ti devono", mai "hai diritto a".
  */
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -22,12 +22,16 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import Bottone from "@/components/Bottone";
 import Campo from "@/components/Campo";
+import CardAvvisi, { type StatoAvvisi } from "@/components/CardAvvisi";
 import CardVolo from "@/components/CardVolo";
 import RicercaTratta from "@/components/RicercaTratta";
 import Titolo from "@/components/Titolo";
 import { verificaVolo } from "@/lib/api";
 import { conBarre, dataIso } from "@/lib/data";
+import { chiediPermesso, registraToken, statoPermesso } from "@/lib/notifiche";
+import { useSessione } from "@/lib/sessione";
 import { leggiVoli, salvaVolo, togliVolo, type VoloSalvato } from "@/lib/voliSalvati";
+import { seguiVoli, smettiDiSeguire } from "@/lib/voliSeguiti";
 import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
 import { TESTI } from "@/lib/testi";
 
@@ -44,13 +48,55 @@ export default function SchermataCheck() {
      sa a memoria una persona su dieci, e chi non ce l'ha se ne va. */
   const [modo, setModo] = useState<"tratta" | "numero">("tratta");
 
+  /* Gli avvisi: chi non è entrato non può essere avvisato (il server deve
+     sapere di chi è il volo), quindi lo stato si deduce, non si tiene. */
+  const { utente } = useSessione();
+  const [permesso, setPermesso] = useState<"da_chiedere" | "concesso" | "negato">("da_chiedere");
+  const avvisi: StatoAvvisi = !utente
+    ? "ospite"
+    : permesso === "concesso"
+      ? "attivi"
+      : permesso === "negato"
+        ? "negato"
+        : "da_attivare";
+
+  /* Il permesso si chiede UNA volta, al primo volo salvato (scelta di
+     Valerio): chiederlo all'avvio, a freddo, se lo prende un "no". */
+  const giaChiesto = useRef(false);
+
   /* I voli tornano a ogni ritorno sulla schermata: se ne è stato appena
-     controllato uno, la lista lo mostra aggiornato senza riavviare. */
+     controllato uno, la lista lo mostra aggiornato senza riavviare.
+     È anche il momento in cui i voli salvati salgono sul server, se
+     l'utente è entrato: così chi entra dopo ritrova tutto seguito. */
   useFocusEffect(
     useCallback(() => {
-      void leggiVoli().then(setSalvati);
-    }, []),
+      void leggiVoli().then(async (voli) => {
+        setSalvati(voli);
+        if (!utente || voli.length === 0) return;
+
+        await seguiVoli(voli);
+        const stato = await statoPermesso();
+        if (stato === "da_chiedere" && !giaChiesto.current) {
+          giaChiesto.current = true;
+          const ok = await chiediPermesso();
+          setPermesso(ok ? "concesso" : "negato");
+          if (ok) await registraToken();
+          return;
+        }
+        setPermesso(stato);
+        if (stato === "concesso") await registraToken();
+      });
+    }, [utente]),
   );
+
+  /** Il bottone della card: riapre il permesso o porta all'accesso. */
+  async function attivaAvvisi() {
+    const ok = await chiediPermesso();
+    setPermesso(ok ? "concesso" : "negato");
+    if (!ok) return;
+    await registraToken();
+    await seguiVoli(salvati);
+  }
 
   /** Il check vero e proprio: lo usa il form e lo usa "ricontrolla". */
   async function chiedi(voloDaControllare: string, iso: string) {
@@ -80,6 +126,8 @@ export default function SchermataCheck() {
       aggiuntoIl: new Date().toISOString(),
     });
     setSalvati(aggiornati);
+    // Se è entrato, il volo sale subito fra quelli che il server ricontrolla.
+    void seguiVoli(aggiornati);
     // Il verdetto viaggia come parametri: la schermata dopo non richiama l'API.
     router.push({
       pathname: "/verdetto",
@@ -231,10 +279,19 @@ export default function SchermataCheck() {
                   key={`${v.volo}-${v.data}`}
                   volo={v}
                   onApri={() => void chiedi(v.volo, v.data)}
-                  onTogli={() => void togliVolo(v.volo, v.data).then(setSalvati)}
+                  onTogli={() => {
+                    void togliVolo(v.volo, v.data).then(setSalvati);
+                    void smettiDiSeguire(v.volo, v.data);
+                  }}
                 />
               ))}
             </View>
+
+            <CardAvvisi
+              stato={avvisi}
+              onEntra={() => router.push("/accesso")}
+              onAttiva={() => void attivaAvvisi()}
+            />
           </View>
         )}
 
