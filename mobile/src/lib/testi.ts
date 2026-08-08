@@ -107,6 +107,21 @@ export const TESTI = {
     },
   },
 
+  /* ---- LA WELCOME: la prima apertura dell'app ---- */
+  benvenuto: {
+    tagline: "Riprenditi i soldi che ti devono.",
+    sottotitolo:
+      "Controlli un volo in trenta secondi, coi dati certificati. Se ti spetta una fascia, la lettera è pronta.",
+    salta: "Salta",
+    carta: {
+      titolo: "Iniziamo dal tuo volo",
+      testo: "Con l'email tieni le pratiche, gli avvisi e la classifica. Oppure prima guarda com'è.",
+      segnaposto: "La tua email",
+      inizia: "Inizia",
+      esplora: "Esplora prima l'app",
+    },
+  },
+
   /* ---- GLI AVVISI: il server ricontrolla, il telefono suona ----
      Regola dettata da Valerio: mai il numero di volo, mai una promessa.
      Si parla di tratta e di ore, e si dice cosa succede davvero. */

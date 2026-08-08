@@ -15,7 +15,7 @@ import {
   View,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import Bottone from "@/components/Bottone";
 import Campo from "@/components/Campo";
 import Titolo from "@/components/Titolo";
@@ -27,8 +27,10 @@ const A = TESTI.accessoApp;
 
 export default function SchermataAccesso() {
   const router = useRouter();
-  const [nuovo, setNuovo] = useState(false);
-  const [email, setEmail] = useState("");
+  /* L'email può arrivare già scritta dalla welcome: un campo in meno. */
+  const { email: emailIniziale } = useLocalSearchParams<{ email?: string }>();
+  const [nuovo, setNuovo] = useState(Boolean(emailIniziale));
+  const [email, setEmail] = useState(emailIniziale ?? "");
   const [password, setPassword] = useState("");
   const [errore, setErrore] = useState<string | null>(null);
   const [inCorso, setInCorso] = useState(false);

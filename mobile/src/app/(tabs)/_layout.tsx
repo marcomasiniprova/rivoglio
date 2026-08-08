@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 import { Tabs } from "expo-router/js-tabs";
 import type { BottomTabBarProps } from "expo-router/js-tabs";
 import BarraTab from "@/components/BarraTab";
 import { classifica } from "@/lib/api";
+import { CHIAVE_BENVENUTO } from "@/app/benvenuto";
+import { useSessione } from "@/lib/sessione";
 import { TESTI } from "@/lib/testi";
 
 /**
@@ -18,7 +22,23 @@ import { TESTI } from "@/lib/testi";
  * avvio, senza aggiornare l'app.
  */
 export default function LayoutTab() {
+  const router = useRouter();
+  const { utente, pronto } = useSessione();
   const [conClassifica, setConClassifica] = useState(false);
+
+  /* LA WELCOME, una volta sola: al primo avvio (nessun account, mai
+     vista) si va alla scena d'ingresso. Da lì si torna qui con "Salta"
+     o dopo l'accesso, e il segno resta scritto sul telefono. */
+  useEffect(() => {
+    if (!pronto || utente) return;
+    let montato = true;
+    void AsyncStorage.getItem(CHIAVE_BENVENUTO).then((vista) => {
+      if (montato && !vista) router.replace("/benvenuto");
+    });
+    return () => {
+      montato = false;
+    };
+  }, [pronto, utente, router]);
 
   useEffect(() => {
     let montato = true;

@@ -3,12 +3,23 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Logo from "@/components/Logo";
 import ModuloEntra from "@/components/ModuloEntra";
+
 export const metadata: Metadata = {
   title: "Entra | Rivoglio",
   description: "Entra nel tuo account e segui le tue pratiche.",
   robots: { index: false },
 };
 
+/**
+ * L'ingresso, sul riferimento scelto da Valerio (8/08): la pagina è una
+ * cornice scura con dentro UNA carta chiara divisa in due. A sinistra il
+ * modulo; a destra la promessa in grande, come una citazione, e una
+ * skyline aeroportuale disegnata a linee.
+ *
+ * Il riferimento aveva la recensione di un cliente: noi clienti ancora
+ * non ne abbiamo, e le recensioni non si inventano (regola 3). Al suo
+ * posto c'è la promessa del prodotto, firmata dal prodotto.
+ */
 export default async function PaginaEntra({ searchParams }: PageProps<"/entra">) {
   const p = await searchParams;
   const grezzo = typeof p.poi === "string" ? p.poi : "/app";
@@ -17,91 +28,101 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
   const errore = typeof p.errore === "string" ? p.errore : null;
 
   return (
-    <main className="grid min-h-dvh lg:grid-cols-2">
-      {/* ---------- sinistra: il modulo ---------- */}
-      <div className="flex flex-col px-6 py-8 sm:px-10 lg:px-16">
-        <div className="flex items-center justify-between">
-          <Logo />
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-sm text-fumo transition-colors hover:text-inchiostro"
-          >
-            <ArrowLeft className="size-4" aria-hidden="true" />
-            Torna al sito
-          </Link>
-        </div>
-
-        <div className="flex flex-1 items-center justify-center py-14">
-          <ModuloEntra modoIniziale={modo} poi={poi} errore={errore} />
-        </div>
-
-        <p className="text-center text-xs leading-relaxed text-fumo-2">
-          Entrando accetti che ti scriviamo solo per le tue pratiche.
-          Niente pubblicità, niente liste vendute a nessuno.
-        </p>
-      </div>
-
-      {/* ---------- destra: cosa ci fai dentro ----------
-          Non è decorazione: è l'esempio vero preso da lib/esempio.ts, gli
-          stessi numeri della landing. Se cambiano lì, cambiano anche qui. */}
-      <aside className="relative hidden overflow-hidden bg-verde-notte lg:flex lg:flex-col lg:justify-center lg:px-16">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-70"
-          style={{
-            background:
-              "radial-gradient(90% 60% at 20% 0%, rgba(127,232,174,0.22) 0%, transparent 62%)",
-          }}
-        />
-        <div className="relative">
-          <p className="text-[0.8rem] font-medium uppercase tracking-[0.18em] text-menta">
-            Cosa ci fai dentro
-          </p>
-          <h2 className="mt-5 max-w-md font-display text-[2.6rem] leading-[1.05] tracking-[-0.04em] text-white">
-            La tua pratica, seguita passo per passo.
-          </h2>
-
-          {/* Un esempio COSTRUITO e dichiarato tale (regola 3): niente voli
-              veri, niente dati che sembrano veri. */}
-          <div className="mt-10 max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde">
-                <span className="size-1.5 rounded-full bg-verde" />
-                Fascia 400€
-              </div>
-              <span className="rounded-pillola bg-nebbia-2 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-fumo">
-                Esempio
-              </span>
-            </div>
-            <p className="mt-3 font-display text-xl tracking-[-0.03em]">Volo di esempio</p>
-            <p className="mt-1 text-sm text-fumo">Arrivato con 3h52 di ritardo</p>
-
-            <ol className="mt-5 flex flex-col gap-2.5 border-t border-bordo pt-5 text-sm">
-              <li className="flex items-center gap-2.5">
-                <span className="grid size-5 place-items-center rounded-full bg-menta text-[10px] font-semibold text-verde-notte">✓</span>
-                <span>Pagata, lettera pronta</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <span className="grid size-5 place-items-center rounded-full bg-menta text-[10px] font-semibold text-verde-notte">✓</span>
-                <span>Inviata dalla tua email</span>
-              </li>
-              <li className="flex items-center gap-2.5 text-fumo">
-                <span className="grid size-5 place-items-center rounded-full border border-verde/40 text-[10px] font-semibold text-verde">3</span>
-                <span>Giorno 15: sollecito pronto da inviare</span>
-              </li>
-              <li className="flex items-center gap-2.5 text-fumo-2">
-                <span className="grid size-5 place-items-center rounded-full border border-bordo text-[10px]">4</span>
-                <span>Esito, o rimborso con la garanzia</span>
-              </li>
-            </ol>
+    <main className="grid min-h-dvh place-items-center bg-verde-notte px-4 py-6 sm:px-8 sm:py-10">
+      <div className="grid w-full max-w-6xl overflow-hidden rounded-[2rem] bg-white shadow-[0_60px_120px_-40px_rgba(0,0,0,.6)] lg:grid-cols-[1.05fr_1fr]">
+        {/* ---------- sinistra: il modulo ---------- */}
+        <div className="flex flex-col bg-nebbia px-6 py-8 sm:px-10 lg:px-14">
+          <div className="flex items-center justify-between">
+            <Logo />
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-sm text-fumo transition-colors hover:text-inchiostro"
+            >
+              <ArrowLeft className="size-4" aria-hidden="true" />
+              Torna al sito
+            </Link>
           </div>
 
-          <p className="mt-8 max-w-sm text-sm leading-relaxed text-menta/80">
-            Il sollecito al giorno 15 è il pezzo che vale: è lì che la maggior
-            parte delle persone molla, e il nostro parte da solo.
+          <div className="flex flex-1 items-center justify-center py-12">
+            <ModuloEntra modoIniziale={modo} poi={poi} errore={errore} />
+          </div>
+
+          <p className="text-center text-xs leading-relaxed text-fumo-2">
+            Entrando accetti che ti scriviamo solo per le tue pratiche.
+            Niente pubblicità, niente liste vendute a nessuno.
           </p>
         </div>
-      </aside>
+
+        {/* ---------- destra: la promessa e la skyline ---------- */}
+        <aside className="relative hidden flex-col justify-between overflow-hidden bg-white lg:flex">
+          <div className="px-12 pt-16">
+            {/* le virgolette, come nel riferimento, nel nostro verde */}
+            <span aria-hidden="true" className="font-display text-[64px] leading-none text-verde">
+              &ldquo;
+            </span>
+            <blockquote className="mt-2 max-w-md font-display text-[1.75rem] leading-[1.3] tracking-[-0.02em] text-inchiostro">
+              Controlli il volo in trenta secondi, coi dati certificati. Se ti
+              spetta una fascia, la lettera è pronta: la invii tu e la
+              compensazione arriva a te. Fino a 600€ a passeggero.
+            </blockquote>
+            <div className="mt-7 flex items-center gap-3">
+              <span className="grid size-10 place-items-center rounded-full bg-menta-tenue">
+                <span className="size-4 rounded-full bg-verde" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-[15px] font-semibold text-inchiostro">Rivoglio</p>
+                <p className="text-[13px] text-fumo">Regolamento CE 261/2004</p>
+              </div>
+            </div>
+          </div>
+
+          {/* la skyline aeroportuale, a linee: torre, terminal, aereo in decollo */}
+          <svg
+            viewBox="0 0 560 300"
+            aria-hidden="true"
+            className="mt-10 w-full"
+            fill="none"
+            stroke="var(--color-verde-notte)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {/* il terminal */}
+            <rect x="60" y="190" width="150" height="110" fill="#E6FAF0" />
+            <path d="M60 190h150" />
+            <path d="M60 190 135 158l75 32" />
+            <path d="M80 215h110M80 240h110M80 265h110" strokeWidth="1.8" opacity=".55" />
+            {/* la torre di controllo */}
+            <rect x="258" y="120" width="34" height="180" fill="#FDF3D7" />
+            <path d="M246 120h58l-10-34h-38z" fill="white" />
+            <path d="M251 100h48" strokeWidth="1.8" />
+            <path d="M267 140v140M283 140v140" strokeWidth="1.6" opacity=".45" />
+            {/* i palazzi dietro */}
+            <rect x="330" y="170" width="70" height="130" fill="white" />
+            <path d="M342 190h46M342 212h46M342 234h46M342 256h46" strokeWidth="1.6" opacity=".5" />
+            <rect x="418" y="140" width="58" height="160" fill="#FBE9E4" />
+            <path d="M428 160h38M428 184h38M428 208h38M428 232h38M428 256h38" strokeWidth="1.6" opacity=".5" />
+            {/* la pista */}
+            <path d="M20 300h520" strokeWidth="3" />
+            <path d="M40 288h30M96 288h30M152 288h30M208 288h30M264 288h30M320 288h30M376 288h30M432 288h30M488 288h30" strokeWidth="2" opacity=".5" />
+            {/* l'aereo in decollo */}
+            <g transform="translate(392 60) rotate(-14)">
+              <path
+                d="M0 18c34-8 74-10 96-6 12 2 18 8 12 12-10 7-38 8-62 4L8 24c-6-1-10-4-8-6z"
+                fill="white"
+              />
+              <path d="M34 14 58 -6l10 2-16 20" fill="#E6FAF0" />
+              <path d="M40 26l30 14 10-2-24-16" fill="#E6FAF0" />
+              <path d="M96 10l14-10 6 2-10 12" fill="#E6FAF0" />
+              <circle cx="20" cy="20" r="1.6" fill="var(--color-verde-notte)" stroke="none" />
+              <circle cx="30" cy="19" r="1.6" fill="var(--color-verde-notte)" stroke="none" />
+              <circle cx="40" cy="18" r="1.6" fill="var(--color-verde-notte)" stroke="none" />
+            </g>
+            {/* la scia */}
+            <path d="M300 132c30-18 62-34 96-46" strokeDasharray="2 10" strokeWidth="2.4" opacity=".6" />
+          </svg>
+        </aside>
+      </div>
     </main>
   );
 }
