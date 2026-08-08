@@ -23,6 +23,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import Bottone from "@/components/Bottone";
 import Campo from "@/components/Campo";
 import CardVolo from "@/components/CardVolo";
+import RicercaTratta from "@/components/RicercaTratta";
 import Titolo from "@/components/Titolo";
 import { verificaVolo } from "@/lib/api";
 import { conBarre, dataIso } from "@/lib/data";
@@ -39,6 +40,9 @@ export default function SchermataCheck() {
   const [errore, setErrore] = useState<string | null>(null);
   const [inCorso, setInCorso] = useState(false);
   const [salvati, setSalvati] = useState<VoloSalvato[]>([]);
+  /* Il modo predefinito è la tratta, non il numero: il numero di volo lo
+     sa a memoria una persona su dieci, e chi non ce l'ha se ne va. */
+  const [modo, setModo] = useState<"tratta" | "numero">("tratta");
 
   /* I voli tornano a ogni ritorno sulla schermata: se ne è stato appena
      controllato uno, la lista lo mostra aggiornato senza riavviare. */
@@ -144,6 +148,41 @@ export default function SchermataCheck() {
 
         {/* ------------------------------------------------ il form */}
         <View style={stili.scheda}>
+          {/* I due modi di dire qual è il volo: la tratta per tutti,
+              il numero per chi ce l'ha davanti. */}
+          <View style={stili.modi}>
+            {(["tratta", "numero"] as const).map((m) => (
+              <Pressable
+                key={m}
+                onPress={() => {
+                  setModo(m);
+                  setErrore(null);
+                }}
+                accessibilityRole="button"
+                accessibilityState={{ selected: modo === m }}
+                style={[stili.modo, modo === m && stili.modoAttivo]}
+              >
+                <Text style={[stili.modoTesto, modo === m && stili.modoTestoAttivo]}>
+                  {T.modo[m]}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
+          {modo === "tratta" ? (
+            <>
+              <RicercaTratta
+                occupato={inCorso}
+                onScegli={(v, iso) => void chiedi(v, iso)}
+              />
+              {errore && (
+                <Text style={stili.errore} accessibilityRole="alert">
+                  {errore}
+                </Text>
+              )}
+            </>
+          ) : (
+            <>
           <Campo
             etichetta={T.volo.etichetta}
             valore={volo}
@@ -176,6 +215,8 @@ export default function SchermataCheck() {
             caricamento={inCorso}
             icona="arrow-right"
           />
+            </>
+          )}
           <Text style={stili.rassicurazione}>{T.rassicurazione}</Text>
         </View>
 
@@ -264,6 +305,25 @@ const stili = StyleSheet.create({
     marginTop: SPAZIO.xl,
     ...OMBRA.scheda,
   },
+  modi: {
+    flexDirection: "row",
+    gap: SPAZIO.xs,
+    backgroundColor: COLORI.nebbia,
+    borderRadius: RAGGIO.campo,
+    padding: SPAZIO.xs,
+    marginBottom: SPAZIO.l,
+  },
+  modo: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: RAGGIO.campo - 3,
+    paddingVertical: SPAZIO.s + 2,
+    minHeight: 40,
+  },
+  modoAttivo: { backgroundColor: COLORI.bianco, ...OMBRA.scheda },
+  modoTesto: { fontFamily: FONT.testoMedio, fontSize: 13.5, color: COLORI.fumo },
+  modoTestoAttivo: { color: COLORI.inchiostro },
   aiuto: {
     fontFamily: FONT.testo,
     fontSize: 12,

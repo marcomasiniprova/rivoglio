@@ -37,6 +37,43 @@ export const TESTI = {
       dataStrana: "Scrivi la data come GG/MM/AAAA.",
     },
     entra: "Ho già un account",
+    /* I due modi di dire qual è il volo. Il primo è quello per tutti: il
+       numero di volo lo sa a memoria una persona su dieci. */
+    modo: {
+      tratta: "Non so il numero",
+      numero: "So il numero",
+    },
+  },
+
+  /* ---- LA RICERCA PER TRATTA: si dice da dove a dove, non il numero ---- */
+  tratta: {
+    da: { etichetta: "Da dove sei partito", segnaposto: "Città o aeroporto" },
+    a: { etichetta: "Dove sei arrivato", segnaposto: "Città o aeroporto" },
+    data: {
+      etichetta: "Che giorno",
+      segnaposto: "GG/MM/AAAA",
+      aiuto: "Il giorno della partenza.",
+    },
+    bottone: "Cerca il volo",
+    errori: {
+      partenza: "Scegli da dove sei partito.",
+      arrivo: "Scegli dove sei arrivato.",
+      stessoScalo: "Partenza e arrivo sono lo stesso aeroporto.",
+      data: "Scegli il giorno del volo.",
+      dataStrana: "Scrivi la data come GG/MM/AAAA.",
+    },
+    elenco: {
+      titolo: "Qual era il tuo?",
+      sottotitolo: "Gli orari sono quelli di partenza previsti. Tocca il tuo volo.",
+      arrivo: "arrivo",
+      cancellato: "cancellato",
+      demo: "Elenco dimostrativo: manca la chiave del fornitore dati.",
+    },
+    nessuno: {
+      titolo: "Nessun volo trovato su questa tratta.",
+      testo:
+        "Può essere l'aeroporto sbagliato (molte città ne hanno più di uno) o il giorno sbagliato. Prova a cambiarlo, oppure passa al numero del volo.",
+    },
   },
 
   /* ---- I TUOI VOLI: salvati sul telefono, si ricontrollano ---- */
