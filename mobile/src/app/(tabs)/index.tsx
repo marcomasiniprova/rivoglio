@@ -10,6 +10,7 @@
 import { useCallback, useRef, useState } from "react";
 import {
   Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -20,12 +21,14 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
+import marchio from "../../../assets/images/marchio.png";
 import Bottone from "@/components/Bottone";
 import Campo from "@/components/Campo";
 import CardAvvisi, { type StatoAvvisi } from "@/components/CardAvvisi";
 import CardVolo from "@/components/CardVolo";
 import RicercaTratta from "@/components/RicercaTratta";
 import ScattaCarta from "@/components/ScattaCarta";
+import ScenaScan from "@/components/ScenaScan";
 import Titolo from "@/components/Titolo";
 import { verificaVolo } from "@/lib/api";
 import { conBarre, dataIso, inItaliano, perEsteso } from "@/lib/data";
@@ -37,6 +40,23 @@ import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
 import { TESTI } from "@/lib/testi";
 
 const T = TESTI.check;
+
+const attesa = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/* L'analisi profonda, identica al sito (scelta di Valerio, 8/08): un passo
+   ogni 2,4 secondi e la sequenza non si taglia MAI, nemmeno se il server
+   risponde subito. */
+const PASSO_MS = 2400;
+const PAUSA_FINALE_MS = 900;
+const PASSI_TOTALI = TESTI.analisi.passi.length;
+
+/** "2026-08-06T14:55:00Z" → "14:55" (ora di Greenwich, come sul sito). */
+function oraDa(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+}
 
 export default function SchermataCheck() {
   const router = useRouter();
@@ -51,6 +71,21 @@ export default function SchermataCheck() {
   /* Quello che è stato letto dalla carta d'imbarco, per dirlo in chiaro:
      un campo che si riempie da solo senza spiegazioni mette a disagio. */
   const [daCarta, setDaCarta] = useState<string | null>(null);
+
+  /* IL TEATRO: durante l'analisi la scheda diventa la scena di scansione,
+     come sul sito. `passo` avanza col tempo vero della sequenza, `letto`
+     si riempie SOLO coi dati che il server ha davvero dato. */
+  const [fase, setFase] = useState<"campo" | "teatro">("campo");
+  const [passo, setPasso] = useState(0);
+  const [inAnalisi, setInAnalisi] = useState({ volo: "", data: "" });
+  const [letto, setLetto] = useState<{
+    tratta: string | null;
+    previsto: string | null;
+    effettivo: string | null;
+  }>({ tratta: null, previsto: null, effettivo: null });
+  /* Vera finché sequenza e richiesta non sono chiuse: tiene il sipario
+     giù anche se il focus va e torna (cambio tab a metà analisi). */
+  const analisiViva = useRef(false);
 
   /* Gli avvisi: chi non è entrato non può essere avvisato (il server deve
      sapere di chi è il volo), quindi lo stato si deduce, non si tiene. */
@@ -74,6 +109,15 @@ export default function SchermataCheck() {
      l'utente è entrato: così chi entra dopo ritrova tutto seguito. */
   useFocusEffect(
     useCallback(() => {
+      /* Se si torna qui dal verdetto, il sipario della scena è ancora
+         giù: si riapre adesso, a schermata coperta ormai alle spalle.
+         Ma se l'analisi sta ANCORA girando (cambio tab a metà), resta
+         tutto in scena: al termine arriverà il verdetto da sola. */
+      if (!analisiViva.current) {
+        setFase("campo");
+        setInCorso(false);
+        setPasso(0);
+      }
       void leggiVoli().then(async (voli) => {
         setSalvati(voli);
         if (!utente || voli.length === 0) return;
@@ -104,15 +148,45 @@ export default function SchermataCheck() {
 
   /** Il check vero e proprio: lo usa il form e lo usa "ricontrolla". */
   async function chiedi(voloDaControllare: string, iso: string) {
+    if (analisiViva.current) return;
+    analisiViva.current = true;
     setErrore(null);
     setInCorso(true);
+    Keyboard.dismiss();
+
+    /* Su va il sipario: la scena di scansione, identica al sito. La
+       sequenza dei passi corre col suo tempo e non si taglia mai; la
+       richiesta vera corre in parallelo. */
+    setInAnalisi({ volo: voloDaControllare.trim().toUpperCase(), data: iso });
+    setLetto({ tratta: null, previsto: null, effettivo: null });
+    setPasso(0);
+    setFase("teatro");
+
+    const sequenza = (async () => {
+      for (let i = 1; i <= PASSI_TOTALI; i++) {
+        await attesa(PASSO_MS);
+        setPasso(i);
+      }
+      await attesa(PAUSA_FINALE_MS);
+    })();
+
     const esito = await verificaVolo(voloDaControllare, iso);
-    setInCorso(false);
 
     if (!esito.ok) {
+      /* Un errore chiude la scena: si torna al campo, col motivo detto. */
+      analisiViva.current = false;
+      setFase("campo");
+      setInCorso(false);
       setErrore(esito.errore);
       return;
     }
+
+    /* I dati veri del server compilano il biglietto, al passo giusto. */
+    setLetto({
+      tratta: esito.dato.da && esito.dato.a ? `${esito.dato.da} → ${esito.dato.a}` : null,
+      previsto: oraDa(esito.dato.previsto),
+      effettivo: oraDa(esito.dato.effettivo),
+    });
 
     /* Il volo si salva da solo, con l'esito che ha dato il motore: è
        quello che rende l'app diversa dal sito, e la base delle notifiche.
@@ -132,6 +206,15 @@ export default function SchermataCheck() {
     setSalvati(aggiornati);
     // Se è entrato, il volo sale subito fra quelli che il server ricontrolla.
     void seguiVoli(aggiornati);
+
+    /* La scena finisce il suo giro anche se il server ha già risposto:
+       l'analisi profonda non si taglia. Il sipario NON si riapre qui:
+       durante la transizione la schermata resta visibile sotto il
+       verdetto, e un form che riappare a metà scivolata sarebbe un
+       lampo brutto. Si riapre al ritorno del focus (useFocusEffect). */
+    await sequenza;
+    analisiViva.current = false;
+
     // Il verdetto viaggia come parametri: la schermata dopo non richiama l'API.
     router.push({
       pathname: "/verdetto",
@@ -202,11 +285,7 @@ export default function SchermataCheck() {
       >
         {/* ------------------------------------------------ il marchio */}
         <View style={stili.marchio}>
-          <Image
-            source={require("../../../assets/images/marchio.png")}
-            style={stili.segno}
-            accessibilityLabel="Rivoglio"
-          />
+          <Image source={marchio} style={stili.segno} accessibilityLabel="Rivoglio" />
           <Text style={stili.nomeMarchio}>
             Rivo<Text style={stili.nomeVerde}>glio</Text>
           </Text>
@@ -222,6 +301,19 @@ export default function SchermataCheck() {
 
         {/* ------------------------------------------------ il form */}
         <View style={stili.scheda}>
+          {fase === "teatro" ? (
+            /* La scena di scansione prende il posto del form: il biglietto
+               si compila coi dati veri mentre i sei passi avanzano. */
+            <ScenaScan
+              volo={inAnalisi.volo}
+              dataTesto={inItaliano(inAnalisi.data)}
+              passo={passo}
+              tratta={letto.tratta}
+              arrivoPrevisto={letto.previsto}
+              arrivoEffettivo={letto.effettivo}
+            />
+          ) : (
+            <>
           {/* La strada più corta di tutte, quando la carta d'imbarco c'è. */}
           <ScattaCarta onLetto={dallaCarta} />
 
@@ -302,10 +394,12 @@ export default function SchermataCheck() {
             </>
           )}
           <Text style={stili.rassicurazione}>{T.rassicurazione}</Text>
+            </>
+          )}
         </View>
 
         {/* ------------------------------------------------ i tuoi voli */}
-        {salvati.length > 0 && (
+        {fase === "campo" && salvati.length > 0 && (
           <View style={stili.voli}>
             <Text style={stili.voliTitolo}>{TESTI.mieiVoli.titolo}</Text>
             <Text style={stili.voliSotto}>{TESTI.mieiVoli.sottotitolo}</Text>
@@ -332,22 +426,26 @@ export default function SchermataCheck() {
         )}
 
         {/* ------------------------------------------------ la fiducia */}
-        <View style={stili.punti}>
-          {T.punti.map((p) => (
-            <View key={p} style={stili.punto}>
-              <Feather name="check-circle" size={15} color={COLORI.verde} />
-              <Text style={stili.puntoTesto}>{p}</Text>
+        {fase === "campo" && (
+          <>
+            <View style={stili.punti}>
+              {T.punti.map((p) => (
+                <View key={p} style={stili.punto}>
+                  <Feather name="check-circle" size={15} color={COLORI.verde} />
+                  <Text style={stili.puntoTesto}>{p}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
 
-        <Pressable
-          onPress={() => router.push("/accesso")}
-          accessibilityRole="link"
-          style={stili.entra}
-        >
-          <Text style={stili.entraTesto}>{T.entra}</Text>
-        </Pressable>
+            <Pressable
+              onPress={() => router.push("/accesso")}
+              accessibilityRole="link"
+              style={stili.entra}
+            >
+              <Text style={stili.entraTesto}>{T.entra}</Text>
+            </Pressable>
+          </>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );

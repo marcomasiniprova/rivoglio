@@ -13,11 +13,10 @@
  * - niente bottoni Google/Apple finché non esistono le chiavi OAuth:
  *   un bottone che non funziona è una promessa rotta.
  */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Animated,
   Easing,
-  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -29,6 +28,8 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import marchio from "../../assets/images/marchio.png";
+import { useValoreAnimato } from "@/lib/animazioni";
 import { COLORI, FONT, RAGGIO, SPAZIO } from "@/lib/tema";
 import { TESTI } from "@/lib/testi";
 
@@ -38,7 +39,7 @@ export const CHIAVE_BENVENUTO = "rivoglio.benvenuto.v1";
 
 /** Le colonne del marchio, che respirano piano sul fondo. */
 function Colonna({ x, ritardo, alta }: { x: number; ritardo: number; alta: number }) {
-  const respiro = useRef(new Animated.Value(0)).current;
+  const respiro = useValoreAnimato(0);
   useEffect(() => {
     const giro = Animated.loop(
       Animated.sequence([
@@ -82,11 +83,11 @@ export default function SchermataBenvenuto() {
   const [email, setEmail] = useState("");
 
   /* la regia: volo del logo → nome → tagline → carta */
-  const volo = useRef(new Animated.Value(0)).current;
-  const nome = useRef(new Animated.Value(0)).current;
-  const riga = useRef(new Animated.Value(0)).current;
-  const carta = useRef(new Animated.Value(0)).current;
-  const salta = useRef(new Animated.Value(0)).current;
+  const volo = useValoreAnimato(0);
+  const nome = useValoreAnimato(0);
+  const riga = useValoreAnimato(0);
+  const carta = useValoreAnimato(0);
+  const salta = useValoreAnimato(0);
 
   useEffect(() => {
     Animated.sequence([
@@ -177,7 +178,7 @@ export default function SchermataBenvenuto() {
 
       <View style={stili.scena}>
         <Animated.Image
-          source={require("../../assets/images/marchio.png")}
+          source={marchio}
           accessibilityLabel="Rivoglio"
           style={[
             stili.logo,

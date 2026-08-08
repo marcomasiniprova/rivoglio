@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import marchio from "../../assets/images/marchio.png";
 import Bottone from "@/components/Bottone";
 import Titolo from "@/components/Titolo";
 import { SITO } from "@/lib/api";
@@ -76,11 +77,7 @@ export default function SchermataVerdetto() {
   return (
     <ScrollView style={stili.pagina} contentContainerStyle={stili.contenuto}>
       <View style={stili.testata}>
-        <Image
-          source={require("../../assets/images/marchio.png")}
-          style={stili.segno}
-          accessibilityLabel="Rivoglio"
-        />
+        <Image source={marchio} style={stili.segno} accessibilityLabel="Rivoglio" />
         <Pressable onPress={() => router.back()} accessibilityRole="button">
           <Text style={stili.altro}>{V.altroVolo}</Text>
         </Pressable>

@@ -12,7 +12,15 @@
  *
  * Si lancia da `npm run anteprima` dentro mobile/, dopo l'export.
  */
-import { readdirSync, readFileSync, renameSync, rmdirSync, statSync, writeFileSync } from "node:fs";
+import {
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -64,4 +72,27 @@ for (const bundle of file(JS).filter((f) => f.endsWith(".js"))) {
   writeFileSync(bundle, testo);
 }
 
-console.log(`Appiattiti ${mappa.length} asset, riscritti ${sostituzioni} riferimenti.`);
+/* 4. tieni SOLO i font che l'app carica davvero (i 5 del marchio via
+   useFonts + Feather, l'unica famiglia di icone usata): l'export di
+   Expo trascina TUTTI i ttf di @expo/vector-icons, ~8MB che nessuno
+   scarica mai. Il bundle continua a nominarli, ma non li chiede. */
+const FONT_USATI = [
+  "Feather.",
+  "Geist_500Medium.",
+  "InstrumentSerif_400Regular_Italic.",
+  "Poppins_400Regular.",
+  "Poppins_500Medium.",
+  "Poppins_600SemiBold.",
+];
+let tolti = 0;
+for (const percorso of file(ASSETS).filter((f) => f.endsWith(".ttf"))) {
+  const nome = percorso.split("/").pop();
+  if (!FONT_USATI.some((ok) => nome.startsWith(ok))) {
+    rmSync(percorso);
+    tolti++;
+  }
+}
+
+console.log(
+  `Appiattiti ${mappa.length} asset, riscritti ${sostituzioni} riferimenti, tolti ${tolti} font inutili.`,
+);

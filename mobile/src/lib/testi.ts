@@ -59,6 +59,42 @@ export const TESTI = {
     lettoSoloData: "Dalla carta d'imbarco ho letto il giorno {data}. Il volo scrivilo tu.",
   },
 
+  /* ---- L'ANALISI IN CORSO: il teatro onesto, identico al sito ----
+     Stesse parole di lib/copy.ts (comeFunziona.verifica): i 6 passi VERI
+     dell'analisi del server. Nessuno è decorativo, la sequenza non si
+     taglia mai (scelta di Valerio, 8/08). */
+  analisi: {
+    titolo: "Analisi in corso",
+    passi: [
+      "Cerco il volo negli archivi di volo",
+      "Leggo l'orario di atterraggio certificato",
+      "Calcolo la distanza reale della tratta",
+      "Controllo scioperi e circostanze note del giorno",
+      "Confronto orario previsto e orario effettivo",
+      "Applico il Regolamento CE 261/2004",
+    ],
+    dettagli: [
+      "Interrogo il tracciamento del volo",
+      "Verifico che l'orario sia confermato, non stimato",
+      "Distanza ortodromica fra i due aeroporti",
+      "Incrocio la tabella scioperi del trasporto aereo",
+      "Ritardo all'arrivo, al minuto",
+      "Articoli 5, 6 e 7 del Regolamento",
+    ],
+    nota: "Ogni passo è reale: interroghiamo davvero i dati del volo. Se non li troviamo, te lo diciamo.",
+    carta: {
+      intestazione: "Carta d'imbarco",
+      intestazioneEn: "Boarding pass",
+      volo: "Volo",
+      data: "Data",
+      tratta: "Tratta",
+      previsto: "Arrivo previsto",
+      effettivo: "Arrivo effettivo",
+      verifica: "Verifica",
+      timbro: "Reg. CE 261/2004",
+    },
+  },
+
   /* ---- LA RICERCA PER TRATTA: si dice da dove a dove, non il numero ---- */
   tratta: {
     da: { etichetta: "Da dove sei partito", segnaposto: "Città o aeroporto" },
