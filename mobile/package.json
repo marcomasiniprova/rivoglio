@@ -52,7 +52,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "tipi": "tsc --noEmit",
-    "prove": "jest"
+    "prove": "jest",
+    "anteprima": "expo export --platform web --output-dir ../public/app-anteprima"
   },
   "private": true,
   "jest": {
