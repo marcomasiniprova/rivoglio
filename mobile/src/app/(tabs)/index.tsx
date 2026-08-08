@@ -217,7 +217,7 @@ export default function SchermataCheck() {
           <Text style={stili.occhielloTesto}>{T.occhiello}</Text>
         </View>
 
-        <Titolo prima={T.titolo.prima} corsivo={T.titolo.corsivo} />
+        <Titolo prima={T.titolo.prima} corsivo={T.titolo.corsivo} centro />
         <Text style={stili.sottotitolo}>{T.sottotitolo}</Text>
 
         {/* ------------------------------------------------ il form */}
@@ -360,7 +360,15 @@ const stili = StyleSheet.create({
     paddingTop: SPAZIO.xxl + SPAZIO.l,
     paddingBottom: 116,
   },
-  marchio: { flexDirection: "row", alignItems: "center", gap: SPAZIO.s },
+  /* La testata sta AL CENTRO (richiesta di Valerio, 8/08): marchio,
+     occhiello, titolo e sottotitolo sono un blocco simmetrico, non
+     appoggiato a sinistra. */
+  marchio: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: SPAZIO.s,
+  },
   segno: { width: 30, height: 30 },
   nomeMarchio: {
     fontFamily: FONT.display,
@@ -373,7 +381,7 @@ const stili = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: SPAZIO.s,
-    alignSelf: "flex-start",
+    alignSelf: "center",
     backgroundColor: COLORI.bianco,
     borderRadius: RAGGIO.pillola,
     paddingHorizontal: SPAZIO.m,
@@ -390,6 +398,9 @@ const stili = StyleSheet.create({
     lineHeight: 22,
     color: COLORI.fumo,
     marginTop: SPAZIO.m,
+    textAlign: "center",
+    alignSelf: "center",
+    maxWidth: 320,
   },
   scheda: {
     backgroundColor: COLORI.bianco,

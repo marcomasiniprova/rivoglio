@@ -5,13 +5,18 @@ import { TESTI } from "@/lib/testi";
 import type { VoloSalvato } from "@/lib/voliSalvati";
 
 /**
- * Un volo salvato: numero, giorno e l'ultimo verdetto del motore.
+ * Un volo salvato, disegnato come un BIGLIETTO AEREO vero (richiesta di
+ * Valerio, 8/08: "più realistico, una roba seria, non un gioco").
+ *
+ * L'anatomia è quella di una carta d'imbarco: la tratta grande in alto,
+ * lo strappo tratteggiato coi due fori laterali, l'esito nel corpo e il
+ * codice a barre in fondo. Il codice a barre è DERIVATO dal numero del
+ * volo (stesso volo = stesse barre): è un elemento grafico, non un
+ * codice leggibile, e non finge di esserlo.
  *
  * I tre esiti hanno tre facce diverse, e nessuna promette niente: un
  * idoneo mostra la fascia di legge, un incerto dice che non si vende,
- * un non idoneo dice il perché. Un volo mai controllato resta grigio,
- * con l'invito a controllarlo: mai un colore che suggerisca un esito
- * che non abbiamo.
+ * un non idoneo dice il perché. Un volo mai controllato resta grigio.
  */
 
 const T = TESTI.mieiVoli;
@@ -35,6 +40,20 @@ const durata = (minuti: number) => {
   return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2, "0")}`;
 };
 
+/**
+ * Le barre del codice, derivate dal codice volo: deterministiche, così
+ * lo stesso biglietto ha sempre lo stesso disegno.
+ */
+function barre(seme: string): number[] {
+  const larghezze: number[] = [];
+  let x = 0;
+  for (let i = 0; i < 34; i++) {
+    x = (x * 31 + seme.charCodeAt(i % seme.length) + i) % 7;
+    larghezze.push(1 + (x % 3));
+  }
+  return larghezze;
+}
+
 export default function CardVolo({
   volo,
   onApri,
@@ -49,18 +68,26 @@ export default function CardVolo({
   const nonIdoneo = volo.esito === "non_idoneo";
 
   return (
-    <View style={stili.scheda}>
-      <View style={stili.riga}>
+    <View style={stili.biglietto}>
+      {/* ------------------------------------------------ la testata */}
+      <View style={stili.testata}>
         <View style={stili.intestazione}>
           {/* Prima la tratta, perché è così che uno riconosce il suo volo;
               il codice resta sotto, per chi lo cerca. */}
-          <Text style={stili.volo}>
-            {volo.da && volo.a ? `${volo.da} → ${volo.a}` : volo.volo}
+          <Text style={stili.trattaTesto} numberOfLines={1}>
+            {volo.da && volo.a ? (
+              <>
+                {volo.da} <Text style={stili.freccia}>→</Text> {volo.a}
+              </>
+            ) : (
+              volo.volo
+            )}
           </Text>
-          <Text style={stili.data}>
-            {volo.da && volo.a ? `${volo.volo} · ` : ""}
-            {dataIt(volo.data)}
-          </Text>
+          <View style={stili.sottoRiga}>
+            <Text style={stili.etichettaVolo}>VOLO</Text>
+            <Text style={stili.codice}>{volo.volo}</Text>
+            <Text style={stili.data}>{dataIt(volo.data)}</Text>
+          </View>
         </View>
         <Pressable
           onPress={onTogli}
@@ -68,83 +95,148 @@ export default function CardVolo({
           accessibilityLabel={T.togli}
           hitSlop={10}
         >
-          <Feather name="x" size={17} color={COLORI.fumo2} />
+          <Feather name="x" size={16} color={COLORI.fumo2} />
         </Pressable>
       </View>
 
-      {/* L'esito, con la faccia che gli spetta */}
-      {idoneo && (
-        <View style={[stili.esito, stili.esitoIdoneo]}>
-          <Text style={stili.importo}>
-            {volo.importo}€ <Text style={stili.perPasseggero}>{T.perPasseggero}</Text>
-          </Text>
-          {typeof volo.ritardoMinuti === "number" && (
-            <Text style={stili.dettaglio}>
-              {T.ritardo}: {durata(volo.ritardoMinuti)}
+      {/* ------------------------------- lo strappo, coi fori laterali */}
+      <View style={stili.strappo}>
+        <View style={[stili.foro, stili.foroSinistro]} />
+        <View style={stili.tratteggio} />
+        <View style={[stili.foro, stili.foroDestro]} />
+      </View>
+
+      {/* ------------------------------------------------ l'esito */}
+      <View style={stili.corpo}>
+        {idoneo && (
+          <View style={[stili.esito, stili.esitoIdoneo]}>
+            <Text style={stili.importo}>
+              {volo.importo}€ <Text style={stili.perPasseggero}>{T.perPasseggero}</Text>
             </Text>
-          )}
-        </View>
-      )}
+            {typeof volo.ritardoMinuti === "number" && (
+              <Text style={stili.dettaglio}>
+                {T.ritardo}: {durata(volo.ritardoMinuti)}
+              </Text>
+            )}
+          </View>
+        )}
 
-      {incerto && (
-        <View style={[stili.esito, stili.esitoIncerto]}>
-          <Text style={stili.esitoTitolo}>{T.esiti.incerto}</Text>
-          {volo.motivo ? <Text style={stili.dettaglio}>{volo.motivo}</Text> : null}
-        </View>
-      )}
+        {incerto && (
+          <View style={[stili.esito, stili.esitoNeutro]}>
+            <Text style={stili.esitoTitolo}>{T.esiti.incerto}</Text>
+            {volo.motivo ? <Text style={stili.dettaglio}>{volo.motivo}</Text> : null}
+          </View>
+        )}
 
-      {nonIdoneo && (
-        <View style={[stili.esito, stili.esitoNo]}>
-          <Text style={stili.esitoTitolo}>{T.esiti.nonIdoneo}</Text>
-          {typeof volo.ritardoMinuti === "number" && (
-            <Text style={stili.dettaglio}>
-              {T.ritardo}: {durata(volo.ritardoMinuti)}
-            </Text>
-          )}
-        </View>
-      )}
+        {nonIdoneo && (
+          <View style={[stili.esito, stili.esitoNeutro]}>
+            <Text style={stili.esitoTitolo}>{T.esiti.nonIdoneo}</Text>
+            {typeof volo.ritardoMinuti === "number" && (
+              <Text style={stili.dettaglio}>
+                {T.ritardo}: {durata(volo.ritardoMinuti)}
+              </Text>
+            )}
+          </View>
+        )}
 
-      {!volo.esito && (
-        <View style={[stili.esito, stili.esitoVuoto]}>
-          <Text style={stili.dettaglio}>{T.esiti.daControllare}</Text>
-        </View>
-      )}
+        {!volo.esito && (
+          <View style={[stili.esito, stili.esitoNeutro]}>
+            <Text style={stili.dettaglio}>{T.esiti.daControllare}</Text>
+          </View>
+        )}
 
-      <Pressable onPress={onApri} accessibilityRole="button" style={stili.azione}>
-        <Feather name="refresh-cw" size={14} color={COLORI.verdeScuro} />
-        <Text style={stili.azioneTesto}>{volo.esito ? T.ricontrolla : T.controlla}</Text>
-      </Pressable>
+        <Pressable onPress={onApri} accessibilityRole="button" style={stili.azione}>
+          <Feather name="refresh-cw" size={14} color={COLORI.verdeScuro} />
+          <Text style={stili.azioneTesto}>{volo.esito ? T.ricontrolla : T.controlla}</Text>
+        </Pressable>
+      </View>
+
+      {/* --------------------------------------- il codice a barre */}
+      <View style={stili.piede}>
+        <View style={stili.codiceBarre} accessibilityElementsHidden>
+          {barre(volo.volo).map((larghezza, i) => (
+            <View
+              key={i}
+              style={[stili.barra, { width: larghezza, opacity: larghezza === 1 ? 0.55 : 1 }]}
+            />
+          ))}
+        </View>
+        <Text style={stili.timbro}>RIVOGLIO · REG. CE 261/2004</Text>
+      </View>
     </View>
   );
 }
 
 const stili = StyleSheet.create({
-  scheda: {
+  biglietto: {
     backgroundColor: COLORI.bianco,
     borderRadius: RAGGIO.scheda,
-    padding: SPAZIO.l,
     ...OMBRA.scheda,
+    // I fori dello strappo escono di mezzo cerchio: senza clip resterebbero quadrati.
+    overflow: "hidden",
   },
-  riga: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" },
+  testata: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: SPAZIO.m,
+    paddingHorizontal: SPAZIO.l,
+    paddingTop: SPAZIO.l,
+    paddingBottom: SPAZIO.m,
+  },
   intestazione: { flex: 1, minWidth: 0 },
-  volo: {
+  trattaTesto: {
     fontFamily: FONT.display,
-    fontSize: 19,
-    letterSpacing: -0.5,
+    fontSize: 20,
+    letterSpacing: -0.6,
     color: COLORI.inchiostro,
   },
-  data: { fontFamily: FONT.testo, fontSize: 13, color: COLORI.fumo, marginTop: 2 },
+  freccia: { color: COLORI.verde },
+  sottoRiga: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPAZIO.s,
+    marginTop: SPAZIO.xs,
+  },
+  etichettaVolo: {
+    fontFamily: FONT.testoMedio,
+    fontSize: 9,
+    letterSpacing: 1.2,
+    color: COLORI.fumo2,
+  },
+  codice: { fontFamily: FONT.testoSemi, fontSize: 12.5, color: COLORI.inchiostro },
+  data: { fontFamily: FONT.testo, fontSize: 12.5, color: COLORI.fumo },
+  strappo: {
+    height: 18,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  tratteggio: {
+    flex: 1,
+    borderBottomWidth: 1.5,
+    borderStyle: "dashed",
+    borderColor: COLORI.bordo,
+    marginHorizontal: SPAZIO.l + 2,
+  },
+  foro: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: COLORI.nebbia,
+    borderWidth: 1,
+    borderColor: COLORI.bordo,
+  },
+  foroSinistro: { marginLeft: -9 },
+  foroDestro: { marginRight: -9 },
+  corpo: { paddingHorizontal: SPAZIO.l, paddingTop: SPAZIO.s },
   esito: {
-    marginTop: SPAZIO.m,
     borderRadius: RAGGIO.campo,
     paddingHorizontal: SPAZIO.m,
     paddingVertical: SPAZIO.m,
     borderWidth: 1,
   },
   esitoIdoneo: { backgroundColor: COLORI.mentaTenue, borderColor: COLORI.menta },
-  esitoIncerto: { backgroundColor: COLORI.nebbia, borderColor: COLORI.bordo },
-  esitoNo: { backgroundColor: COLORI.nebbia, borderColor: COLORI.bordo },
-  esitoVuoto: { backgroundColor: COLORI.nebbia, borderColor: COLORI.bordo },
+  esitoNeutro: { backgroundColor: COLORI.nebbia, borderColor: COLORI.bordo },
   importo: {
     fontFamily: FONT.display,
     fontSize: 26,
@@ -164,9 +256,28 @@ const stili = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: SPAZIO.s,
-    marginTop: SPAZIO.m,
+    marginTop: SPAZIO.s,
     alignSelf: "flex-start",
     paddingVertical: SPAZIO.xs,
   },
   azioneTesto: { fontFamily: FONT.testoMedio, fontSize: 14, color: COLORI.verdeScuro },
+  piede: {
+    paddingHorizontal: SPAZIO.l,
+    paddingBottom: SPAZIO.m,
+    paddingTop: SPAZIO.xs,
+  },
+  codiceBarre: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 2,
+    height: 22,
+  },
+  barra: { backgroundColor: COLORI.inchiostro, borderRadius: 0.5 },
+  timbro: {
+    fontFamily: FONT.testoMedio,
+    fontSize: 8.5,
+    letterSpacing: 1.4,
+    color: COLORI.fumo2,
+    marginTop: SPAZIO.xs + 2,
+  },
 });

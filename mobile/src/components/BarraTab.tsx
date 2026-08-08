@@ -10,6 +10,7 @@ type NomeIcona = ComponentProps<typeof Feather>["name"];
 const ICONE: Record<string, NomeIcona> = {
   index: "search",
   pratiche: "file-text",
+  classifica: "award",
   profilo: "user",
 };
 

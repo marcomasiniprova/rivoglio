@@ -43,7 +43,9 @@ export function oltreIlLimite(chiave: string, ip: string, massimo: number): bool
  */
 export const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  /* Authorization: l'app manda il token della sua sessione lì dentro, e
+     senza il permesso esplicito il browser blocca il preflight. */
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Max-Age": "86400",
 } as const;

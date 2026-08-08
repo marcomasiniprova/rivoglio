@@ -14,8 +14,9 @@ import {
   Text,
   View,
 } from "react-native";
+import { Pressable } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import { openBrowserAsync } from "expo-web-browser";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BadgeDemo from "@/components/BadgeDemo";
 import Bottone from "@/components/Bottone";
@@ -27,9 +28,6 @@ import { useSessione } from "@/lib/sessione";
 import { dataBreve, euro } from "@/lib/formati";
 import { COLORI, FONT, RAGGIO, SPAZIO } from "@/lib/tema";
 import { TESTI } from "@/lib/testi";
-
-/** Dove vive il check (progetto Netlify `rivoglio`, vedi DECISIONI.md). */
-const SITO = "https://rivoglio.netlify.app";
 
 // Aria sotto l'ultima card: la barra tab è una pillola flottante assoluta
 // (offset SPAZIO.m + altezza della pillola + margine), il contenuto non
@@ -95,13 +93,9 @@ export default function Pratiche() {
     setAggiorno(false);
   };
 
-  const apriSito = async () => {
-    try {
-      await openBrowserAsync(SITO);
-    } catch (e) {
-      console.error("[pratiche] sito non aperto:", e);
-    }
-  };
+  /* Lo stato vuoto porta al check DENTRO l'app: l'app non scappa più
+     nel browser (richiesta di Valerio, 8/08). */
+  const vaiAlCheck = () => router.navigate("/");
 
   return (
     <View style={stili.schermo}>
@@ -145,39 +139,51 @@ export default function Pratiche() {
 
         {stato === "pronto" && pratiche.length > 0
           ? pratiche.map((p) => (
-              <Scheda key={p.id} stile={stili.pratica}>
-                <View style={stili.rigaAlta}>
-                  <View style={stili.pillolaStato}>
-                    <Text style={stili.pillolaStatoTesto}>{nomeStato(p.stato)}</Text>
+              <Pressable
+                key={p.id}
+                onPress={() => router.push(`/pratica/${p.id}`)}
+                accessibilityRole="button"
+              >
+                <Scheda stile={stili.pratica}>
+                  <View style={stili.rigaAlta}>
+                    <View style={stili.pillolaStato}>
+                      <Text style={stili.pillolaStatoTesto}>{nomeStato(p.stato)}</Text>
+                    </View>
+                    {p.demo ? <BadgeDemo /> : null}
                   </View>
-                  {p.demo ? <BadgeDemo /> : null}
-                </View>
 
-                <Text style={stili.volo}>
-                  {p.volo_iata && p.data_locale
-                    ? riempi(T.volo, {
-                        volo: p.volo_iata,
-                        data: dataBreve(p.data_locale),
-                      })
-                    : T.voloMancante}
-                </Text>
-
-                <View style={stili.fascia}>
-                  <Text style={stili.fasciaImporto}>
-                    {p.importo_fascia !== null
-                      ? riempi(T.fascia, { importo: euro(p.importo_fascia) })
-                      : T.fasciaDaConfermare}
+                  <Text style={stili.volo}>
+                    {p.volo_iata && p.data_locale
+                      ? riempi(T.volo, {
+                          volo: p.volo_iata,
+                          data: dataBreve(p.data_locale),
+                        })
+                      : T.voloMancante}
                   </Text>
-                  {p.importo_fascia !== null ? (
-                    // La cifra non resta mai sola: si cita da dove viene.
-                    <Text style={stili.fasciaFonte}>{T.fasciaFonte}</Text>
-                  ) : null}
-                </View>
 
-                <Text style={stili.aperta}>
-                  {riempi(T.aperta, { data: dataBreve(p.creata_il.slice(0, 10)) })}
-                </Text>
-              </Scheda>
+                  <View style={stili.fascia}>
+                    <Text style={stili.fasciaImporto}>
+                      {p.importo_fascia !== null
+                        ? riempi(T.fascia, { importo: euro(p.importo_fascia) })
+                        : T.fasciaDaConfermare}
+                    </Text>
+                    {p.importo_fascia !== null ? (
+                      // La cifra non resta mai sola: si cita da dove viene.
+                      <Text style={stili.fasciaFonte}>{T.fasciaFonte}</Text>
+                    ) : null}
+                  </View>
+
+                  <View style={stili.piede}>
+                    <Text style={stili.aperta}>
+                      {riempi(T.aperta, { data: dataBreve(p.creata_il.slice(0, 10)) })}
+                    </Text>
+                    <View style={stili.apriRiga}>
+                      <Text style={stili.apriTesto}>{T.apri}</Text>
+                      <Feather name="chevron-right" size={15} color={COLORI.verdeScuro} />
+                    </View>
+                  </View>
+                </Scheda>
+              </Pressable>
             ))
           : null}
 
@@ -186,7 +192,7 @@ export default function Pratiche() {
             <Vuoto
               titolo={T.vuoto.titolo}
               testo={T.vuoto.testo}
-              azione={() => void apriSito()}
+              azione={vaiAlCheck}
               testoAzione={T.vuoto.azione}
             />
           ) : (
@@ -286,4 +292,11 @@ const stili = StyleSheet.create({
     fontSize: 12.5,
     color: COLORI.fumo,
   },
+  piede: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  apriRiga: { flexDirection: "row", alignItems: "center", gap: 2 },
+  apriTesto: { fontFamily: FONT.testoMedio, fontSize: 13, color: COLORI.verdeScuro },
 });

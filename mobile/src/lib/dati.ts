@@ -13,6 +13,7 @@
  * riconosciamo diventa un messaggio generico e finisce su console.error.
  */
 import { supabase } from "./supabase";
+import type { SchedaPratica } from "./api";
 
 export const DEMO: boolean = process.env.EXPO_PUBLIC_DEMO === "1";
 
@@ -70,6 +71,58 @@ function praticheDemo(): Pratica[] {
       demo: true,
     },
   ];
+}
+
+/**
+ * La scheda dimostrativa di una pratica, per provare la schermata del
+ * tracker senza rete. Gli importi sono le fasce vere del Regolamento;
+ * la lettera è un estratto segnato come esempio.
+ */
+export function schedaDemo(id: string): SchedaPratica | null {
+  if (!DEMO) return null;
+  const base = praticheDemo().find((p) => p.id === id);
+  if (!base) return null;
+
+  const pronta = base.stato === "pronta";
+  return {
+    pratica: {
+      id: base.id,
+      stato: base.stato,
+      tipo: "singola",
+      importo: base.importo_fascia,
+      passeggeri: 1,
+      garanziaFinoAl: giorniFa(-69).slice(0, 10),
+      inviataIl: pronta ? null : giorniFa(4),
+      creataIl: base.creata_il,
+      volo: {
+        iata: base.volo_iata ?? "FR8321",
+        data: base.data_locale ?? giorniFa(21).slice(0, 10),
+        da: pronta ? "Bergamo" : "Roma",
+        a: pronta ? "Siviglia" : "Catania",
+      },
+    },
+    eventi: [
+      { tipo: "creata", nota: "Pratica aperta.", creato_il: base.creata_il },
+      { tipo: "pagata", nota: "Pagamento ricevuto.", creato_il: base.creata_il },
+      { tipo: "pronta", nota: "Lettera generata.", creato_il: base.creata_il },
+      ...(pronta
+        ? []
+        : [{ tipo: "inviata", nota: "Reclamo inviato dall'utente.", creato_il: giorniFa(4) }]),
+    ],
+    lettera: {
+      oggetto: "ESEMPIO - Richiesta di compensazione pecuniaria, Reg. (CE) 261/2004",
+      corpo:
+        "Questo è un ESEMPIO dimostrativo della lettera.\n\nNella pratica vera qui c'è il reclamo completo, coi dati verificati del volo, gli orari certificati e la fascia di compensazione del Regolamento CE 261/2004, pronto da inviare alla compagnia.",
+      allegati: ["Carta d'imbarco", "Documento d'identità"],
+      compagnia: {
+        nome: "ZZ Compagnia Demo",
+        canale: "Modulo reclami sul sito della compagnia (esempio).",
+        url: "https://rivoglio.netlify.app",
+        email: null,
+        indirizzoPostale: null,
+      },
+    },
+  };
 }
 
 type RigaPratica = {

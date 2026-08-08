@@ -1,20 +1,23 @@
 /**
- * Il profilo: chi sei, e i link alle cose che contano.
+ * Il profilo, rifatto l'8/08 sul riferimento scelto da Valerio:
+ * avatar al centro, nome e email sotto, "Modifica il profilo", il
+ * riquadro dell'invito agli amici e le voci in elenco con l'icona.
  *
- * Riscritto l'8/08 per Rivoglio: prima era il profilo del prodotto viaggi
- * (crediti, comune di partenza, tetto settimanale). Qui non c'è niente da
- * configurare, perché il check non ha impostazioni: si scrive il volo e
- * basta. Quindi resta l'essenziale, e le pagine legali vivono sul sito
- * (una sola versione, quella pubblicata).
+ * Cosa NON c'è, di proposito: carte di pagamento (si paga sul sito,
+ * scelta di Valerio: Apple e Google trattengono il 15-30%) e premi in
+ * denaro per gli inviti (nessuna promessa che non possiamo mantenere:
+ * l'invito condivide l'app e basta).
  */
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useCallback, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Bottone from "@/components/Bottone";
 import Titolo from "@/components/Titolo";
 import { SITO } from "@/lib/api";
+import { leggiProfilo } from "@/lib/profilo";
 import { esci, useSessione } from "@/lib/sessione";
 import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
 import { TESTI } from "@/lib/testi";
@@ -25,39 +28,88 @@ const ARIA_BARRA = 116;
 type Voce = {
   chiave: string;
   icona: React.ComponentProps<typeof Feather>["name"];
-  testo: string;
+  titolo: string;
+  sotto: string;
   fai: () => void;
 };
+
+/** Le iniziali per l'avatar: dal nome pubblico, o dall'email. */
+function iniziali(nickname: string | null, email: string | null | undefined): string {
+  const base = nickname ?? email?.split("@")[0] ?? "";
+  const pulita = base.replace(/[^a-zA-Z0-9]/g, "");
+  return (pulita.slice(0, 2) || "??").toUpperCase();
+}
 
 export default function SchermataProfilo() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { utente } = useSessione();
+  const [nickname, setNickname] = useState<string | null>(null);
+
+  /* Il nome pubblico si rilegge a ogni ritorno: se è appena stato
+     cambiato in Dati personali, qui deve vedersi subito. */
+  useFocusEffect(
+    useCallback(() => {
+      if (!utente) {
+        setNickname(null);
+        return;
+      }
+      void leggiProfilo().then((p) => setNickname(p?.nickname ?? null));
+    }, [utente]),
+  );
+
+  async function invita() {
+    try {
+      await Share.share({ message: P.invita.messaggio });
+    } catch (e) {
+      console.warn("[profilo] condivisione fallita:", e);
+    }
+  }
 
   const voci: Voce[] = [
     {
-      chiave: "sito",
-      icona: "globe",
-      testo: P.voci.sito,
-      fai: () => void openBrowserAsync(SITO),
+      chiave: "dati",
+      icona: "user",
+      titolo: P.voci.dati,
+      sotto: P.voci.datiSotto,
+      fai: () => router.push("/modifica-profilo"),
     },
     {
-      chiave: "supporto",
-      icona: "mail",
-      testo: P.voci.supporto,
-      fai: () => void Linking.openURL(`mailto:${P.email}`),
+      chiave: "notifiche",
+      icona: "bell",
+      titolo: P.voci.notifiche,
+      sotto: P.voci.notificheSotto,
+      // Le notifiche si governano dalle impostazioni di sistema: si
+      // aprono quelle, non una copia finta dentro l'app.
+      fai: () => void Linking.openSettings(),
     },
     {
       chiave: "privacy",
       icona: "shield",
-      testo: P.voci.privacy,
+      titolo: P.voci.privacy,
+      sotto: P.voci.privacySotto,
       fai: () => void openBrowserAsync(`${SITO}/privacy`),
     },
     {
       chiave: "condizioni",
       icona: "file-text",
-      testo: P.voci.condizioni,
+      titolo: P.voci.condizioni,
+      sotto: P.voci.condizioniSotto,
       fai: () => void openBrowserAsync(`${SITO}/condizioni`),
+    },
+    {
+      chiave: "supporto",
+      icona: "mail",
+      titolo: P.voci.supporto,
+      sotto: P.voci.supportoSotto,
+      fai: () => void Linking.openURL(`mailto:${P.email}`),
+    },
+    {
+      chiave: "sito",
+      icona: "globe",
+      titolo: P.voci.sito,
+      sotto: P.voci.sitoSotto,
+      fai: () => void openBrowserAsync(SITO),
     },
   ];
 
@@ -72,17 +124,30 @@ export default function SchermataProfilo() {
       <Titolo prima={P.titolo.prima} corsivo={P.titolo.corsivo} />
 
       {/* ------------------------------------------------ chi sei */}
-      <View style={stili.scheda}>
+      <View style={stili.carta}>
+        <View style={stili.avatar}>
+          {utente ? (
+            <Text style={stili.avatarTesto}>{iniziali(nickname, utente.email)}</Text>
+          ) : (
+            <Feather name="user" size={30} color={COLORI.verdeScuro} />
+          )}
+        </View>
+
         {utente ? (
           <>
-            <Text style={stili.etichetta}>{P.entratoCome}</Text>
-            <Text style={stili.email}>{utente.email}</Text>
-            <View style={stili.spazio} />
-            <Bottone testo={P.esci} onPress={() => void esci()} variante="fantasma" />
+            <Text style={stili.nome}>{nickname ?? utente.email?.split("@")[0]}</Text>
+            <Text style={stili.emailTesto}>{utente.email}</Text>
+            <Pressable
+              onPress={() => router.push("/modifica-profilo")}
+              accessibilityRole="button"
+              style={stili.modifica}
+            >
+              <Text style={stili.modificaTesto}>{P.modifica}</Text>
+            </Pressable>
           </>
         ) : (
           <>
-            <Text style={stili.etichetta}>{P.ospite.titolo}</Text>
+            <Text style={stili.nome}>{P.ospite.titolo}</Text>
             <Text style={stili.ospiteTesto}>{P.ospite.testo}</Text>
             <View style={stili.spazio} />
             <Bottone testo={P.ospite.azione} onPress={() => router.push("/accesso")} />
@@ -90,7 +155,19 @@ export default function SchermataProfilo() {
         )}
       </View>
 
-      {/* ------------------------------------------------ i link */}
+      {/* ------------------------------------------------ invita */}
+      <Pressable onPress={() => void invita()} accessibilityRole="button" style={stili.invita}>
+        <View style={stili.invitaIcona}>
+          <Feather name="share" size={17} color={COLORI.verdeScuro} />
+        </View>
+        <View style={stili.invitaTesti}>
+          <Text style={stili.invitaTitolo}>{P.invita.titolo}</Text>
+          <Text style={stili.invitaSotto}>{P.invita.testo}</Text>
+        </View>
+        <Feather name="chevron-right" size={18} color={COLORI.verdeScuro} />
+      </Pressable>
+
+      {/* ------------------------------------------------ le voci */}
       <View style={stili.elenco}>
         {voci.map((v, i) => (
           <Pressable
@@ -99,12 +176,21 @@ export default function SchermataProfilo() {
             accessibilityRole="button"
             style={[stili.voce, i < voci.length - 1 && stili.voceBordo]}
           >
-            <Feather name={v.icona} size={18} color={COLORI.verde} />
-            <Text style={stili.voceTesto}>{v.testo}</Text>
+            <View style={stili.voceIcona}>
+              <Feather name={v.icona} size={16} color={COLORI.verdeScuro} />
+            </View>
+            <View style={stili.voceTesti}>
+              <Text style={stili.voceTitolo}>{v.titolo}</Text>
+              <Text style={stili.voceSotto}>{v.sotto}</Text>
+            </View>
             <Feather name="chevron-right" size={18} color={COLORI.fumo2} />
           </Pressable>
         ))}
       </View>
+
+      {utente && (
+        <Bottone testo={P.esci} onPress={() => void esci()} variante="fantasma" />
+      )}
 
       <Text style={stili.piede}>{P.piede}</Text>
     </ScrollView>
@@ -114,34 +200,85 @@ export default function SchermataProfilo() {
 const stili = StyleSheet.create({
   schermo: { flex: 1, backgroundColor: COLORI.nebbia },
   contenuto: { paddingHorizontal: SPAZIO.schermata, gap: SPAZIO.l },
-  scheda: {
+  carta: {
     backgroundColor: COLORI.bianco,
     borderRadius: RAGGIO.grande,
     padding: SPAZIO.xl,
+    alignItems: "center",
     ...OMBRA.scheda,
   },
-  etichetta: {
-    fontFamily: FONT.testoMedio,
-    fontSize: 11.5,
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
-    color: COLORI.fumo2,
+  avatar: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: COLORI.mentaTenue,
+    borderWidth: 2,
+    borderColor: COLORI.menta,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  email: {
+  avatarTesto: {
     fontFamily: FONT.display,
-    fontSize: 20,
+    fontSize: 26,
     letterSpacing: -0.5,
-    color: COLORI.inchiostro,
-    marginTop: SPAZIO.s,
+    color: COLORI.verdeScuro,
   },
+  nome: {
+    fontFamily: FONT.display,
+    fontSize: 21,
+    letterSpacing: -0.6,
+    color: COLORI.inchiostro,
+    marginTop: SPAZIO.m,
+  },
+  emailTesto: { fontFamily: FONT.testo, fontSize: 13.5, color: COLORI.fumo, marginTop: 2 },
+  modifica: {
+    marginTop: SPAZIO.l,
+    backgroundColor: COLORI.nebbia,
+    borderWidth: 1,
+    borderColor: COLORI.bordo,
+    borderRadius: RAGGIO.pillola,
+    paddingHorizontal: SPAZIO.xl,
+    paddingVertical: SPAZIO.s + 2,
+    minHeight: 38,
+    justifyContent: "center",
+  },
+  modificaTesto: { fontFamily: FONT.testoMedio, fontSize: 13.5, color: COLORI.inchiostro },
   ospiteTesto: {
     fontFamily: FONT.testo,
-    fontSize: 14.5,
+    fontSize: 14,
     lineHeight: 21,
     color: COLORI.fumo,
+    textAlign: "center",
     marginTop: SPAZIO.s,
   },
   spazio: { height: SPAZIO.l },
+  invita: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPAZIO.m,
+    backgroundColor: COLORI.mentaTenue,
+    borderWidth: 1,
+    borderColor: COLORI.menta,
+    borderRadius: RAGGIO.scheda,
+    padding: SPAZIO.l,
+  },
+  invitaIcona: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORI.bianco,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  invitaTesti: { flex: 1, minWidth: 0 },
+  invitaTitolo: { fontFamily: FONT.testoSemi, fontSize: 14.5, color: COLORI.verdeNotte },
+  invitaSotto: {
+    fontFamily: FONT.testo,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: COLORI.verdeScuro,
+    marginTop: 1,
+  },
   elenco: {
     backgroundColor: COLORI.bianco,
     borderRadius: RAGGIO.grande,
@@ -151,11 +288,24 @@ const stili = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: SPAZIO.m,
-    paddingHorizontal: SPAZIO.xl,
-    paddingVertical: SPAZIO.l,
+    paddingHorizontal: SPAZIO.l,
+    paddingVertical: SPAZIO.m + 2,
+    minHeight: 60,
   },
   voceBordo: { borderBottomWidth: 1, borderBottomColor: COLORI.bordo },
-  voceTesto: { flex: 1, fontFamily: FONT.testo, fontSize: 15, color: COLORI.inchiostro },
+  voceIcona: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: COLORI.nebbia,
+    borderWidth: 1,
+    borderColor: COLORI.bordo,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  voceTesti: { flex: 1, minWidth: 0 },
+  voceTitolo: { fontFamily: FONT.testoMedio, fontSize: 15, color: COLORI.inchiostro },
+  voceSotto: { fontFamily: FONT.testo, fontSize: 12, color: COLORI.fumo2, marginTop: 1 },
   piede: {
     fontFamily: FONT.testo,
     fontSize: 12.5,

@@ -163,6 +163,20 @@ export async function accedi(email: string, password: string): Promise<{ errore?
   }
 }
 
+/**
+ * Il token della sessione, per presentarsi alle API del sito
+ * (Authorization: Bearer). Null se non sei entrato o in demo.
+ */
+export async function tokenSessione(): Promise<string | null> {
+  if (DEMO) return null;
+  try {
+    const { data } = await supabase.auth.getSession();
+    return data.session?.access_token ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function esci(): Promise<void> {
   if (DEMO) {
     utenteDemo = null;

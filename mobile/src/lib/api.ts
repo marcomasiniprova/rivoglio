@@ -96,6 +96,133 @@ export async function cercaAeroporti(q: string): Promise<AeroportoTrovato[]> {
   }
 }
 
+/* ─────────────────────────── LA SCHEDA DELLA PRATICA ─────────────────────
+   La pratica si SEGUE dentro l'app (scelta di Valerio, 8/08): timeline,
+   lettera e "l'ho inviata" vivono qui. L'unica cosa che apre il sito è il
+   pagamento. L'app si presenta col token della sua sessione Supabase. */
+
+export type EventoScheda = { tipo: string; nota: string | null; creato_il: string };
+
+export type LetteraScheda = {
+  oggetto: string;
+  corpo: string;
+  allegati: string[];
+  compagnia: {
+    nome: string;
+    canale: string;
+    url: string;
+    email: string | null;
+    indirizzoPostale: string | null;
+  } | null;
+};
+
+export type SchedaPratica = {
+  pratica: {
+    id: string;
+    stato: string;
+    tipo: "singola" | "famiglia";
+    importo: number | null;
+    passeggeri: number;
+    garanziaFinoAl: string | null;
+    inviataIl: string | null;
+    creataIl: string;
+    volo: { iata: string; data: string; da: string | null; a: string | null } | null;
+  };
+  eventi: EventoScheda[];
+  lettera: LetteraScheda | null;
+};
+
+export type EsitoScheda = { ok: true; scheda: SchedaPratica } | { ok: false; errore: string };
+
+/** La scheda completa di una pratica, dal server. */
+export async function schedaPratica(id: string, token: string): Promise<EsitoScheda> {
+  try {
+    const r = await fetch(`${SITO}/api/pratiche/${encodeURIComponent(id)}/scheda`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const dati = await r.json().catch(() => null);
+    if (!r.ok || !dati?.ok) {
+      return {
+        ok: false,
+        errore:
+          typeof dati?.errore === "string"
+            ? dati.errore
+            : "Non riesco a leggere la pratica. Riprova fra un attimo.",
+      };
+    }
+    return { ok: true, scheda: dati as SchedaPratica };
+  } catch {
+    return { ok: false, errore: "Sei offline? Controlla la connessione e riprova." };
+  }
+}
+
+/** "L'ho inviata": la conferma d'invio del reclamo, registrata sul server. */
+export async function confermaInvio(
+  id: string,
+  token: string,
+): Promise<{ ok: true } | { ok: false; errore: string }> {
+  try {
+    const r = await fetch(`${SITO}/api/pratiche/conferma-invio`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ pratica_id: id }),
+    });
+    const dati = await r.json().catch(() => null);
+    if (!r.ok || !dati?.ok) {
+      return {
+        ok: false,
+        errore:
+          typeof dati?.errore === "string" ? dati.errore : "Non sono riuscito a salvare. Riprova.",
+      };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, errore: "Sei offline? Controlla la connessione e riprova." };
+  }
+}
+
+/* ─────────────────────────── LA CLASSIFICA ───────────────────────────────
+   Chi si è ripreso più soldi. Il server decide se è accesa: al lancio è
+   SPENTA finché non ci sono vincite vere (scelta di Valerio, 8/08), e
+   l'app la nasconde da sola. In classifica c'è solo chi ha scelto un
+   nome pubblico e ha detto sì. */
+
+export type VoceClassifica = { posizione: number; nickname: string; totale: number };
+
+export type EsitoClassifica =
+  | { attiva: false }
+  | { attiva: true; demo: boolean; voci: VoceClassifica[] };
+
+/** La classifica dal server. Un errore = spenta: mai un guasto in faccia. */
+export async function classifica(): Promise<EsitoClassifica> {
+  // In demo la classifica si vede senza rete, dichiarata come esempio.
+  if (process.env.EXPO_PUBLIC_DEMO === "1") {
+    return {
+      attiva: true,
+      demo: true,
+      voci: [
+        { posizione: 1, nickname: "esempio_giulia", totale: 1200 },
+        { posizione: 2, nickname: "esempio_marco", totale: 800 },
+        { posizione: 3, nickname: "esempio_sara", totale: 650 },
+        { posizione: 4, nickname: "esempio_luca", totale: 400 },
+        { posizione: 5, nickname: "esempio_anna", totale: 250 },
+      ],
+    };
+  }
+  try {
+    const r = await fetch(`${SITO}/api/classifica`);
+    const dati = await r.json().catch(() => null);
+    if (!r.ok || !dati?.ok || !dati.attiva) return { attiva: false };
+    return {
+      attiva: true,
+      demo: Boolean(dati.demo),
+      voci: Array.isArray(dati.voci) ? (dati.voci as VoceClassifica[]) : [],
+    };
+  } catch {
+    return { attiva: false };
+  }
+}
+
 export type EsitoTratta =
   | { ok: true; voli: VoloDiTratta[]; demo: boolean }
   | { ok: false; errore: string };

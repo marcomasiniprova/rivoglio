@@ -176,6 +176,7 @@ export const TESTI = {
     tab: {
       controlla: "Controlla",
       pratiche: "Pratiche",
+      classifica: "Classifica",
       profilo: "Profilo",
     },
   },
@@ -250,26 +251,61 @@ export const TESTI = {
 
   // `campi` e `validazione` li usa anche il passo registrati dell'onboarding:
   // stessi moduli, stesse parole.
-  /* ---- il profilo dell'app (riscritto per Rivoglio, 8/08) ---- */
+  /* ---- il profilo dell'app (rifatto l'8/08 sul riferimento di Valerio:
+     avatar al centro, invito agli amici, voci in elenco) ---- */
   profiloApp: {
     titolo: { prima: "Il tuo", corsivo: "profilo." },
-    entratoCome: "Sei entrato come",
+    modifica: "Modifica il profilo",
     esci: "Esci dall'account",
     email: "valerio@artecai.it",
     ospite: {
       titolo: "Non sei entrato",
       testo:
-        "Il check dei voli funziona lo stesso. L'account serve solo a ritrovare le pratiche che hai aperto.",
+        "Il check dei voli funziona lo stesso. L'account serve per le pratiche, gli avvisi e la classifica.",
       azione: "Entra",
     },
+    invita: {
+      titolo: "Fai controllare un volo a chi ami",
+      testo: "Il check è gratis: passa Rivoglio a chi ha preso un volo in ritardo.",
+      // Il messaggio che parte con la condivisione. Niente promesse.
+      messaggio:
+        "Ho controllato il mio volo con Rivoglio: se è atterrato in ritardo ti dice subito se rientra in una fascia di compensazione fino a 600€. Gratis: https://rivoglio.netlify.app",
+    },
     voci: {
-      sito: "Apri Rivoglio sul sito",
-      supporto: "Scrivici",
-      privacy: "Privacy",
+      dati: "Dati personali",
+      datiSotto: "Nome pubblico e classifica",
+      notifiche: "Notifiche",
+      notificheSotto: "Gli avvisi sui tuoi voli",
+      privacy: "Privacy e sicurezza",
+      privacySotto: "Come trattiamo i tuoi dati",
       condizioni: "Condizioni d'uso",
+      condizioniSotto: "Il contratto, in chiaro",
+      supporto: "Scrivici",
+      supportoSotto: "Rispondiamo per email",
+      sito: "Rivoglio sul web",
+      sitoSotto: "rivoglio.netlify.app",
     },
     piede:
       "Rivoglio non è un intermediario: prepara i documenti, il reclamo lo invii tu e la compensazione arriva a te.",
+  },
+
+  /* ---- modifica del profilo: nome pubblico e classifica ---- */
+  modificaProfilo: {
+    titolo: { prima: "Dati", corsivo: "personali." },
+    sottotitolo: "L'email è quella con cui entri. Il nome pubblico serve solo alla classifica.",
+    email: "La tua email",
+    nickname: {
+      etichetta: "Nome pubblico",
+      segnaposto: "es. maverick_bg",
+      aiuto: "Da 3 a 20 caratteri: lettere, numeri e trattino basso. Lo vedono gli altri in classifica.",
+    },
+    classifica: {
+      etichetta: "Partecipa alla classifica",
+      testo:
+        "Quando una tua pratica viene pagata dalla compagnia, il tuo nome pubblico e l'importo entrano in classifica. Senza il tuo sì non compari mai.",
+    },
+    salva: "Salva",
+    salvato: "Salvato.",
   },
 
   /* ---- accesso e registrazione dell'app (schermata unica, 8/08) ---- */
@@ -335,13 +371,15 @@ export const TESTI = {
       esito_rifiutata: "Rifiutata",
       rimborsata: "Rimborsata",
     },
-    // Il check vive sul sito, senza login (SPEC §3): l'app segue, non apre.
+    /* Il check vive nell'app: lo stato vuoto porta alla tab Controlla,
+       non al sito (8/08: l'app non deve scappare nel browser). */
     vuoto: {
       titolo: "Non hai ancora nessuna pratica.",
       testo:
-        "Si parte sempre dal check, sul sito: numero di volo e data, gratis. Se il volo rientra in una fascia, da lì apri la pratica e la segui qui.",
-      azione: "Controlla un volo sul sito",
+        "Si parte dal check, qui nell'app: gratis, in trenta secondi. Se il volo rientra in una fascia, apri la pratica e la segui qui, passo per passo.",
+      azione: "Controlla un volo",
     },
+    apri: "Apri la pratica",
     /** Chi non è entrato: il check resta libero, le pratiche no. */
     ospite: {
       titolo: "Qui trovi le tue pratiche.",
@@ -350,6 +388,83 @@ export const TESTI = {
       azione: "Entra",
     },
     errore: "Non riesco a leggere le tue pratiche. Riprova fra qualche minuto.",
+  },
+
+  /* ---- LA CLASSIFICA: chi si è ripreso più soldi ----
+     Regole: solo pratiche PAGATE dalla compagnia (numeri veri), solo chi
+     ha scelto un nome pubblico e ha detto sì. Spenta al lancio. */
+  classifica: {
+    titolo: { prima: "Chi si è ripreso", corsivo: "di più." },
+    sottotitolo:
+      "Somma delle compensazioni pagate dalle compagnie a chi ha scelto di comparire. Fasce del Regolamento CE 261/2004.",
+    demo: "Esempio dimostrativo: i primi vincitori veri stanno arrivando.",
+    perPersona: "vinti",
+    tu: "Tu",
+    vuota: {
+      titolo: "Il primo posto è libero.",
+      testo:
+        "Nessuna vincita in classifica, ancora. Controlla un volo: se la compagnia paga, il posto è tuo.",
+      azione: "Controlla un volo",
+    },
+    entra: {
+      titolo: "Vuoi esserci anche tu?",
+      testo: "Scegli un nome pubblico nel profilo e accendi \"partecipa alla classifica\".",
+      azione: "Scegli il nome",
+    },
+  },
+
+  /* ---- LA SCHEDA DELLA PRATICA: il tracker, dentro l'app ----
+     Qui la pratica si SEGUE: timeline, lettera, "l'ho inviata". L'unica
+     cosa che apre il sito è il pagamento. Mai promettere l'esito. */
+  praticaScheda: {
+    indietro: "Le tue pratiche",
+    voloMancante: "Pratica senza volo agganciato",
+    perPasseggero: "a passeggero",
+    // {n} è il numero di passeggeri della pratica famiglia.
+    passeggeri: "{n} passeggeri",
+    fonteImporto: "Importo del Regolamento CE 261/2004, per passeggero",
+    /* La timeline: i passi nell'ordine in cui succedono. */
+    passi: {
+      pagata: "Pagamento ricevuto",
+      pronta: "La lettera è pronta",
+      inviata: "Reclamo inviato da te",
+      sollecito: "Sollecito alla compagnia",
+      enac: "Reclamo all'ENAC",
+      esito: "Risposta della compagnia",
+    },
+    esitiFinali: {
+      esito_pagata: "La compagnia ha pagato",
+      esito_rifiutata: "La compagnia ha rifiutato",
+      rimborsata: "Rimborsata con la garanzia",
+    },
+    lettera: {
+      titolo: "La tua lettera",
+      sottotitolo:
+        "La invii tu, dalla tua email. Le compagnie, Ryanair per prima, trattano meglio chi scrive in proprio.",
+      oggetto: "Oggetto",
+      apriEmail: "Aprila nella tua email",
+      copia: "Copia la lettera",
+      copiata: "Copiata. Incollala nella tua email.",
+      condividi: "Condividi",
+      // {nome} è la compagnia.
+      canaleTitolo: "Dove si manda a {nome}",
+      apriCanale: "Apri il canale reclami",
+      indirizzo: "Indirizzo postale",
+      allegati: "Da allegare",
+      manca:
+        "La lettera qui non c'è ancora. Se hai appena pagato, arriva a minuti: tira giù per aggiornare.",
+    },
+    invio: {
+      bottone: "L'ho inviata alla compagnia",
+      nota: "Premilo DOPO averla inviata: da quel giorno partono i tempi del sollecito e dell'ENAC.",
+      grazie: "Registrato. Da oggi contiamo i giorni per te.",
+    },
+    // {data} da dataBreve().
+    garanzia: "Garanzia attiva fino al {data}: se la compagnia non paga, riavere i 14,90€ è un tuo diritto.",
+    cronologia: "La cronologia",
+    caricamento: "Sto leggendo la pratica",
+    entraPrima: "Per vedere la pratica devi entrare con l'email con cui l'hai aperta.",
+    errore: "Non riesco a leggere la pratica. Riprova fra qualche minuto.",
   },
 
   destinazioni: {
