@@ -879,6 +879,7 @@ export const COPY = {
         voci: [
           { testo: "Posso fare da solo, gratis?", ancora: "#domande" },
           { testo: "Cosa pago, esattamente?", ancora: "#domande" },
+          { testo: "Bagaglio perso o in ritardo?", ancora: "/guida-bagagli" },
           { testo: "Tutte le risposte", ancora: "#domande" },
         ],
       },

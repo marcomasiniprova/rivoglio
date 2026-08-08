@@ -14,10 +14,14 @@ import Footer from "@/components/Footer";
 export default function PaginaLegale({
   titolo,
   aggiornata,
+  sottotitolo,
   children,
 }: {
   titolo: string;
   aggiornata: string;
+  /** Al posto della riga "Versione 1...": lo usano le guide, che non sono
+      documenti versionati ma contenuti con una data di verifica. */
+  sottotitolo?: string;
   children: ReactNode;
 }) {
   return (
@@ -39,7 +43,7 @@ export default function PaginaLegale({
           {titolo}
         </h1>
         <p className="numeri mt-3 text-[13.5px] text-fumo-2">
-          Versione 1, aggiornata il {aggiornata}.
+          {sottotitolo ?? `Versione 1, aggiornata il ${aggiornata}.`}
         </p>
         <div className="legale mt-8">{children}</div>
       </main>

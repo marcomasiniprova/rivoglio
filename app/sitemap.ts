@@ -18,6 +18,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    // le guide: contenuto da ricerca, vale più delle pagine legali
+    {
+      url: `${casa}/guida-bagagli`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    },
     // le pagine legali: contenuto stabile, priorità bassa
     ...["/condizioni", "/privacy", "/cookie"].map((percorso) => ({
       url: `${casa}${percorso}`,
