@@ -2,21 +2,23 @@ import { casa, spedisci, type Esito } from "./posta";
 import { bottone, COLORI as C, FONT, riga, vestito } from "./modello";
 
 /**
- * Ogni email che il prodotto sa mandare, una funzione ciascuna.
+ * Le email di servizio, una funzione ciascuna.
  *
- * Le azioni dell'utente coperte:
- *   1. si iscrive alla lista d'attesa  → benvenuto-lista
- *   2. crea l'account                  → benvenuto + primi passi
- *   3. deve confermare l'email         → conferma
- *   4. chiede di entrare senza password→ link magico
- *   5. imposta la prima ricerca        → ricerca attiva
- *   6. arriva un'offerta buona         → ALERT (è il prodotto)
- *   7. finisce i crediti               → crediti esauriti
- *   8. compra crediti                  → ricevuta
+ * VIVE (le mandano i flussi di Rivoglio):
+ *   1. iscrizione all'Osservatorio     → benvenutoLista
+ *   2. creazione dell'account          → benvenuto
+ *   3. conferma dell'email             → conferma
+ *   4. accesso senza password          → linkMagico
+ * Le email della PRATICA (T+0/2/15/30/60) stanno in `pratiche.ts`.
+ *
+ * EREDITÀ del prodotto viaggi (5-8: ricercaAttiva, alert, creditiFiniti,
+ * ricevuta): nessun flusso di Rivoglio le manda più; le richiama solo il
+ * vecchio ramo ricerche/alert, da spegnere (voce in ARRETRATI). Non
+ * riusarle per testi nuovi.
  *
  * Nessuna di queste lancia eccezioni: se l'email non parte, l'azione
- * dell'utente è comunque riuscita. Un alert perso è un problema; una
- * registrazione fallita perché la posta era giù è un disastro.
+ * dell'utente è comunque riuscita. Una registrazione fallita perché la
+ * posta era giù sarebbe un disastro.
  */
 
 const p = (testo: string) =>
@@ -52,31 +54,32 @@ export function benvenutoLista(a: string, _comune?: string | null): Promise<Esit
 }
 
 /* ---------------------------------------------------------------- 2 */
-export function benvenuto(a: string, crediti = 3): Promise<Esito> {
+export function benvenuto(a: string): Promise<Esito> {
   return spedisci({
     a,
-    oggetto: `Hai ${crediti} alert gratis. Ecco come usarli bene.`,
+    oggetto: "Il tuo account Rivoglio è pronto.",
     html: vestito({
       titolo: "Benvenuto",
       corpo:
         h("Il tuo account è pronto.") +
         p(
-          `Hai <strong style="color:${C.inchiostro}">${crediti} crediti</strong>. Un credito si consuma solo quando ti segnalo una destinazione vera, mai per cercare.`,
+          "Il check dei voli resta gratis e senza account, per te e per chiunque. L'account serve al resto: le tue pratiche e gli avvisi.",
         ) +
         `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.menta};border-radius:14px;padding:20px 22px;margin:0 0 8px;">
            <tr><td style="font-family:${FONT};font-size:15px;line-height:1.7;color:${C.verdeNotte};">
-             <strong>Tre cose, in due minuti</strong><br>
-             1. Dimmi da dove parti: senza, non posso calcolarti i chilometri.<br>
-             2. Metti la tua soglia: il totale a testa, non il prezzo della camera.<br>
-             3. Dimmi quanto sei disposto a guidare. Il resto lo faccio io.
+             <strong>Cosa ti sei aperto</strong><br>
+             1. Le pratiche si seguono passo per passo, dal sito e dall'app.<br>
+             2. I voli che salvi nell'app li ricontrolliamo il giorno dopo: se rientrano in una fascia, ti avvisiamo noi.<br>
+             3. Con questa email ritrovi tutto, su sito e app.
            </td></tr>
          </table>` +
-        bottone("Imposta la tua prima ricerca", `${casa()}/app`) +
+        bottone("Controlla un volo, gratis", `${casa()}/app`) +
         p(
-          "Non serve una carta e non c'è nessun abbonamento. Quando i crediti finiscono, decidi tu se ricaricare.",
+          "Nessun abbonamento e nessun addebito: si paga solo se apri una pratica, una volta sola. Se questo account non l'hai chiesto tu, rispondi a questa email e lo cancelliamo.",
         ),
+      coda: "Ricevi questa email perché è stato creato un account Rivoglio con questo indirizzo.",
     }),
-    testo: `Il tuo account è pronto.\n\nHai ${crediti} crediti. Un credito si consuma solo quando ricevi un alert vero.\n\n1. Dimmi da dove parti\n2. Metti la tua soglia\n3. Dimmi quanto sei disposto a guidare\n\nImposta la prima ricerca: ${casa()}/app`,
+    testo: `Il tuo account è pronto.\n\nIl check dei voli resta gratis e senza account. L'account serve al resto:\n1. Le pratiche si seguono passo per passo, dal sito e dall'app.\n2. I voli che salvi nell'app li ricontrolliamo il giorno dopo: se rientrano in una fascia, ti avvisiamo noi.\n3. Con questa email ritrovi tutto, su sito e app.\n\nControlla un volo, gratis: ${casa()}/app\n\nNessun abbonamento e nessun addebito: si paga solo se apri una pratica, una volta sola.`,
   });
 }
 
