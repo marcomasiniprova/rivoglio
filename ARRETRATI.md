@@ -224,6 +224,17 @@ non altro codice.**
 | 101 | **Popup: le 4 scelte sull'app** | Tutte e tre le funzioni in ordine (notifiche voli, fotocamera, tracker) · pagamento SUL SITO, così Apple e Google non trattengono il 15-30% · voli aggiunti a mano, una volta sola · prima completa e bella, poi store. Segnate qui e in STATO. |
 | 102 | **Primo pezzo: "I tuoi voli"** | Ogni volo controllato si salva sul telefono con l'esito che ha dato il motore (copiato, mai ricalcolato) e resta nella schermata Controlla, con la sua faccia: idoneo mostra la fascia, incerto dice che non si vende, non idoneo dice il ritardo. Bottone "Ricontrolla" su ognuno: serve per i voli appena partiti, che il giorno dopo hanno il dato. È la base delle notifiche, il pezzo successivo. |
 
+## ✅ CHIUSI l'8/08 notte fonda — ventunesimo giro: i 6 pezzi del handoff #31
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 103 | **Scena di scansione nativa nell'app** (il check saltava dritto al verdetto) | `ScenaScan.tsx`: la stessa scena del sito in React Native. 6 passi da 2,4s mai tagliati, biglietto che si compila coi dati veri del server, luce dello scanner (3,4s + pausa), timbro CE a molla, barra e contatore. Scelta popup: identica al sito. Provata end-to-end su Expo web: ZZ250 → scena → verdetto da sola, zero errori. Su 390px la tratta ha una riga sua (le tre colonne del sito la troncavano). |
+| 104 | **Sezione prezzi da rifare esteticamente** | Due carte d'imbarco affiancate (scelta popup): fascia scura col nome e il nastro "La più scelta", strappo coi fori, codice a barre, timbro Rivoglio. Il check gratis è una striscia sopra le carte. Conti e confronto apribili restano (prova landing verde). |
+| 105 | **Messaggi del motore per cancellato/dirottato** | Riscritti per l'utente: il cancellato dice che il preavviso lo sa solo lui e che rimborso/volo alternativo si chiedono comunque; il dirottato spiega l'atterraggio in un altro scalo e perché il dato non basta. Versione regole 2026.08.4, golden set verde. |
+| 106 | **Pagina guida bagagli** (popup: guida sì, vendita no) | `/guida-bagagli`: PIR, termini 7/21 giorni, perso dopo 21, 2 anni, tetto 1.519 DSP (ICAO dal 28/12/2024) con conversione dichiarata stima, fonti in fondo, ponte al check. Footer (colonna Domande) + sitemap. |
+| 107 | **Testi delle email brandizzate** | Scoperta: l'email di benvenuto alla registrazione era ANCORA quella dei crediti viaggi. Riscritta per Rivoglio (check libero, pratiche, avvisi). Le T+0/2/15/30/60 rilette: già in stile casa. Il ramo email/alert viaggi resta da spegnere (voce qui sotto). |
+| 108 | **QA da utente critico + verify** | Giro visivo con Chromium su app (welcome → check → scena → verdetto), prezzi 1440/390, guida 1440/390: zero errori console, zero scroll orizzontale. Fix piccoli subito (data ISO sul biglietto del sito → GG/MM/AAAA; griglia carta mobile). Il lint mobile era rosso dal giro precedente (ref Animated + require): sistemato con `useValoreAnimato` e import statici. Verify e prove nel commit di chiusura. |
+
 ## ⏳ ANCORA DA FARE
 
 ### LA MEGA TO DO (dall'audit dei prompt, 8/08 notte)
@@ -235,6 +246,14 @@ non altro codice.**
   ricontrollare il cruscotto MIT e aggiungere le date nuove alla tabella.
 
 **Prodotto (dal documento, rimandati di proposito):**
+- **Spegnere il ramo email/alert del prodotto viaggi**: le email 5-8 di
+  `lib/email/messaggi.ts` (ricerca attiva, destinazione, crediti, ricevuta)
+  sono ancora testi viaggi e restano richiamabili da `creaRicerca`,
+  `lib/alert/invia.ts` e dalle rotte `/api/motore/abbina|raccogli`, che
+  però nessun flusso di Rivoglio usa più. Scoperto l'8/08 notte
+  ricontrollando i testi: l'unica che partiva DAVVERO (benvenuto, alla
+  registrazione) è stata riscritta subito per Rivoglio. Il resto si
+  spegne in un giro suo, con calma: rimuovere chiamanti morti e funzioni.
 - **Onboarding dell'app mobile ancora al prodotto viaggi**: va riscritto
   per Rivoglio (check del volo, non micro-vacanze). Scoperto l'8/08 con
   l'anteprima web. Si fa insieme al tracker mobile completo.

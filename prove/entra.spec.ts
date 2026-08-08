@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { COPY } from "../lib/copy";
+import { apriModoNumero } from "./aiuti";
 
 /**
  * Prove sull'accesso.
@@ -22,6 +23,8 @@ test.describe("Accesso", () => {
     await expect(
       page.getByRole("heading", { name: COPY.appOspite.titolo }),
     ).toBeVisible();
+    // dall'8/08 il modo predefinito è la tratta: il numero ha il suo selettore
+    await apriModoNumero(page);
     await expect(page.getByLabel(COPY.hero.form.volo.etichetta)).toBeVisible();
     await expect(
       page.getByRole("button", { name: COPY.hero.form.bottone }),
@@ -84,7 +87,10 @@ test.describe("Accesso", () => {
       .getByRole("link", { name: COPY.nav.cta })
       .click();
     await expect(page).toHaveURL(/#controllo/);
-    await expect(page.getByLabel(COPY.hero.form.volo.etichetta).first()).toBeVisible();
+    // il check c'è: il selettore dei modi è la sua faccia (tratta predefinita)
+    await expect(
+      page.getByRole("button", { name: COPY.check.modo.numero, exact: true }).first(),
+    ).toBeVisible();
   });
 
   test("la landing porta alla web app (decisione dell'8/08)", async ({ page }) => {

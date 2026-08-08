@@ -54,6 +54,7 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | Sequenza email T+0/2/15/30/60 (Resend) + cron follow-up | ✅ 07/08, invii idempotenti marcati a evento |
 | Tracker pratica (web) + area utente | ✅ 07/08 |
 | `/admin` shadow mode (conferma umana dei verdetti) | ✅ 07/08, SHADOW_MODE=1 |
+| Guida bagagli `/guida-bagagli` (Montreal: solo guida, niente vendita) | ✅ 8/08 notte, footer + sitemap |
 | Prove Playwright del flusso in modalità demo | ✅ 208/210 (2 = rete sandbox verso Supabase) + eval 35/35 |
 
 ## 1.3 Deploy e conti
@@ -71,10 +72,11 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 
 | | Stato |
 |---|---|
-| App Expo rinominata, icone, motore, 29 prove | ✅ (base del 07/08) |
-| Pivot minimo: tab "Le tue pratiche" | ✅ 07/08 (tsc, lint, 29/29) |
-| Tracker completo + notifiche push sulle pratiche | ⏳ dopo che il web incassa (da documento: app = retention, novembre) |
-| Store (Apple 99$, Play 25$ + 12 tester × 14 giorni) | ⏳ serve Valerio, non è il collo di bottiglia ora |
+| App Expo rinominata, icone, motore, prove | ✅ (base del 07/08) |
+| L'app È Rivoglio: check a 3 modi (foto carta, tratta, numero), voli salvati, verdetto | ✅ 8/08 |
+| Notifiche push sui voli seguiti + tracker pratica DENTRO l'app + profilo + welcome | ✅ 8/08 (l'app non scappa nel sito: fuori solo il pagamento) |
+| Scena di scansione nativa (il teatro del check, identico al sito) | ✅ 8/08 notte, provata end-to-end su Expo web |
+| Store (Apple 99$, Play 25$ + 12 tester × 14 giorni) | ⏳ serve Valerio; prima l'app completa e bella (sua scelta), poi gli store |
 
 ---
 

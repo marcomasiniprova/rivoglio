@@ -1,9 +1,9 @@
 # STATO — Rivoglio
 
-**Aggiornato:** 2026-08-08, sera (giro #29: l'app non scappa più nel sito.
-Ricerca per tratta, notifiche push, foto della carta d'imbarco, pratiche
-col tracker DENTRO l'app, profilo vero, classifica completa e spenta,
-biglietto realistico. Guida Polar in POLAR.md)
+**Aggiornato:** 2026-08-08, notte fonda (giro #31 COMPLETATO: scena di
+scansione nativa nell'app, prezzi come carte d'imbarco, messaggi
+cancellato/dirottato, guida bagagli, email benvenuto riscritta per
+Rivoglio, QA visivo su app e landing)
 **RIVOGLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
 Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
 verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
@@ -17,6 +17,46 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #31 COMPLETATO (8/08 notte fonda)**: i 6 pezzi rimasti dal
+  handoff, tutti chiusi e provati.
+  - **La scena di scansione è NELL'APP** (`mobile/src/components/
+    ScenaScan.tsx`): identica al sito, 6 passi veri da 2,4s che non si
+    tagliano mai, biglietto che si COMPILA coi dati del server (tratta su
+    una riga sua: su 390px le tre colonne del sito troncavano), luce
+    dello scanner in loop 3,4s, timbro CE a molla. Provata end-to-end su
+    Expo web: ZZ250 → 15 secondi di scena → verdetto da sola, zero
+    errori console. Il sipario resta giù durante la transizione al
+    verdetto (il reset avviene al ritorno del focus), e un cambio tab a
+    metà analisi non rompe niente (ref `analisiViva`).
+  - **Il lint mobile era ROSSO dal giro della welcome** (react-hooks v6
+    vieta `useRef(...).current` letto in render sugli Animated.Value, e
+    i `require()` delle immagini): nato `useValoreAnimato` in
+    `mobile/src/lib/animazioni.ts` (stesso comportamento, da useState),
+    immagini a import statico con `src/tipi/immagini.d.ts`. Ora tsc,
+    lint e jest mobile: tutti verdi.
+  - **La sezione prezzi è due carte d'imbarco** (scelta popup): pratica
+    evidenziata col nastro "La più scelta" nella fascia scura, famiglia
+    accanto, strappo coi fori, codice a barre derivato dal nome, timbro
+    "Rivoglio · Reg. CE 261/2004". Il check gratis è una striscia sopra
+    le carte, non un terzo biglietto. Confronto coi portali e conti
+    apribili invariati (la prova landing li blinda).
+  - **Cancellato e dirottato parlano all'utente** (versione regole
+    2026.08.4): il cancellato spiega che il preavviso lo sa solo lui e
+    che rimborso o volo alternativo si chiedono comunque; il dirottato
+    spiega l'atterraggio in un altro scalo. Via il gergo interno ("è il
+    prossimo pezzo che costruiamo", "da guardare a mano").
+  - **/guida-bagagli** (scelta popup: guida sì, vendita no): PIR subito
+    in aeroporto, reclamo scritto in 7/21 giorni, perso dopo 21, azione
+    in 2 anni, tetto 1.519 DSP (revisione ICAO dal 28/12/2024, circa
+    1.900€ dichiarati come stima), fonti nel finale. Linkata dal footer
+    (colonna Domande) e in sitemap. In fondo il ponte al check EU261.
+  - **L'email di benvenuto era ANCORA del prodotto viaggi** (crediti,
+    destinazioni) e partiva a ogni registrazione: riscritta per
+    Rivoglio. Le T+0/2/15/30/60 della pratica rilette: già giuste. Il
+    ramo email/alert viaggi (ricerca attiva, destinazione, crediti,
+    ricevuta + chiamanti) è segnato in ARRETRATI da spegnere.
+  - **La data sul biglietto in scansione del sito** era l'ISO grezza
+    (2026-08-07): ora GG/MM/AAAA, come nell'app.
 - **GIRO #30 (8/08 notte)**: stress test sul motore VERO (14 voli reali
   via workbench remoto, da ieri a febbraio: 11 verdetti certificati, 3
   incerti onesti per orario mancante in archivio, 0 errori). Un incerto
@@ -110,9 +150,13 @@ social rifatta (era rimasta al prodotto viaggi).
   firma Standard Webhooks provata su 10 casi); lettera deterministica coi
   canali reclamo verificati di 10 compagnie; email T+0/2/15/30/60; garanzia
   90 giorni; tracker web; `/admin` = conferma umana (shadow mode acceso).
-- **Prove**: web 208/210 Playwright (2 = rete sandbox verso Supabase),
-  eval 35/35 sui 32 casi d'oro, mobile tsc/lint/jest 29/29. Una prova
+- **Prove**: web 298/300 Playwright (2 = rete sandbox verso Supabase),
+  eval sui 32 casi d'oro dentro, mobile tsc/lint/jest verdi. Una prova
   vieta per sempre "hai diritto a" e il trattino lungo nei testi visibili.
+  Dall'8/08 notte le prove del funnel passano dal selettore "So il
+  numero" (il modo predefinito è la tratta): `prove/aiuti.ts` porta
+  l'helper col click ripetuto (l'idratazione può mangiare il primo) e
+  `exact: true` (senza, "Non so il numero" si prende il click).
 - **Schema dati applicato sul Supabase vero** (voli, verifiche, pratiche,
   eventi + RLS) via Composio, come migrazione tracciata.
 - **SEO/GEO**: robots, sitemap, JSON-LD Organization+WebSite, llms.txt,
@@ -238,6 +282,14 @@ social rifatta (era rimasta al prodotto viaggi).
    Gemini e UNSPLASH_ACCESS_KEY quando l'approvazione arriva.
 
 ## Da non rifare
+- **Nella sandbox il watcher di Metro NON vede gli edit**: dopo una
+  modifica al codice mobile il dev server Expo va riavviato con
+  `--clear`, o l'anteprima continua a servire il codice VECCHIO (pagato
+  con una controprova identica alla prova).
+- Il MCP Playwright cerca Chrome di sistema che nella sandbox non c'è:
+  il giro visivo si fa con uno script Node che importa
+  `node_modules/playwright` (Chromium preinstallato via
+  PLAYWRIGHT_BROWSERS_PATH).
 - `.env.local` è in UTF-16 e Next lo ignora: chiavi vive in
   `.env.development.local`.
 - Il fornitore demo si accende DA SOLO senza AERODATABOX_API_KEY: i voli

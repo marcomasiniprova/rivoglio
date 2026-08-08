@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { COPY } from "../lib/copy";
+import { apriModoNumero } from "./aiuti";
 
 /**
  * La landing di Rivoglio: lo scanner dei rimborsi (SPEC §1, §3).
@@ -21,6 +22,9 @@ test.describe("Landing page", () => {
 
   test("l'hero ha il form volo+data, che è il prodotto", async ({ page }) => {
     await page.goto("/");
+    // il modo predefinito è la tratta (standard dell'8/08): il numero sta
+    // dietro il suo selettore, e la prova segue la strada dell'utente
+    await apriModoNumero(page);
     const volo = page.getByLabel(COPY.hero.form.volo.etichetta).first();
     const data = page.getByLabel(COPY.hero.form.data.etichetta).first();
     await expect(volo).toBeVisible();
@@ -33,6 +37,7 @@ test.describe("Landing page", () => {
 
   test("il form vuoto non parte: dice cosa manca, senza giro di rete", async ({ page }) => {
     await page.goto("/");
+    await apriModoNumero(page);
     await page.getByRole("button", { name: COPY.hero.form.bottone }).first().click();
     await expect(page.getByText(COPY.hero.form.errori.voloMancante).first()).toBeVisible();
     await expect(page).not.toHaveURL(/\/verifica\//);

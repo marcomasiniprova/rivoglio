@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { COPY } from "../lib/copy";
+import { apriModoNumero } from "./aiuti";
 import { VOLI_DEMO } from "../lib/voli/fornitori/demo";
 
 /**
@@ -35,6 +36,8 @@ const urlDemo = (volo: string) => `/verifica/demo-${volo}-${ieri()}`;
 test.describe("Il check dalla home", () => {
   async function compilaECont(page: import("@playwright/test").Page, volo: string) {
     await page.goto("/");
+    // dall'8/08 il modo predefinito è la tratta: il numero ha il suo selettore
+    await apriModoNumero(page);
     await page.getByLabel(COPY.hero.form.volo.etichetta).first().fill(volo);
     // ISO va bene sia per un campo data sia per l'API (normalizzaData).
     await page.getByLabel(COPY.hero.form.data.etichetta).first().fill(ieri());

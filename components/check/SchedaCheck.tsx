@@ -64,6 +64,9 @@ const dataEstesa = (iso: string) =>
     timeZone: "UTC",
   });
 
+/** "2026-08-07" → "07/08/2026": sul biglietto la data si legge, non è ISO. */
+const dataBreve = (iso: string) => iso.split("-").reverse().join("/");
+
 /* ─────────────────────────── il campo aeroporto ────────────────────── */
 
 type Scalo = { iata: string; citta: string; nome: string; paese: string };
@@ -435,7 +438,7 @@ export default function SchedaCheck() {
             arrivoPrevisto={letto.previsto}
             arrivoEffettivo={letto.effettivo}
             volo={inAnalisi.volo}
-            dataTesto={inAnalisi.data}
+            dataTesto={inAnalisi.data ? dataBreve(inAnalisi.data) : ""}
             passo={Math.min(3, Math.floor(passo / 2))}
           />
         </div>
@@ -741,10 +744,12 @@ export default function SchedaCheck() {
             {HERO.form.bottone}
             <span aria-hidden="true">→</span>
           </button>
-
-          <p className="mt-3 text-center text-[14.5px] text-fumo">{HERO.form.rassicurazione}</p>
         </form>
       )}
+
+      {/* La promessa del funnel vale in OGNI modo, non solo col numero:
+          niente email, niente account. Come nell'app. */}
+      <p className="mt-3 text-center text-[14.5px] text-fumo">{HERO.form.rassicurazione}</p>
     </div>
   );
 }
