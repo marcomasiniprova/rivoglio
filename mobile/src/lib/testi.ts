@@ -9,9 +9,66 @@
  */
 
 export const TESTI = {
+  /* ---- IL CHECK: la prima schermata dell'app, senza account ---- */
+  check: {
+    occhiello: "Lo scanner dei rimborsi",
+    titolo: { prima: "Hai preso un volo", corsivo: "nell'ultimo anno?" },
+    sottotitolo: "Forse ti devono fino a 600€. Controllalo gratis in 30 secondi.",
+    volo: {
+      etichetta: "Numero del volo",
+      segnaposto: "FR 8321",
+      aiuto: "Lo trovi sulla carta d'imbarco o nell'email di conferma.",
+    },
+    data: {
+      etichetta: "Data del volo",
+      segnaposto: "GG/MM/AAAA",
+      aiuto: "Il giorno della partenza.",
+    },
+    bottone: "Controlla gratis",
+    rassicurazione: "Niente email, niente account. Il risultato lo vedi subito.",
+    punti: [
+      "Il check è gratis, sempre",
+      "Nessuna percentuale sulla compensazione",
+      "Se la compagnia non paga, non paghi neanche tu",
+    ],
+    errori: {
+      voloMancante: "Scrivi il numero del volo.",
+      dataMancante: "Scegli la data del volo.",
+      dataStrana: "Scrivi la data come GG/MM/AAAA.",
+    },
+    entra: "Ho già un account",
+  },
+
+  /* ---- IL VERDETTO: tre esiti, mai una promessa ---- */
+  verdetto: {
+    idoneo: {
+      occhiello: "Verifica completata",
+      titolo: { prima: "Il tuo volo è atterrato", corsivo: "in ritardo." },
+      fasciaEtichetta: "Fascia di compensazione",
+      perPasseggero: "per passeggero",
+      nota: "Verifichiamo se ci sono cause escludenti. La pratica si apre dal sito.",
+    },
+    incerto: {
+      occhiello: "Verifica completata",
+      titolo: { prima: "Il dato non è", corsivo: "abbastanza solido." },
+      nota: "Vendiamo solo su fatti verificati. Quando il fatto non è certo, non ti facciamo pagare.",
+    },
+    nonIdoneo: {
+      occhiello: "Verifica completata",
+      titolo: { prima: "Per questo volo non risulta", corsivo: "una compensazione." },
+      nota: "Meglio così. Il check resta gratis: se un altro volo ti è andato peggio, controllalo.",
+    },
+    previsto: "Arrivo previsto",
+    effettivo: "Arrivo effettivo",
+    ritardo: "Ritardo all'arrivo",
+    demo: "Esempio dimostrativo",
+    altroVolo: "Controlla un altro volo",
+    apriPratica: "Apri la pratica dal sito",
+  },
+
   comune: {
     marchio: "Rivoglio",
-    tagline: "La tua fuga, al prezzo giusto.",
+    tagline: "Riprenditi i soldi che ti devono.",
     avanti: "Avanti",
     indietro: "Torna indietro",
     annulla: "Annulla",

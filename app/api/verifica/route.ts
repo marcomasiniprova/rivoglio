@@ -26,7 +26,9 @@ function oltreIlLimite(ip: string): boolean {
   const adesso = Date.now();
   // La mappa non deve crescere per sempre: ogni tanto si butta via tutto.
   if (richiestePerIp.size > 10_000) richiestePerIp.clear();
-  const recenti = (richiestePerIp.get(ip) ?? []).filter((t) => adesso - t < FINESTRA_MS);
+  const recenti = (richiestePerIp.get(ip) ?? []).filter(
+    (t) => adesso - t < FINESTRA_MS,
+  );
   recenti.push(adesso);
   richiestePerIp.set(ip, recenti);
   return recenti.length > MASSIMO_NELLA_FINESTRA;
@@ -41,11 +43,30 @@ function ipDi(req: Request): string {
   return grezzo.split(",")[0].trim();
 }
 
+/* Il check è pubblico e non autenticato: lo usa anche l'app mobile, che
+   chiama da un'origine diversa (in sviluppo il server Expo, in produzione
+   l'app installata). Senza questi header il browser blocca la risposta e
+   l'app dice "sei offline" pur avendo la rete. Nessun cookie in gioco:
+   qui non passa nulla di personale, e il tetto per IP resta quello. */
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Max-Age": "86400",
+} as const;
+
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: CORS });
+}
+
 export async function POST(req: Request) {
   if (oltreIlLimite(ipDi(req))) {
     return NextResponse.json(
-      { ok: false, errore: "Troppe richieste di fila. Aspetta un minuto e riprova." },
-      { status: 429 },
+      {
+        ok: false,
+        errore: "Troppe richieste di fila. Aspetta un minuto e riprova.",
+      },
+      { status: 429, headers: CORS },
     );
   }
 
@@ -53,43 +74,60 @@ export async function POST(req: Request) {
   try {
     corpo = await req.json();
   } catch {
-    return NextResponse.json({ ok: false, errore: "Richiesta non leggibile." }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, errore: "Richiesta non leggibile." },
+      { status: 400, headers: CORS },
+    );
   }
   const { volo, data } = (corpo ?? {}) as { volo?: unknown; data?: unknown };
   if (typeof volo !== "string" || typeof data !== "string") {
     return NextResponse.json(
-      { ok: false, errore: "Servono il numero del volo e la data di partenza." },
-      { status: 400 },
+      {
+        ok: false,
+        errore: "Servono il numero del volo e la data di partenza.",
+      },
+      { status: 400, headers: CORS },
     );
   }
 
   // Da qui in giù verificaVolo non lancia mai: un guasto diventa esito incerto.
   const esito = await verificaVolo(volo, data);
   if (!esito.ok) {
-    return NextResponse.json({ ok: false, errore: esito.errore }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, errore: esito.errore },
+      { status: 400, headers: CORS },
+    );
   }
 
   const { verdetto, fatto } = esito;
-  return NextResponse.json({
-    ok: true,
-    id: esito.verificaId,
-    esito: verdetto.esito,
-    ...(verdetto.esito === "idoneo" ? { importo: verdetto.importo } : {}),
-    ...("ritardoMinuti" in verdetto && verdetto.ritardoMinuti !== null
-      ? { ritardoMinuti: verdetto.ritardoMinuti }
-      : {}),
-    motivo: verdetto.motivo,
-    // I dati oggettivi dietro il verdetto: la trasparenza è il prodotto.
-    dato: {
-      previsto: fatto.arrivoPrevistoUtc,
-      effettivo: fatto.arrivoEffettivoUtc,
-      vettoreOperativo: fatto.vettoreOperativo,
-      km: fatto.kmOrtodromica,
+  return NextResponse.json(
+    {
+      ok: true,
+      id: esito.verificaId,
+      esito: verdetto.esito,
+      ...(verdetto.esito === "idoneo" ? { importo: verdetto.importo } : {}),
+      ...("ritardoMinuti" in verdetto && verdetto.ritardoMinuti !== null
+        ? { ritardoMinuti: verdetto.ritardoMinuti }
+        : {}),
+      motivo: verdetto.motivo,
+      // I dati oggettivi dietro il verdetto: la trasparenza è il prodotto.
+      dato: {
+        previsto: fatto.arrivoPrevistoUtc,
+        effettivo: fatto.arrivoEffettivoUtc,
+        vettoreOperativo: fatto.vettoreOperativo,
+        km: fatto.kmOrtodromica,
+      },
+      demo: esito.demo,
+      // La prescrizione è una STIMA dichiarata (SPEC §4), e solo dove ha senso.
+      ...(verdetto.esito === "idoneo"
+        ? {
+            scadenzaStimata: scadenzaStimata(
+              fatto.dataLocale,
+              fatto.vettoreOperativo,
+            ),
+          }
+        : {}),
     },
-    demo: esito.demo,
-    // La prescrizione è una STIMA dichiarata (SPEC §4), e solo dove ha senso.
-    ...(verdetto.esito === "idoneo"
-      ? { scadenzaStimata: scadenzaStimata(fatto.dataLocale, fatto.vettoreOperativo) }
-      : {}),
-  });
+    { headers: CORS },
+  );
 }

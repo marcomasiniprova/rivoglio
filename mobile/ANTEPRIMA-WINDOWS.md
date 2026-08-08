@@ -81,8 +81,17 @@ $env:BROWSER="none"
 npx expo start --web
 ```
 
-Poi apri **tu** il browser su <http://localhost:8081>. Per fermare il
-server: `Ctrl + C` nel terminale.
+Poi apri **tu** il browser su <http://localhost:8081>, e **lascia stare la
+finestra del terminale**: se ci premi dentro un tasto il server si ferma
+(lo scrive: `Stopped server`) e la pagina smette di rispondere. La prima
+apertura resta bianca 30-60 secondi mentre compila.
+
+**Per vederla come un telefono e non stirata su tutto lo schermo:** con la
+pagina aperta premi `F12`, poi `Ctrl + Shift + M` (o l'icona del telefonino
+in alto nel pannello) e scegli un iPhone dall'elenco. È lo strumento che
+usano gli sviluppatori web per il mobile.
+
+Per fermare il server quando hai finito: `Ctrl + C`.
 
 > **Perché diciamo a Expo di non aprire il browser da solo:** su questo
 > PC il comando di Windows che lancia il browser predefinito va in crash

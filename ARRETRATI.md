@@ -198,6 +198,14 @@ non altro codice.**
 | 90 | **"Ammorbidisci l'intervista di art-director"** | FASE 0 ora dice: salta le domande già risposte nel brief, chiedi solo ciò che manca, e se non manca niente vai avanti dichiarando cosa hai dedotto. Un brief esplicito e dettagliato vale come conferma per passare alla fase dopo. |
 | 91 | **"Dove si configurano le variabili d'ambiente, mettile una volta sola"** | `.claude/settings.json` (tracciato) con USE_BUILTIN_RIPGREP=0 e ENABLE_TOOL_SEARCH=auto:5: valgono su ogni macchina che apre il repo, PC compreso, senza toccare più nessun file di shell. FIGMA_API_KEY è un segreto, quindi sta in `.claude/settings.local.json` che è in .gitignore (regola #5): sul tuo PC va ricreato, la riga è nel rapporto in chat. |
 
+## ✅ CHIUSI l'8/08 sera — diciottesimo giro: l'app mobile diventa Rivoglio
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 92 | **"Ho aperto l'app ed è ancora quella dei viaggi, fa schifo, non c'è traccia di Rivoglio"** | Vero, ed era scritto in STATO ma andava fatto. Primo pezzo consegnato: la schermata di apertura ora è **il check del volo di Rivoglio** (logo, occhiello, titolo col corsivo, campo volo e data con le barre automatiche, punti di fiducia) e il **verdetto** ha la sua schermata coi tre esiti, orari, ritardo e fascia. Il motore non è duplicato: l'app chiama la stessa API del sito. Provato end-to-end nell'anteprima (ZZ250 → 3h20 di ritardo → fascia 250€). **Restano viaggi**: tab, registrazione, destinazioni, ricerche. Prossimo pezzo. |
+| 93 | **"Voglio vedere l'app come uno sviluppatore serio, col mockup del telefono"** | La cornice iPhone della tua immagine è il simulatore iOS, che su Windows non esiste (Apple lo dà solo su Mac). Le due strade vere: `F12` → `Ctrl+Shift+M` nel browser (misure del telefono in 2 secondi, è quello che usano gli sviluppatori web) oppure l'emulatore Android di Android Studio, che ha la cornice vera. Entrambe nella guida. |
+| 94 | **Il check dell'app diceva "sei offline" pur avendo rete** | Trovato provando davvero: mancavano gli header CORS su `/api/verifica`, e il browser bloccava la risposta. Aggiunti (più la risposta al preflight OPTIONS). Verificato con preflight e POST: 204 e 200 con gli header giusti. |
+
 ## ⏳ ANCORA DA FARE
 
 ### LA MEGA TO DO (dall'audit dei prompt, 8/08 notte)
