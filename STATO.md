@@ -196,7 +196,12 @@ social rifatta (era rimasta al prodotto viaggi).
   firma Standard Webhooks provata su 10 casi); lettera deterministica coi
   canali reclamo verificati di 10 compagnie; email T+0/2/15/30/60; garanzia
   90 giorni; tracker web; `/admin` = conferma umana (shadow mode acceso).
-- **Prove**: web 298/300 Playwright (2 = rete sandbox verso Supabase),
+- **Prove**: web 306/308 Playwright (9/08). Le 2 rosse sono lo stesso
+  test su desktop e telefono, "il modulo dell'Osservatorio accetta
+  un'email valida e conferma": la sandbox non arriva a Supabase (`Host
+  not in allowlist`), quindi il salvataggio dell'iscritto risponde 500 e
+  il pannello di conferma non compare. Sul PC di Valerio e su Netlify
+  passa. Tutto il resto verde, comprese le 8 nuove sul doppio opt-in;
   eval sui 32 casi d'oro dentro, mobile tsc/lint/jest verdi. Una prova
   vieta per sempre "hai diritto a" e il trattino lungo nei testi visibili.
   Dall'8/08 notte le prove del funnel passano dal selettore "So il
@@ -352,8 +357,9 @@ social rifatta (era rimasta al prodotto viaggi).
   demo iniziano per ZZ e ogni risposta è marcata demo.
 - SHADOW_MODE=1 in produzione finché 100 verdetti di fila non passano
   puliti: si spegne dal pannello, non dal codice.
-- Le 2 prove Playwright dell'Osservatorio falliscono SOLO nella sandbox
-  (rete verso Supabase bloccata): sul PC di Valerio passano.
+- Le 2 prove dell'Osservatorio falliscono SOLO nella sandbox: l'egress
+  blocca *.supabase.co ("Host not in allowlist"). Non è un bug del
+  codice e non va "sistemato": sul PC di Valerio e su Netlify passano.
 - Le tabelle viaggi (offerte, ricerche, invii, strutture) sono eredità nel
   DB: non usarle, non cancellarle.
 - Resend in prova spedisce SOLO a valerio@artecai.it finché il dominio non
