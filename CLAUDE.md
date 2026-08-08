@@ -107,6 +107,27 @@ dati ISTAT e MIMIT. Funzioni Netlify: 10 secondi → il matcher va a lotti.
 Spendere soldi · comprare domini · installare software di sistema · pubblicare
 online · qualsiasi cosa irreversibile. Tutto il resto: fai, poi riferisci.
 
+## Protocollo operativo
+
+- Per localizzare codice usa `rg -C 20 <pattern>` in un solo comando.
+  Mai "cerca" e poi "leggi intorno" come due step separati.
+  Leggi un file intero solo se devi modificarne più punti.
+- Prima di un edit verifica che la stringa target sia unica nel file.
+  Se un edit fallisce due volte, fermati e chiedimi.
+- Non spawnare subagenti per task singoli o piccoli: costano un
+  moltiplicatore di token. Solo per esplorazione ampia e indipendente.
+- Non aggiungere feature, refactor o astrazioni oltre quanto richiesto.
+- Dopo ogni task completato, verificato e committato, chiudi con:
+  --- CHECKPOINT: task chiuso. Consigliato /clear. Prossimo task? ---
+- Se ti chiedo qualcosa che non c'entra col task corrente, non iniziare.
+  Rispondi: "Task nuovo. /clear prima, poi ripeti la richiesta."
+- Se noti uno di questi sintomi, fermati e segnalalo:
+  rileggi un file già letto in sessione / riproponi un approccio scartato /
+  mi richiedi un'informazione già data / un fix supera i 3 tentativi.
+  Output: "--- DEGRADO: [quale]. Consigliato /compact ---"
+- Prima di ogni /clear che consigli, scrivi HANDOFF.md con:
+  stato attuale, decisioni prese, file toccati, cosa resta.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

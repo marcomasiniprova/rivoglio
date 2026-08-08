@@ -1,0 +1,109 @@
+import type { Metadata } from "next";
+import PaginaLegale from "@/components/legale/PaginaLegale";
+
+export const metadata: Metadata = {
+  title: "Privacy | Rivoglio",
+  description:
+    "Come Rivoglio tratta i tuoi dati: quali raccogliamo, perché, per quanto tempo e quali diritti hai.",
+};
+
+/**
+ * Informativa ai sensi dell'art. 13 del Regolamento (UE) 2016/679 (GDPR).
+ * PRIMA BOZZA operativa dell'8/08: dice la verità su cosa facciamo coi
+ * dati (che è poca roba, ed è un vanto). Revisione legale in ARRETRATI.
+ */
+export default function PaginaPrivacy() {
+  return (
+    <PaginaLegale titolo="Informativa sulla privacy" aggiornata="8 agosto 2026">
+      <p>
+        Questa pagina spiega quali dati personali raccoglie Rivoglio, perché li raccoglie,
+        per quanto li conserva e quali diritti hai. È scritta per essere letta, non per
+        spaventare: se qualcosa non è chiaro, scrivici.
+      </p>
+
+      <h2>Chi è il titolare</h2>
+      <p>
+        Il titolare del trattamento è il gestore di Rivoglio, contattabile all&apos;indirizzo{" "}
+        <a href="mailto:valerio@artecai.it">valerio@artecai.it</a>. Rivoglio è un progetto in
+        fase di avvio: questa informativa sarà integrata con i dati societari completi appena
+        l&apos;attività sarà formalizzata.
+      </p>
+
+      <h2>Quali dati trattiamo, e perché</h2>
+      <ul>
+        <li>
+          <strong>Il check gratuito</strong>: per verificare un volo ci servono solo numero di
+          volo e data. Non sono dati che ti identificano e non ti chiediamo né email né
+          account per usare il check. Base giuridica: esecuzione del servizio che richiedi
+          (art. 6.1.b GDPR).
+        </li>
+        <li>
+          <strong>L&apos;Osservatorio (newsletter)</strong>: se ti iscrivi trattiamo la tua
+          email per mandarti la newsletter. Base giuridica: il tuo consenso (art. 6.1.a),
+          che puoi revocare in ogni momento con il link in fondo a ogni email o scrivendoci.
+        </li>
+        <li>
+          <strong>Account e pratiche</strong>: se apri una pratica trattiamo la tua email
+          (per l&apos;accesso senza password), i nomi e cognomi dei passeggeri che inserisci
+          tu, i dati verificati del volo e la cronologia della pratica. Base giuridica:
+          esecuzione del contratto (art. 6.1.b) e obblighi di legge (art. 6.1.c).
+        </li>
+        <li>
+          <strong>I documenti che carichi</strong> (carta d&apos;imbarco o email della
+          compagnia): li leggiamo per confrontarli coi dati verificati del volo e{" "}
+          <strong>non li salviamo</strong>. Il file viene letto, l&apos;esito del confronto
+          viene registrato nella pratica, il file viene scartato.
+        </li>
+        <li>
+          <strong>Pagamenti</strong>: sono gestiti dal fornitore di pagamento (Polar, in
+          qualità di merchant of record). Noi non vediamo e non conserviamo i dati della tua
+          carta.
+        </li>
+      </ul>
+      <p>
+        Non facciamo profilazione, non vendiamo dati a terzi e non usiamo i tuoi dati per
+        pubblicità.
+      </p>
+
+      <h2>Chi li tratta per noi</h2>
+      <p>
+        Per far funzionare il servizio usiamo fornitori che trattano i dati per nostro conto,
+        come responsabili o autonomi titolari: Supabase (database e accessi, server
+        nell&apos;Unione Europea), Netlify (hosting del sito), Resend (invio email), Mistral
+        (lettura del testo dei documenti che carichi, senza conservazione del file),
+        AeroDataBox (dati di volo: riceve solo numero di volo e data, mai la tua identità).
+        Alcuni fornitori possono trovarsi fuori dall&apos;Unione Europea: in quel caso il
+        trasferimento avviene con le garanzie previste dagli artt. 44 e seguenti del GDPR
+        (clausole contrattuali standard).
+      </p>
+
+      <h2>Per quanto li conserviamo</h2>
+      <ul>
+        <li>Le verifiche dei voli: senza dati che ti identificano, per le statistiche del servizio.</li>
+        <li>
+          L&apos;iscrizione all&apos;Osservatorio: finché non ti disiscrivi.
+        </li>
+        <li>
+          Account e pratiche: per la durata della pratica e poi per il tempo richiesto dagli
+          obblighi legali e fiscali (di norma 10 anni per i documenti contabili).
+        </li>
+      </ul>
+
+      <h2>I tuoi diritti</h2>
+      <p>
+        Hai il diritto di chiederci l&apos;accesso ai tuoi dati, la rettifica, la
+        cancellazione, la limitazione del trattamento, la portabilità, e di opporti al
+        trattamento (artt. 15-22 GDPR). Per esercitarli scrivi a{" "}
+        <a href="mailto:valerio@artecai.it">valerio@artecai.it</a>: rispondiamo entro 30
+        giorni. Se pensi che qualcosa non vada, hai anche il diritto di presentare reclamo al
+        Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer">garanteprivacy.it</a>).
+      </p>
+
+      <h2>Aggiornamenti</h2>
+      <p>
+        Questa informativa può cambiare quando cambia il servizio. La versione e la data in
+        testa alla pagina ti dicono sempre quale stai leggendo.
+      </p>
+    </PaginaLegale>
+  );
+}

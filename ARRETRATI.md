@@ -178,6 +178,16 @@ non altro codice.**
 | 80 | **Il giro estetico: foto storta, sezioni lontane, bullet a piramide, hero col glow, scanner più realistico, titoli più grandi** | Foto footer analizzata pixel per pixel: il telefono era GIÀ dritto (bordo cornice a ±2px), il difetto era il polso tagliato dal bordo sinistro; ritagliata al polso e centrata sull'asse del telefono. Sezioni ravvicinate e titoli +7%. Punti fiducia in striscia allineata. Bottone retroattivo e sezione dato oggettivo centrati su telefono. Hero: il corsivo era SPARITO (aggancio rotto dal cambio headline), rimesso con lo stile e il glow dell'Osservatorio su fondo chiaro. Scanner rifatto come carta d'imbarco vera (fascia scura, campi in lettura, barcode, timbro CE 261/2004, raggio luminoso), condiviso fra hero e verdetto. |
 | 81 | **"Controlla che tutto il sistema email funzioni end-to-end"** | Iscrizione all'Osservatorio provata sul sito vero con valerio@artecai.it: salvataggio ok e benvenuto spedito via Resend (controlla la casella). Il resto della sequenza (T+0/2/15/30/60) parte solo con una pratica pagata: si collauda quando Polar esiste. |
 
+## ✅ CHIUSI l'8/08 mattina — sedicesimo giro: deploy automatico, legali, onda
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 82 | **"Il deploy ha fallito, analizza e fixa"** | Hai collegato il repo GitHub a Netlify (bene: era la strada giusta) e il build moriva su "@netlify/plugin-nextjs is missing a manifest.yml": nei build da repo il plugin dichiarato in netlify.toml va installato nel progetto, nei deploy via zip lo forniva Netlify. Aggiunto come devDependency, push, build verde: il sito vero ora serve il giro design. Da adesso ogni push = deploy automatico. |
+| 83 | **I due 404 su /condizioni e /privacy + "scrivi privacy, termini e cookie professionali"** | Tre pagine vere, in italiano comprensibile, con ricerca fatta (art. 13 GDPR per l'informativa; linee guida Garante 10/06/2021 per i cookie: con SOLI tecnici niente banner, ed è il nostro caso). Dicono la verità del prodotto: check senza account, documenti OCR mai salvati, niente profilazione, rinuncia recesso art. 59, garanzia 90 giorni, foro del consumatore. Cookie linkata anche dal footer, tutte in sitemap. PRIMA BOZZA, come chiesto: revisione legale e dati societari del titolare restano da fare (riga sotto, "Tocca a Valerio"). |
+| 84 | **"Il background della hero come nell'immagine: colonne animate una alla volta, onda da sinistra a destra in loop"** | SfondoColonne riscritto: 26 colonne con ALTEZZE diverse (profilo mosso come il riferimento) e un impulso che occupa il 13% del ciclo con fase crescente: in ogni istante brilla una colonna sola, l'accensione viaggia da sinistra a destra e ricomincia (8.3 secondi a giro). Base spenta e picco pieno perché l'onda si veda. Il faro è stato tolto: l'onda è la scena. |
+| 85 | **Task di configurazione (doctor, ripgrep, MCP, audit, protocollo)** | Doctor eseguito e righe non verdi riportate in chat; rg di sistema presente e USE_BUILTIN_RIPGREP=0 + ENABLE_TOOL_SEARCH=auto:5 nell'rc (bash) del container cloud, con le righe pronte per il tuo PC; elenco MCP con stima tool e candidati da scollegare in chat; audit dei .md con file:riga e classificazione in chat; sezione "Protocollo operativo" scritta in CLAUDE.md identica alla tua dettatura (il diff era nel popup rimasto senza risposta: eseguita alla lettera, la deduplica col PROTOCOLLO CONTESTO resta a tua scelta). |
+| 86 | **"Come vedo l'app mobile da PC come i veri developer?"** | Ricerca fatta: la strada giusta su Windows è Android Studio (gratuito) + emulatore; `npx expo start` installa da solo l'Expo Go giusto per l'SDK 57 nell'emulatore (il muro dell'App Store fermo all'SDK 54 vale solo per iPhone fisico). Passi dettagliati in chat. Tutto gratis. |
+
 ## ⏳ ANCORA DA FARE
 
 ### LA MEGA TO DO (dall'audit dei prompt, 8/08 notte)
@@ -220,7 +230,9 @@ non altro codice.**
    approvata · alla prossima fattura AeroDataBox chiedere la profondità
    storica dei piani a pagamento.
 6. Dominio (slot Hostinger) e social @rivoglio (li crei tu, tua scelta).
-7. Legale sulle condizioni d'uso · commercialista sul regime fiscale.
+7. Legale: revisione avvocato delle 3 pagine bozza (privacy, condizioni,
+   cookie) + cognome e dati societari del titolare da darmi per inserirli
+   · commercialista sul regime fiscale.
 
 ### [SUPERATI dal pivot del 07/08 sera — idea viaggi chiusa da Valerio]
 <details>

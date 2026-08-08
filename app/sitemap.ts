@@ -18,5 +18,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    // le pagine legali: contenuto stabile, priorità bassa
+    ...["/condizioni", "/privacy", "/cookie"].map((percorso) => ({
+      url: `${casa}${percorso}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.2,
+    })),
   ];
 }

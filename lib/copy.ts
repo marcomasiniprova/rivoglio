@@ -778,6 +778,7 @@ export const COPY = {
         voci: [
           { testo: "Condizioni d'uso", ancora: "/condizioni" },
           { testo: "Privacy", ancora: "/privacy" },
+          { testo: "Cookie", ancora: "/cookie" },
         ],
       },
     },

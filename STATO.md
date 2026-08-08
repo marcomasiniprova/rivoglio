@@ -113,10 +113,21 @@ social rifatta (era rimasta al prodotto viaggi).
   `.env.development.local`.
   Gemini: rete e chiave ok ma quota immagini 0 sul piano gratuito, serve
   la fatturazione su Google AI Studio. Manca UNSPLASH_ACCESS_KEY.
-- **I deploy li fa Valerio a mano** (scelta sua; in alternativa si
-  riautorizza il connettore Netlify su claude.ai). ATTENZIONE: mai
-  trascinare cartelle su Netlify Drop, le azioni server muoiono; o si
-  collega il repo GitHub al progetto, o si rifà il giro col client.
+- **DEPLOY AUTOMATICO: il repo GitHub è collegato a Netlify** (8/08,
+  mossa di Valerio). Ogni push sul ramo = build e deploy da soli. Il
+  primo build da repo moriva con "plugin-nextjs missing manifest.yml":
+  nei build da repo il plugin dichiarato in netlify.toml va installato
+  come devDependency (fatto, `@netlify/plugin-nextjs`). Controprova:
+  il sito vero serve il giro design. Niente più giri manuali né zip.
+- **Le pagine legali esistono (8/08)**: /privacy, /condizioni e /cookie
+  (linkate dal footer, in sitemap). PRIMA BOZZA onesta: solo cookie
+  tecnici quindi niente banner (linee guida Garante 2021), documenti
+  OCR mai salvati, rinuncia recesso art. 59, garanzia 90 giorni, foro
+  del consumatore. Titolare indicato col contatto valerio@artecai.it:
+  cognome e dati societari da completare, revisione legale in ARRETRATI.
+- **CLAUDE.md ha il "Protocollo operativo"** dettato da Valerio (8/08):
+  rg in un colpo, edit con stringa unica, niente subagenti per task
+  piccoli, checkpoint e degrado. Convive col PROTOCOLLO CONTESTO.
 
 ## Serve Valerio (in ordine)
 1. **Deploy dell'ultimo giro** (design + Osservatorio dati veri): il ramo è
@@ -136,9 +147,11 @@ social rifatta (era rimasta al prodotto viaggi).
    Poi 30 casi reali a mano per il golden set.
 5. **Dominio** per Rivoglio (slot gratuito Hostinger da configurare) e
    account social `@rivoglio`.
-6. Legale su condizioni d'uso; commercialista sul regime fiscale (il
-   documento stesso lo chiede). Fatturazione Google AI Studio per Gemini
-   e UNSPLASH_ACCESS_KEY quando l'approvazione arriva (per gli asset).
+6. Legale: le 3 pagine (privacy, condizioni, cookie) sono una PRIMA BOZZA
+   scritta l'8/08: falle rivedere da un avvocato e dammi cognome e dati
+   societari del titolare da inserire. Commercialista sul regime fiscale
+   (il documento stesso lo chiede). Fatturazione Google AI Studio per
+   Gemini e UNSPLASH_ACCESS_KEY quando l'approvazione arriva.
 
 ## Da non rifare
 - `.env.local` è in UTF-16 e Next lo ignora: chiavi vive in

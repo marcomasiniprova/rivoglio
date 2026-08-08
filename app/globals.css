@@ -142,6 +142,9 @@
 .colonna {
   width: clamp(18px, 2.6vw, 46px);
   flex: 0 0 auto;
+  /* ogni colonna ha la SUA altezza (vedi SfondoColonne): il profilo
+     mosso del riferimento scelto da Valerio, non una tenda uniforme */
+  height: var(--altezza, 60%);
   /* geometriche e definite (scelta di Valerio, 8/08): niente pillola,
      spigolo appena smussato e un filo di bordo chiaro che le disegna */
   border-radius: 10px;
@@ -155,14 +158,16 @@
   );
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
   transform-origin: top center;
-  /* UN'onda sola, calma, che viaggia da sinistra a destra: stessa durata
-     per tutte, fase che cresce con l'indice (vedi SfondoColonne). Il
-     easing a seno la fa respirare come una tenda a fisarmonica. */
-  animation: onda-colonna 8.4s ease-in-out infinite;
+  /* L'ONDA UNA-ALLA-VOLTA (direzione di Valerio, 8/08): il ciclo dura
+     8.32s e l'impulso di ogni colonna occupa solo l'11% del giro, con
+     la fase che cresce con l'indice. Risultato: in ogni istante è
+     accesa una colonna sola (più mezza vicina, per l'armonia), e
+     l'accensione viaggia da sinistra a destra, poi ricomincia. */
+  animation: onda-colonna 8.32s linear infinite;
   animation-delay: var(--fase, 0s);
 }
 
-/* lo zigzag della tenda: le dispari partono un filo più corte e scure */
+/* lo zigzag: le dispari un filo più tenui, come nel riferimento */
 .colonna:nth-child(odd) {
   background: linear-gradient(
     to bottom,
@@ -174,36 +179,24 @@
 }
 
 @keyframes onda-colonna {
-  0%,
-  100% {
-    transform: scaleY(0.62);
-    opacity: 0.55;
+  0% {
+    transform: scaleY(1);
+    opacity: 0.3;
   }
-  50% {
-    transform: scaleY(1.04);
+  /* l'impulso: sale in fretta, scende morbido, poi riposa fino al giro dopo.
+     Base spenta e picco pieno: l'onda deve VEDERSI viaggiare (Valerio, 8/08). */
+  6% {
+    transform: scaleY(1.1);
     opacity: 1;
   }
-}
-
-/* Il faro: una lama di luce che attraversa le colonne, lenta.
-   Solo transform e opacity: resta sulla scheda grafica. */
-.faro {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 36%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55) 50%, transparent);
-  mix-blend-mode: soft-light;
-  animation: faro 11s cubic-bezier(0.45, 0, 0.25, 1) infinite;
-  pointer-events: none;
-}
-@keyframes faro {
-  0% { transform: translateX(-110%); opacity: 0; }
-  12% { opacity: 1; }
-  55% { transform: translateX(240%); opacity: 1; }
-  70% { opacity: 0; }
-  100% { transform: translateX(240%); opacity: 0; }
+  13% {
+    transform: scaleY(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0.3;
+  }
 }
 
 /* L'alone che segue il titolo: un solo fuoco di luce, non macchie sparse. */
@@ -339,6 +332,35 @@
     0 0 22px rgba(127, 232, 174, 0.45),
     0 2px 40px rgba(127, 232, 174, 0.22),
     0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- le pagine legali: lettura prima di tutto ---------- */
+.legale h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin-top: 2.25rem;
+}
+.legale p,
+.legale li {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--color-fumo);
+}
+.legale ul {
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+.legale strong {
+  color: var(--color-inchiostro);
+  font-weight: 600;
+}
+.legale a {
+  color: var(--color-verde-scuro);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* Lo stesso glow dell'Osservatorio, adattato al corsivo verde su fondo
@@ -501,13 +523,11 @@ a[class*="rounded-pillola"]:active {
 @media (prefers-reduced-motion: reduce) {
   .fluttua,
   .colonna,
-  .faro,
   .alone {
     animation: none !important;
   }
   .colonna {
-    transform: scaleY(0.72);
-    opacity: 0.7;
+    opacity: 0.6;
   }
   .riflesso::after {
     display: none;
