@@ -23,11 +23,18 @@ const CHIAVE = process.env.RESEND_API_KEY ?? "";
 export const POSTA_ATTIVA = Boolean(CHIAVE);
 
 /**
- * Il mittente. `resend.dev` è il dominio di prova di Resend.
- * Quando il dominio è verificato diventa "Rivoglio <ciao@rivoglio.it>".
+ * Il mittente. Il NOME mostrato è una persona, non un marchio (scelta di
+ * Valerio, 9/08): "Valerio di Rivoglio" apre più di "Rivoglio", e chi
+ * risponde trova qualcuno dall'altra parte.
+ *
+ * L'INDIRIZZO invece resta quello di prova di Resend finché il dominio
+ * non è verificato: da lì si può spedire solo al proprietario
+ * dell'account. Appena `rivoglio.it` è verificato, su Netlify si mette
+ * RESEND_MITTENTE = "Valerio di Rivoglio <valerio@rivoglio.it>" e parte
+ * tutto, senza toccare una riga di codice.
  */
 export const MITTENTE =
-  process.env.RESEND_MITTENTE ?? "Rivoglio <onboarding@resend.dev>";
+  process.env.RESEND_MITTENTE ?? "Valerio di Rivoglio <onboarding@resend.dev>";
 
 /** Dove torna la gente che clicca. */
 export function casa() {

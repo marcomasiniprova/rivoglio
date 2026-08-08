@@ -122,14 +122,12 @@ export default function Footer() {
             {/* DUE BLOCCHI SEPARATI, non una fila sola di riquadri uguali.
                 Store e social chiedono due cose diverse ("scarica" e
                 "seguici") e prima si leggevano come un blocco unico di
-                sei bottoni gemelli. Ora: gli store in un riquadro con la
-                sua riga di titolo, i social come cerchi sotto una riga
+                sei bottoni gemelli. Ora: gli store liberi sotto la loro
+                riga di titolo, i social come cerchi piccoli sotto una riga
                 divisoria. Forma diversa = gerarchia leggibile. */}
-            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-menta/60">
-                {F.app.titolo}
-              </p>
-              <div className="mt-3">
+            <div className="mt-8">
+              <p className="text-[13.5px] font-medium text-white/65">{F.app.titolo}</p>
+              <div className="mt-3.5">
                 <BadgeStore />
               </div>
             </div>

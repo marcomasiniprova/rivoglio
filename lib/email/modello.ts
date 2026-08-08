@@ -45,15 +45,32 @@ export function riga(voce: string, cifra: string, forte = false) {
   </tr>`;
 }
 
+/**
+ * Una riga di scalo per l'email: nome a sinistra, indice e mediana a
+ * destra. Nelle email non esistono griglie: è una tabella, e basta.
+ */
+export function rigaScalo(nome: string, indice: string, sotto: string) {
+  return `
+  <tr>
+    <td style="padding:11px 0;border-top:1px solid ${C.bordo};font-family:${FONT};font-size:15px;color:${C.inchiostro};font-weight:600;">${nome}
+      <span style="display:block;font-size:12.5px;color:${C.fumo2};font-weight:400;margin-top:2px;">${sotto}</span>
+    </td>
+    <td align="right" style="padding:11px 0;border-top:1px solid ${C.bordo};font-family:${FONT};font-size:19px;color:${C.inchiostro};font-weight:700;white-space:nowrap;">${indice}<span style="font-size:12px;color:${C.fumo2};font-weight:400;"> / 5</span></td>
+  </tr>`;
+}
+
 /** Avvolge il corpo nel vestito completo. */
 export function vestito({
   titolo,
   corpo,
   coda,
+  disdetta,
 }: {
   titolo: string;
   corpo: string;
   coda?: string;
+  /** Il link per disdire: obbligatorio su tutto ciò che è newsletter. */
+  disdetta?: string | null;
 }) {
   const sito = casa();
   return `<!doctype html>
@@ -65,23 +82,22 @@ export function vestito({
 
   <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;">
 
-    <tr><td style="padding-bottom:22px;">
-      <a href="${sito}" style="text-decoration:none;font-family:${FONT};font-size:17px;font-weight:600;color:${C.inchiostro};">
-        <span style="display:inline-block;width:26px;height:26px;background:${C.verde};border-radius:7px;vertical-align:middle;"></span>
-        <span style="vertical-align:middle;margin-left:8px;">Rivoglio</span>
-      </a>
+    <tr><td style="padding:0 4px 20px;">
+      <a href="${sito}" style="text-decoration:none;font-family:${FONT};font-size:19px;font-weight:700;letter-spacing:-0.4px;color:${C.inchiostro};">Rivo<span style="color:${C.verde};">glio</span></a>
+      <span style="font-family:${FONT};font-size:13px;color:${C.fumo2};margin-left:10px;">Lo scanner dei rimborsi</span>
     </td></tr>
 
     <tr><td style="background:#ffffff;border-radius:20px;padding:38px 36px;">
       ${corpo}
     </td></tr>
 
-    <tr><td style="padding:24px 8px 0;">
-      <p style="margin:0;font-family:${FONT};font-size:12.5px;line-height:1.6;color:${C.fumo2};">
+    <tr><td style="padding:22px 12px 0;">
+      <p style="margin:0 0 10px;font-family:${FONT};font-size:12.5px;line-height:1.65;color:${C.fumo2};">
         ${coda ?? "Ricevi questa email perché hai un account su Rivoglio."}
-        <br>
-        Rivoglio genera documenti: il reclamo lo invii tu, dalla tua email. Non siamo un intermediario e non diamo consulenza legale.
-        I costi di viaggio sono stime calcolate, non prezzi garantiti.
+      </p>
+      <p style="margin:0;font-family:${FONT};font-size:12.5px;line-height:1.65;color:${C.fumo2};">
+        Rivoglio prepara i documenti: il reclamo lo invii tu, dalla tua email, e la compensazione arriva a te. Non siamo un intermediario e non diamo consulenza legale.
+        ${disdetta ? `<br><a href="${disdetta}" style="color:${C.fumo2};text-decoration:underline;">Non voglio più ricevere queste email</a>` : ""}
       </p>
     </td></tr>
 

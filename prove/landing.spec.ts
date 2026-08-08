@@ -95,8 +95,12 @@ test.describe("Landing page", () => {
     await page.goto("/#osservatorio");
     await page.locator("#osservatorio-email").fill(`prova+${Date.now()}@rivoglio.it`);
     await page.getByRole("button", { name: COPY.osservatorio.bottone }).click();
-    // la prima frase della conferma di COPY fa da titolo del pannello
-    await expect(page.getByText(/^Fatto\./).first()).toBeVisible({ timeout: 10_000 });
+    /* Doppio opt-in (9/08): non si è iscritti finché non si clicca il
+       link nell'email, e il pannello deve dirlo. La prima frase della
+       conferma di COPY fa da titolo. */
+    await expect(page.getByText(/^Controlla la posta\./).first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test("mai 'hai diritto a': il claim è un fatto, non una promessa", async ({ page }) => {

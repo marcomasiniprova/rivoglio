@@ -476,7 +476,8 @@ export const COPY = {
       segnaposto: "nome@esempio.it",
     },
     bottone: "Iscrivimi",
-    conferma: "Fatto. La prossima uscita arriva nella tua casella.",
+    conferma:
+      "Controlla la posta. Ti ho mandato un'email con un link da cliccare: è quel clic che ti iscrive, così nessuno può iscrivere l'indirizzo di un altro. Se non la vedi, guarda nella posta indesiderata.",
     nota: "Solo l'Osservatorio, niente promozioni.",
     /** La striscia coi dati VERI (#25): indice ritardi per aeroporto. */
     ritardi: {
@@ -493,6 +494,43 @@ export const COPY = {
       /** Ogni numero mostrato è apribile o spiegato: questa è la spiegazione. */
       nota: "Indice da 0 (tutto in orario) a 5 sugli arrivi delle ultime due ore, dal tracciamento AeroDataBox. Si aggiorna al massimo una volta al giorno.",
       rilevatoTemplate: "Ultima rilevazione: {quando}",
+    },
+  },
+
+  /** Gli esiti dei link nelle email: conferma iscrizione e disdetta. */
+  iscrizione: {
+    torna: "Torna alla home",
+    esiti: {
+      fatto: {
+        titolo: "Iscrizione confermata.",
+        corpo:
+          "Ci sei. La prima uscita dell'Osservatorio arriva nella tua casella, e nel benvenuto che ti ho appena mandato trovi già come stanno andando gli aeroporti italiani oggi.",
+        azione: { testo: "Controlla un tuo volo", dove: "/app" },
+      },
+      disdetto: {
+        titolo: "Fatto, non ti scrivo più.",
+        corpo:
+          "Il tuo indirizzo è fuori dall'Osservatorio da adesso. Nessuna domanda e nessun modulo: se un giorno cambi idea, il campo sulla home è sempre lì.",
+        azione: { testo: "Controlla un volo, gratis", dove: "/app" },
+      },
+      scaduto: {
+        titolo: "Questo link è scaduto.",
+        corpo:
+          "I link di conferma valgono trenta giorni. Riscrivi il tuo indirizzo sulla home e te ne mando subito uno nuovo.",
+        azione: { testo: "Iscriviti di nuovo", dove: "/#osservatorio" },
+      },
+      guasto: {
+        titolo: "Questo link non torna.",
+        corpo:
+          "Può essere che si sia spezzato passando dalla posta: certi programmi tagliano i link lunghi. Riscrivi il tuo indirizzo sulla home e te ne arriva un altro.",
+        azione: { testo: "Iscriviti di nuovo", dove: "/#osservatorio" },
+      },
+      riprova: {
+        titolo: "Colpa nostra, non tua.",
+        corpo:
+          "Il clic è arrivato ma non sono riuscito a registrarlo. Il link resta valido: riprova fra qualche minuto e andrà a posto.",
+        azione: { testo: "Torna all'Osservatorio", dove: "/#osservatorio" },
+      },
     },
   },
 

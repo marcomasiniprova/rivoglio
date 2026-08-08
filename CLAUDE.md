@@ -21,6 +21,8 @@ Scelte chiuse: `DECISIONI.md`. Marchio: `BRAND.md`. Social: `CONTENUTI.md`.
   marcata, mai domande di riempimento. Se il giro ha meno di 4 decisioni
   vere, le restanti si usano per scelte di prodotto che prima o poi
   andranno prese comunque.
+- **Se il mio messaggio contiene più di una richiesta, consulta la skill
+  copertura-prompt prima di iniziare.** (regola sua, 9/08)
 - **Consegna a pezzi, non in blocco.** Se la richiesta contiene più cose, fai la
   prima, dilla, e continua con la successiva senza fermarti ad aspettare. Non
   accumulare dieci lavori in un turno solo: Valerio resta mezz'ora davanti allo

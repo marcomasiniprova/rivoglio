@@ -1,11 +1,13 @@
 import { casa, spedisci, type Esito } from "./posta";
-import { bottone, COLORI as C, FONT, riga, vestito } from "./modello";
+import { bottone, COLORI as C, FONT, riga, rigaScalo, vestito } from "./modello";
+import { linkConferma, linkDisdetta } from "@/lib/iscritti/gettone";
 
 /**
  * Le email di servizio, una funzione ciascuna.
  *
  * VIVE (le mandano i flussi di Rivoglio):
- *   1. iscrizione all'Osservatorio     → benvenutoLista
+ *   0. chiedi conferma dell'iscrizione → chiediConferma  (doppio opt-in)
+ *   1. iscrizione confermata           → benvenutoLista
  *   2. creazione dell'account          → benvenuto
  *   3. conferma dell'email             → conferma
  *   4. accesso senza password          → linkMagico
@@ -30,27 +32,94 @@ const h = (testo: string) =>
 const euro = (n: number) =>
   n.toLocaleString("it-IT", { maximumFractionDigits: 0 }) + "€";
 
+/* ---------------------------------------------------------------- 0 */
+/**
+ * DOPPIO OPT-IN: prima di iscrivere qualcuno gli si chiede di cliccare.
+ *
+ * Non è burocrazia. Chiunque può scrivere l'indirizzo di un altro nel
+ * campo della newsletter: senza il clic gli manderemmo posta che non ha
+ * chiesto. E ogni indirizzo falso che rimbalza abbassa la reputazione del
+ * dominio, cioè fa finire in spam anche le email di chi ci tiene.
+ */
+export function componiConferma(link: string) {
+  return {
+    oggetto: "Confermi l'iscrizione all'Osservatorio?",
+    html: vestito({
+      titolo: "Confermi l'iscrizione?",
+      corpo:
+        h("Manca un clic.") +
+        p(
+          "Qualcuno ha chiesto di iscrivere questo indirizzo all'Osservatorio dei Disservizi: ogni settimana i voli più in ritardo sui cieli italiani, dai dati che verifichiamo per i check.",
+        ) +
+        p("Se sei stato tu, confermalo qui sotto. Da lì parte tutto.") +
+        bottone("Sì, confermo", link) +
+        p("Il link vale trenta giorni. Se scade, riscrivi il tuo indirizzo sul sito e te ne mando un altro."),
+      coda: "Se non hai chiesto tu questa iscrizione, butta questa email: senza il clic non ti arriva più niente e il tuo indirizzo resta fermo.",
+    }),
+    testo: `Manca un clic.\n\nConferma l'iscrizione all'Osservatorio dei Disservizi:\n${link}\n\nSe non hai chiesto tu questa iscrizione, ignora questa email.`,
+  };
+}
+
+export function chiediConferma(a: string): Promise<Esito> {
+  const link = linkConferma(casa(), a);
+  if (!link) return Promise.resolve({ ok: false, motivo: "Nessun segreto per firmare il link." });
+  return spedisci({ a, ...componiConferma(link) });
+}
+
 /* ---------------------------------------------------------------- 1 */
-export function benvenutoLista(a: string, _comune?: string | null): Promise<Esito> {
-  return spedisci({
-    a,
+export type ScaloOggi = { nome: string; indice: number; medianaMinuti: number | null };
+
+/**
+ * Il benvenuto vero, quello che parte DOPO il clic di conferma.
+ * Dentro ci sono già gli scali di oggi: chi si iscrive riceve subito una
+ * cosa utile, non la promessa di riceverne una fra sette giorni.
+ */
+export function componiBenvenuto(scali: ScaloOggi[], disdetta: string | null) {
+  const tabella = scali.length
+    ? `<p style="margin:26px 0 4px;font-family:${FONT};font-size:12.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:${C.verde};">Gli aeroporti italiani, adesso</p>
+       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 6px;">
+         ${scali
+           .map((s) =>
+             rigaScalo(
+               s.nome,
+               s.indice.toLocaleString("it-IT", { maximumFractionDigits: 1 }),
+               s.medianaMinuti !== null ? `mediana ${s.medianaMinuti} min di ritardo` : "indice ritardi",
+             ),
+           )
+           .join("")}
+       </table>
+       <p style="margin:8px 0 0;font-family:${FONT};font-size:12.5px;line-height:1.6;color:${C.fumo2};">Indice da 0 (tutto in orario) a 5, sugli arrivi delle ultime due ore. Fonte: tracciamento AeroDataBox.</p>`
+    : "";
+
+  return {
     oggetto: "Sei nell'Osservatorio dei Disservizi.",
     html: vestito({
       titolo: "Sei dentro",
       corpo:
         h("Sei dentro.") +
         p(
-          "Ogni settimana ti mando i 10 voli più in ritardo sui cieli italiani, presi dai dati che verifichiamo per i check. Una email a settimana, si annulla con un clic.",
+          "Ogni settimana ti mando i voli più in ritardo sui cieli italiani, presi dai dati che verifichiamo per i check. Una email a settimana, niente altro.",
         ) +
-        p("Solo l'Osservatorio: niente pubblicità, niente altro.") +
-        bottone("Controlla un volo, gratis", `${casa()}/app`) +
+        tabella +
+        bottone("Controlla un tuo volo, gratis", `${casa()}/app`) +
         p(
-          `<strong style="color:${C.inchiostro}">Nel frattempo:</strong> se nell'ultimo anno hai preso un volo atterrato con più di 3 ore di ritardo, il check dice subito in che fascia rientri (250, 400 o 600 euro).`,
+          `<strong style="color:${C.inchiostro}">Intanto una cosa utile:</strong> se nell'ultimo anno hai preso un volo atterrato con più di 3 ore di ritardo, il check dice in trenta secondi in che fascia rientri (250, 400 o 600 euro). Non serve account.`,
         ),
-      coda: "Ricevi questa email perché ti sei iscritto all'Osservatorio dei Disservizi di Rivoglio.",
+      coda: "Ricevi questa email perché hai confermato l'iscrizione all'Osservatorio dei Disservizi di Rivoglio.",
+      disdetta,
     }),
-    testo: `Sei dentro.\n\nOgni settimana i 10 voli più in ritardo sui cieli italiani, dai dati che verifichiamo per i check. Una email a settimana, si annulla con un clic.\n\nControlla un volo, gratis: ${casa()}/app`,
-  });
+    testo:
+      `Sei dentro.\n\nOgni settimana i voli più in ritardo sui cieli italiani, dai dati che verifichiamo per i check.\n` +
+      (scali.length
+        ? `\nGli aeroporti italiani adesso:\n${scali.map((s) => `- ${s.nome}: ${s.indice.toLocaleString("it-IT", { maximumFractionDigits: 1 })}/5${s.medianaMinuti !== null ? ` (mediana ${s.medianaMinuti} min)` : ""}`).join("\n")}\n`
+        : "") +
+      `\nControlla un tuo volo, gratis: ${casa()}/app` +
+      (disdetta ? `\n\nPer non ricevere più queste email: ${disdetta}` : ""),
+  };
+}
+
+export function benvenutoLista(a: string, scali: ScaloOggi[] = []): Promise<Esito> {
+  return spedisci({ a, ...componiBenvenuto(scali, linkDisdetta(casa(), a)) });
 }
 
 /* ---------------------------------------------------------------- 2 */

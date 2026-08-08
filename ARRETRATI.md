@@ -350,3 +350,21 @@ non altro codice.**
 - **Ti servono:** chiave AeroDataBox, prodotti Polar, dominio, account social.
 - **Come vuoi che lavori:** tutte le cose chieste in una seduta, domande mentre
   si lavora e non al posto di lavorare, aggiornandoti su dove siamo.
+
+## Dal giro #32 (9/08)
+- **Migrazione doppio opt-in da applicare** sul Supabase vero:
+  `supabase/2026-08-11-doppio-optin.sql` (colonne `confermato_il` e
+  `disdetto_il` su `iscritti`). Senza, il clic di conferma non si
+  registra: la pagina dice onestamente "riprova", ma nessuno si iscrive.
+- **Chi manda la newsletter deve filtrare i confermati**: quando si
+  scriverà l'invio settimanale dell'Osservatorio, la query è
+  `confermato_il is not null and disdetto_il is null`. L'indice
+  `iscritti_confermati_idx` è già lì per quello.
+- **Gli iscritti di prima del 9/08 non hanno `confermato_il`**: sono
+  pochi (prove di Valerio) e vanno confermati a mano o riscritti una
+  volta sola chiedendo la conferma. Non mandare loro la newsletter
+  dandoli per confermati.
+- **RESEND_MITTENTE su Netlify** appena il dominio è verificato:
+  "Valerio di Rivoglio <valerio@DOMINIO>". Finché non c'è, il nome
+  mostrato è giusto ma l'indirizzo resta quello di prova di Resend e la
+  consegna è limitata a valerio@artecai.it.

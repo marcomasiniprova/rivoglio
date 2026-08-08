@@ -1,9 +1,8 @@
 # STATO — Rivoglio
 
-**Aggiornato:** 2026-08-08, notte fonda (giro #31 COMPLETATO: scena di
-scansione nativa nell'app, prezzi come carte d'imbarco, messaggi
-cancellato/dirottato, guida bagagli, email benvenuto riscritta per
-Rivoglio, QA visivo su app e landing)
+**Aggiornato:** 2026-08-09 (giro #32: mockup del footer con l'app VERA,
+monumenti sulle card dell'Osservatorio, doppio opt-in con conferma e
+disdetta, tasti muti dell'anteprima app, skill copertura-prompt)
 **RIVOGLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
 Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
 verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
@@ -17,6 +16,53 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #32 (9/08)**: il giro delle cose che Valerio ha visto rotte
+  guardando il sito dal telefono.
+  - **IL TELEFONO DEL FOOTER MOSTRA L'APP VERA**: dentro la foto c'era
+    una schermata inventata dall'AI ("Ciao, Marco", tab "Rimborsi") di
+    un'app mai esistita. Ora c'è la cattura vera dell'app (check di
+    U23508 Palermo → Milano a metà analisi), senza tacca nera, col
+    telefono centrato sul centro dello SCHERMO (era 72px a sinistra),
+    a 2x e in WebP: da 1 MB a 178 KB. Lo fa `scripts/telefono-mockup.mjs`
+    (trova il rettangolo dello schermo dai pixel); la foto di partenza
+    sta in `sorgenti/telefono-mano.png`.
+  - **LA TAB CLASSIFICA SI VEDEVA ANCHE DA SPENTA**: expo-router traduce
+    `href: null` in `tabBarItemStyle {display:"none"}`, e la nostra
+    BarraTab su misura non lo guardava. Il tocco portava su una
+    schermata vuota. Ora rispetta il segnale (`prove`: l'export
+    dell'anteprima mostra 3 tab, non 4).
+  - **I TASTI MUTI DELL'ANTEPRIMA**: nel browser (l'unico posto dove
+    Valerio può provare l'app) "Fai controllare un volo a chi ami" e
+    "Notifiche" non facevano NIENTE: `Share` non esiste su web e
+    `Linking.openSettings` nemmeno (TypeError in console). Nato
+    `mobile/src/lib/sistema.ts`: Web Share → appunti → messaggio in
+    chiaro. Mai più un tocco senza risposta.
+  - **LE CARD DELL'OSSERVATORIO HANNO UN MONUMENTO**: Colosseo, Duomo,
+    Campanone, Campanile, Vesuvio, Etna, Due Torri, disegnati in SVG
+    (`components/rivoglio/Monumenti.tsx`), tinti col colore della
+    giornata, più cinque tacche e il giudizio in parole. I buchi (archi,
+    finestre) sono in verde notte pieno: con una trasparenza dello
+    stesso colore sparivano e il Colosseo era un barattolo.
+  - **IL TESTO INVISIBILE IN FONDO**: l'alone verde della sezione era a
+    opacità 25 e su telefono copriva la metà bassa. Ora 0.10, più in
+    basso, e le card hanno un fondo pieno che non dipende da lui.
+  - **DOPPIO OPT-IN SULL'OSSERVATORIO** (scelta di Valerio): chi scrive
+    l'email riceve "Confermi l'iscrizione?"; solo dopo il clic parte il
+    benvenuto, con dentro gli scali di oggi. Link firmati HMAC
+    (`lib/iscritti/gettone.ts`, 30 giorni, confronto a tempo costante),
+    rotte `/api/iscriviti/conferma` e `/disdetta`, esiti su `/iscrizione`.
+    Migrazione `2026-08-11-doppio-optin.sql` (confermato_il, disdetto_il)
+    DA APPLICARE sul Supabase vero.
+  - **EMAIL RIVESTITE**: testata col marchio a parole, corpo pulito, un
+    solo bottone verde, link di disdetta in fondo (la landing promette
+    "si annulla con un clic": adesso è vero). Mittente mostrato:
+    "Valerio di Rivoglio" (scelta sua). Anteprima in sviluppo su
+    `/api/email-anteprima?q=conferma|benvenuto`, che chiama le stesse
+    funzioni delle email vere: non può divergere.
+  - **"Milan" è diventato "Milano"**: l'archivio scrive i nomi in
+    inglese, `inItaliano()` li gira sulla tratta del verdetto.
+  - **Skill `copertura-prompt`** salvata in `.claude/skills/` e regola
+    aggiunta in CLAUDE.md (messaggi con più richieste).
 - **GIRO #31 COMPLETATO (8/08 notte fonda)**: i 6 pezzi rimasti dal
   handoff, tutti chiusi e provati.
   - **La scena di scansione è NELL'APP** (`mobile/src/components/
@@ -258,6 +304,16 @@ social rifatta (era rimasta al prodotto viaggi).
   (Android Studio + emulatore, oppure `expo start --web` in 2 minuti).
 
 ## Serve Valerio (in ordine)
+0. **DUE COSE SOLO TUE, e sbloccano le email:**
+   a. **Il dominio.** Finché `rivoglio.it` (o quello che scegli) non è
+      verificato su Resend, le email partono SOLO verso
+      valerio@artecai.it: lo decide Resend, non il nostro codice. Dammi
+      il dominio dello slot gratuito Hostinger e ti do i 3 record DNS.
+      Poi su Netlify: RESEND_MITTENTE = "Valerio di Rivoglio
+      <valerio@TUODOMINIO>".
+   b. **La migrazione del doppio opt-in** (`supabase/2026-08-11-doppio-
+      optin.sql`) va applicata sul Supabase vero, altrimenti il clic di
+      conferma non si registra e la pagina dice "riprova".
 1. **Deploy dell'ultimo giro** (design + Osservatorio dati veri): il ramo è
    pronto e collaudato, pubblichi tu (tua scelta col popup). Il motore
    online funziona già.
