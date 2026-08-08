@@ -28,9 +28,15 @@ Se l'utente dice "decidi tu": proponi **massimo 3 opzioni** con una riga di moti
 
 ---
 
-## FASE 0 — INTERVISTA (obbligatoria, ogni volta)
+## FASE 0 — INTERVISTA
 
-Prima di scrivere una riga di codice o generare un asset, poni queste domande **in italiano, in un unico messaggio, numerate**. Poi **FERMATI**.
+**Salta le domande già risposte nel brief.** Se il messaggio dell'utente (o
+un riferimento allegato) risponde già a un punto, quel punto è chiuso: non
+richiederlo. Chiedi solo ciò che manca davvero, e se non manca niente vai
+avanti dichiarando in una riga cosa hai dedotto dal brief.
+
+Per il resto, poni le domande **in italiano, in un unico messaggio,
+numerate**. Poi **FERMATI**.
 
 ```
 Prima di iniziare mi servono 8 risposte:
@@ -46,9 +52,12 @@ Prima di iniziare mi servono 8 risposte:
 8. ANIMAZIONE — quanto: nessuna / discreta / cinematica?
 ```
 
-Se l'utente allega un'immagine ma non risponde, **non iniziare**. Richiedi le risposte mancanti.
+Se l'utente allega un'immagine e il brief non dice cosa vuole ottenerne,
+**non iniziare**: richiedi solo le risposte mancanti.
 
-**Non passare alla Fase 1 senza conferma esplicita.**
+**Non passare alla Fase 1 senza conferma esplicita** — a meno che il brief
+non l'abbia già data (una richiesta esplicita e dettagliata vale come
+conferma: rifare le domande a quel punto è tempo perso).
 
 ---
 

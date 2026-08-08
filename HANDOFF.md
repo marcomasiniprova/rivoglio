@@ -1,60 +1,55 @@
 # HANDOFF — per la prossima sessione
 
-*Aggiornato: 2026-08-08, mattina (dopo il giro #29: deploy automatico dal
-repo, pagine legali, onda colonne, task di configurazione).
+*Aggiornato: 2026-08-08, pomeriggio (dopo il giro #30: barre dell'hero,
+regole unificate, ambiente Claude, guida anteprima mobile).
 Si aggiorna prima di ogni /clear.*
 
 ## Stato attuale
-- **DEPLOY AUTOMATICO**: il repo GitHub è collegato a Netlify (mossa di
-  Valerio) e il build da repo funziona dopo il fix `@netlify/plugin-nextjs`
-  come devDependency (nei build da repo il plugin di netlify.toml va
-  installato nel progetto). Ogni push sul ramo = deploy. Controprova:
-  il sito vero serve già il giro design (luce-corsivo presente).
-- Il motore online resta collaudato (FR4001: non idoneo, 155 min,
-  demo:false). Tutte le chiavi su Netlify tranne Polar.
-- **Pagine legali** /privacy /condizioni /cookie: PRIMA BOZZA onesta
-  (art. 13 GDPR; Garante 2021: soli cookie tecnici = niente banner).
-  Titolare indicato solo col contatto email: cognome e dati societari
-  li deve dare Valerio (popup senza risposta, usato il default), poi
-  revisione avvocato. Cookie aggiunta al footer, tutte in sitemap.
-- **Onda colonne hero** rifatta come il riferimento di Valerio: altezze
-  diverse, impulso una-colonna-alla-volta che viaggia da sinistra a
-  destra in loop (8.3s), base 0.3 picco 1. Faro rimosso.
-- **CLAUDE.md**: aggiunta la sezione "Protocollo operativo" IDENTICA
-  alla dettatura di Valerio (il popup con la proposta di deduplica col
-  PROTOCOLLO CONTESTO è rimasto senza risposta: eseguito alla lettera).
-  Le 4 regole doppie (checkpoint, task nuovo, degrado, HANDOFF) ora
-  esistono in due versioni: unificarle resta a scelta di Valerio.
-- Config: USE_BUILTIN_RIPGREP=0 e ENABLE_TOOL_SEARCH=auto:5 nell'rc del
-  CONTAINER cloud (evapora col container): le stesse righe vanno
-  aggiunte sul PC di Valerio, gliel'ho scritto in chat col doctor report.
-- Mobile: la strada per l'anteprima da PC Windows è Android Studio +
-  emulatore + `npx expo start` (installa da solo l'Expo Go per SDK 57).
-  Passi dettagliati dati in chat. Lo sviluppo mobile vero resta da fare
-  (onboarding ancora al prodotto viaggi).
+- **Deploy automatico dal repo GitHub**: ogni push sul ramo fa build e
+  deploy su rivoglio.netlify.app. Il fix che lo sbloccava era
+  `@netlify/plugin-nextjs` come devDependency (nei build da repo il
+  plugin di netlify.toml va installato nel progetto).
+- Il motore online è collaudato (FR4001: non idoneo, 155 min, demo:false).
+  Su Netlify ci sono tutte le chiavi tranne Polar (che non esiste ancora).
+- **Pagine legali** /privacy /condizioni /cookie online (prima bozza).
+  Manca da Valerio: cognome e dati societari del titolare, poi revisione
+  avvocato.
+- **Barre dell'hero** come il riferimento: attaccate, quadrate in ogni
+  estremo, a tutta larghezza, base 0.55 e picco 1, onda una-alla-volta
+  da sinistra a destra (8,3s a giro).
+- **Regole unificate**: checkpoint / task nuovo / degrado / HANDOFF solo
+  nel "Protocollo operativo" di CLAUDE.md. Il PROTOCOLLO CONTESTO tiene
+  metodo batch, /compact vs /clear, task = unità committabile.
+  art-director FASE 0 ora salta le domande già risposte nel brief.
+- **Ambiente Claude**: `.claude/settings.json` (tracciato) porta
+  USE_BUILTIN_RIPGREP=0 e ENABLE_TOOL_SEARCH=auto:5 su ogni macchina.
+  FIGMA_API_KEY sta in `.claude/settings.local.json` (gitignored): sul PC
+  di Valerio va ricreato a mano, la riga è nel rapporto in chat.
+- **Composio NON è nel codice**: è solo un utensile di sessione per
+  applicare migrazioni sul Supabase vero. L'app parla a Supabase da
+  `lib/supabase/servizio.ts:27` (chiave di servizio) e
+  `lib/supabase/chiavi.ts:28` (chiave pubblica).
 
 ## Decisioni prese (ultime)
-- Deploy: repo collegato, niente più zip né giri manuali.
-- Legali: prima bozza pubblicata subito per chiudere i 404; identità
-  completa del titolare e revisione legale come passi successivi.
-- Colonne: una alla volta, sinistra→destra, loop; niente faro.
-- Protocollo operativo in CLAUDE.md: versione letterale di Valerio.
+- Colonne: attaccate e quadrate, la tinta pari/dispari le separa.
+- Variabili non segrete in settings.json tracciato, segreti solo in
+  settings.local.json (mai nel repo, regola #5).
+- Mobile: si guarda con l'emulatore Android da Windows; iPhone fisico
+  solo con TestFlight, quindi non ora.
 
 ## File toccati in questo giro
-package.json (+@netlify/plugin-nextjs devDep) · components/SfondoColonne.tsx
-· app/globals.css (onda, .legale, niente faro) ·
-components/legale/PaginaLegale.tsx (nuovo) · app/privacy/page.tsx ·
-app/condizioni/page.tsx · app/cookie/page.tsx (nuovi) · app/sitemap.ts ·
-lib/copy.ts (footer link Cookie) · CLAUDE.md (Protocollo operativo) ·
+app/globals.css (colonne attaccate/quadrate, onda più visibile) ·
+CLAUDE.md (dedup regole) · .claude/skills/art-director/SKILL.md (FASE 0
+ammorbidita) · .claude/settings.json (nuovo) · .claude/settings.local.json
+(nuovo, non tracciato) · mobile/ANTEPRIMA-WINDOWS.md (nuovo) ·
 STATO/ARRETRATI/HANDOFF.
 
 ## Cosa resta da fare
-1. Valerio: cognome + dati societari del titolare per le pagine legali,
-   poi revisione avvocato (segnato in ARRETRATI).
+1. Valerio: dati del titolare per le pagine legali; poi avvocato.
 2. Polar: prodotti, checkout link, segreto webhook, approvazione org.
-   Collo di bottiglia per incassare.
-3. Mobile: onboarding da rifare per Rivoglio (tracker), da vedere con
-   l'emulatore Android seguendo i passi dati in chat.
+   È il collo di bottiglia per incassare.
+3. Mobile: l'onboarding è ancora al prodotto viaggi. Va rifatto per
+   Rivoglio (il tracker della pratica) guardandolo dall'emulatore.
 4. Scioperi di ottobre a inizio settembre (cruscotto MIT dal PC).
-5. Se Valerio risponde sul CLAUDE.md: eventualmente unificare le 4
-   regole doppie fra Protocollo operativo e PROTOCOLLO CONTESTO.
+5. MCP da scollegare (scelta di Valerio): Shopify, Miro, Notion, e
+   probabilmente Blender.

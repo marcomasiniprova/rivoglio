@@ -127,7 +127,21 @@ social rifatta (era rimasta al prodotto viaggi).
   cognome e dati societari da completare, revisione legale in ARRETRATI.
 - **CLAUDE.md ha il "Protocollo operativo"** dettato da Valerio (8/08):
   rg in un colpo, edit con stringa unica, niente subagenti per task
-  piccoli, checkpoint e degrado. Convive col PROTOCOLLO CONTESTO.
+  piccoli, checkpoint e degrado. Le 4 regole che erano doppie (checkpoint,
+  task nuovo, degrado, HANDOFF) ora vivono SOLO lì: il PROTOCOLLO
+  CONTESTO tiene metodo batch, /compact vs /clear e "un task = una
+  unità committabile".
+- **Le colonne dell'hero sono le barre del riferimento (8/08)**:
+  attaccate (gap 0), QUADRATE in ogni estremo (raggio 0, colore fino al
+  bordo basso), a tutta larghezza (flex 1), base di luminosità 0.55 e
+  picco 1. L'onda accende una colonna alla volta da sinistra a destra,
+  giro di 8,3 secondi. A separarle è la tinta pari/dispari, non il vuoto.
+- **Variabili d'ambiente di Claude, una volta sola**: `.claude/settings.json`
+  (tracciato) porta USE_BUILTIN_RIPGREP=0 e ENABLE_TOOL_SEARCH=auto:5, e
+  vale su OGNI macchina che apre il repo. I segreti no: FIGMA_API_KEY sta
+  in `.claude/settings.local.json`, che è in .gitignore.
+- **Guida anteprima mobile da Windows**: `mobile/ANTEPRIMA-WINDOWS.md`
+  (Android Studio + emulatore, oppure `expo start --web` in 2 minuti).
 
 ## Serve Valerio (in ordine)
 1. **Deploy dell'ultimo giro** (design + Osservatorio dati veri): il ramo è

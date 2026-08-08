@@ -188,6 +188,16 @@ non altro codice.**
 | 85 | **Task di configurazione (doctor, ripgrep, MCP, audit, protocollo)** | Doctor eseguito e righe non verdi riportate in chat; rg di sistema presente e USE_BUILTIN_RIPGREP=0 + ENABLE_TOOL_SEARCH=auto:5 nell'rc (bash) del container cloud, con le righe pronte per il tuo PC; elenco MCP con stima tool e candidati da scollegare in chat; audit dei .md con file:riga e classificazione in chat; sezione "Protocollo operativo" scritta in CLAUDE.md identica alla tua dettatura (il diff era nel popup rimasto senza risposta: eseguita alla lettera, la deduplica col PROTOCOLLO CONTESTO resta a tua scelta). |
 | 86 | **"Come vedo l'app mobile da PC come i veri developer?"** | Ricerca fatta: la strada giusta su Windows è Android Studio (gratuito) + emulatore; `npx expo start` installa da solo l'Expo Go giusto per l'SDK 57 nell'emulatore (il muro dell'App Store fermo all'SDK 54 vale solo per iPhone fisico). Passi dettagliati in chat. Tutto gratis. |
 
+## ✅ CHIUSI l'8/08 pomeriggio — diciassettesimo giro: barre, regole, ambiente
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 87 | **"Le colonne troppo trasparenti, staccate e rotonde agli estremi"** | Attaccate (gap 0) e a tutta larghezza: a separarle è la tinta pari/dispari, non il vuoto. Quadrate ovunque: raggio 0 e colore che arriva fino al bordo basso, così il taglio si vede netto (prima sfumava a trasparente e sembrava arrotondato). Più visibili: base di luminosità da 0.30 a 0.55, picco pieno. La maschera del contenitore inizia a sfumare all'80%, non al 45%: gli estremi quadrati restano visibili. |
+| 88 | **"Non ho capito come vedere l'app dal PC Windows"** | Scritta la guida `mobile/ANTEPRIMA-WINDOWS.md`: Strada A (`expo start --web`, 2 minuti, zero installazioni) e Strada B (Android Studio + emulatore, quella vera). Comandi copia-incolla uno alla volta, con la regola zero: nel terminale si incollano solo i riquadri di codice, non i titoli della guida (era quello l'errore in PowerShell). |
+| 89 | **"Unifica le 4 regole duplicate"** | Fatto: checkpoint, task nuovo, degrado e HANDOFF stanno SOLO nel Protocollo operativo. Il PROTOCOLLO CONTESTO tiene le tre cose che non erano doppie: metodo batch, /compact vs /clear, un task = una unità committabile. |
+| 90 | **"Ammorbidisci l'intervista di art-director"** | FASE 0 ora dice: salta le domande già risposte nel brief, chiedi solo ciò che manca, e se non manca niente vai avanti dichiarando cosa hai dedotto. Un brief esplicito e dettagliato vale come conferma per passare alla fase dopo. |
+| 91 | **"Dove si configurano le variabili d'ambiente, mettile una volta sola"** | `.claude/settings.json` (tracciato) con USE_BUILTIN_RIPGREP=0 e ENABLE_TOOL_SEARCH=auto:5: valgono su ogni macchina che apre il repo, PC compreso, senza toccare più nessun file di shell. FIGMA_API_KEY è un segreto, quindi sta in `.claude/settings.local.json` che è in .gitignore (regola #5): sul tuo PC va ricreato, la riga è nel rapporto in chat. |
+
 ## ⏳ ANCORA DA FARE
 
 ### LA MEGA TO DO (dall'audit dei prompt, 8/08 notte)

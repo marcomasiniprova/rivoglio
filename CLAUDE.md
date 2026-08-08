@@ -30,30 +30,17 @@ Scelte chiuse: `DECISIONI.md`. Marchio: `BRAND.md`. Social: `CONTENUTI.md`.
 - **Trattalo come se fosse tuo**, non come un compito da consegnare.
 
 ## PROTOCOLLO CONTESTO
-*Io segnalo i reset del contesto: Valerio non se ne accorge da solo.*
+*Io segnalo i reset del contesto: Valerio non se ne accorge da solo.
+Checkpoint, task nuovo, degrado e HANDOFF stanno nel "Protocollo
+operativo" in fondo: lì una volta sola, qui niente doppioni.*
 
-0. **Metodo:** batch di TUTTI i fix, poi UN solo verify alla fine (mai
+1. **Metodo:** batch di TUTTI i fix, poi UN solo verify alla fine (mai
    fix → verify → fix → verify: raddoppia i tempi morti). Per trovare
    un punto nel codice: `rg`, non leggere file interi. Schermate solo
    alla consegna, non a ogni ritocco.
-1. Dopo ogni task completato E verificato E committato, chiudo la
-   risposta con esattamente:
-   --- CHECKPOINT: task chiuso. Consigliato /clear. Prossimo task? ---
-2. Se Valerio chiede qualcosa che non c'entra col task corrente (file
-   diversi, layer diverso, feature diversa), NON inizio. Rispondo solo:
-   "Questo è un task nuovo. /clear prima, poi ripeti la richiesta."
-3. Se noto uno di questi sintomi, mi fermo e lo segnalo:
-   - sto per rileggere un file già letto in questa sessione
-   - sto riproponendo un approccio già scartato
-   - sto richiedendo un'informazione già data
-   - un fix richiede più di 3 tentativi
-   Output: --- SINTOMO DEGRADO: [quale]. Consigliato /compact ---
-4. Prima di ogni /clear che consiglio, aggiorno HANDOFF.md con: stato
-   attuale, decisioni prese, file toccati, cosa resta da fare. Poi
-   dico che l'ho scritto.
-5. Distinzione: /compact <focus> = stesso task, sessione lunga, la
+2. Distinzione: /compact <focus> = stesso task, sessione lunga, la
    storia serve ancora. /clear = task chiuso o pivot totale.
-6. Un task = una unità committabile. "Costruire la SaaS" NON è un
+3. Un task = una unità committabile. "Costruire la SaaS" NON è un
    task. "Fixare il salvataggio iscritti" è un task.
 
 ## Le 6 regole
