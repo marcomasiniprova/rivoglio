@@ -17,6 +17,19 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #30 (8/08 notte)**: stress test sul motore VERO (14 voli reali
+  via workbench remoto, da ieri a febbraio: 11 verdetti certificati, 3
+  incerti onesti per orario mancante in archivio, 0 errori). Un incerto
+  su un volo degli ultimi 2 giorni ora DICE che il dato arriva entro un
+  giorno (prima "controlla numero e data" faceva credere a un errore).
+  Scan rifatto: fascia di luce lenta 3,4s + il biglietto si COMPILA coi
+  dati veri al passo giusto. **/anteprima-app**: l'app dentro un iPhone
+  di CSS su Netlify, si aggiorna con `npm run anteprima` (mobile/) +
+  push; font ridotti da 12 a 3 MB (solo i 6 caricati). **La web app /app
+  ha le tre sezioni dell'app** (Controlla / Pratiche / Profilo con
+  nickname e classifica via server action). Regola nuova in CLAUDE.md:
+  4 domande popup a ogni prompt di Valerio. POLAR.md: mail al supporto
+  pronta, consegnata a Valerio in chat.
 - **L'APP NON SCAPPA PIÙ NEL SITO (8/08 sera, richiesta di Valerio)**:
   l'unica cosa che apre il browser è il pagamento (scelta sua: in-app
   Apple e Google trattengono il 15-30%). Le regole del giro, decise coi

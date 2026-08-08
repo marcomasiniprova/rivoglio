@@ -17,6 +17,21 @@ L'app non rimanda più al sito, tranne che per il pagamento:
   (/api/leggi-carta, foto mai salvata), notifiche push (cron 6 UTC,
   testo per tratta, mai il numero del volo).
 
+## Giro #30 (dopo il #29): cosa è cambiato
+- Scan della landing: luce lenta + biglietto che si compila coi dati
+  veri (CartaImbarcoScan ha le prop tratta/arrivoPrevisto/arrivoEffettivo,
+  HeroCheck le riempie appena il server risponde).
+- lib/voli/verifica.ts: un incerto con stato sconosciuto su un volo degli
+  ultimi 2 giorni spiega che l'orario certificato arriva entro un giorno.
+- /anteprima-app: cornice iPhone + build web dell'app in
+  public/app-anteprima (baseUrl in mobile/app.json, rewrite in
+  next.config.ts). Si rigenera con `npm run anteprima` dentro mobile/ e
+  si committa: 3 MB (i font non caricati si eliminano, vedi commit).
+- /app: tre pannelli client (components/app/AppRivoglio.tsx), profilo
+  con nickname+classifica via server action salvaProfiloWeb.
+- Il PC di Valerio: fetch.unpackLimit=1 è il fix per unpack-objects
+  (antivirus); comando già consegnato in chat.
+
 ## I pezzi che restano sull'app
 1. Ricontrollo del volo "ancora in coda" dalla notifica: quando l'utente
    tocca la push, aprire direttamente il verdetto (deep link con

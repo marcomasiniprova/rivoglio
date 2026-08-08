@@ -59,6 +59,53 @@ export const COPY = {
     nota: "Con un account le tue pratiche restano qui, pronte da seguire.",
   },
 
+  /* ---- LA WEB APP: le stesse sezioni dell'app sul telefono ----
+     Un solo prodotto, due schermi (scelta di Valerio, 8/08). */
+  appWeb: {
+    tab: {
+      controlla: "Controlla",
+      pratiche: "Le tue pratiche",
+      profilo: "Profilo",
+    },
+    ospite: {
+      pratiche: {
+        titolo: "Qui trovi le tue pratiche.",
+        testo:
+          "Il check è libero e non serve l'account. L'account serve solo per ritrovare le pratiche che hai aperto e vedere a che punto sono.",
+        azione: "Entra",
+      },
+      profilo: {
+        titolo: "Non sei entrato.",
+        testo:
+          "Il check funziona lo stesso. Con l'account trovi le pratiche, gli avvisi e la classifica.",
+        azione: "Entra",
+      },
+    },
+    profilo: {
+      email: "La tua email",
+      dati: {
+        titolo: "Dati personali",
+        sottotitolo: "Il nome pubblico serve solo alla classifica.",
+        nickname: "Nome pubblico",
+        nicknameSegnaposto: "es. maverick_bg",
+        nicknameAiuto:
+          "Da 3 a 20 caratteri: lettere, numeri e trattino basso. Lo vedono gli altri in classifica.",
+        classifica: "Partecipa alla classifica",
+        classificaTesto:
+          "Quando una tua pratica viene pagata dalla compagnia, il tuo nome pubblico e l'importo entrano in classifica. Senza il tuo sì non compari mai.",
+        salva: "Salva",
+        salvato: "Salvato.",
+      },
+      voci: {
+        privacy: "Privacy",
+        condizioni: "Condizioni d'uso",
+        supporto: "Scrivici",
+      },
+      piede:
+        "Rivoglio non è un intermediario: prepara i documenti, il reclamo lo invii tu e la compensazione arriva a te.",
+    },
+  },
+
   hero: {
     occhiello: "Lo scanner dei rimborsi",
     titolo: "Hai preso un volo nell'ultimo anno?",

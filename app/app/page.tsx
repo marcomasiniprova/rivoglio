@@ -1,6 +1,4 @@
-import Link from "next/link";
-import { ArrowRight, FileText, Plane } from "lucide-react";
-import CheckRapido from "@/components/app/CheckRapido";
+import AppRivoglio, { type CardPratica } from "@/components/app/AppRivoglio";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
@@ -8,13 +6,11 @@ import { COPY } from "@/lib/copy";
 import type { StatoPratica, TipoPratica } from "@/lib/pratiche/pratiche";
 
 /**
- * Le tue pratiche: l'elenco di tutti i reclami dell'utente collegato.
- *
- * La lettura delle pratiche passa dal client di sessione, quindi dalla RLS:
- * la policy "pratiche: le mie" garantisce che arrivino SOLO le righe con
- * utente_id = auth.uid(). I voli invece non hanno policy (li legge solo il
- * server): si agganciano dopo, con la chiave di servizio, limitati agli id
- * delle pratiche già filtrate dalla RLS.
+ * LA WEB APP: le stesse sezioni dell'app sul telefono (Controlla,
+ * Le tue pratiche, Profilo). Questo file fa solo la spesa: legge
+ * pratiche (con la RLS), voli (con la chiave di servizio, limitati agli
+ * id già filtrati) e profilo, e passa tutto già apparecchiato al
+ * componente client che sceglie il pannello.
  */
 export const dynamic = "force-dynamic";
 
@@ -49,150 +45,76 @@ function classiStato(stato: StatoPratica): string {
   return "bg-menta-tenue text-verde-notte";
 }
 
-export default async function PaginaPratiche() {
-  /* Dall'8/08 la web app è aperta a tutti (decisione di Valerio): chi
-     arriva senza account trova il check, libero e illimitato. L'elenco
-     pratiche resta solo per chi è collegato (la RLS fa il resto). */
+export default async function PaginaApp() {
   const utente = SUPABASE_CONFIGURATO ? await utenteCollegato() : null;
+
   if (!utente) {
-    const O = COPY.appOspite;
     return (
-      <div className="flex flex-col gap-8">
-        <div>
-          <h1 className="font-display text-[2.3rem] leading-none tracking-[-0.04em] sm:text-[2.8rem]">
-            {O.titolo}
-          </h1>
-          <p className="mt-3 max-w-xl text-[0.98rem] leading-relaxed text-fumo">{O.testo}</p>
-        </div>
-        <CheckRapido />
-        <p className="text-sm leading-relaxed text-fumo">
-          {O.nota}{" "}
-          <Link
-            href="/entra?poi=/app"
-            className="font-medium text-verde hover:text-verde-scuro"
-          >
-            {O.entra}
-          </Link>
-        </p>
-      </div>
+      <AppRivoglio
+        email={null}
+        nickname={null}
+        classificaOptin={false}
+        pratiche={[]}
+        erroreLettura={false}
+      />
     );
   }
 
   const supabase = await supabaseServer();
-  const { data, error } = await supabase
-    .from("pratiche")
-    .select("id, stato, tipo, importo_fascia, volo_id, creata_il, aggiornata_il")
-    .order("aggiornata_il", { ascending: false });
 
-  const pratiche = (data ?? []) as RigaPratica[];
+  const [{ data, error }, { data: profilo }] = await Promise.all([
+    supabase
+      .from("pratiche")
+      .select("id, stato, tipo, importo_fascia, volo_id, creata_il, aggiornata_il")
+      .order("aggiornata_il", { ascending: false }),
+    supabase.from("profili").select("nickname, classifica_optin").eq("id", utente.id).maybeSingle(),
+  ]);
+
+  const righe = (data ?? []) as RigaPratica[];
 
   /* I voli delle pratiche, in un colpo solo. Se la chiave di servizio manca
      l'elenco resta in piedi lo stesso: si mostra la data della pratica. */
   const voli = new Map<string, VoloBreve>();
-  const voloIds = [...new Set(pratiche.map((p) => p.volo_id).filter(Boolean))] as string[];
+  const voloIds = [...new Set(righe.map((p) => p.volo_id).filter(Boolean))] as string[];
   if (SERVIZIO_ATTIVO && voloIds.length > 0) {
-    const { data: righe } = await supabaseServizio()
+    const { data: vr } = await supabaseServizio()
       .from("voli")
       .select("id, volo_iata, data_locale")
       .in("id", voloIds);
-    for (const v of righe ?? []) {
+    for (const v of vr ?? []) {
       voli.set(v.id as string, { volo_iata: v.volo_iata, data_locale: v.data_locale });
     }
   }
 
   const C = COPY.pratica.elenco;
+  const pratiche: CardPratica[] = righe.map((p) => {
+    const stato = COPY.pratica.stati[p.stato] ?? null;
+    const volo = p.volo_id ? voli.get(p.volo_id) : undefined;
+    return {
+      id: p.id,
+      statoNome: stato?.nome ?? p.stato,
+      statoClassi: classiStato(p.stato),
+      fascia:
+        p.importo_fascia !== null
+          ? riempi(C.fasciaTemplate, { importo: `${p.importo_fascia}€` })
+          : null,
+      fasciaFonte: C.fasciaFonte,
+      famiglia: p.tipo === "famiglia",
+      titolo: volo
+        ? riempi(C.voloTemplate, { volo: volo.volo_iata, data: dataIt(volo.data_locale) })
+        : riempi(C.voloMancante, { data: dataIt(p.creata_il) }),
+      prossimoPasso: stato?.prossimoPasso ?? null,
+      apri: C.apri,
+    };
+  });
 
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="font-display text-[2.3rem] leading-none tracking-[-0.04em] sm:text-[2.8rem]">
-          {C.titolo}
-        </h1>
-        <p className="mt-3 max-w-xl text-[0.98rem] leading-relaxed text-fumo">{C.sottotitolo}</p>
-      </div>
-
-      {error ? (
-        /* ---- guasto onesto: si dice, non si mostra un elenco vuoto finto ---- */
-        <div className="rounded-3xl border border-bordo bg-white px-6 py-10 text-center">
-          <p className="text-[0.95rem] leading-relaxed text-fumo">{C.errore}</p>
-        </div>
-      ) : pratiche.length === 0 ? (
-        /* ---- stato vuoto: la porta è il check sulla home ---- */
-        <div className="rounded-3xl border border-dashed border-bordo bg-white/60 px-6 py-12 text-center">
-          <Plane className="mx-auto size-6 text-fumo-2" aria-hidden="true" />
-          <h2 className="mt-4 font-display text-xl tracking-[-0.03em]">{C.vuoto.titolo}</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-fumo">
-            {C.vuoto.testo}
-          </p>
-          <Link
-            href="/"
-            className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-verde hover:text-verde-scuro"
-          >
-            {C.vuoto.cta}
-            <ArrowRight className="size-4" aria-hidden="true" />
-          </Link>
-        </div>
-      ) : (
-        <section className="flex flex-col gap-4">
-          {pratiche.map((p, indice) => {
-            const stato = COPY.pratica.stati[p.stato] ?? null;
-            const volo = p.volo_id ? voli.get(p.volo_id) : undefined;
-            const titolo = volo
-              ? riempi(C.voloTemplate, { volo: volo.volo_iata, data: dataIt(volo.data_locale) })
-              : riempi(C.voloMancante, { data: dataIt(p.creata_il) });
-
-            return (
-              <Link
-                key={p.id}
-                href={`/pratica/${p.id}`}
-                style={{ "--n": indice } as React.CSSProperties}
-                className="pratica-entra group block rounded-3xl border border-bordo bg-white px-6 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-verde/40 hover:shadow-[0_18px_36px_-24px_rgba(5,46,31,0.35)]"
-              >
-                <div className="flex flex-wrap items-center gap-2">
-                  <span
-                    className={`inline-flex items-center rounded-pillola px-3 py-1 text-xs font-medium ${classiStato(p.stato)}`}
-                  >
-                    {stato?.nome ?? p.stato}
-                  </span>
-                  {p.importo_fascia !== null && (
-                    <span
-                      className="numeri inline-flex items-center rounded-pillola border border-bordo px-3 py-1 text-xs font-medium text-inchiostro"
-                      title={C.fasciaFonte}
-                    >
-                      {riempi(C.fasciaTemplate, { importo: `${p.importo_fascia}€` })}
-                    </span>
-                  )}
-                  {p.tipo === "famiglia" && (
-                    <span className="inline-flex items-center rounded-pillola border border-bordo px-3 py-1 text-xs text-fumo">
-                      {C.famiglia}
-                    </span>
-                  )}
-                </div>
-
-                <p className="mt-3 font-display text-xl tracking-[-0.03em]">{titolo}</p>
-
-                {stato && (
-                  <p className="mt-2 text-sm leading-relaxed text-fumo">
-                    <span className="font-medium text-inchiostro">
-                      {C.prossimoPassoEtichetta}:
-                    </span>{" "}
-                    {stato.prossimoPasso}
-                  </p>
-                )}
-
-                <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-verde transition-colors group-hover:text-verde-scuro">
-                  <FileText className="size-4" aria-hidden="true" />
-                  {C.apri}
-                  <ArrowRight
-                    className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
-                    aria-hidden="true"
-                  />
-                </span>
-              </Link>
-            );
-          })}
-        </section>
-      )}
-    </div>
+    <AppRivoglio
+      email={utente.email ?? null}
+      nickname={(profilo?.nickname as string | null) ?? null}
+      classificaOptin={Boolean(profilo?.classifica_optin)}
+      pratiche={pratiche}
+      erroreLettura={Boolean(error)}
+    />
   );
 }
