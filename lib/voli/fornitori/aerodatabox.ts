@@ -25,7 +25,13 @@ const HOST = "aerodatabox.p.rapidapi.com";
 type OrarioAdb = { utc?: string | null; local?: string | null } | null;
 
 type MovimentoAdb = {
-  airport?: { iata?: string | null } | null;
+  /* municipalityName è la CITTÀ ("Bergamo"), name è il nome dello scalo
+     ("Bergamo Orio al Serio"): all'utente serve la città. */
+  airport?: {
+    iata?: string | null;
+    name?: string | null;
+    municipalityName?: string | null;
+  } | null;
   scheduledTime?: OrarioAdb;
   revisedTime?: OrarioAdb;
   predictedTime?: OrarioAdb;
@@ -147,6 +153,12 @@ export const aerodatabox: FornitoreVoli = {
          IsCodeshared, Unknown o campo assente: vettore da determinare,
          il motore ferma la vendita. */
       vettoreDaDeterminare: volo.codeshareStatus !== "IsOperator",
+      partenzaIata: volo.departure?.airport?.iata ?? null,
+      partenzaCitta:
+        volo.departure?.airport?.municipalityName ?? volo.departure?.airport?.name ?? null,
+      arrivoIata: volo.arrival?.airport?.iata ?? null,
+      arrivoCitta:
+        volo.arrival?.airport?.municipalityName ?? volo.arrival?.airport?.name ?? null,
       arrivoPrevistoUtc: utcIso(volo.arrival?.scheduledTime),
       arrivoEffettivoUtc: stato === "atterrato" ? effettivo : null,
       stato,

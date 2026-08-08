@@ -36,6 +36,13 @@ export type FattoVolo = {
   /** Chi ha OPERATO il volo: il reclamo va a lui, non a chi ha venduto. */
   vettoreOperativo: string;
   vettoreMarketing?: string | null;
+  /* LA TRATTA, in chiaro. Serve a parlare come una persona: nessuno
+     ricorda "FR4001", tutti ricordano "Bergamo → Lanzarote" (regola
+     dell'utente medio, Valerio 8/08). Null quando il fornitore non la dà. */
+  partenzaIata?: string | null;
+  partenzaCitta?: string | null;
+  arrivoIata?: string | null;
+  arrivoCitta?: string | null;
   arrivoPrevistoUtc: string | null;
   arrivoEffettivoUtc: string | null;
   stato: "atterrato" | "cancellato" | "dirottato" | "sconosciuto";

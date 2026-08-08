@@ -66,6 +66,22 @@ Valerio NON è tecnico e non deve diventarlo. Quindi:
 - Quando qualcosa non si può fare sul suo PC (Windows), dirlo subito e
   dare l'alternativa che funziona, non la teoria.
 
+## PENSA PER L'UTENTE MEDIO (regola di Valerio, 8/08)
+Prima di costruire qualsiasi cosa, mettiti nei panni di **dieci persone
+normali** che aprono Rivoglio per la prima volta. Non sanno cos'è un
+numero di volo, non hanno il biglietto sottomano, non leggono le
+istruzioni. Le domande da farsi, ogni volta:
+- **Questa informazione l'utente ce l'ha?** Se per rispondere deve
+  cercare un'email o rovistare in casa, la domanda è sbagliata: si
+  cambia la domanda, non si aggiunge una guida.
+- **Si capisce in tre secondi?** Vale per notifiche, titoli, bottoni.
+  "FR4001" è un codice da pilota: la gente pensa "Bergamo-Lanzarote".
+  Parla di città e di orari, non di codici e di articoli di legge.
+- **Cosa succede se sbaglia?** Ogni campo deve perdonare: maiuscole,
+  spazi, formati diversi.
+Un aiuto ("come trovo il numero?") è l'ultima spiaggia, non la
+soluzione: prima si toglie l'ostacolo.
+
 ## Come si scrive (ogni parola che vede l'utente)
 Dai del tu, ma **professionale, non da amici al bar**. Frasi corte, zero gergo,
 zero superlativi. **MAI il trattino lungo (—): è il segno più riconoscibile del

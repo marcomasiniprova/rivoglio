@@ -27,6 +27,9 @@ export type VoloSalvato = {
   volo: string;
   /** "2026-08-06" */
   data: string;
+  /** La tratta in chiaro: è così che la gente riconosce il proprio volo. */
+  da?: string | null;
+  a?: string | null;
   /** L'ultimo verdetto del motore. Null = non ancora controllato. */
   esito: EsitoSalvato | null;
   /** La frase del motore, come l'ha scritta lui. */

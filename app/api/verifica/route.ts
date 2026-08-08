@@ -112,6 +112,9 @@ export async function POST(req: Request) {
       motivo: verdetto.motivo,
       // I dati oggettivi dietro il verdetto: la trasparenza è il prodotto.
       dato: {
+        // La tratta in chiaro: l'utente riconosce le città, non i codici.
+        da: fatto.partenzaCitta ?? fatto.partenzaIata ?? null,
+        a: fatto.arrivoCitta ?? fatto.arrivoIata ?? null,
         previsto: fatto.arrivoPrevistoUtc,
         effettivo: fatto.arrivoEffettivoUtc,
         vettoreOperativo: fatto.vettoreOperativo,

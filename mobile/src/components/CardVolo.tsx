@@ -52,8 +52,15 @@ export default function CardVolo({
     <View style={stili.scheda}>
       <View style={stili.riga}>
         <View style={stili.intestazione}>
-          <Text style={stili.volo}>{volo.volo}</Text>
-          <Text style={stili.data}>{dataIt(volo.data)}</Text>
+          {/* Prima la tratta, perché è così che uno riconosce il suo volo;
+              il codice resta sotto, per chi lo cerca. */}
+          <Text style={stili.volo}>
+            {volo.da && volo.a ? `${volo.da} → ${volo.a}` : volo.volo}
+          </Text>
+          <Text style={stili.data}>
+            {volo.da && volo.a ? `${volo.volo} · ` : ""}
+            {dataIt(volo.data)}
+          </Text>
         </View>
         <Pressable
           onPress={onTogli}

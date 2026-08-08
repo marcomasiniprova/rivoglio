@@ -23,6 +23,9 @@ export type EsitoCheck =
       ritardoMinuti?: number;
       motivo: string;
       dato: {
+        /** Le città della tratta: "Bergamo" e "Lanzarote". */
+        da: string | null;
+        a: string | null;
         previsto: string | null;
         effettivo: string | null;
         vettoreOperativo: string | null;

@@ -66,6 +66,8 @@ export default function SchermataCheck() {
     const aggiornati = await salvaVolo({
       volo: voloDaControllare.trim().toUpperCase(),
       data: iso,
+      da: esito.dato.da,
+      a: esito.dato.a,
       esito: esito.esito,
       motivo: esito.motivo,
       importo: esito.importo,
@@ -84,6 +86,8 @@ export default function SchermataCheck() {
         motivo: esito.motivo,
         importo: String(esito.importo ?? ""),
         ritardo: String(esito.ritardoMinuti ?? ""),
+        da: esito.dato.da ?? "",
+        a: esito.dato.a ?? "",
         previsto: esito.dato.previsto ?? "",
         effettivo: esito.dato.effettivo ?? "",
         demo: esito.demo ? "1" : "",

@@ -46,6 +46,10 @@ type RigaVolo = {
   data_locale: string;
   vettore_operativo: string | null;
   vettore_marketing: string | null;
+  partenza_iata: string | null;
+  partenza_citta: string | null;
+  arrivo_iata: string | null;
+  arrivo_citta: string | null;
   arrivo_previsto_utc: string | null;
   arrivo_effettivo_utc: string | null;
   stato: FattoVolo["stato"];
@@ -63,6 +67,10 @@ function fattoDaRiga(riga: RigaVolo): FattoVolo {
     dataLocale: riga.data_locale,
     vettoreOperativo: riga.vettore_operativo ?? riga.volo_iata.slice(0, 2),
     vettoreMarketing: riga.vettore_marketing,
+    partenzaIata: riga.partenza_iata,
+    partenzaCitta: riga.partenza_citta,
+    arrivoIata: riga.arrivo_iata,
+    arrivoCitta: riga.arrivo_citta,
     arrivoPrevistoUtc: riga.arrivo_previsto_utc,
     arrivoEffettivoUtc: riga.arrivo_effettivo_utc,
     stato: riga.stato,
@@ -103,7 +111,7 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
       const { data: riga } = await sb
         .from("voli")
         .select(
-          "id, volo_iata, data_locale, vettore_operativo, vettore_marketing, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, orario_verificato, vettore_da_determinare",
+          "id, volo_iata, data_locale, vettore_operativo, vettore_marketing, partenza_iata, partenza_citta, arrivo_iata, arrivo_citta, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, orario_verificato, vettore_da_determinare",
         )
         .eq("volo_iata", volo.valore)
         .eq("data_locale", data.valore)
@@ -166,6 +174,10 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
                 data_locale: fatto.dataLocale,
                 vettore_operativo: fatto.vettoreOperativo,
                 vettore_marketing: fatto.vettoreMarketing ?? null,
+                partenza_iata: fatto.partenzaIata ?? null,
+                partenza_citta: fatto.partenzaCitta ?? null,
+                arrivo_iata: fatto.arrivoIata ?? null,
+                arrivo_citta: fatto.arrivoCitta ?? null,
                 arrivo_previsto_utc: fatto.arrivoPrevistoUtc,
                 arrivo_effettivo_utc: fatto.arrivoEffettivoUtc,
                 stato: fatto.stato,

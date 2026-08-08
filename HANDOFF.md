@@ -1,55 +1,62 @@
 # HANDOFF — per la prossima sessione
 
-*Aggiornato: 2026-08-08, pomeriggio (dopo il giro #30: barre dell'hero,
-regole unificate, ambiente Claude, guida anteprima mobile).
-Si aggiorna prima di ogni /clear.*
+*Aggiornato: 2026-08-08, notte (dopo la tratta in chiaro e la base delle
+notifiche). Si aggiorna prima di ogni /clear.*
 
-## Stato attuale
-- **Deploy automatico dal repo GitHub**: ogni push sul ramo fa build e
-  deploy su rivoglio.netlify.app. Il fix che lo sbloccava era
-  `@netlify/plugin-nextjs` come devDependency (nei build da repo il
-  plugin di netlify.toml va installato nel progetto).
-- Il motore online è collaudato (FR4001: non idoneo, 155 min, demo:false).
-  Su Netlify ci sono tutte le chiavi tranne Polar (che non esiste ancora).
-- **Pagine legali** /privacy /condizioni /cookie online (prima bozza).
-  Manca da Valerio: cognome e dati societari del titolare, poi revisione
-  avvocato.
-- **Barre dell'hero** come il riferimento: attaccate, quadrate in ogni
-  estremo, a tutta larghezza, base 0.55 e picco 1, onda una-alla-volta
-  da sinistra a destra (8,3s a giro).
-- **Regole unificate**: checkpoint / task nuovo / degrado / HANDOFF solo
-  nel "Protocollo operativo" di CLAUDE.md. Il PROTOCOLLO CONTESTO tiene
-  metodo batch, /compact vs /clear, task = unità committabile.
-  art-director FASE 0 ora salta le domande già risposte nel brief.
-- **Ambiente Claude**: `.claude/settings.json` (tracciato) porta
-  USE_BUILTIN_RIPGREP=0 e ENABLE_TOOL_SEARCH=auto:5 su ogni macchina.
-  FIGMA_API_KEY sta in `.claude/settings.local.json` (gitignored): sul PC
-  di Valerio va ricreato a mano, la riga è nel rapporto in chat.
-- **Composio NON è nel codice**: è solo un utensile di sessione per
-  applicare migrazioni sul Supabase vero. L'app parla a Supabase da
-  `lib/supabase/servizio.ts:27` (chiave di servizio) e
-  `lib/supabase/chiavi.ts:28` (chiave pubblica).
+## Il pezzo in corso: LE NOTIFICHE PUSH
 
-## Decisioni prese (ultime)
-- Colonne: attaccate e quadrate, la tinta pari/dispari le separa.
-- Variabili non segrete in settings.json tracciato, segreti solo in
-  settings.local.json (mai nel repo, regola #5).
-- Mobile: si guarda con l'emulatore Android da Windows; iPhone fisico
-  solo con TestFlight, quindi non ora.
+Scelte di Valerio (popup dell'8/08):
+1. **Sul server, con account**: chi vuole l'avviso entra con l'email; i
+   suoi voli vanno su Supabase e il server li ricontrolla. Il check resta
+   libero e senza account per tutti gli altri.
+2. **La mattina dopo**: l'orario certificato arriva con qualche ora di
+   ritardo, avvisare subito darebbe verdetti su dati non consolidati.
+3. **Il testo NON deve essere tecnico** (richiesta esplicita): niente
+   "FR4001", si parla di TRATTA e di ore. Esempio del tono giusto:
+   "Bergamo → Lanzarote: 3 ore di ritardo. Un volo così rientra nella
+   fascia da 250€." Mai promettere il pagamento.
+4. **Il permesso si chiede al primo volo salvato**, non all'avvio.
 
-## File toccati in questo giro
-app/globals.css (colonne attaccate/quadrate, onda più visibile) ·
-CLAUDE.md (dedup regole) · .claude/skills/art-director/SKILL.md (FASE 0
-ammorbidita) · .claude/settings.json (nuovo) · .claude/settings.local.json
-(nuovo, non tracciato) · mobile/ANTEPRIMA-WINDOWS.md (nuovo) ·
-STATO/ARRETRATI/HANDOFF.
+### Cosa è GIÀ PRONTO (fatto in questa sessione)
+- Migrazione `20260810_tratta_e_voli_seguiti` applicata sul Supabase vero:
+  colonne `partenza_iata/citta`, `arrivo_iata/citta` su `voli`; tabella
+  `voli_seguiti` (utente_id, volo_iata, data_locale, esito_avvisato,
+  avvisato_il) con RLS "ognuno vede i suoi"; `profili.expo_push_token`.
+- La TRATTA arriva dal fornitore fino alla risposta di `/api/verifica`
+  (`dato.da`, `dato.a`) e si vede nell'app: card dei voli salvati e
+  schermata verdetto mostrano "Bergamo → Lanzarote" col codice sotto.
+- I voli salvati sul telefono (`mobile/src/lib/voliSalvati.ts`) portano
+  già `da` e `a`.
 
-## Cosa resta da fare
-1. Valerio: dati del titolare per le pagine legali; poi avvocato.
-2. Polar: prodotti, checkout link, segreto webhook, approvazione org.
-   È il collo di bottiglia per incassare.
-3. Mobile: l'onboarding è ancora al prodotto viaggi. Va rifatto per
-   Rivoglio (il tracker della pratica) guardandolo dall'emulatore.
-4. Scioperi di ottobre a inizio settembre (cruscotto MIT dal PC).
-5. MCP da scollegare (scelta di Valerio): Shopify, Miro, Notion, e
-   probabilmente Blender.
+### Cosa MANCA per chiudere le notifiche
+1. `expo-notifications` nell'app: chiedere il permesso al primo volo
+   salvato, prendere il token Expo e scriverlo in `profili.expo_push_token`.
+2. Quando l'utente è entrato, i voli salvati vanno copiati in
+   `voli_seguiti` (e tolti quando li cancella).
+3. Una rotta cron sul sito (tipo `app/api/cron/notifiche/route.ts`, sullo
+   schema di quella dei follow-up email): ogni mattina prende i voli di
+   ieri da `voli_seguiti`, chiama `verificaVolo`, e se l'esito è nuovo
+   manda la push con l'API di Expo (https://exp.host/--/api/v2/push/send),
+   poi scrive `esito_avvisato` e `avvisato_il` per non ripetersi.
+4. Netlify: schedulare il cron (netlify.toml o scheduled function).
+
+## L'ALTRA COSA GROSSA che ha detto Valerio (da fare)
+**Il numero di volo è troppa frizione.** Ha ragione: l'utente medio non sa
+dove trovarlo. La soluzione NON è un aiuto "come lo trovo", è togliere
+l'ostacolo: **ricerca per tratta e data** (da dove sei partito, dove sei
+arrivato, che giorno) con l'elenco dei voli di quel giorno fra i due
+scali, da cui si sceglie il proprio. AeroDataBox ha l'endpoint degli
+aeroporti (partenze/arrivi in una finestra oraria) e i 6.072 aeroporti
+per l'autocomplete sono già nel repo (`lib/dati/aeroporti.json`).
+Regola scritta in CLAUDE.md: "PENSA PER L'UTENTE MEDIO".
+
+## Il resto dello stato
+Vedi STATO.md: sito online e collaudato, app mobile tutta Rivoglio (tre
+tab, niente più prodotto viaggi), deploy automatico a ogni push, pagine
+legali online, Osservatorio coi dati veri.
+
+## Cosa resta a Valerio
+1. Polar (prodotti, checkout link, segreto webhook): è il collo di
+   bottiglia per incassare.
+2. Dati del titolare per le pagine legali, poi avvocato.
+3. Scioperi di ottobre a inizio settembre.

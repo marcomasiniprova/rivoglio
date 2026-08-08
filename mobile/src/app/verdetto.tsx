@@ -56,6 +56,8 @@ export default function SchermataVerdetto() {
   const p = useLocalSearchParams<{
     volo: string;
     data: string;
+    da: string;
+    a: string;
     esito: string;
     motivo: string;
     importo: string;
@@ -96,7 +98,11 @@ export default function SchermataVerdetto() {
       {/* ------------------------------------------------ il fatto */}
       <View style={stili.scheda}>
         <Text style={stili.volo}>
-          {p.volo} · {dataIt(p.data)}
+          {p.da && p.a ? `${p.da} → ${p.a}` : p.volo}
+        </Text>
+        <Text style={stili.voloNota}>
+          {p.da && p.a ? `${p.volo} · ` : ""}
+          {dataIt(p.data)}
         </Text>
 
         {haOrari && (
@@ -199,10 +205,12 @@ const stili = StyleSheet.create({
     ...OMBRA.scheda,
   },
   volo: {
-    fontFamily: FONT.testoMedio,
-    fontSize: 14,
-    color: COLORI.fumo,
+    fontFamily: FONT.display,
+    fontSize: 18,
+    letterSpacing: -0.4,
+    color: COLORI.inchiostro,
   },
+  voloNota: { fontFamily: FONT.testo, fontSize: 13, color: COLORI.fumo, marginTop: 2 },
   orari: { flexDirection: "row", gap: SPAZIO.m, marginTop: SPAZIO.l },
   ora: {
     flex: 1,
