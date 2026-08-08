@@ -1,62 +1,48 @@
 # HANDOFF — per la prossima sessione
 
-*Aggiornato: 2026-08-08, notte (dopo la tratta in chiaro e la base delle
-notifiche). Si aggiorna prima di ogni /clear.*
+*Aggiornato: 2026-08-08, sera (giro #29 chiuso: app piena). Si aggiorna
+prima di ogni /clear.*
 
-## Il pezzo in corso: LE NOTIFICHE PUSH
+## Cosa è appena stato chiuso (giro #29)
+L'app non rimanda più al sito, tranne che per il pagamento:
+- pratiche col tracker DENTRO l'app (`/api/pratiche/{id}/scheda`,
+  Bearer + cookie; timeline, lettera via mailto, "L'ho inviata");
+- profilo stile riferimento (avatar, Dati personali con nickname e
+  adesione classifica, invito amici via Share, voci con icona);
+- classifica end-to-end SPENTA: si accende con CLASSIFICA_ATTIVA=1 su
+  Netlify quando ci sono ~10 giorni di vincite vere. Conta solo
+  `esito_pagata`, compare solo chi ha nickname + opt-in;
+- biglietto tipo carta d'imbarco (strappo, fori, codice a barre);
+- prima ancora: ricerca per tratta (predefinita), foto carta d'imbarco
+  (/api/leggi-carta, foto mai salvata), notifiche push (cron 6 UTC,
+  testo per tratta, mai il numero del volo).
 
-Scelte di Valerio (popup dell'8/08):
-1. **Sul server, con account**: chi vuole l'avviso entra con l'email; i
-   suoi voli vanno su Supabase e il server li ricontrolla. Il check resta
-   libero e senza account per tutti gli altri.
-2. **La mattina dopo**: l'orario certificato arriva con qualche ora di
-   ritardo, avvisare subito darebbe verdetti su dati non consolidati.
-3. **Il testo NON deve essere tecnico** (richiesta esplicita): niente
-   "FR4001", si parla di TRATTA e di ore. Esempio del tono giusto:
-   "Bergamo → Lanzarote: 3 ore di ritardo. Un volo così rientra nella
-   fascia da 250€." Mai promettere il pagamento.
-4. **Il permesso si chiede al primo volo salvato**, non all'avvio.
+## I pezzi che restano sull'app
+1. Ricontrollo del volo "ancora in coda" dalla notifica: quando l'utente
+   tocca la push, aprire direttamente il verdetto (deep link con
+   dati.volo/data già nel payload della notifica).
+2. La ricerca per tratta anche sul SITO (l'app ce l'ha, il sito no).
+3. Store: icone pronte, serve l'account sviluppatore (scelta di Valerio:
+   prima app completa, store dopo).
 
-### Cosa è GIÀ PRONTO (fatto in questa sessione)
-- Migrazione `20260810_tratta_e_voli_seguiti` applicata sul Supabase vero:
-  colonne `partenza_iata/citta`, `arrivo_iata/citta` su `voli`; tabella
-  `voli_seguiti` (utente_id, volo_iata, data_locale, esito_avvisato,
-  avvisato_il) con RLS "ognuno vede i suoi"; `profili.expo_push_token`.
-- La TRATTA arriva dal fornitore fino alla risposta di `/api/verifica`
-  (`dato.da`, `dato.a`) e si vede nell'app: card dei voli salvati e
-  schermata verdetto mostrano "Bergamo → Lanzarote" col codice sotto.
-- I voli salvati sul telefono (`mobile/src/lib/voliSalvati.ts`) portano
-  già `da` e `a`.
+## Cosa resta a Valerio (in ordine)
+1. **Polar**: leggere POLAR.md. PRIMA di tutto mandare al supporto il
+   testo pronto per farsi approvare il caso d'uso (vietano la
+   "consulenza": noi siamo software, ma deve dirlo un loro revisore).
+   Poi: prodotti 14,90/24,90, checkout link, segreto webhook, verifica
+   da Finance → Account SUBITO (fino a 14 giorni, vendite mai ferme).
+2. PC suo: se l'app resta vecchia, la guida riparata è in
+   mobile/ANTEPRIMA-WINDOWS.md (fetch + reset, mai git pull).
+3. Quando ci sono vincite vere da 10 giorni: CLASSIFICA_ATTIVA=1 su
+   Netlify e la tab compare da sola.
 
-### Cosa MANCA per chiudere le notifiche
-1. `expo-notifications` nell'app: chiedere il permesso al primo volo
-   salvato, prendere il token Expo e scriverlo in `profili.expo_push_token`.
-2. Quando l'utente è entrato, i voli salvati vanno copiati in
-   `voli_seguiti` (e tolti quando li cancella).
-3. Una rotta cron sul sito (tipo `app/api/cron/notifiche/route.ts`, sullo
-   schema di quella dei follow-up email): ogni mattina prende i voli di
-   ieri da `voli_seguiti`, chiama `verificaVolo`, e se l'esito è nuovo
-   manda la push con l'API di Expo (https://exp.host/--/api/v2/push/send),
-   poi scrive `esito_avvisato` e `avvisato_il` per non ripetersi.
-4. Netlify: schedulare il cron (netlify.toml o scheduled function).
-
-## L'ALTRA COSA GROSSA che ha detto Valerio (da fare)
-**Il numero di volo è troppa frizione.** Ha ragione: l'utente medio non sa
-dove trovarlo. La soluzione NON è un aiuto "come lo trovo", è togliere
-l'ostacolo: **ricerca per tratta e data** (da dove sei partito, dove sei
-arrivato, che giorno) con l'elenco dei voli di quel giorno fra i due
-scali, da cui si sceglie il proprio. AeroDataBox ha l'endpoint degli
-aeroporti (partenze/arrivi in una finestra oraria) e i 6.072 aeroporti
-per l'autocomplete sono già nel repo (`lib/dati/aeroporti.json`).
-Regola scritta in CLAUDE.md: "PENSA PER L'UTENTE MEDIO".
-
-## Il resto dello stato
-Vedi STATO.md: sito online e collaudato, app mobile tutta Rivoglio (tre
-tab, niente più prodotto viaggi), deploy automatico a ogni push, pagine
-legali online, Osservatorio coi dati veri.
-
-## Cosa resta a Valerio
-1. Polar (prodotti, checkout link, segreto webhook): è il collo di
-   bottiglia per incassare.
-2. Dati del titolare per le pagine legali, poi avvocato.
-3. Scioperi di ottobre a inizio settembre.
+## Attenzioni tecniche fresche
+- `voli` NON ha RLS: l'app non deve mai leggerla direttamente, passa
+  dalle API del sito.
+- Il CORS condiviso sta in lib/api/limite.ts e permette Authorization:
+  serve alle chiamate col Bearer dall'app.
+- Migrazioni applicate sul Supabase vero e tracciate in supabase/:
+  2026-08-10-tratta-e-voli-seguiti.sql, 2026-08-10-profilo-e-classifica.sql.
+- expo-image-picker e expo-clipboard sono a versione SDK 57 (~57.0.x):
+  `npx expo install` non funziona in sandbox (proxy), si usa npm con la
+  versione giusta a mano.

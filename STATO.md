@@ -1,8 +1,9 @@
 # STATO — Rivoglio
 
-**Aggiornato:** 2026-08-08, alba (giro #28: chiave volo su Netlify e motore
-collaudato ONLINE, Osservatorio coi dati veri, hero col glow, scanner
-carta d'imbarco, foto footer raddrizzata)
+**Aggiornato:** 2026-08-08, sera (giro #29: l'app non scappa più nel sito.
+Ricerca per tratta, notifiche push, foto della carta d'imbarco, pratiche
+col tracker DENTRO l'app, profilo vero, classifica completa e spenta,
+biglietto realistico. Guida Polar in POLAR.md)
 **RIVOGLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
 Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
 verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
@@ -16,6 +17,41 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **L'APP NON SCAPPA PIÙ NEL SITO (8/08 sera, richiesta di Valerio)**:
+  l'unica cosa che apre il browser è il pagamento (scelta sua: in-app
+  Apple e Google trattengono il 15-30%). Le regole del giro, decise coi
+  popup: pratiche "tutto tranne pagare", classifica costruita completa ma
+  SPENTA al lancio (10 giorni di dati veri, poi si accende con
+  CLASSIFICA_ATTIVA=1 su Netlify e la tab compare da sola), nickname
+  opt-in per la classifica, invito agli amici SENZA premi in denaro.
+- **I tre modi di dire qual è il volo nell'app**: foto della carta
+  d'imbarco (Mistral OCR via /api/leggi-carta, la foto NON si salva),
+  ricerca per tratta (predefinita: "da dove sei partito", autocompletamento
+  su 6.072 scali OpenFlights con nomi italiani ed esonimi, poi l'elenco
+  dei voli del giorno da AeroDataBox), numero di volo per chi lo ha.
+- **La pratica si segue DENTRO l'app**: /api/pratiche/{id}/scheda (Bearer
+  dall'app, cookie dal sito, CORS con Authorization) dà stato, tratta,
+  cronologia e lettera in una chiamata. Timeline coi sei passi, lettera
+  che si apre nell'email già compilata (mailto), copia/condividi, canale
+  reclami e "L'ho inviata" (conferma-invio ora accetta anche il Bearer).
+- **Le notifiche push**: permesso chiesto al primo volo salvato, voli su
+  `voli_seguiti`, cron alle 6 UTC (netlify/functions/avvisa.mjs →
+  /api/motore/avvisa) che ricontrolla i voli di ieri e manda la push
+  SOLO sugli idonei, scritta per tratta ("Bergamo → Lanzarote: 3 ore e
+  15 minuti di ritardo... fascia da 250€"), mai col numero del volo.
+  8 prove bloccano il testo. Incerti in coda 7 giorni, poi chiusi.
+- **Profilo come il riferimento**: avatar con le iniziali, "Modifica il
+  profilo" (nickname + adesione classifica, migrazione
+  2026-08-10-profilo-e-classifica applicata sul Supabase vero con
+  vincolo formato e unicità), riquadro "Fai controllare un volo a chi
+  ami" (Share nativo), voci con icona e sottotitolo.
+- **Il biglietto**: CardVolo è una carta d'imbarco con strappo, fori,
+  tratta grande e codice a barre derivato dal numero del volo.
+- **POLAR.md**: la ricerca completa su Polar (agosto 2026). Tariffa nuove
+  organizzazioni 5% + 50 cent; verifica prima del primo bonifico, fino a
+  14 giorni, vendite MAI ferme; ⚠️ vietati i "servizi umani" e la
+  consulenza: prima di tutto farsi approvare il caso d'uso per iscritto
+  dal supporto (testo pronto nel documento).
 - **Il motore EU261 decide, l'AI mai**: `lib/regole/eu261.ts`, versione
   2026.08.3, tre stati (idoneo · incerto: MAI vendere · non idoneo).
   Dal giro #26: senza quality "Live" sull'arrivo NESSUN verdetto (una stima
