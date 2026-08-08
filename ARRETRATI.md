@@ -206,6 +206,16 @@ non altro codice.**
 | 93 | **"Voglio vedere l'app come uno sviluppatore serio, col mockup del telefono"** | La cornice iPhone della tua immagine è il simulatore iOS, che su Windows non esiste (Apple lo dà solo su Mac). Le due strade vere: `F12` → `Ctrl+Shift+M` nel browser (misure del telefono in 2 secondi, è quello che usano gli sviluppatori web) oppure l'emulatore Android di Android Studio, che ha la cornice vera. Entrambe nella guida. |
 | 94 | **Il check dell'app diceva "sei offline" pur avendo rete** | Trovato provando davvero: mancavano gli header CORS su `/api/verifica`, e il browser bloccava la risposta. Aggiunti (più la risposta al preflight OPTIONS). Verificato con preflight e POST: 204 e 200 con gli header giusti. |
 
+## ✅ CHIUSI l'8/08 notte — diciannovesimo giro: le tab, il deep scan, il motore spiegato
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 95 | **"Procedi col prossimo pezzo: le tab e le pratiche"** | Fatto, e con la pulizia vera: tre tab (Controlla, Pratiche, Profilo), nessuna protetta, il check è la prima cosa che si vede e funziona senza account. Pratiche invita a entrare invece di sbattere un muro. Profilo riscritto (prima erano crediti e ore di auto del prodotto viaggi): chi sei, sito, supporto, privacy, condizioni. CANCELLATI onboarding viaggi, registrazione viaggi, destinazioni, ricerche e il motore punteggio: dell'app vecchia non resta niente. |
+| 96 | **"Rendi lo scan più realistico, un deep scan da almeno 15 secondi"** | L'analisi ora dura ~16 secondi e racconta SEI passi veri (archivi di volo, orario certificato, distanza della tratta, scioperi del giorno, confronto orari, regolamento), ognuno col suo dettaglio sotto e una barra che si riempie a passo chiuso. La sequenza non si taglia mai, nemmeno se il server risponde subito: si va al verdetto quando sono finiti sia il lavoro sia il racconto. Se invece c'è un errore si torna subito al campo: far aspettare chi deve correggere sarebbe cattiveria. |
+| 97 | **"Non ho capito come vedere l'app e il mockup del telefono"** | Guida riscritta con in cima il blocco "in due minuti": sei comandi copia-incolla, uno alla volta, coi percorsi veri. E la vista telefono: `F12` poi `Ctrl+Shift+M`. |
+| 98 | **"Segnati che non sono tecnico e devi spiegare più facile"** | Scritto in CLAUDE.md, sezione "Come parlare a Valerio": zero gergo senza traduzione, comandi uno alla volta col percorso giusto (mai segnaposto), prima cosa succede e poi perché, e se una cosa su Windows non si può dirlo subito con l'alternativa. |
+| 99 | **"Il motore dietro le quinte cosa fa? Usa tutte le API?"** | Spiegato in chat passo per passo con FR4001: il check usa AeroDataBox (dati del volo), la cache Supabase, la tabella scioperi e il motore di regole. NON usa Mistral (OCR: solo dopo il pagamento, dentro la pratica), NON usa Open-Meteo (spento, serve il piano a pagamento) e NON usa più AviationStack. |
+
 ## ⏳ ANCORA DA FARE
 
 ### LA MEGA TO DO (dall'audit dei prompt, 8/08 notte)

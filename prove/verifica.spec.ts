@@ -45,8 +45,9 @@ test.describe("Il check dalla home", () => {
     page,
   }) => {
     await compilaECont(page, idoneo250.voloIata);
-    // il teatro onesto dura 8-10 secondi prima di navigare (SPEC §3)
-    await page.waitForURL(/\/verifica\//, { timeout: 30_000 });
+    /* L'analisi profonda dura ~16 secondi prima di navigare (scelta di
+       Valerio dell'8/08: sei passi da 2,4s piu la pausa del timbro). */
+    await page.waitForURL(/\/verifica\//, { timeout: 45_000 });
     // il contatore si posa sull'importo pieno della fascia
     await expect(page.getByText("250€", { exact: true }).first()).toBeVisible({
       timeout: 10_000,
@@ -57,7 +58,7 @@ test.describe("Il check dalla home", () => {
 
   test("volo demo non idoneo: risposta chiara, senza vendita", async ({ page }) => {
     await compilaECont(page, nonIdoneoPerUnMinuto.voloIata);
-    await page.waitForURL(/\/verifica\//, { timeout: 30_000 });
+    await page.waitForURL(/\/verifica\//, { timeout: 45_000 });
     await expect(page.getByText(COPY.risultato.nonIdoneo.titolo).first()).toBeVisible();
     // il dato mostrato: 179 minuti sono 2h59
     await expect(page.getByText(/2h59/).first()).toBeVisible();

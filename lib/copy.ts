@@ -123,11 +123,29 @@ export const COPY = {
     ],
     /** I 3 passi mostrati durante il check: avanzamento REALE, mai finto. */
     verifica: {
-      titolo: "Cosa succede durante il check",
+      titolo: "Analisi in corso",
+      /**
+       * I 6 passi VERI dell'analisi (SPEC §4, gli strati di
+       * lib/voli/verifica.ts). Nessuno è decorativo: ognuno racconta un
+       * lavoro che il server fa davvero, e i primi non si accendono prima
+       * che quel lavoro sia partito.
+       */
       passi: [
-        "Cerco il volo negli archivi",
+        "Cerco il volo negli archivi di volo",
+        "Leggo l'orario di atterraggio certificato",
+        "Calcolo la distanza reale della tratta",
+        "Controllo scioperi e circostanze note del giorno",
         "Confronto orario previsto e orario effettivo",
         "Applico il Regolamento CE 261/2004",
+      ],
+      /** Quello che scorre sotto i passi: dettagli veri, non numeri finti. */
+      dettagli: [
+        "Interrogo il tracciamento del volo",
+        "Verifico che l'orario sia confermato, non stimato",
+        "Distanza ortodromica fra i due aeroporti",
+        "Incrocio la tabella scioperi del trasporto aereo",
+        "Ritardo all'arrivo, al minuto",
+        "Articoli 5, 6 e 7 del Regolamento",
       ],
       nota: "Ogni passo è reale: interroghiamo davvero i dati del volo. Se non li troviamo, te lo diciamo.",
     },

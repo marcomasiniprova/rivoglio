@@ -1,5 +1,32 @@
 # Vedere l'app di Rivoglio dal PC Windows
 
+## In due minuti, se hai già fatto tutto una volta
+
+Apri PowerShell e incolla queste righe una alla volta:
+
+```powershell
+cd $HOME\rivoglio
+```
+```powershell
+git pull
+```
+```powershell
+cd $HOME\rivoglio\mobile
+```
+```powershell
+npm install
+```
+```powershell
+$env:BROWSER="none"
+```
+```powershell
+npx expo start --web
+```
+
+Poi apri <http://localhost:8081>, premi `F12` e `Ctrl + Shift + M` per la
+vista telefono. **Non toccare più la finestra nera** mentre guardi.
+
+
 Guida passo passo per Valerio, riscritta l'8/08 dopo il primo tentativo.
 Tutto quello che serve è gratuito.
 

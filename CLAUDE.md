@@ -54,6 +54,18 @@ operativo" in fondo: lì una volta sola, qui niente doppioni.*
 6. **Fine sessione:** aggiorna `STATO.md`, `PIANO.md` e `ARRETRATI.md`, verify,
    committa.
 
+## Come parlare a Valerio (regola sua, 8/08)
+Valerio NON è tecnico e non deve diventarlo. Quindi:
+- **Zero gergo senza traduzione.** Se serve una parola tecnica, spiegala
+  in mezza riga con un paragone concreto.
+- **I comandi si danno uno alla volta**, in un riquadro, col percorso già
+  giusto: mai segnaposto tipo `C:\percorso\della\cartella`. E si dice
+  sempre dove si incolla (PowerShell) e cosa deve succedere dopo.
+- **Prima cosa succede, poi perché.** Il risultato in cima, la spiegazione
+  sotto, e solo se serve.
+- Quando qualcosa non si può fare sul suo PC (Windows), dirlo subito e
+  dare l'alternativa che funziona, non la teoria.
+
 ## Come si scrive (ogni parola che vede l'utente)
 Dai del tu, ma **professionale, non da amici al bar**. Frasi corte, zero gergo,
 zero superlativi. **MAI il trattino lungo (—): è il segno più riconoscibile del

@@ -75,7 +75,7 @@ export default function SchermataVerdetto() {
     <ScrollView style={stili.pagina} contentContainerStyle={stili.contenuto}>
       <View style={stili.testata}>
         <Image
-          source={require("../../../assets/images/marchio.png")}
+          source={require("../../assets/images/marchio.png")}
           style={stili.segno}
           accessibilityLabel="Rivoglio"
         />

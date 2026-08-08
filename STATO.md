@@ -84,16 +84,17 @@ social rifatta (era rimasta al prodotto viaggi).
 - **La web app è APERTA A TUTTI dall'8/08** (decisione di Valerio, ribaltata
   la scelta del pivot): `/app` senza account col check libero (CheckRapido),
   link "Entra" in nav e "La web app" nel footer. `/admin` resta chiuso.
-- **Mobile, primo pezzo di Rivoglio fatto (8/08)**: la schermata di
-  apertura non è più l'onboarding viaggi ma **il check del volo**, con
-  logo, colori e testi di Rivoglio, senza account come sul web; il
-  verdetto ha una schermata sua coi tre esiti, orari, ritardo e fascia.
+- **L'APP MOBILE È RIVOGLIO (8/08, due giri)**: niente più tracce del
+  prodotto viaggi. Tre tab: **Controlla** (il check, prima schermata),
+  **Pratiche**, **Profilo**. Nessuna tab è protetta: il check funziona
+  senza account, come sul sito; le pratiche invitano a entrare invece di
+  sbattere un muro. Il verdetto ha la sua schermata coi tre esiti.
   Il motore NON è duplicato: `mobile/src/lib/api.ts` chiama la stessa
-  `/api/verifica` del sito (con EXPO_PUBLIC_SITO si punta al server
-  locale in sviluppo). Provato end-to-end nell'anteprima web.
-  **RESTANO al prodotto viaggi**: le tab (pratiche, profilo), le
-  schermate registrati/aggancio/criteri/valore/avvisi, `destinazione/[id]`
-  e `ricerca/nuova`, più `src/motore/` (punteggio viaggi). Prossimo pezzo.
+  `/api/verifica` del sito (EXPO_PUBLIC_SITO punta al server locale in
+  sviluppo). CANCELLATI: onboarding viaggi, registrati, destinazioni,
+  ricerche, `src/motore/` (punteggio viaggi), tipi e componenti relativi.
+  Prove: tipi puliti e 4 prove nuove sul campo data (l'unico punto dove
+  un testo diventa un dato per il motore).
 - **CORS sul check (8/08)**: `/api/verifica` risponde con
   Access-Control-Allow-Origin *. Serve all'app: senza, il browser blocca
   la risposta e l'app dice "sei offline" pur avendo rete.

@@ -30,6 +30,18 @@ type Fase = "campo" | "teatro";
 
 const attesa = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * L'ANALISI PROFONDA (scelta di Valerio, 8/08): il check non deve
+ * sembrare un giochino da mezzo secondo, perché non lo è: dietro ci sono
+ * l'interrogazione degli archivi di volo, la distanza della tratta, la
+ * tabella scioperi e il regolamento. I sei passi scorrono con questo
+ * ritmo e la sequenza non si taglia MAI, nemmeno se il server risponde
+ * subito: si va al verdetto solo quando entrambe le cose sono finite,
+ * il lavoro vero e il racconto.
+ */
+const PASSO_MS = 2400;
+const PAUSA_FINALE_MS = 900;
+
 /** Spezza il titolo per dare il corsivo alla parte finale, senza duplicare il testo in COPY. */
 function spezzaTitolo(titolo: string, taglio: string): [string, string] {
   const i = titolo.indexOf(taglio);
@@ -100,6 +112,19 @@ export default function HeroCheck() {
     setFase("teatro");
     setPasso(0); // passo 1 acceso: la richiesta è DAVVERO in volo
 
+    /* La sequenza dei passi parte SUBITO e vive per conto suo: la
+       richiesta al server corre in parallelo. Alla fine si aspettano a
+       vicenda (vedi sotto), così nessuno dei due viene tagliato. */
+    const sequenza = (async () => {
+      for (let i = 1; i < TEATRO.passi.length; i++) {
+        await attesa(PASSO_MS);
+        setPasso(i);
+      }
+      await attesa(PASSO_MS);
+      setPasso(TEATRO.passi.length); // tutti fatti: scatta il timbro
+      await attesa(PAUSA_FINALE_MS);
+    })();
+
     try {
       const r = await fetch("/api/verifica", {
         method: "POST",
@@ -109,6 +134,8 @@ export default function HeroCheck() {
       const dati = await r.json().catch(() => null);
 
       if (!r.ok || !dati?.ok) {
+        /* Un errore non fa aspettare: si torna subito al campo. Il
+           racconto serve mentre si lavora, non a chi deve correggere. */
         setFase("campo");
         setErrore(
           typeof dati?.errore === "string" ? dati.errore : COPY.comune.erroreGenerico,
@@ -138,17 +165,10 @@ export default function HeroCheck() {
         return;
       }
 
-      /* La risposta c'è: confronto orari e calcolo sono stati fatti davvero.
-         Si mostrano completati in sequenza, il tempo di leggerli, il timbro
-         chiude la carta, poi si va al risultato. Nessun passo si accende
-         prima del lavoro che racconta. */
-      await attesa(650);
-      setPasso(1);
-      await attesa(650);
-      setPasso(2);
-      await attesa(650);
-      setPasso(3);
-      await attesa(750);
+      /* Il verdetto c'è. Si aspetta che anche l'analisi finisca di
+         raccontarsi: chi arriva al risultato deve aver visto tutti i
+         passi, non un lampo. */
+      await sequenza;
       /* il verdetto sa che la scansione c'è già stata qui */
       sessionStorage.setItem("rivoglio-scan-fatto", "1");
       router.push(destinazione);
@@ -356,27 +376,48 @@ export default function HeroCheck() {
                    completato. Il teatro resta onesto: i passi avanzano con
                    lo stato vero della richiesta, qui cambia solo la scena. */
                 <div aria-live="polite" className="py-1">
-                  <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-fumo">
-                    {TEATRO.titolo}
-                  </p>
+                  <div className="flex items-baseline justify-between gap-4">
+                    <p className="text-[13px] font-medium uppercase tracking-[0.14em] text-fumo">
+                      {TEATRO.titolo}
+                    </p>
+                    {/* L'avanzamento: quanti passi sono chiusi sul totale.
+                        Una percentuale finta salirebbe anche a server fermo. */}
+                    <p className="numeri text-[13px] font-medium text-verde-scuro">
+                      {Math.min(passo, TEATRO.passi.length)}/{TEATRO.passi.length}
+                    </p>
+                  </div>
 
-                  {/* la carta d'imbarco sotto scansione, coi dati veri */}
+                  {/* la barra: si riempie a passo chiuso, non a caso */}
+                  <div className="mt-2 h-1 overflow-hidden rounded-full bg-bordo">
+                    <motion.div
+                      className="h-full rounded-full bg-verde"
+                      initial={{ width: "0%" }}
+                      animate={{
+                        width: `${(Math.min(passo, TEATRO.passi.length) / TEATRO.passi.length) * 100}%`,
+                      }}
+                      transition={{ duration: 0.8, ease: CURVA }}
+                    />
+                  </div>
+
+                  {/* la carta d'imbarco sotto scansione, coi dati veri.
+                      I 6 passi diventano i 4 stati della carta: si legge il
+                      volo, poi gli orari, e alla fine arriva il timbro. */}
                   <div className="mt-4">
                     <CartaImbarcoScan
                       volo={volo.trim().toUpperCase()}
                       dataTesto={data}
-                      passo={passo}
+                      passo={Math.min(3, Math.floor(passo / 2))}
                     />
                   </div>
 
-                  <ol className="mt-4 space-y-3.5">
+                  <ol className="mt-4 space-y-3">
                     {TEATRO.passi.map((testo, i) => {
                       const fatto = i < passo;
                       const attivo = i === passo;
                       return (
-                        <li key={testo} className="flex items-center gap-3.5">
+                        <li key={testo} className="flex items-start gap-3.5">
                           <span
-                            className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${
+                            className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${
                               fatto
                                 ? "border-verde bg-verde text-white"
                                 : attivo
@@ -405,12 +446,30 @@ export default function HeroCheck() {
                               <span className="h-2.5 w-2.5 rounded-full bg-bordo" />
                             )}
                           </span>
-                          <span
-                            className={`text-[15.5px] transition-colors duration-300 ${
-                              fatto || attivo ? "font-medium text-inchiostro" : "text-fumo-2"
-                            }`}
-                          >
-                            {testo}
+                          <span className="min-w-0">
+                            <span
+                              className={`block text-[15.5px] transition-colors duration-300 ${
+                                fatto || attivo ? "font-medium text-inchiostro" : "text-fumo-2"
+                              }`}
+                            >
+                              {testo}
+                            </span>
+                            {/* Il dettaglio compare SOLO sul passo in corso:
+                                dice cosa sta facendo il server proprio ora. */}
+                            <AnimatePresence initial={false}>
+                              {attivo && TEATRO.dettagli[i] && (
+                                <motion.span
+                                  key="dettaglio"
+                                  initial={{ opacity: 0, y: -3 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0 }}
+                                  transition={{ duration: 0.35 }}
+                                  className="mt-0.5 block text-[13px] leading-snug text-fumo"
+                                >
+                                  {TEATRO.dettagli[i]}
+                                </motion.span>
+                              )}
+                            </AnimatePresence>
                           </span>
                         </li>
                       );

@@ -13,9 +13,6 @@ export function euro(n: number, decimali = 0): string {
   return (dec ? `${conPunti},${dec}` : conPunti) + "€";
 }
 
-/** 2.35 -> "2h21". Le ore di viaggio non si mostrano mai in decimali. */
-export { oreLeggibili } from "../motore/viaggio";
-
 /** "2026-08-14" -> "ven 14 ago" */
 export function dataBreve(iso: string): string {
   const d = new Date(iso + "T12:00:00");

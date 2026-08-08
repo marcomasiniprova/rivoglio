@@ -1,7 +1,11 @@
 /**
  * La radice dell'app: carica i caratteri del marchio, monta la sessione e
- * smista. Senza utente si va in (benvenuto), con utente in (tabs): sono le
- * guardie dello Stack a fare il reindirizzamento, in entrambe le direzioni.
+ * apre sulle tab.
+ *
+ * Regola di prodotto (uguale al sito, 8/08): il check è APERTO A TUTTI.
+ * Niente muro di registrazione all'avvio: si entra, si controlla un volo e
+ * si vede il verdetto senza account. L'accesso serve solo per seguire le
+ * pratiche, e lo chiede la schermata che ne ha bisogno.
  */
 import { useEffect } from "react";
 import { Geist_500Medium } from "@expo-google-fonts/geist";
@@ -23,7 +27,7 @@ import { COLORI } from "@/lib/tema";
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function Smistamento({ fontiPronte }: { fontiPronte: boolean }) {
-  const { utente, pronto } = useSessione();
+  const { pronto } = useSessione();
   const tuttoPronto = fontiPronte && pronto;
 
   useEffect(() => {
@@ -40,14 +44,9 @@ function Smistamento({ fontiPronte }: { fontiPronte: boolean }) {
         contentStyle: { backgroundColor: COLORI.nebbia },
       }}
     >
-      <Stack.Protected guard={!utente}>
-        <Stack.Screen name="(benvenuto)" />
-      </Stack.Protected>
-      <Stack.Protected guard={!!utente}>
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="destinazione/[id]" />
-        <Stack.Screen name="ricerca/nuova" options={{ presentation: "modal" }} />
-      </Stack.Protected>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="verdetto" />
+      <Stack.Screen name="accesso" options={{ presentation: "modal" }} />
     </Stack>
   );
 }

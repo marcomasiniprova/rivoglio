@@ -78,6 +78,7 @@ export const TESTI = {
     // Etichetta di accessibilità dell'avanzamento: {passo} e {totale} sono numeri.
     passoDi: "Passo {passo} di {totale}",
     tab: {
+      controlla: "Controlla",
       pratiche: "Pratiche",
       profilo: "Profilo",
     },
@@ -153,6 +154,47 @@ export const TESTI = {
 
   // `campi` e `validazione` li usa anche il passo registrati dell'onboarding:
   // stessi moduli, stesse parole.
+  /* ---- il profilo dell'app (riscritto per Rivoglio, 8/08) ---- */
+  profiloApp: {
+    titolo: { prima: "Il tuo", corsivo: "profilo." },
+    entratoCome: "Sei entrato come",
+    esci: "Esci dall'account",
+    email: "valerio@artecai.it",
+    ospite: {
+      titolo: "Non sei entrato",
+      testo:
+        "Il check dei voli funziona lo stesso. L'account serve solo a ritrovare le pratiche che hai aperto.",
+      azione: "Entra",
+    },
+    voci: {
+      sito: "Apri Rivoglio sul sito",
+      supporto: "Scrivici",
+      privacy: "Privacy",
+      condizioni: "Condizioni d'uso",
+    },
+    piede:
+      "Rivoglio non è un intermediario: prepara i documenti, il reclamo lo invii tu e la compensazione arriva a te.",
+  },
+
+  /* ---- accesso e registrazione dell'app (schermata unica, 8/08) ---- */
+  accessoApp: {
+    entra: {
+      titolo: { prima: "Entra nel tuo", corsivo: "account." },
+      testo: "Serve solo per seguire le pratiche. Il check dei voli resta libero.",
+      bottone: "Entra",
+    },
+    registra: {
+      titolo: { prima: "Crea il tuo", corsivo: "account." },
+      testo: "Email e password, nient'altro. Serve per ritrovare le tue pratiche.",
+      bottone: "Crea l'account",
+    },
+    email: "Email",
+    password: "Password",
+    errori: { campiVuoti: "Scrivi email e password." },
+    nonHaiAccount: "Non ho un account",
+    haiAccount: "Ho già un account",
+  },
+
   accesso: {
     titolo: { prima: "Entra nel tuo", corsivo: "account." },
     sottotitolo: "Email e password con cui ti sei registrato.",
@@ -203,6 +245,13 @@ export const TESTI = {
       testo:
         "Si parte sempre dal check, sul sito: numero di volo e data, gratis. Se il volo rientra in una fascia, da lì apri la pratica e la segui qui.",
       azione: "Controlla un volo sul sito",
+    },
+    /** Chi non è entrato: il check resta libero, le pratiche no. */
+    ospite: {
+      titolo: "Qui trovi le tue pratiche.",
+      testo:
+        "Il check dei voli è libero e non serve l'account. L'account serve solo per ritrovare le pratiche che hai aperto e vedere a che punto sono.",
+      azione: "Entra",
     },
     errore: "Non riesco a leggere le tue pratiche. Riprova fra qualche minuto.",
   },

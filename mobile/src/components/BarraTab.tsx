@@ -8,8 +8,8 @@ type NomeIcona = ComponentProps<typeof Feather>["name"];
 
 /** Un'icona per rotta del gruppo (tabs). Le etichette arrivano dalle opzioni. */
 const ICONE: Record<string, NomeIcona> = {
-  index: "map-pin",
-  ricerche: "sliders",
+  index: "search",
+  pratiche: "file-text",
   profilo: "user",
 };
 

@@ -14,6 +14,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
+  /* Il check racconta l'analisi per ~16 secondi prima di dare il verdetto
+     (scelta di Valerio, 8/08): i 30 secondi di serie non bastano più. */
+  timeout: 90_000,
   reporter: [["list"], ["html", { outputFolder: "prove/report", open: "never" }]],
 
   use: {
