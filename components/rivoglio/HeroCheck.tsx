@@ -352,7 +352,19 @@ export default function HeroCheck() {
                         max={maxData}
                         value={data}
                         onChange={(e) => setData(e.target.value)}
-                        className="h-14 w-full min-w-0 rounded-bottone border border-bordo bg-white px-4 text-[16px] text-inchiostro outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/12"
+                        /* Il calendario si apre toccando TUTTO il campo,
+                           non solo l'iconcina: senza, su Chrome e Edge il
+                           click sul campo sembrava morto (visto da
+                           Valerio l'8/08). Safari non ha showPicker: il
+                           try lo lascia al suo comportamento nativo. */
+                        onClick={(e) => {
+                          try {
+                            e.currentTarget.showPicker();
+                          } catch {
+                            /* niente: il browser fa da sé */
+                          }
+                        }}
+                        className="h-14 w-full min-w-0 cursor-pointer rounded-bottone border border-bordo bg-white px-4 text-[16px] text-inchiostro outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/12"
                       />
                       <p className="text-[12px] leading-snug text-fumo">
                         {HERO.form.data.aiuto}

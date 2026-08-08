@@ -37,12 +37,14 @@ export async function POST(req: Request) {
     );
   }
 
-  /* L'email di benvenuto parte DOPO il salvataggio e senza bloccare la
-     risposta. Se Resend è giù, l'iscritto resta salvato lo stesso: perdere
-     un indirizzo perché la posta non funziona sarebbe assurdo. */
-  void benvenutoLista(pulita, (comune ?? "").trim() || null).then((e) => {
-    if (!e.ok) console.warn("[iscriviti] benvenuto non spedito:", e.motivo);
-  });
+  /* L'email di benvenuto si ASPETTA prima di rispondere. Non è pignoleria:
+     su Netlify la funzione viene congelata nell'istante in cui risponde,
+     e un invio lanciato senza await muore lì. È il motivo per cui la
+     newsletter "funzionava" senza che arrivasse mai niente (trovato l'8/08
+     col test di Valerio). Se Resend fallisce, l'iscritto resta salvato e
+     la risposta lo dice, senza fingere. */
+  const invio = await benvenutoLista(pulita, (comune ?? "").trim() || null);
+  if (!invio.ok) console.warn("[iscriviti] benvenuto non spedito:", invio.motivo);
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, email: invio.ok });
 }

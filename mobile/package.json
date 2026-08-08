@@ -53,7 +53,7 @@
     "lint": "expo lint",
     "tipi": "tsc --noEmit",
     "prove": "jest",
-    "anteprima": "expo export --platform web --output-dir ../public/app-anteprima"
+    "anteprima": "expo export --platform web --output-dir ../public/app-anteprima && node ../scripts/appiattisci-anteprima.mjs"
   },
   "private": true,
   "jest": {

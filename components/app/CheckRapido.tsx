@@ -114,7 +114,15 @@ export default function CheckRapido() {
             min={minData}
             max={maxData}
             onChange={(e) => setData(e.target.value)}
-            className="mt-2 block h-13 w-full appearance-none rounded-bottone border border-bordo bg-white px-4 text-[16px] outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/10"
+            // Come nell'hero: il calendario si apre toccando tutto il campo.
+            onClick={(e) => {
+              try {
+                e.currentTarget.showPicker();
+              } catch {
+                /* niente: il browser fa da sé */
+              }
+            }}
+            className="mt-2 block h-13 w-full cursor-pointer appearance-none rounded-bottone border border-bordo bg-white px-4 text-[16px] outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/10"
           />
         </div>
         <button
