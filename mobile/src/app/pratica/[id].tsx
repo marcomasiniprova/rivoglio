@@ -17,12 +17,12 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
-  Share,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
+import { condividi as condividiApp } from "@/lib/sistema";
 import { Feather } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
@@ -152,11 +152,10 @@ export default function SchermataPratica() {
 
   async function condividi() {
     if (!scheda?.lettera) return;
-    try {
-      await Share.share({ message: `${scheda.lettera.oggetto}\n\n${scheda.lettera.corpo}` });
-    } catch (e) {
-      console.warn("[pratica] condivisione fallita:", e);
-    }
+    /* Sul web `Share` non esiste: condividiApp ripiega su Web Share e poi
+       sugli appunti, così il tasto risponde sempre a qualcosa. */
+    const avviso = await condividiApp(`${scheda.lettera.oggetto}\n\n${scheda.lettera.corpo}`);
+    if (avviso) setMessaggio(avviso);
   }
 
   async function hoInviato() {

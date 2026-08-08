@@ -98,7 +98,7 @@ export default function Footer() {
                 non l'immagine) e il telefono è al centro ottico della tela. */}
             <div className="relative flex items-end justify-center overflow-hidden pt-4 md:pt-8">
               <Image
-                src="/telefono-app.png"
+                src="/telefono-app.webp"
                 alt={F.cartolina.altTelefono}
                 width={940}
                 height={917}
@@ -119,47 +119,59 @@ export default function Footer() {
             </Link>
             <p className="mt-5 text-[14.5px] leading-relaxed">{F.frase}</p>
 
-            {/* I badge degli store sono inerti finché l'app non c'è davvero:
-                vedi BadgeStore.tsx. Qui l'app è il tracker della pratica. */}
-            <div className="mt-7">
-              <p className="text-[13.5px] font-medium text-white/65">{F.app.titolo}</p>
+            {/* DUE BLOCCHI SEPARATI, non una fila sola di riquadri uguali.
+                Store e social chiedono due cose diverse ("scarica" e
+                "seguici") e prima si leggevano come un blocco unico di
+                sei bottoni gemelli. Ora: gli store in un riquadro con la
+                sua riga di titolo, i social come cerchi sotto una riga
+                divisoria. Forma diversa = gerarchia leggibile. */}
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+              <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-menta/60">
+                {F.app.titolo}
+              </p>
               <div className="mt-3">
                 <BadgeStore />
               </div>
             </div>
 
-            <div className="mt-6 flex gap-2.5">
-              {SOCIAL.map((s) => (
-                <a
-                  key={s.nome}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.nome}
-                  className="grid size-10 place-items-center rounded-xl border border-white/12 bg-white/6 text-white/70 transition-all duration-300 hover:-translate-y-0.5 hover:border-menta/40 hover:bg-menta/12 hover:text-menta"
-                >
-                  <svg viewBox="0 0 24 24" className="size-[18px]" aria-hidden="true">
-                    {s.d && <path d={s.d} fill="currentColor" />}
-                    {s.contorno && (
-                      <path
-                        d={s.contorno}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                      />
-                    )}
-                    {s.cerchio && (
-                      <circle
-                        {...s.cerchio}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                      />
-                    )}
-                    {s.punto && <circle {...s.punto} fill="currentColor" />}
-                  </svg>
-                </a>
-              ))}
+            <div className="mt-7 border-t border-white/10 pt-6">
+              <p className="text-[12px] font-medium uppercase tracking-[0.16em] text-white/35">
+                {F.social.titolo}
+              </p>
+              <div className="mt-3.5 flex gap-3">
+                {SOCIAL.map((s) => (
+                  <a
+                    key={s.nome}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.nome}
+                    title={s.nome}
+                    className="grid size-9 place-items-center rounded-full border border-white/12 text-white/60 transition-all duration-300 hover:-translate-y-0.5 hover:border-menta/50 hover:text-menta"
+                  >
+                    <svg viewBox="0 0 24 24" className="size-[17px]" aria-hidden="true">
+                      {s.d && <path d={s.d} fill="currentColor" />}
+                      {s.contorno && (
+                        <path
+                          d={s.contorno}
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        />
+                      )}
+                      {s.cerchio && (
+                        <circle
+                          {...s.cerchio}
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        />
+                      )}
+                      {s.punto && <circle {...s.punto} fill="currentColor" />}
+                    </svg>
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
 

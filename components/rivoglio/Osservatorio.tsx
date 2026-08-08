@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { COPY } from "@/lib/copy";
+import { monumentoDi } from "./Monumenti";
 
 /**
  * L'Osservatorio dei Disservizi: la newsletter settimanale generata dai
@@ -42,6 +43,24 @@ const riempi = (modello: string, valori: Record<string, string>) =>
 const coloreIndice = (indice: number) =>
   indice < 1 ? "text-menta" : indice < 2.5 ? "text-sole" : "text-red-400";
 
+/** Lo stesso semaforo, per l'alone dietro al monumento. */
+const aloneIndice = (indice: number) =>
+  indice < 1 ? "bg-menta/25" : indice < 2.5 ? "bg-sole/25" : "bg-red-400/25";
+
+/** In parole: il numero da solo non dice se 2,2 è tanto o poco. */
+const giudizio = (indice: number) =>
+  indice < 1
+    ? SEZIONE.ritardi.giudizi.calmo
+    : indice < 2.5
+      ? SEZIONE.ritardi.giudizi.qualcheRitardo
+      : SEZIONE.ritardi.giudizi.giornataStorta;
+
+/** "Roma Fiumicino" → città in grande, scalo sotto: così non si tronca. */
+function spezzaNome(nome: string): [string, string] {
+  const spazio = nome.indexOf(" ");
+  return spazio < 0 ? [nome, ""] : [nome.slice(0, spazio), nome.slice(spazio + 1)];
+}
+
 function StrisciaRitardi() {
   const [righe, setRighe] = useState<Ritardo[]>([]);
 
@@ -72,34 +91,74 @@ function StrisciaRitardi() {
   });
 
   return (
-    <div className="mx-auto mt-10 max-w-3xl text-left">
+    <div className="mx-auto mt-12 max-w-3xl">
       <p className="text-center text-[12.5px] font-medium uppercase tracking-[0.18em] text-menta/70">
         {SEZIONE.ritardi.titolo}
       </p>
-      <ul className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-        {conIndice.map((r) => (
-          <li key={r.iata} className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3.5">
-            <p className="truncate text-[13px] font-medium text-white/75">{r.nome}</p>
-            <p
-              className={`numeri mt-1.5 font-display text-[26px] font-medium leading-none tracking-[-0.03em] ${coloreIndice(r.indice ?? 0)}`}
+      <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {conIndice.map((r) => {
+          const indice = r.indice ?? 0;
+          const Monumento = monumentoDi(r.iata);
+          const [citta, scalo] = spezzaNome(r.nome);
+          /* Le tacche piene: l'indice si legge senza leggere il numero. */
+          const tacche = Math.max(1, Math.round(indice));
+          return (
+            <li
+              key={r.iata}
+              /* fondo pieno, non trasparente: sotto passa l'alone verde
+                 della sezione e il testo chiaro ci spariva dentro */
+              className="relative overflow-hidden rounded-[1.3rem] border border-white/12 bg-verde-notte/85 px-4 pb-4 pt-5 text-center backdrop-blur-sm"
             >
-              {(r.indice ?? 0).toLocaleString("it-IT", { maximumFractionDigits: 1 })}
-              <span className="ml-1.5 align-middle text-[10.5px] font-sans font-medium uppercase tracking-[0.08em] text-white/40">
-                / 5
-              </span>
-            </p>
-            <p className="numeri mt-1 text-[11.5px] text-white/45">
-              {r.medianaMinuti !== null
-                ? riempi(SEZIONE.ritardi.medianaTemplate, { minuti: String(r.medianaMinuti) })
-                : SEZIONE.ritardi.indiceEtichetta}
-              {r.cancellati !== null && r.cancellati > 0
-                ? ` · ${riempi(SEZIONE.ritardi.cancellatiTemplate, { n: String(r.cancellati) })}`
-                : ""}
-            </p>
-          </li>
-        ))}
+              {/* il monumento sul suo alone, del colore della giornata */}
+              <div className="relative mx-auto grid h-[62px] w-[62px] place-items-center">
+                <span
+                  aria-hidden="true"
+                  className={`absolute inset-0 rounded-full blur-[14px] ${aloneIndice(indice)}`}
+                />
+                <Monumento className={`relative h-[54px] w-[54px] ${coloreIndice(indice)}`} />
+              </div>
+
+              <p className="mt-3 font-display text-[15px] font-medium leading-tight tracking-[-0.02em] text-white">
+                {citta}
+              </p>
+              {scalo && <p className="text-[11.5px] leading-tight text-white/45">{scalo}</p>}
+
+              <p
+                className={`numeri mt-2.5 font-display text-[30px] font-medium leading-none tracking-[-0.03em] ${coloreIndice(indice)}`}
+              >
+                {indice.toLocaleString("it-IT", { maximumFractionDigits: 1 })}
+                <span className="ml-1 align-middle font-sans text-[10.5px] font-medium uppercase tracking-[0.08em] text-white/40">
+                  / 5
+                </span>
+              </p>
+
+              <div aria-hidden="true" className="mt-2.5 flex justify-center gap-1">
+                {[1, 2, 3, 4, 5].map((t) => (
+                  <span
+                    key={t}
+                    className={`h-1 w-[9px] rounded-full ${
+                      t <= tacche ? `${coloreIndice(indice)} bg-current` : "bg-white/15"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <p className="mt-2.5 text-[11.5px] font-medium leading-tight text-white/70">
+                {giudizio(indice)}
+              </p>
+              <p className="numeri mt-1 text-[11px] leading-tight text-white/45">
+                {r.medianaMinuti !== null
+                  ? riempi(SEZIONE.ritardi.medianaTemplate, { minuti: String(r.medianaMinuti) })
+                  : SEZIONE.ritardi.indiceEtichetta}
+                {r.cancellati !== null && r.cancellati > 0
+                  ? ` · ${riempi(SEZIONE.ritardi.cancellatiTemplate, { n: String(r.cancellati) })}`
+                  : ""}
+              </p>
+            </li>
+          );
+        })}
       </ul>
-      <p className="mt-3 text-center text-[12px] leading-relaxed text-white/40">
+      <p className="mt-4 text-center text-[12px] leading-relaxed text-white/55">
         {SEZIONE.ritardi.nota} {riempi(SEZIONE.ritardi.rilevatoTemplate, { quando: rilevatoIl })}.
       </p>
     </div>
@@ -142,7 +201,11 @@ export default function Osservatorio() {
       <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-[2rem] bg-verde-notte px-6 py-16 text-center text-white sm:px-14 sm:py-24">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-40 left-1/2 h-[460px] w-[760px] -translate-x-1/2 rounded-full opacity-25 blur-[100px]"
+          /* L'alone stava a opacità 25 e su telefono copriva la metà
+             bassa della sezione: il testo chiaro ci diventava invisibile.
+             Ora è tenue e non arriva alle card, che hanno comunque un
+             fondo pieno per non dipendere da lui. */
+          className="pointer-events-none absolute -bottom-72 left-1/2 h-[240px] w-[440px] -translate-x-1/2 rounded-full opacity-[0.10] blur-[120px] sm:h-[320px] sm:w-[640px]"
           style={{
             background: "var(--color-menta)",
             animation: "respiro 12s ease-in-out infinite",

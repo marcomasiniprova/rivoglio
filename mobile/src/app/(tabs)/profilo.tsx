@@ -8,7 +8,7 @@
  * denaro per gli inviti (nessuna promessa che non possiamo mantenere:
  * l'invito condivide l'app e basta).
  */
-import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -19,6 +19,7 @@ import Titolo from "@/components/Titolo";
 import { SITO } from "@/lib/api";
 import { leggiProfilo } from "@/lib/profilo";
 import { esci, useSessione } from "@/lib/sessione";
+import { apriImpostazioni, condividi, scriviA } from "@/lib/sistema";
 import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
 import { TESTI } from "@/lib/testi";
 
@@ -45,6 +46,10 @@ export default function SchermataProfilo() {
   const insets = useSafeAreaInsets();
   const { utente } = useSessione();
   const [nickname, setNickname] = useState<string | null>(null);
+  /* Quando un'azione non può andare fino in fondo (il browser non ha le
+     impostazioni di sistema, la condivisione non c'è) si dice perché,
+     invece di lasciare il tasto muto. */
+  const [avviso, setAvviso] = useState<string | null>(null);
 
   /* Il nome pubblico si rilegge a ogni ritorno: se è appena stato
      cambiato in Dati personali, qui deve vedersi subito. */
@@ -59,11 +64,7 @@ export default function SchermataProfilo() {
   );
 
   async function invita() {
-    try {
-      await Share.share({ message: P.invita.messaggio });
-    } catch (e) {
-      console.warn("[profilo] condivisione fallita:", e);
-    }
+    setAvviso(await condividi(P.invita.messaggio));
   }
 
   const voci: Voce[] = [
@@ -81,7 +82,7 @@ export default function SchermataProfilo() {
       sotto: P.voci.notificheSotto,
       // Le notifiche si governano dalle impostazioni di sistema: si
       // aprono quelle, non una copia finta dentro l'app.
-      fai: () => void Linking.openSettings(),
+      fai: () => setAvviso(apriImpostazioni()),
     },
     {
       chiave: "privacy",
@@ -102,7 +103,7 @@ export default function SchermataProfilo() {
       icona: "mail",
       titolo: P.voci.supporto,
       sotto: P.voci.supportoSotto,
-      fai: () => void Linking.openURL(`mailto:${P.email}`),
+      fai: () => void scriviA(P.email).then(setAvviso),
     },
     {
       chiave: "sito",
@@ -172,7 +173,10 @@ export default function SchermataProfilo() {
         {voci.map((v, i) => (
           <Pressable
             key={v.chiave}
-            onPress={v.fai}
+            onPress={() => {
+              setAvviso(null);
+              v.fai();
+            }}
             accessibilityRole="button"
             style={[stili.voce, i < voci.length - 1 && stili.voceBordo]}
           >
@@ -187,6 +191,13 @@ export default function SchermataProfilo() {
           </Pressable>
         ))}
       </View>
+
+      {avviso && (
+        <View style={stili.avviso}>
+          <Feather name="info" size={15} color={COLORI.verdeScuro} />
+          <Text style={stili.avvisoTesto}>{avviso}</Text>
+        </View>
+      )}
 
       {utente && (
         <Bottone testo={P.esci} onPress={() => void esci()} variante="fantasma" />
@@ -306,6 +317,21 @@ const stili = StyleSheet.create({
   voceTesti: { flex: 1, minWidth: 0 },
   voceTitolo: { fontFamily: FONT.testoMedio, fontSize: 15, color: COLORI.inchiostro },
   voceSotto: { fontFamily: FONT.testo, fontSize: 12, color: COLORI.fumo2, marginTop: 1 },
+  avviso: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: SPAZIO.s,
+    backgroundColor: COLORI.mentaTenue,
+    borderRadius: RAGGIO.scheda,
+    padding: SPAZIO.m,
+  },
+  avvisoTesto: {
+    flex: 1,
+    fontFamily: FONT.testo,
+    fontSize: 13.5,
+    lineHeight: 19,
+    color: COLORI.verdeScuro,
+  },
   piede: {
     fontFamily: FONT.testo,
     fontSize: 12.5,

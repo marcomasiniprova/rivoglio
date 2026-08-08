@@ -484,9 +484,15 @@ export const COPY = {
       indiceEtichetta: "indice ritardi",
       medianaTemplate: "mediana {minuti} min",
       cancellatiTemplate: "{n} cancellati",
+      /** Il numero da solo non dice se 2,2 è tanto: queste tre parole sì. */
+      giudizi: {
+        calmo: "Si vola liscio",
+        qualcheRitardo: "Qualche ritardo",
+        giornataStorta: "Giornata storta",
+      },
       /** Ogni numero mostrato è apribile o spiegato: questa è la spiegazione. */
       nota: "Indice da 0 (tutto in orario) a 5 sugli arrivi delle ultime due ore, dal tracciamento AeroDataBox. Si aggiorna al massimo una volta al giorno.",
-      rilevatoTemplate: "Rilevato il {quando}",
+      rilevatoTemplate: "Ultima rilevazione: {quando}",
     },
   },
 
@@ -895,6 +901,9 @@ export const COPY = {
     app: {
       titolo: "L'app per seguire la pratica",
       presto: "Presto su",
+    },
+    social: {
+      titolo: "Seguici",
     },
     disclaimer:
       "Rivoglio genera documenti a partire da dati di volo verificati. Non è un intermediario, non offre consulenza legale, non incassa per conto tuo e non chiede la cessione del credito. Il reclamo lo invii tu, dalla tua email. Gli importi indicati sono le fasce del Regolamento CE 261/2004: l'esito della richiesta dipende dalla compagnia.",

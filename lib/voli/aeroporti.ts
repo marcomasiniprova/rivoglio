@@ -305,6 +305,31 @@ export function cercaAeroporti(query: string, limite = MASSIMO): AeroportoTrovat
   }));
 }
 
+/**
+ * Il nome della città come lo scrive un italiano.
+ *
+ * Il dataset (e AeroDataBox) parlano inglese: "Milan", "Rome", "Naples".
+ * Un utente italiano che legge "Palermo → Milan" pensa a un errore, e ha
+ * ragione. Qui si gira la tabella degli esonimi: dataset → italiano.
+ * Se il nome non è in tabella si restituisce identico: mai inventato.
+ */
+const IN_ITALIANO: Record<string, string> = Object.fromEntries(
+  Object.entries(ESONIMI).map(([it, en]) => [en, it]),
+);
+
+export function inItaliano(nome: string | null | undefined): string | null {
+  if (!nome) return null;
+  const italiano = IN_ITALIANO[nome.trim().toLowerCase()];
+  if (!italiano) return nome;
+  /* Le iniziali maiuscole, parola per parola: "the hague" → "L'Aia" no,
+     ma "monaco di baviera" → "Monaco Di Baviera" sarebbe brutto. Si
+     alza solo la prima lettera di ogni parola lunga. */
+  return italiano
+    .split(" ")
+    .map((p) => (p.length > 2 ? p[0].toUpperCase() + p.slice(1) : p))
+    .join(" ");
+}
+
 /** Un aeroporto preciso dal suo codice, per mostrarlo in chiaro. */
 export function aeroportoPerIata(iata: string): AeroportoTrovato | null {
   const codice = (iata ?? "").trim().toUpperCase();

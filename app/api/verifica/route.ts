@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { scadenzaStimata } from "@/lib/regole/eu261";
 import { verificaVolo } from "@/lib/voli/verifica";
+import { inItaliano } from "@/lib/voli/aeroporti";
 
 /**
  * POST /api/verifica  {volo, data}
@@ -112,9 +113,11 @@ export async function POST(req: Request) {
       motivo: verdetto.motivo,
       // I dati oggettivi dietro il verdetto: la trasparenza è il prodotto.
       dato: {
-        // La tratta in chiaro: l'utente riconosce le città, non i codici.
-        da: fatto.partenzaCitta ?? fatto.partenzaIata ?? null,
-        a: fatto.arrivoCitta ?? fatto.arrivoIata ?? null,
+        /* La tratta in chiaro: l'utente riconosce le città, non i codici.
+           E le riconosce in italiano: l'archivio scrive "Milan", noi
+           mostriamo "Milano" (inItaliano). */
+        da: inItaliano(fatto.partenzaCitta) ?? fatto.partenzaIata ?? null,
+        a: inItaliano(fatto.arrivoCitta) ?? fatto.arrivoIata ?? null,
         previsto: fatto.arrivoPrevistoUtc,
         effettivo: fatto.arrivoEffettivoUtc,
         vettoreOperativo: fatto.vettoreOperativo,

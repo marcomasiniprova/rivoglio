@@ -24,6 +24,16 @@ export default function BarraTab({
     <View style={[stili.barra, { bottom: insets.bottom + SPAZIO.m }]}>
       {state.routes.map((rotta, indice) => {
         const opzioni = descriptors[rotta.key]?.options;
+        /* href: null significa "la rotta esiste ma la tab non si vede".
+           expo-router non lo lascia passare così com'è: lo traduce in
+           tabBarItemStyle {display:"none"} (vedi layouts/TabsClient.js).
+           La barra la disegniamo noi, quindi tocca a noi rispettarlo:
+           senza questa riga la Classifica compariva anche col server che
+           la dichiara spenta, e il tocco portava su una schermata vuota. */
+        const nascosta =
+          StyleSheet.flatten(opzioni?.tabBarItemStyle)?.display === "none" ||
+          (opzioni as { href?: string | null } | undefined)?.href === null;
+        if (nascosta) return null;
         const etichetta =
           typeof opzioni?.tabBarLabel === "string"
             ? opzioni.tabBarLabel
