@@ -16,7 +16,7 @@
  * i casi d'oro devono passare tutti.
  */
 
-export const VERSIONE_REGOLE = "2026.08.3";
+export const VERSIONE_REGOLE = "2026.08.4";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
 const SOGLIA_MINUTI = 180;
@@ -134,13 +134,13 @@ export function valuta(f: FattoVolo): Verdetto {
      un volo cancellato è per definizione incerto: MAI vendere sul giallo. */
   if (f.stato === "cancellato") {
     return incerto(
-      "Questo volo risulta cancellato. La compensazione dipende da quando ti hanno avvisato: è il prossimo pezzo che costruiamo. Per ora non ti facciamo pagare niente.",
+      "Questo volo risulta cancellato. La compensazione dipende da quando la compagnia ti ha avvisato e dal volo alternativo che ti ha proposto: dati che hai solo tu, non gli archivi di volo. Quindi il caso è incerto e non paghi niente. Il rimborso del biglietto o un volo alternativo, invece, si chiedono comunque alla compagnia.",
     );
   }
 
   if (f.stato === "dirottato") {
     return incerto(
-      "Questo volo risulta dirottato su un altro aeroporto. È un caso da guardare a mano: non ti facciamo pagare niente.",
+      "Questo volo risulta atterrato in un aeroporto diverso da quello previsto. Il ritardo si misura all'arrivo nella destinazione finale del biglietto, e il tracciamento qui non basta a certificarlo. Quindi il caso è incerto e non paghi niente.",
     );
   }
 
