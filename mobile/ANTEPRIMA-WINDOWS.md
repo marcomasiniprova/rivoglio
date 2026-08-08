@@ -8,7 +8,10 @@ Apri PowerShell e incolla queste righe una alla volta:
 cd $HOME\rivoglio
 ```
 ```powershell
-git pull
+git fetch origin claude/saas-app-repo-analysis-ghehqa
+```
+```powershell
+git reset --hard origin/claude/saas-app-repo-analysis-ghehqa
 ```
 ```powershell
 cd $HOME\rivoglio\mobile
@@ -178,19 +181,87 @@ Scorciatoie mentre gira: `r` ricarica, `m` apre il menu di sviluppo,
 
 ## Quando lavoriamo in cloud e vuoi le modifiche nuove
 
-Due righe, ogni volta che ti dico che ho pushato:
+Tre righe, ogni volta che ti dico che ho pushato. Sono queste e non
+`git pull`, perché su questo PC `git pull` si è rotto una volta (vedi
+sotto) e queste funzionano sempre:
 
 ```powershell
 cd $HOME\rivoglio
 ```
 
 ```powershell
-git pull
+git fetch origin claude/saas-app-repo-analysis-ghehqa
 ```
 
-Poi torna in `mobile` e rilancia. Se `git pull` si lamenta di modifiche
-locali, vuol dire che hai toccato dei file sul PC: dimmelo e lo
-sistemiamo insieme.
+```powershell
+git reset --hard origin/claude/saas-app-repo-analysis-ghehqa
+```
+
+L'ultima riga vuol dire: **"butta quello che hai sul PC e prendi quello
+che c'è online"**. Va bene perché tu il codice non lo modifichi: lo
+guardi. Se un giorno modificherai dei file, dimmelo prima.
+
+Poi torna in `mobile`, `npm install` e rilancia.
+
+---
+
+## Se l'app resta quella vecchia anche dopo l'aggiornamento
+
+Vuol dire che l'aggiornamento non è passato. Il segnale nel terminale è
+uno di questi:
+
+```
+fatal: unpack-objects failed
+error: failed to perform geometric repack
+```
+
+Git sta cercando di riordinare i suoi file mentre l'antivirus di Windows
+glieli tiene occupati, e si ferma a metà. Si spegne quel riordino, una
+volta sola:
+
+```powershell
+cd $HOME\rivoglio
+```
+
+```powershell
+git config gc.auto 0
+```
+
+```powershell
+git config maintenance.auto false
+```
+
+Poi riprova le tre righe dell'aggiornamento qui sopra.
+
+**Se ancora non va, si riparte da zero.** Non si perde niente, il codice
+sta online:
+
+```powershell
+cd $HOME
+```
+
+```powershell
+Rename-Item rivoglio rivoglio-vecchio
+```
+
+```powershell
+git clone -b claude/saas-app-repo-analysis-ghehqa https://github.com/marcomasiniprova/rivoglio.git rivoglio
+```
+
+```powershell
+cd $HOME\rivoglio\mobile
+```
+
+```powershell
+npm install
+```
+
+Quando funziona, la cartella `rivoglio-vecchio` si può cancellare.
+
+**Come capisci a colpo d'occhio se è aggiornata:** apri l'app e guarda la
+prima schermata. Se c'è scritto **"Da dove sei partito"**, è quella
+nuova. Se c'è scritto "Dimmi cosa cerchi" o vedi delle destinazioni di
+viaggio, è ancora quella vecchia.
 
 ---
 
