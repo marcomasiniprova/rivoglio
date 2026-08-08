@@ -20,10 +20,10 @@ const titoloCorsivo = stacco > 0 ? SEZIONE.titolo.slice(stacco + 1) : "";
 
 export default function NumeriMercato() {
   return (
-    <section id="numeri" className="scroll-mt-24 px-5 py-24 sm:px-8 sm:py-28">
+    <section id="numeri" className="scroll-mt-24 px-5 py-16 sm:px-8 sm:py-20">
       <div className="mx-auto max-w-[1200px]">
         <Anima className="mx-auto max-w-2xl text-center">
-          <h2 className="luce-testo text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.04]">
+          <h2 className="luce-testo text-[clamp(2.25rem,5.2vw,3.5rem)] leading-[1.04]">
             {titoloPrima}
             {titoloCorsivo && (
               <>
@@ -58,7 +58,7 @@ export default function NumeriMercato() {
         </AnimaLista>
 
         <Anima ritardo={0.12}>
-          <p className="mx-auto mt-10 max-w-xl text-center text-[15.5px] leading-relaxed text-fumo">
+          <p className="mx-auto mt-8 max-w-xl text-center text-[15.5px] leading-relaxed text-fumo">
             {SEZIONE.chiusa}{" "}
             <a
               href="#controllo"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { COPY } from "@/lib/copy";
 
 /**
@@ -22,6 +22,89 @@ const titoloCorsivo = stacco > 0 ? SEZIONE.titolo.slice(stacco + 1) : "";
 const punto = SEZIONE.conferma.indexOf(". ") + 1;
 const confermaTitolo = SEZIONE.conferma.slice(0, punto);
 const confermaTesto = SEZIONE.conferma.slice(punto + 1);
+
+/* ---- la striscia coi dati veri (#25): indice ritardi per aeroporto ---- */
+
+type Ritardo = {
+  iata: string;
+  nome: string;
+  indice: number | null;
+  medianaMinuti: number | null;
+  arrivi: number | null;
+  cancellati: number | null;
+  rilevatoIl: string;
+};
+
+const riempi = (modello: string, valori: Record<string, string>) =>
+  modello.replace(/\{(\w+)\}/g, (tutto, chiave) => valori[chiave] ?? tutto);
+
+/** L'indice AeroDataBox va da 0 a 5: sotto 1 è calmo, oltre 2.5 è brutto. */
+const coloreIndice = (indice: number) =>
+  indice < 1 ? "text-menta" : indice < 2.5 ? "text-sole" : "text-red-400";
+
+function StrisciaRitardi() {
+  const [righe, setRighe] = useState<Ritardo[]>([]);
+
+  useEffect(() => {
+    let vivo = true;
+    fetch("/api/osservatorio")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((dati) => {
+        if (vivo && Array.isArray(dati?.aeroporti)) setRighe(dati.aeroporti);
+      })
+      .catch(() => {
+        /* niente striscia: la sezione vive lo stesso */
+      });
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  const conIndice = righe.filter((r) => r.indice !== null);
+  if (conIndice.length === 0) return null;
+
+  const rilevatoIl = new Date(conIndice[0].rilevatoIl).toLocaleString("it-IT", {
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/Rome",
+  });
+
+  return (
+    <div className="mx-auto mt-10 max-w-3xl text-left">
+      <p className="text-center text-[12.5px] font-medium uppercase tracking-[0.18em] text-menta/70">
+        {SEZIONE.ritardi.titolo}
+      </p>
+      <ul className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        {conIndice.map((r) => (
+          <li key={r.iata} className="rounded-2xl border border-white/10 bg-white/6 px-4 py-3.5">
+            <p className="truncate text-[13px] font-medium text-white/75">{r.nome}</p>
+            <p
+              className={`numeri mt-1.5 font-display text-[26px] font-medium leading-none tracking-[-0.03em] ${coloreIndice(r.indice ?? 0)}`}
+            >
+              {(r.indice ?? 0).toLocaleString("it-IT", { maximumFractionDigits: 1 })}
+              <span className="ml-1.5 align-middle text-[10.5px] font-sans font-medium uppercase tracking-[0.08em] text-white/40">
+                / 5
+              </span>
+            </p>
+            <p className="numeri mt-1 text-[11.5px] text-white/45">
+              {r.medianaMinuti !== null
+                ? riempi(SEZIONE.ritardi.medianaTemplate, { minuti: String(r.medianaMinuti) })
+                : SEZIONE.ritardi.indiceEtichetta}
+              {r.cancellati !== null && r.cancellati > 0
+                ? ` · ${riempi(SEZIONE.ritardi.cancellatiTemplate, { n: String(r.cancellati) })}`
+                : ""}
+            </p>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 text-center text-[12px] leading-relaxed text-white/40">
+        {SEZIONE.ritardi.nota} {riempi(SEZIONE.ritardi.rilevatoTemplate, { quando: rilevatoIl })}.
+      </p>
+    </div>
+  );
+}
 
 export default function Osservatorio() {
   const [email, setEmail] = useState("");
@@ -70,7 +153,7 @@ export default function Osservatorio() {
           <span className="inline-block rounded-pillola bg-white/10 px-3.5 py-1.5 text-[12.5px] font-medium text-menta">
             {SEZIONE.occhiello}
           </span>
-          <h2 className="luce-testo-chiaro mt-5 text-[clamp(2rem,4.6vw,3.2rem)] leading-[1.04]">
+          <h2 className="luce-testo-chiaro mt-5 text-[clamp(2.1rem,4.8vw,3.35rem)] leading-[1.04]">
             {titoloPrima}
             {titoloCorsivo && (
               <>
@@ -128,6 +211,9 @@ export default function Osservatorio() {
               <p className="mt-4 text-center text-[13px] text-white/40">{SEZIONE.nota}</p>
             </form>
           )}
+
+          {/* I dati veri sotto la promessa: l'indice ritardi di oggi (#25). */}
+          <StrisciaRitardi />
         </div>
       </div>
     </section>

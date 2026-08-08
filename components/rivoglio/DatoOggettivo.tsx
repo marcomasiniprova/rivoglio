@@ -22,14 +22,16 @@ const titoloCorsivo = SEZIONE.titolo.slice(virgola + 1);
 
 export default function DatoOggettivo() {
   return (
-    <section id="dato-oggettivo" className="scroll-mt-24 px-5 py-24 sm:px-8 sm:py-28">
+    <section id="dato-oggettivo" className="scroll-mt-24 px-5 py-16 sm:px-8 sm:py-20">
       <div className="mx-auto grid max-w-[1200px] items-center gap-12 lg:grid-cols-2 lg:gap-20">
-        <div>
+        {/* Su telefono la colonna è centrata come il resto della pagina
+            (fix 8/08); su desktop resta allineata a sinistra. */}
+        <div className="text-center lg:text-left">
           <Anima>
             <p className="text-[13px] font-medium uppercase tracking-[0.16em] text-verde">
               {SEZIONE.occhiello}
             </p>
-            <h2 className="luce-testo mt-3 text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.02]">
+            <h2 className="luce-testo mt-3 text-[clamp(2.25rem,5.2vw,3.5rem)] leading-[1.02]">
               {titoloPrima}
               <br />
               <span className="corsivo text-verde-scuro">{titoloCorsivo}</span>
@@ -38,10 +40,10 @@ export default function DatoOggettivo() {
 
           <TestoRivelato
             testo={SEZIONE.testo}
-            className="mt-6 max-w-lg text-[17px] leading-relaxed text-inchiostro sm:text-[18px]"
+            className="mx-auto mt-6 max-w-lg text-[17px] leading-relaxed text-inchiostro sm:text-[18px] lg:mx-0"
           />
 
-          <AnimaLista className="mt-8 space-y-5" passo={0.09}>
+          <AnimaLista className="mx-auto mt-8 max-w-md space-y-5 text-left lg:mx-0 lg:max-w-none" passo={0.09}>
             {SEZIONE.punti.map((p) => (
               <Figlio key={p.titolo}>
                 <div className="flex gap-4">
@@ -67,7 +69,9 @@ export default function DatoOggettivo() {
           </AnimaLista>
 
           <Anima ritardo={0.1}>
-            <p className="mt-7 text-[13px] leading-relaxed text-fumo-2">{SEZIONE.nota}</p>
+            <p className="mx-auto mt-7 max-w-md text-[13px] leading-relaxed text-fumo-2 lg:mx-0 lg:max-w-none">
+              {SEZIONE.nota}
+            </p>
           </Anima>
         </div>
 

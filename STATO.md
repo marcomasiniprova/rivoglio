@@ -1,7 +1,8 @@
 # STATO — Rivoglio
 
-**Aggiornato:** 2026-08-08, notte fonda (giro #27: seconda fonte documenti,
-20 compagnie, scioperi, meteo pronto ma spento)
+**Aggiornato:** 2026-08-08, alba (giro #28: chiave volo su Netlify e motore
+collaudato ONLINE, Osservatorio coi dati veri, hero col glow, scanner
+carta d'imbarco, foto footer raddrizzata)
 **RIVOGLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
 Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
 verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
@@ -67,18 +68,19 @@ social rifatta (era rimasta al prodotto viaggi).
   eventi + RLS) via Composio, come migrazione tracciata.
 - **SEO/GEO**: robots, sitemap, JSON-LD Organization+WebSite, llms.txt,
   canonical, metadata Rivoglio ovunque.
-- **ONLINE: https://rivoglio.netlify.app** ma col DEPLOY VECCHIO dell'8/08
-  (logo e footer sì; onda, pricing nuovo, scanner, 12 mesi, recesso NO:
-  i commit da `f4e05a5` in poi non sono deployati). Filiera provata: zip del ramo da GitHub
-  scaricato sul workbench Composio (la sandbox blocca gli host Netlify),
-  client Netlify lanciato da lì con l'URL firmato del connettore. Servono
-  TUTTI E DUE i pezzi di `netlify.toml`: senza `[build]` l'upload viene
-  pubblicato com'è (sorgenti esposti, home 404); senza `[[plugins]]`
-  la build gira ma pubblica `.next` cruda senza server. Ora: 1 function
-  (Next.js Server Handler), sorgenti non esposti, API viva.
-  Il `rivoglioo.netlify.app` di Valerio è su un ALTRO account Netlify,
-  fuori dal connettore e senza le 5 variabili: da dismettere o aggiornare
-  a mano, il sito buono è rivoglio.netlify.app.
+- **ONLINE: https://rivoglio.netlify.app COL MOTORE VERO COLLAUDATO**
+  (8/08 alba): il "FR4001 non funziona" di Valerio era SOLO la chiave
+  AERODATABOX_API_KEY mancante su Netlify (il sito girava in demo).
+  Messa via connettore, rideploy, controprova sul sito vero: FR4001 del
+  6/08 → non idoneo, 155 minuti, orari veri, demo:false. Su Netlify ora
+  ci sono TUTTE le chiavi: Supabase secret, Resend, Mistral, AeroDataBox
+  (manca solo Polar, che ancora non esiste). ATTENZIONE connettore: il
+  flag "secret" del connettore Netlify fallisce IN SILENZIO (risponde
+  "upserted" ma non salva): le variabili vanno scritte senza quel flag.
+  L'ultimo giro (design + Osservatorio dati veri) NON è ancora deployato:
+  lo pubblica Valerio (scelta sua col popup). Filiera provata: zip del
+  ramo da GitHub sul workbench Composio, client Netlify con l'URL firmato
+  del connettore, `netlify.toml` con [build] E [[plugins]] obbligatori.
 - **La web app è APERTA A TUTTI dall'8/08** (decisione di Valerio, ribaltata
   la scelta del pivot): `/app` senza account col check libero (CheckRapido),
   link "Entra" in nav e "La web app" nel footer. `/admin` resta chiuso.
@@ -87,6 +89,26 @@ social rifatta (era rimasta al prodotto viaggi).
   tracker). Per vederla su iPhone: da maggio 2026 l'Expo Go dell'App Store
   è fermo all'SDK 54 (noi 57), quindi anteprima web (`npx expo start --web`
   dal PC) oppure TestFlight con l'account Apple Developer.
+- **L'Osservatorio ha i dati VERI (#25, 8/08 alba)**: tabella
+  `osservatorio_ritardi` sul Supabase vero (migrazione applicata), indice
+  ritardi AeroDataBox (0-5 sugli arrivi delle ultime 2 ore) per gli 8
+  aeroporti scelti da Valerio col popup (FCO MXP LIN BGY VCE NAP CTA BLQ),
+  cache di 24 ore rinnovata da /api/osservatorio, striscia nella sezione
+  scura della landing. Prima rilevazione vera seminata (notte: 4 scali con
+  indice, gli altri senza traffico = nascosti, onestà). Senza chiave o
+  senza DB la striscia sparisce, mai un errore.
+- **Il giro di design dell'8/08 alba**: hero con lo stile dell'Osservatorio
+  su fondo chiaro (corsivo verde col glow; il corsivo era SPARITO per un
+  aggancio rotto dal cambio headline 12 mesi, trovato con lo screenshot);
+  scanner rifatto come vera carta d'imbarco (componente condiviso
+  `CartaImbarcoScan`: fascia scura, campi in lettura, codice a barre,
+  timbro CE 261/2004, raggio con nucleo luminoso) usato da hero e pagina
+  verdetto; punti fiducia in striscia allineata (niente piramide); sezioni
+  ravvicinate (py-24/28 → 16/20) e titoli leggermente più grandi; bottone
+  del retroattivo centrato su telefono; sezione dato oggettivo centrata su
+  telefono; foto del footer analizzata pixel per pixel: telefono già
+  dritto, il difetto era il polso tagliato dal bordo SINISTRO; ritagliata
+  al polso (esce solo dal fondo card), telefono al centro ottico, 205KB.
 - **Chiavi**: GEMINI, FIGMA, MISTRAL e AERODATABOX in
   `.env.development.local`.
   Gemini: rete e chiave ok ma quota immagini 0 sul piano gratuito, serve
@@ -97,14 +119,15 @@ social rifatta (era rimasta al prodotto viaggi).
   collega il repo GitHub al progetto, o si rifà il giro col client.
 
 ## Serve Valerio (in ordine)
-1. **Deploy**: il sito online è vecchio. O rifai il giro manuale su Netlify,
-   o riautorizzi il connettore su claude.ai e lo faccio io.
+1. **Deploy dell'ultimo giro** (design + Osservatorio dati veri): il ramo è
+   pronto e collaudato, pubblichi tu (tua scelta col popup). Il motore
+   online funziona già.
 2. **Polar**: creare i 2 prodotti (pratica 14,90 · famiglia 24,90), darmi i
    checkout link e il segreto webhook; chiedere SUBITO l'approvazione
    dell'organizzazione (~2 settimane).
-3. **Chiavi su Netlify** (progetto `rivoglio`): SUPABASE_SECRET_KEY,
-   RESEND_API_KEY, e ora anche AERODATABOX_API_KEY e MISTRAL_API_KEY (in
-   locale ci sono, online no: senza la prima il sito vero gira in demo).
+3. **Email**: l'iscrizione all'Osservatorio dal sito vero è stata provata
+   con valerio@artecai.it: controlla la casella, l'email di benvenuto deve
+   esserci. Resend spedisce SOLO lì finché il dominio non è verificato.
 4. **Scioperi e meteo**: riverifica le date scioperi sul cruscotto MIT
    (scioperi.mit.gov.it, la sandbox non lo apre) e a inizio settembre
    aggiungi quelli di ottobre. La riga meteo nel reclamo si accende solo

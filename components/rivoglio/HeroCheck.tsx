@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { Anima } from "@/components/Anima";
 import SfondoColonne from "@/components/SfondoColonne";
+import CartaImbarcoScan from "@/components/rivoglio/CartaImbarcoScan";
 import { COPY } from "@/lib/copy";
 
 /**
@@ -74,7 +75,9 @@ export default function HeroCheck() {
   const [passo, setPasso] = useState(0);
   const inCorso = useRef(false);
 
-  const [titoloPrima, titoloCorsivo] = spezzaTitolo(HERO.titolo, "negli ultimi");
+  /* Il taglio segue la headline dei 12 mesi: "nell'ultimo anno?" va in
+     corsivo con la luce, come il titolo dell'Osservatorio. */
+  const [titoloPrima, titoloCorsivo] = spezzaTitolo(HERO.titolo, "nell'ultimo");
   const [notaAperta, setNotaAperta] = useState<"importo" | "finestra" | null>(null);
 
   async function invia(e: FormEvent<HTMLFormElement>) {
@@ -136,13 +139,16 @@ export default function HeroCheck() {
       }
 
       /* La risposta c'è: confronto orari e calcolo sono stati fatti davvero.
-         Si mostrano completati in sequenza, il tempo di leggerli, poi si va
-         al risultato. Nessun passo si accende prima del lavoro che racconta. */
-      await attesa(700);
+         Si mostrano completati in sequenza, il tempo di leggerli, il timbro
+         chiude la carta, poi si va al risultato. Nessun passo si accende
+         prima del lavoro che racconta. */
+      await attesa(650);
       setPasso(1);
-      await attesa(700);
+      await attesa(650);
       setPasso(2);
-      await attesa(700);
+      await attesa(650);
+      setPasso(3);
+      await attesa(750);
       /* il verdetto sa che la scansione c'è già stata qui */
       sessionStorage.setItem("rivoglio-scan-fatto", "1");
       router.push(destinazione);
@@ -195,12 +201,12 @@ export default function HeroCheck() {
         </Anima>
 
         <Anima ritardo={0.12}>
-          <h1 className="luce-testo mt-6 text-[clamp(2.35rem,7.6vw,4.6rem)] leading-[0.98]">
+          <h1 className="luce-testo mt-6 text-[clamp(2.45rem,7.8vw,4.8rem)] leading-[0.98]">
             {titoloPrima}
             {titoloCorsivo && (
               <>
                 <br />
-                <span className="corsivo text-verde-scuro">{titoloCorsivo}</span>
+                <span className="corsivo luce-corsivo text-verde-scuro">{titoloCorsivo}</span>
               </>
             )}
           </h1>
@@ -354,67 +360,12 @@ export default function HeroCheck() {
                     {TEATRO.titolo}
                   </p>
 
-                  {/* la carta d'imbarco sotto scansione */}
-                  <div className="relative mt-4 overflow-hidden rounded-2xl border border-bordo bg-white">
-                    <div className="flex items-center justify-between border-b border-dashed border-bordo px-4 py-2.5">
-                      <span className="font-display text-[15px] font-medium tracking-[-0.01em]">
-                        {volo.trim().toUpperCase()}
-                      </span>
-                      <span className="numeri text-[13px] text-fumo">{data}</span>
-                    </div>
-                    <div className="space-y-2 px-4 py-3">
-                      {TEATRO.passi.map((testo, i) => {
-                        const fatto = i < passo;
-                        const attivo = i === passo;
-                        return (
-                          <div
-                            key={testo}
-                            className={`flex h-7 items-center justify-between rounded-lg px-2.5 transition-colors duration-500 ${
-                              fatto ? "bg-menta-tenue" : "bg-nebbia"
-                            }`}
-                          >
-                            <span
-                              className={`h-1.5 rounded-full transition-all duration-500 ${
-                                fatto
-                                  ? "w-2/3 bg-verde/45"
-                                  : attivo
-                                    ? "w-1/2 bg-verde/25"
-                                    : "w-1/3 bg-bordo"
-                              }`}
-                            />
-                            {fatto && (
-                              <motion.svg
-                                initial={{ scale: 0.4, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                viewBox="0 0 16 16"
-                                className="h-3.5 w-3.5 text-verde"
-                                aria-hidden="true"
-                              >
-                                <path
-                                  d="m3.5 8.4 2.8 2.8 6-6.4"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="2.2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </motion.svg>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {/* il raggio che scansiona, su e giù, calmo */}
-                    <motion.div
-                      aria-hidden="true"
-                      className="pointer-events-none absolute inset-x-0 top-0 h-14"
-                      style={{
-                        background:
-                          "linear-gradient(180deg, transparent, rgba(10,157,92,.14) 42%, rgba(10,157,92,.42) 50%, rgba(10,157,92,.14) 58%, transparent)",
-                      }}
-                      initial={{ y: "-100%" }}
-                      animate={{ y: ["-100%", "480%", "-100%"] }}
-                      transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+                  {/* la carta d'imbarco sotto scansione, coi dati veri */}
+                  <div className="mt-4">
+                    <CartaImbarcoScan
+                      volo={volo.trim().toUpperCase()}
+                      dataTesto={data}
+                      passo={passo}
                     />
                   </div>
 
@@ -475,24 +426,28 @@ export default function HeroCheck() {
         </Anima>
 
         <Anima ritardo={0.4}>
-          <ul className="mx-auto mt-7 flex max-w-2xl flex-col items-center justify-center gap-x-7 gap-y-2 text-[13.5px] text-fumo sm:flex-row">
-            {HERO.puntiFiducia.map((p) => (
-              <li key={p} className="flex items-center gap-2">
-                <svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0" aria-hidden="true">
-                  <circle cx="8" cy="8" r="7.2" fill="var(--color-menta)" />
-                  <path
-                    d="m5 8.2 2 2 4-4.2"
-                    fill="none"
-                    stroke="var(--color-verde-notte)"
-                    strokeWidth="1.9"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                {p}
-              </li>
-            ))}
-          </ul>
+          {/* I tre punti di fiducia: righe allineate a sinistra dentro una
+              striscia di vetro, non più centrati "a piramide" (fix 8/08). */}
+          <div className="vetro mx-auto mt-7 max-w-md rounded-2xl px-5 py-4 sm:max-w-3xl sm:rounded-pillola sm:px-7 sm:py-3.5">
+            <ul className="flex flex-col gap-2.5 text-[13.5px] font-medium text-inchiostro/85 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+              {HERO.puntiFiducia.map((p) => (
+                <li key={p} className="flex items-center gap-2.5 text-left">
+                  <svg viewBox="0 0 16 16" className="h-4.5 w-4.5 shrink-0" aria-hidden="true">
+                    <circle cx="8" cy="8" r="7.2" fill="var(--color-menta)" />
+                    <path
+                      d="m5 8.2 2 2 4-4.2"
+                      fill="none"
+                      stroke="var(--color-verde-notte)"
+                      strokeWidth="1.9"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </div>
         </Anima>
       </div>
     </section>

@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { COPY } from "@/lib/copy";
 import CardCondivisione from "./CardCondivisione";
+import CartaImbarcoScan from "@/components/rivoglio/CartaImbarcoScan";
 
 /**
  * La pagina del risultato, lato client. TRE stati, mai due (SPEC §4):
@@ -703,37 +704,11 @@ function NonIdoneo({ dati }: { dati: DatiVerifica }) {
  * Con prefers-reduced-motion il verdetto appare subito.
  */
 function ScansioneIngresso({ dati }: { dati: DatiVerifica }) {
+  /* La stessa carta d'imbarco dell'hero: qui il velo dura poco, quindi
+     la carta appare già a metà lettura (volo trovato, orari in corso). */
   return (
-    <div
-      aria-hidden="true"
-      className="relative mx-auto max-w-md overflow-hidden rounded-2xl border border-bordo bg-white shadow-[0_24px_60px_-30px_rgba(5,46,31,0.35)]"
-    >
-      <div className="flex items-center justify-between border-b border-dashed border-bordo px-5 py-3">
-        <span className="font-display text-[16px] font-medium tracking-[-0.01em]">
-          {dati.volo}
-        </span>
-        <span className="numeri text-[13.5px] text-fumo">{dataIt(dati.dataVolo)}</span>
-      </div>
-      <div className="space-y-2.5 px-5 py-4">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex h-8 items-center rounded-lg bg-nebbia px-3">
-            <span
-              className="h-1.5 rounded-full bg-verde/30"
-              style={{ width: `${62 - i * 14}%` }}
-            />
-          </div>
-        ))}
-      </div>
-      <motion.div
-        className="pointer-events-none absolute inset-x-0 top-0 h-16"
-        style={{
-          background:
-            "linear-gradient(180deg, transparent, rgba(10,157,92,.16) 42%, rgba(10,157,92,.5) 50%, rgba(10,157,92,.16) 58%, transparent)",
-        }}
-        initial={{ y: "-100%" }}
-        animate={{ y: ["-100%", "420%"] }}
-        transition={{ duration: 0.62, repeat: 1, repeatType: "mirror", ease: "easeInOut" }}
-      />
+    <div aria-hidden="true" className="mx-auto max-w-md">
+      <CartaImbarcoScan volo={dati.volo} dataTesto={dataIt(dati.dataVolo)} passo={2} />
     </div>
   );
 }

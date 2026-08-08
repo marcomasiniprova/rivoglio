@@ -77,7 +77,7 @@ export default function Footer() {
         <div className="mb-20 overflow-hidden rounded-[2rem] bg-white text-inchiostro">
           <div className="grid items-end gap-0 md:grid-cols-[1.1fr_0.9fr]">
             <div className="px-7 py-10 text-center sm:px-12 sm:py-14 md:pb-16 md:pt-16 md:text-left">
-              <h2 className="luce-testo text-[clamp(1.9rem,3.8vw,2.7rem)] leading-[1.06]">
+              <h2 className="luce-testo text-[clamp(2rem,4vw,2.85rem)] leading-[1.06]">
                 {F.cartolina.titolo}
                 <br />
                 <span className="corsivo text-verde-scuro">{F.cartolina.corsivo}</span>
@@ -93,14 +93,17 @@ export default function Footer() {
                 <span aria-hidden="true">→</span>
               </Link>
             </div>
+            {/* Foto raddrizzata e ritagliata al polso l'8/08: la mano esce
+                SOLO dal bordo basso della card (il taglio lo fa il bordo,
+                non l'immagine) e il telefono è al centro ottico della tela. */}
             <div className="relative flex items-end justify-center overflow-hidden pt-4 md:pt-8">
               <Image
                 src="/telefono-app.png"
                 alt={F.cartolina.altTelefono}
-                width={878}
-                height={1257}
-                sizes="(min-width: 768px) 440px, 340px"
-                className="mb-[-2px] h-[340px] w-auto object-contain object-bottom sm:h-[390px] md:h-[440px]"
+                width={940}
+                height={917}
+                sizes="(min-width: 768px) 460px, 330px"
+                className="mb-[-2px] h-[320px] w-auto object-contain object-bottom sm:h-[380px] md:h-[440px]"
               />
             </div>
           </div>

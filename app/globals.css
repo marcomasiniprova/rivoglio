@@ -341,6 +341,39 @@
     0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
+/* Lo stesso glow dell'Osservatorio, adattato al corsivo verde su fondo
+   chiaro: un alone menta stretto e uno verde più largo, come una luce
+   che filtra da dietro le lettere. */
+.luce-corsivo {
+  text-shadow:
+    0 0 16px rgba(116, 224, 167, 0.6),
+    0 2px 34px rgba(10, 157, 92, 0.3),
+    0 1px 1px rgba(255, 255, 255, 0.65);
+}
+
+/* I campi della carta d'imbarco in lettura: respirano finché il dato
+   non è stato davvero letto. Il raggio sparisce con reduced-motion. */
+.scan-lettura {
+  animation: scan-lettura 1.4s ease-in-out infinite;
+}
+@keyframes scan-lettura {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scan-lettura {
+    animation: none;
+  }
+  .scan-raggio {
+    display: none;
+  }
+}
+
 /* ---------- il riflesso che scorre sui bottoni ----------
    Parte solo al passaggio del mouse. Un riflesso perenne è rumore. */
 /* Curve di movimento condivise (skill animate, 8/08): le native del

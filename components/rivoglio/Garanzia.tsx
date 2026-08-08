@@ -30,7 +30,7 @@ export default function Garanzia() {
             <span className="inline-block rounded-pillola bg-white/10 px-3.5 py-1.5 text-[12.5px] font-medium text-menta">
               {SEZIONE.occhiello}
             </span>
-            <h2 className="luce-testo-chiaro mt-5 text-[clamp(2.1rem,5vw,3.3rem)] leading-[1.04]">
+            <h2 className="luce-testo-chiaro mt-5 text-[clamp(2.25rem,5.2vw,3.5rem)] leading-[1.04]">
               {titoloPrima}
               <br />
               <span className="corsivo text-menta">{titoloCorsivo}</span>

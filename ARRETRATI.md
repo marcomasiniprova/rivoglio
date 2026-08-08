@@ -169,15 +169,22 @@ non altro codice.**
 | 76 | **#27 Open-Meteo nel reclamo, "verifica la licenza prima"** | Verificata dal sorgente ufficiale del sito: l'API gratuita è SOLO non commerciale, e l'archivio storico a uso commerciale richiede il piano Professional (~99 USD/mese, non lo Standard da 29). Il modulo è PRONTO e cablato nella lettera (`lib/meteo/openmeteo.ts`, riga meteo dopo i fatti) ma SPENTO dietro OPENMETEO_COMMERCIALE=1, come da tua scelta col popup: si accende quando decidi di pagare il piano. |
 | 77 | **#27 Codeshare: vendi solo IsOperator** | Il fornitore marca `vettoreDaDeterminare` per ogni volo con codeshareStatus diverso da IsOperator: sopra soglia il motore dice incerto e la lettera non parte verso il vettore sbagliato. Il confronto scioperi usa il codice IATA del volo, non il nome del vettore. |
 
+## ✅ CHIUSI l'8/08 all'alba — quindicesimo giro: il motore online e i dati veri
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 78 | **"Ho provato FR4001 e non funziona, cazzo, mica il motore andava?"** | Il motore andava benissimo: su Netlify mancava AERODATABOX_API_KEY (avevi messo Supabase, Resend e Mistral, non quella) e il sito girava col fornitore demo. Messa via connettore (attenzione: il flag "secret" del connettore fallisce in silenzio), rideploy, controprova sul sito VERO: FR4001 del 6/08 → non idoneo, 155 minuti, orari veri, demo:false. Collaudo end-to-end fatto. |
+| 79 | **#25 Osservatorio coi dati veri** | Tabella `osservatorio_ritardi` sul Supabase vero, indice ritardi AeroDataBox per gli 8 aeroporti che hai scelto col popup, cache 24 ore, striscia nella sezione scura. Prima rilevazione vera già seminata. Fonte e scala (0-5, ultime 2 ore) dichiarate sotto i numeri. |
+| 80 | **Il giro estetico: foto storta, sezioni lontane, bullet a piramide, hero col glow, scanner più realistico, titoli più grandi** | Foto footer analizzata pixel per pixel: il telefono era GIÀ dritto (bordo cornice a ±2px), il difetto era il polso tagliato dal bordo sinistro; ritagliata al polso e centrata sull'asse del telefono. Sezioni ravvicinate e titoli +7%. Punti fiducia in striscia allineata. Bottone retroattivo e sezione dato oggettivo centrati su telefono. Hero: il corsivo era SPARITO (aggancio rotto dal cambio headline), rimesso con lo stile e il glow dell'Osservatorio su fondo chiaro. Scanner rifatto come carta d'imbarco vera (fascia scura, campi in lettura, barcode, timbro CE 261/2004, raggio luminoso), condiviso fra hero e verdetto. |
+| 81 | **"Controlla che tutto il sistema email funzioni end-to-end"** | Iscrizione all'Osservatorio provata sul sito vero con valerio@artecai.it: salvataggio ok e benvenuto spedito via Resend (controlla la casella). Il resto della sequenza (T+0/2/15/30/60) parte solo con una pratica pagata: si collauda quando Polar esiste. |
+
 ## ⏳ ANCORA DA FARE
 
 ### LA MEGA TO DO (dall'audit dei prompt, 8/08 notte)
 
 **Attività numerate restanti (dalla lista del 07/08 sera):**
-- **#25 Osservatorio con dati veri**: alimentarlo dalle statistiche ritardi
-  per aeroporto di AeroDataBox (endpoint esistente, verificare il tier),
-  così "i 10 voli più in ritardo" è vero dal numero 1. È l'unico pezzo
-  numerato rimasto: #22 e #27 chiusi l'8/08 notte (righe 72-77).
+- Nessuna: #22, #25 e #27 sono chiusi (righe 72-79). La lista numerata
+  del 07/08 è finita.
 - **Scioperi di ottobre**: a inizio settembre, finita la franchigia estiva,
   ricontrollare il cruscotto MIT e aggiungere le date nuove alla tabella.
 
@@ -201,10 +208,11 @@ non altro codice.**
   approvazione. Senza asset non si supera il livello attuale.
 
 **Tocca a Valerio (in ordine di soldi):**
-1. Deploy del sito (online c'è il vecchio) o riautorizzare il connettore.
+1. Deploy dell'ultimo giro (design + Osservatorio dati veri): pubblichi tu,
+   tua scelta col popup. Il motore online funziona già.
 2. Prodotti Polar + checkout link + segreto webhook + approvazione org.
-3. Chiavi su Netlify: SUPABASE_SECRET_KEY, RESEND_API_KEY,
-   AERODATABOX_API_KEY, MISTRAL_API_KEY.
+3. ~~Chiavi su Netlify~~ FATTE tutte e 4 (Supabase, Resend, Mistral tue;
+   AeroDataBox messa via connettore l'8/08): resta solo Polar quando ci sarà.
 4. Riverificare gli scioperi sul cruscotto MIT dal tuo PC (la sandbox non
    lo apre) · Open-Meteo Professional (~99 USD/mese) SOLO quando vorrai la
    riga meteo nel reclamo: fino ad allora resta spenta per scelta.

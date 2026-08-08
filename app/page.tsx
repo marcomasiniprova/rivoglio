@@ -41,7 +41,7 @@ function InvitoBreve() {
     <section className="px-5 pb-24 pt-4 text-center sm:px-8">
       <div className="mx-auto max-w-2xl">
         <Anima>
-          <h2 className="luce-testo text-[clamp(1.9rem,4.6vw,3rem)] leading-[1.06]">
+          <h2 className="luce-testo text-[clamp(2rem,4.8vw,3.15rem)] leading-[1.06]">
             {COPY.invito.titolo}
             <br />
             <span className="corsivo text-verde-scuro">{COPY.invito.corsivo}</span>

@@ -369,6 +369,16 @@ export const COPY = {
     bottone: "Iscrivimi",
     conferma: "Fatto. La prossima uscita arriva nella tua casella.",
     nota: "Solo l'Osservatorio, niente promozioni.",
+    /** La striscia coi dati VERI (#25): indice ritardi per aeroporto. */
+    ritardi: {
+      titolo: "Gli aeroporti italiani, adesso",
+      indiceEtichetta: "indice ritardi",
+      medianaTemplate: "mediana {minuti} min",
+      cancellatiTemplate: "{n} cancellati",
+      /** Ogni numero mostrato è apribile o spiegato: questa è la spiegazione. */
+      nota: "Indice da 0 (tutto in orario) a 5 sugli arrivi delle ultime due ore, dal tracciamento AeroDataBox. Si aggiorna al massimo una volta al giorno.",
+      rilevatoTemplate: "Rilevato il {quando}",
+    },
   },
 
   risultato: {

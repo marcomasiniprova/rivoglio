@@ -63,7 +63,7 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | Netlify: progetto `rivoglio` creato, variabili impostate, rivoglio.netlify.app | ✅ 07/08 via connettore |
 | Primo deploy di produzione | ✅ 8/08: **https://rivoglio.netlify.app** (via workbench + connettore; netlify.toml con build e plugin Next). Il rivoglioo.netlify.app di Valerio è un altro account, senza variabili: da dismettere |
 | Polar: account aperto (Valerio) | ✅ · ⏳ prodotti, webhook, richiesta approvazione organizzazione (2 settimane, farla SUBITO) |
-| Chiavi su Netlify: SUPABASE_SECRET_KEY, RESEND_API_KEY, AERODATABOX, POLAR | ⏳ **serve Valerio** (le ha lui) |
+| Chiavi su Netlify: SUPABASE_SECRET_KEY, RESEND_API_KEY, AERODATABOX, MISTRAL | ✅ 8/08: tutte e 4 online, motore vero collaudato (FR4001) · ⏳ POLAR quando esiste |
 | Dominio di Rivoglio (slot Hostinger gratuito da configurare) | ⏳ **serve Valerio** |
 | Legale: condizioni d'uso + disclaimer da avvocato; commercialista sul fiscale | ⏳ prima del lancio vero |
 
@@ -107,9 +107,8 @@ Niente gamification, mai: si torna perché "mi devono dei soldi" succede
 ## Cosa blocca cosa
 
 ```
- chiavi su Netlify (AERODATABOX + MISTRAL) ──→ il sito vero esce dalla demo e legge i documenti
- Polar: 2 checkout link + webhook secret ──→ si incassa
- deploy dell'ultimo ramo ──→ online il prodotto vero (oggi c'è il vecchio)
+ Polar: 2 checkout link + webhook secret ──→ si incassa (È IL COLLO DI BOTTIGLIA)
+ deploy dell'ultimo ramo (Valerio) ──→ online anche design nuovo e Osservatorio dati veri
  dominio ──→ Resend verificato ──→ email a chiunque + link puliti nei video
  account social ──→ FASE 2
 ```
