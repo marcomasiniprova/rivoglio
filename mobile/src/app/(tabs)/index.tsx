@@ -25,9 +25,10 @@ import Campo from "@/components/Campo";
 import CardAvvisi, { type StatoAvvisi } from "@/components/CardAvvisi";
 import CardVolo from "@/components/CardVolo";
 import RicercaTratta from "@/components/RicercaTratta";
+import ScattaCarta from "@/components/ScattaCarta";
 import Titolo from "@/components/Titolo";
 import { verificaVolo } from "@/lib/api";
-import { conBarre, dataIso } from "@/lib/data";
+import { conBarre, dataIso, inItaliano, perEsteso } from "@/lib/data";
 import { chiediPermesso, registraToken, statoPermesso } from "@/lib/notifiche";
 import { useSessione } from "@/lib/sessione";
 import { leggiVoli, salvaVolo, togliVolo, type VoloSalvato } from "@/lib/voliSalvati";
@@ -47,6 +48,9 @@ export default function SchermataCheck() {
   /* Il modo predefinito è la tratta, non il numero: il numero di volo lo
      sa a memoria una persona su dieci, e chi non ce l'ha se ne va. */
   const [modo, setModo] = useState<"tratta" | "numero">("tratta");
+  /* Quello che è stato letto dalla carta d'imbarco, per dirlo in chiaro:
+     un campo che si riempie da solo senza spiegazioni mette a disagio. */
+  const [daCarta, setDaCarta] = useState<string | null>(null);
 
   /* Gli avvisi: chi non è entrato non può essere avvisato (il server deve
      sapere di chi è il volo), quindi lo stato si deduce, non si tiene. */
@@ -147,6 +151,28 @@ export default function SchermataCheck() {
     });
   }
 
+  /**
+   * Quello che è stato letto dalla carta d'imbarco finisce nei campi,
+   * NON in un check automatico: la persona deve vedere il dato e poterlo
+   * correggere. Un verdetto su un volo letto male è peggio di nessun
+   * verdetto.
+   */
+  function dallaCarta(voloLetto: string | null, dataLetta: string | null) {
+    setErrore(null);
+    setModo("numero");
+    if (voloLetto) setVolo(voloLetto);
+    if (dataLetta) setData(inItaliano(dataLetta));
+
+    const giorno = dataLetta ? perEsteso(dataLetta) : "";
+    if (voloLetto && dataLetta) {
+      setDaCarta(TESTI.carta.letto.replace("{volo}", voloLetto).replace("{data}", giorno));
+    } else if (voloLetto) {
+      setDaCarta(TESTI.carta.lettoSoloVolo.replace("{volo}", voloLetto));
+    } else {
+      setDaCarta(TESTI.carta.lettoSoloData.replace("{data}", giorno));
+    }
+  }
+
   /** Il bottone del form: valida quello che è stato scritto, poi chiede. */
   async function controlla() {
     if (!volo.trim()) {
@@ -196,6 +222,9 @@ export default function SchermataCheck() {
 
         {/* ------------------------------------------------ il form */}
         <View style={stili.scheda}>
+          {/* La strada più corta di tutte, quando la carta d'imbarco c'è. */}
+          <ScattaCarta onLetto={dallaCarta} />
+
           {/* I due modi di dire qual è il volo: la tratta per tutti,
               il numero per chi ce l'ha davanti. */}
           <View style={stili.modi}>
@@ -231,6 +260,13 @@ export default function SchermataCheck() {
             </>
           ) : (
             <>
+          {daCarta && (
+            <View style={stili.daCarta}>
+              <Feather name="check-circle" size={15} color={COLORI.verdeScuro} />
+              <Text style={stili.daCartaTesto}>{daCarta}</Text>
+            </View>
+          )}
+
           <Campo
             etichetta={T.volo.etichetta}
             valore={volo}
@@ -381,6 +417,24 @@ const stili = StyleSheet.create({
   modoAttivo: { backgroundColor: COLORI.bianco, ...OMBRA.scheda },
   modoTesto: { fontFamily: FONT.testoMedio, fontSize: 13.5, color: COLORI.fumo },
   modoTestoAttivo: { color: COLORI.inchiostro },
+  daCarta: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: SPAZIO.s,
+    backgroundColor: COLORI.mentaTenue,
+    borderWidth: 1,
+    borderColor: COLORI.menta,
+    borderRadius: RAGGIO.campo,
+    padding: SPAZIO.m,
+    marginBottom: SPAZIO.l,
+  },
+  daCartaTesto: {
+    flex: 1,
+    fontFamily: FONT.testo,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: COLORI.verdeNotte,
+  },
   aiuto: {
     fontFamily: FONT.testo,
     fontSize: 12,

@@ -4,7 +4,7 @@
  * la conversione, il server riceve un giorno diverso da quello che
  * l'utente ha in testa, e il verdetto è di un altro volo.
  */
-import { conBarre, dataIso } from "../data";
+import { conBarre, dataIso, inItaliano, perEsteso } from "../data";
 
 describe("conBarre: le barre si mettono da sole", () => {
   test("mette le barre mentre si scrive", () => {
@@ -34,5 +34,32 @@ describe("dataIso: dal formato italiano a quello del server", () => {
     expect(dataIso("32/08/2026")).toBeNull();
     expect(dataIso("06/13/2026")).toBeNull();
     expect(dataIso("domani")).toBeNull();
+  });
+});
+
+/* La strada al contrario: la carta d'imbarco fotografata torna una data
+   del server, e va rimessa nel campo come la scrive una persona. */
+describe("inItaliano: dal server al campo", () => {
+  test("rimette la data nella forma del campo", () => {
+    expect(inItaliano("2026-08-06")).toBe("06/08/2026");
+  });
+
+  test("una data storta non riempie il campo di spazzatura", () => {
+    expect(inItaliano("6 agosto")).toBe("");
+    expect(inItaliano("")).toBe("");
+  });
+
+  test("va e torna senza perdere niente", () => {
+    expect(dataIso(inItaliano("2026-08-06"))).toBe("2026-08-06");
+  });
+});
+
+describe("perEsteso: la data da leggere", () => {
+  test("scrive il giorno a parole", () => {
+    expect(perEsteso("2026-08-06")).toBe("6 agosto 2026");
+  });
+
+  test("se non è una data la ripete com'è, senza inventare", () => {
+    expect(perEsteso("boh")).toBe("boh");
   });
 });

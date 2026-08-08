@@ -55,6 +55,14 @@ export default function PaginaPrivacy() {
           viene registrato nella pratica, il file viene scartato.
         </li>
         <li>
+          <strong>La foto della carta d&apos;imbarco nell&apos;app</strong>: se scegli di
+          fotografarla per compilare il check, l&apos;immagine viene inviata al nostro
+          servizio, letta per ricavarne numero di volo e data, e{" "}
+          <strong>subito scartata</strong>. Non viene salvata su disco, non entra nel
+          database e non resta in nessun registro. I due dati ricavati finiscono nei campi
+          del check, dove puoi correggerli prima di procedere.
+        </li>
+        <li>
           <strong>Pagamenti</strong>: sono gestiti dal fornitore di pagamento (Polar, in
           qualità di merchant of record). Noi non vediamo e non conserviamo i dati della tua
           carta.

@@ -73,25 +73,103 @@ export async function testoDaDocumento(
   }
 }
 
+/* ─────────────────── I MESI COME LI STAMPANO LE CARTE D'IMBARCO ─────────
+   Quasi nessuna carta d'imbarco scrive "06/08/2026": scrivono "06AUG",
+   "06 AUG 26", "6 AGO 2026". Senza queste tabelle il lettore falliva
+   proprio sul documento per cui è nato. */
+const MESI: Record<string, number> = {
+  JAN: 1, GEN: 1,
+  FEB: 2,
+  MAR: 3,
+  APR: 4,
+  MAY: 5, MAG: 5,
+  JUN: 6, GIU: 6,
+  JUL: 7, LUG: 7,
+  AUG: 8, AGO: 8,
+  SEP: 9, SET: 9,
+  OCT: 10, OTT: 10,
+  NOV: 11,
+  DEC: 12, DIC: 12,
+};
+
+/**
+ * Le sigle davanti a cui un numero NON è un volo: gate, posto, fila,
+ * sequenza. Senza questo filtro "GATE B12" diventava il volo "B12".
+ */
+const NON_VOLO = /(GATE|SEAT|POSTO|POSTI|SEQ|ROW|FILA|VARCO|BOARDING\s?ZONE|ZONE)\s*$/i;
+
+/** I due caratteri iniziali delle compagnie che trattiamo davvero. */
+const CODICI_NOTI = new Set([
+  "FR", "U2", "W6", "AZ", "XZ", "VY", "V7", "LH", "AF", "KL",
+  "BA", "IB", "DY", "LX", "OS", "TK", "EK", "QR", "UX", "HV",
+]);
+
+/**
+ * Da giorno e mese senza anno all'anno giusto.
+ * Una carta d'imbarco che arriva a noi è di un volo GIÀ FATTO: se col
+ * anno corrente la data cadesse nel futuro, allora era l'anno scorso.
+ */
+function annoSensato(giorno: number, mese: number): number {
+  const oggi = new Date();
+  const anno = oggi.getUTCFullYear();
+  const conQuestAnno = Date.UTC(anno, mese - 1, giorno);
+  // Un giorno di margine: il fuso può spostare "oggi" di poche ore.
+  return conQuestAnno > oggi.getTime() + 86_400_000 ? anno - 1 : anno;
+}
+
 /** Estrazione DETERMINISTICA dei campi dal testo OCR. Zero AI qui. */
 export function estraiCampi(testo: string): EstrattoDocumento {
-  // numero volo: 2 alfanumerici + 1-4 cifre (FR4001, U2 1234, AZ 610)
-  const voloTrovato = testo.match(/\b([A-Z][A-Z0-9])\s?0*([0-9]{1,4})\b/);
-  // date: 06/08/2026, 2026-08-06, 6 AGO 2026, 06AUG
+  /* Numero volo: 2 alfanumerici + 1-4 cifre (FR4001, U2 1234, AZ 610).
+     Si raccolgono TUTTI i candidati e si preferisce quello di una
+     compagnia che conosciamo: su una carta d'imbarco ci sono altri
+     codici (posto, gate, coda) che la sola prima occorrenza sbagliava. */
+  const candidati: { codice: string; numero: string; prima: string }[] = [];
+  for (const m of testo.matchAll(/\b([A-Z][A-Z0-9])\s?0*([0-9]{1,4})\b/g)) {
+    candidati.push({
+      codice: m[1].toUpperCase(),
+      numero: m[2],
+      prima: testo.slice(Math.max(0, (m.index ?? 0) - 12), m.index ?? 0),
+    });
+  }
+  const utili = candidati.filter((c) => !NON_VOLO.test(c.prima));
+  const scelto = utili.find((c) => CODICI_NOTI.has(c.codice)) ?? utili[0] ?? null;
+
+  // Date: 2026-08-06, 06/08/2026, e le forme delle carte d'imbarco.
   const dataIso = testo.match(/\b(20\d{2})-([01]\d)-([0-3]\d)\b/);
   const dataIt = testo.match(/\b([0-3]?\d)[/.]([01]?\d)[/.](20\d{2})\b/);
+  const dataMese = testo.match(
+    /\b([0-3]?\d)\s?(JAN|GEN|FEB|MAR|APR|MAY|MAG|JUN|GIU|JUL|LUG|AUG|AGO|SEP|SET|OCT|OTT|NOV|DEC|DIC)\s?(\d{4}|\d{2})?\b/i,
+  );
+
   let data: string | null = null;
-  if (dataIso) data = `${dataIso[1]}-${dataIso[2]}-${dataIso[3]}`;
-  else if (dataIt) {
+  if (dataIso) {
+    data = `${dataIso[1]}-${dataIso[2]}-${dataIso[3]}`;
+  } else if (dataIt) {
     const g = dataIt[1].padStart(2, "0");
     const m = dataIt[2].padStart(2, "0");
     data = `${dataIt[3]}-${m}-${g}`;
+  } else if (dataMese) {
+    const giorno = Number(dataMese[1]);
+    const mese = MESI[dataMese[2].toUpperCase()];
+    const grezzo = dataMese[3];
+    /* Anno scritto (2026 o 26) oppure dedotto: mai inventato in avanti,
+       perché un volo nel futuro non si può ancora verificare. */
+    const anno = grezzo
+      ? grezzo.length === 4
+        ? Number(grezzo)
+        : 2000 + Number(grezzo)
+      : annoSensato(giorno, mese);
+    if (giorno >= 1 && giorno <= 31 && mese) {
+      data = `${anno}-${String(mese).padStart(2, "0")}-${String(giorno).padStart(2, "0")}`;
+    }
   }
+
   const orari = [...testo.matchAll(/\b([0-2]\d):([0-5]\d)\b/g)]
     .map((m) => `${m[1]}:${m[2]}`)
     .slice(0, 6);
+
   return {
-    volo: voloTrovato ? `${voloTrovato[1]}${voloTrovato[2]}`.toUpperCase() : null,
+    volo: scelto ? `${scelto.codice}${scelto.numero}` : null,
     data,
     orari,
     anteprima: testo.split(/\s+/).slice(0, 40).join(" "),

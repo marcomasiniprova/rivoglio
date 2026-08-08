@@ -45,6 +45,20 @@ export const TESTI = {
     },
   },
 
+  /* ---- LA CARTA D'IMBARCO FOTOGRAFATA: la strada più corta ---- */
+  carta: {
+    titolo: "Hai la carta d'imbarco?",
+    testo: "Fotografala e compilo io volo e data. Poi controlli quello che ho letto.",
+    scatta: "Fotografa",
+    galleria: "Dalla galleria",
+    attesa: "Sto leggendo la carta d'imbarco",
+    privacy: "La foto non viene salvata: la leggo e la butto.",
+    // {volo} è il numero letto, {data} il giorno già scritto per esteso.
+    letto: "Letto dalla carta d'imbarco: volo {volo} del {data}. Controlla che sia giusto.",
+    lettoSoloVolo: "Dalla carta d'imbarco ho letto il volo {volo}. La data scrivila tu.",
+    lettoSoloData: "Dalla carta d'imbarco ho letto il giorno {data}. Il volo scrivilo tu.",
+  },
+
   /* ---- LA RICERCA PER TRATTA: si dice da dove a dove, non il numero ---- */
   tratta: {
     da: { etichetta: "Da dove sei partito", segnaposto: "Città o aeroporto" },

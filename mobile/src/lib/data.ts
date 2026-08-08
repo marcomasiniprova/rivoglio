@@ -17,6 +17,24 @@ export function dataIso(scritta: string): string | null {
   return `${anno}-${String(mese).padStart(2, "0")}-${String(giorno).padStart(2, "0")}`;
 }
 
+/** "2026-08-06" → "06/08/2026", come la scrive il campo. */
+export function inItaliano(iso: string): string {
+  const p = iso.trim().match(/^(\d{4})-([01]\d)-([0-3]\d)$/);
+  return p ? `${p[3]}/${p[2]}/${p[1]}` : "";
+}
+
+/** "2026-08-06" → "6 agosto 2026", per dirlo a voce a chi legge. */
+export function perEsteso(iso: string): string {
+  const d = new Date(`${iso}T12:00:00Z`);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("it-IT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 /** Mette le barre mentre si scrive: 06082026 diventa 06/08/2026. */
 export function conBarre(grezzo: string): string {
   const cifre = grezzo.replace(/\D/g, "").slice(0, 8);

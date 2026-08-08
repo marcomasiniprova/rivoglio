@@ -38,6 +38,13 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 96
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Serve solo per fotografare la carta d'imbarco e leggerne volo e data. La foto non viene salvata.",
+          "photosPermission": "Serve solo per scegliere la foto della carta d'imbarco e leggerne volo e data. La foto non viene salvata."
+        }
       ]
     ],
     "experiments": {
