@@ -74,11 +74,23 @@ npm install
 (la prima volta ci mette qualche minuto: sta scaricando le librerie)
 
 ```powershell
+$env:BROWSER="none"
+```
+
+```powershell
 npx expo start --web
 ```
 
-Si apre il browser con l'app dentro. Per fermarla: `Ctrl + C` nel
-terminale.
+Poi apri **tu** il browser su <http://localhost:8081>. Per fermare il
+server: `Ctrl + C` nel terminale.
+
+> **Perché diciamo a Expo di non aprire il browser da solo:** su questo
+> PC il comando di Windows che lancia il browser predefinito va in crash
+> (errore `3221225477`) e si porta dietro anche Expo. Con
+> `$env:BROWSER="none"` Expo non ci prova nemmeno e il server resta su.
+> La riga va ridata a ogni nuova finestra di PowerShell; per non
+> pensarci più, una volta sola:
+> `[Environment]::SetEnvironmentVariable("BROWSER","none","User")`.
 
 ---
 
@@ -153,6 +165,9 @@ sistemiamo insieme.
 - **`npm error EPERM` o `package.json does not exist`**: sei nella
   cartella sbagliata (probabilmente `system32`). Rifai il `cd` della
   Fase 2 e guarda che il prompt mostri `...\rivoglio\mobile>`.
+- **`exited with non-zero code: 3221225477`**: è il browser predefinito
+  che crasha quando Windows prova ad aprirlo. Dai `$env:BROWSER="none"`
+  prima di `npx expo start` e apri la pagina a mano.
 - **Premi `a` e dice che non trova dispositivi**: l'emulatore non è
   acceso. Accendilo, aspetta la schermata principale di Android, ripremi.
 - **L'emulatore è lentissimo**: attiva la virtualizzazione nel BIOS
