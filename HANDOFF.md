@@ -1,63 +1,51 @@
 # HANDOFF — per la prossima sessione
 
-*Aggiornato: 2026-08-08, sera (giro #29 chiuso: app piena). Si aggiorna
-prima di ogni /clear.*
+*Aggiornato: 2026-08-08, notte fonda (giro #31 in corso, contesto al limite).*
 
-## Cosa è appena stato chiuso (giro #29)
-L'app non rimanda più al sito, tranne che per il pagamento:
-- pratiche col tracker DENTRO l'app (`/api/pratiche/{id}/scheda`,
-  Bearer + cookie; timeline, lettera via mailto, "L'ho inviata");
-- profilo stile riferimento (avatar, Dati personali con nickname e
-  adesione classifica, invito amici via Share, voci con icona);
-- classifica end-to-end SPENTA: si accende con CLASSIFICA_ATTIVA=1 su
-  Netlify quando ci sono ~10 giorni di vincite vere. Conta solo
-  `esito_pagata`, compare solo chi ha nickname + opt-in;
-- biglietto tipo carta d'imbarco (strappo, fori, codice a barre);
-- prima ancora: ricerca per tratta (predefinita), foto carta d'imbarco
-  (/api/leggi-carta, foto mai salvata), notifiche push (cron 6 UTC,
-  testo per tratta, mai il numero del volo).
+## Giro #31: FATTO e pushato (5 commit)
+1. Newsletter RIPARATA: l'invio era ucciso dal congelamento serverless
+   (void senza await). Ora si aspetta e la risposta dice email:true/false.
+   DA RIPROVARE sul sito vero dopo il deploy.
+2. Anteprima /anteprima-app RIPARATA: Netlify non pubblica i percorsi
+   node_modules → scripts/appiattisci-anteprima.mjs appiattisce gli asset
+   (agganciato a `npm run anteprima` in mobile/).
+3. Campo data: showPicker su tutto il campo (hero + web app).
+4. STANDARD CHECK UNICO: components/check/SchedaCheck (foto carta
+   d'imbarco + tratta predefinita + numero + teatro col biglietto che si
+   compila) montato su hero E web app. L'app mobile ce l'ha già.
+5. WELCOME cinematica app (benvenuto.tsx: logo in volo, colonne che
+   respirano, email, salta; si vede una volta, CHIAVE_BENVENUTO) e
+   /entra rifatta sul riferimento (cornice scura, carta unica, citazione
+   + skyline a linee).
 
-## Giro #30 (dopo il #29): cosa è cambiato
-- Scan della landing: luce lenta + biglietto che si compila coi dati
-  veri (CartaImbarcoScan ha le prop tratta/arrivoPrevisto/arrivoEffettivo,
-  HeroCheck le riempie appena il server risponde).
-- lib/voli/verifica.ts: un incerto con stato sconosciuto su un volo degli
-  ultimi 2 giorni spiega che l'orario certificato arriva entro un giorno.
-- /anteprima-app: cornice iPhone + build web dell'app in
-  public/app-anteprima (baseUrl in mobile/app.json, rewrite in
-  next.config.ts). Si rigenera con `npm run anteprima` dentro mobile/ e
-  si committa: 3 MB (i font non caricati si eliminano, vedi commit).
-- /app: tre pannelli client (components/app/AppRivoglio.tsx), profilo
-  con nickname+classifica via server action salvaProfiloWeb.
-- Il PC di Valerio: fetch.unpackLimit=1 è il fix per unpack-objects
-  (antivirus); comando già consegnato in chat.
+## Giro #31: RESTA DA FARE (Valerio l'ha chiesto, contesto finito)
+- Scena di scansione NATIVA nell'app mobile (oggi il check salta dritto
+  al verdetto): versione RN del teatro col biglietto che si compila.
+- Sezione prezzi della landing ("Su una compensazione da 600€") da
+  rifare esteticamente.
+- Messaggi del motore per cancellato/dirottato (oggi generici).
+- Pagina guida bagagli/Montreal (scelta popup: guida sì, vendita no).
+- Giro QA da utente critico su tutto + verify completo.
+- Email brandizzate: il modello c'è già (lib/email/modello.ts, tabelle
+  + colori marchio); da ricontrollare i testi dei messaggi.
 
-## I pezzi che restano sull'app
-1. Ricontrollo del volo "ancora in coda" dalla notifica: quando l'utente
-   tocca la push, aprire direttamente il verdetto (deep link con
-   dati.volo/data già nel payload della notifica).
-2. La ricerca per tratta anche sul SITO (l'app ce l'ha, il sito no).
-3. Store: icone pronte, serve l'account sviluppatore (scelta di Valerio:
-   prima app completa, store dopo).
+## La caccia ai 10 voli "sicuramente idonei": esito ONESTO
+~40 voli veri verificati live in due stress test (da febbraio a ieri):
+zero errori, ritardi misurati al minuto (max 155'), incerti solo dove
+l'archivio non ha l'arrivo. NESSUN idoneo trovato: i ritardi ≥3h sono
+l'1-2% dei voli, e i voli disastrati delle cronache vengono riprotetti
+con altri numeri (verificato su NAP-VCE 10/07 e PMO caos vento 26-27/07,
+FR6255 dirottato → incerto onesto). Per provare il flusso idoneo end to
+end: voli demo ZZ250/ZZ400/ZZ300/ZZ600 (motore vero, marcati demo).
+A Valerio serve saperlo: il business È il volume sul check, non trovare
+più idonei di quanti ne esistano.
 
-## Cosa resta a Valerio (in ordine)
-1. **Polar**: leggere POLAR.md. PRIMA di tutto mandare al supporto il
-   testo pronto per farsi approvare il caso d'uso (vietano la
-   "consulenza": noi siamo software, ma deve dirlo un loro revisore).
-   Poi: prodotti 14,90/24,90, checkout link, segreto webhook, verifica
-   da Finance → Account SUBITO (fino a 14 giorni, vendite mai ferme).
-2. PC suo: se l'app resta vecchia, la guida riparata è in
-   mobile/ANTEPRIMA-WINDOWS.md (fetch + reset, mai git pull).
-3. Quando ci sono vincite vere da 10 giorni: CLASSIFICA_ATTIVA=1 su
-   Netlify e la tab compare da sola.
+## Risposte date a Valerio (popup senza risposta → consigliate)
+Welcome primo avvio con salta · check a tre modi ovunque · EU261 + guida
+bagagli (vendita bagagli dopo il lancio) · caccia ~60 chiamate.
 
-## Attenzioni tecniche fresche
-- `voli` NON ha RLS: l'app non deve mai leggerla direttamente, passa
-  dalle API del sito.
-- Il CORS condiviso sta in lib/api/limite.ts e permette Authorization:
-  serve alle chiamate col Bearer dall'app.
-- Migrazioni applicate sul Supabase vero e tracciate in supabase/:
-  2026-08-10-tratta-e-voli-seguiti.sql, 2026-08-10-profilo-e-classifica.sql.
-- expo-image-picker e expo-clipboard sono a versione SDK 57 (~57.0.x):
-  `npx expo install` non funziona in sandbox (proxy), si usa npm con la
-  versione giusta a mano.
+## Cosa resta a Valerio
+1. Risposta di Polar alla mail (inviata l'8/08).
+2. Prodotti Polar + checkout link + segreto webhook quando arriva l'ok.
+3. Dopo il deploy: riprovare la newsletter (deve arrivare a
+   valerio@artecai.it) e /anteprima-app (font e icone giusti).
