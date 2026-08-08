@@ -216,6 +216,14 @@ non altro codice.**
 | 98 | **"Segnati che non sono tecnico e devi spiegare più facile"** | Scritto in CLAUDE.md, sezione "Come parlare a Valerio": zero gergo senza traduzione, comandi uno alla volta col percorso giusto (mai segnaposto), prima cosa succede e poi perché, e se una cosa su Windows non si può dirlo subito con l'alternativa. |
 | 99 | **"Il motore dietro le quinte cosa fa? Usa tutte le API?"** | Spiegato in chat passo per passo con FR4001: il check usa AeroDataBox (dati del volo), la cache Supabase, la tabella scioperi e il motore di regole. NON usa Mistral (OCR: solo dopo il pagamento, dentro la pratica), NON usa Open-Meteo (spento, serve il piano a pagamento) e NON usa più AviationStack. |
 
+## ✅ CHIUSI l'8/08 notte — ventesimo giro: i tuoi voli salvati
+
+| # | Cosa avevi chiesto | Come è stato chiuso |
+|---|---|---|
+| 100 | **"L'app è ancora vecchia"** | Non lo era: le schermate viaggi erano già cancellate sul ramo (verificato su GitHub: nella cartella app restano solo tabs, layout, accesso, verdetto). Sul tuo PC c'era la copia vecchia: serviva `git pull` e il riavvio con `--clear`. Comandi in cima alla guida. |
+| 101 | **Popup: le 4 scelte sull'app** | Tutte e tre le funzioni in ordine (notifiche voli, fotocamera, tracker) · pagamento SUL SITO, così Apple e Google non trattengono il 15-30% · voli aggiunti a mano, una volta sola · prima completa e bella, poi store. Segnate qui e in STATO. |
+| 102 | **Primo pezzo: "I tuoi voli"** | Ogni volo controllato si salva sul telefono con l'esito che ha dato il motore (copiato, mai ricalcolato) e resta nella schermata Controlla, con la sua faccia: idoneo mostra la fascia, incerto dice che non si vende, non idoneo dice il ritardo. Bottone "Ricontrolla" su ognuno: serve per i voli appena partiti, che il giorno dopo hanno il dato. È la base delle notifiche, il pezzo successivo. |
+
 ## ⏳ ANCORA DA FARE
 
 ### LA MEGA TO DO (dall'audit dei prompt, 8/08 notte)

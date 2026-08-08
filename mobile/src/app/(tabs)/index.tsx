@@ -7,7 +7,7 @@
  * - il verdetto lo dà il motore sul server, mai l'app (lib/api.ts);
  * - niente promesse: "forse ti devono", mai "hai diritto a".
  */
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -19,12 +19,14 @@ import {
   View,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import Bottone from "@/components/Bottone";
 import Campo from "@/components/Campo";
+import CardVolo from "@/components/CardVolo";
 import Titolo from "@/components/Titolo";
 import { verificaVolo } from "@/lib/api";
 import { conBarre, dataIso } from "@/lib/data";
+import { leggiVoli, salvaVolo, togliVolo, type VoloSalvato } from "@/lib/voliSalvati";
 import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
 import { TESTI } from "@/lib/testi";
 
@@ -36,7 +38,60 @@ export default function SchermataCheck() {
   const [data, setData] = useState("");
   const [errore, setErrore] = useState<string | null>(null);
   const [inCorso, setInCorso] = useState(false);
+  const [salvati, setSalvati] = useState<VoloSalvato[]>([]);
 
+  /* I voli tornano a ogni ritorno sulla schermata: se ne è stato appena
+     controllato uno, la lista lo mostra aggiornato senza riavviare. */
+  useFocusEffect(
+    useCallback(() => {
+      void leggiVoli().then(setSalvati);
+    }, []),
+  );
+
+  /** Il check vero e proprio: lo usa il form e lo usa "ricontrolla". */
+  async function chiedi(voloDaControllare: string, iso: string) {
+    setErrore(null);
+    setInCorso(true);
+    const esito = await verificaVolo(voloDaControllare, iso);
+    setInCorso(false);
+
+    if (!esito.ok) {
+      setErrore(esito.errore);
+      return;
+    }
+
+    /* Il volo si salva da solo, con l'esito che ha dato il motore: è
+       quello che rende l'app diversa dal sito, e la base delle notifiche.
+       L'esito è copiato, mai ricalcolato qui. */
+    const aggiornati = await salvaVolo({
+      volo: voloDaControllare.trim().toUpperCase(),
+      data: iso,
+      esito: esito.esito,
+      motivo: esito.motivo,
+      importo: esito.importo,
+      ritardoMinuti: esito.ritardoMinuti,
+      controllatoIl: new Date().toISOString(),
+      aggiuntoIl: new Date().toISOString(),
+    });
+    setSalvati(aggiornati);
+    // Il verdetto viaggia come parametri: la schermata dopo non richiama l'API.
+    router.push({
+      pathname: "/verdetto",
+      params: {
+        volo: voloDaControllare.trim().toUpperCase(),
+        data: iso,
+        esito: esito.esito,
+        motivo: esito.motivo,
+        importo: String(esito.importo ?? ""),
+        ritardo: String(esito.ritardoMinuti ?? ""),
+        previsto: esito.dato.previsto ?? "",
+        effettivo: esito.dato.effettivo ?? "",
+        demo: esito.demo ? "1" : "",
+      },
+    });
+  }
+
+  /** Il bottone del form: valida quello che è stato scritto, poi chiede. */
   async function controlla() {
     if (!volo.trim()) {
       setErrore(T.errori.voloMancante);
@@ -51,31 +106,7 @@ export default function SchermataCheck() {
       setErrore(T.errori.dataStrana);
       return;
     }
-
-    setErrore(null);
-    setInCorso(true);
-    const esito = await verificaVolo(volo, iso);
-    setInCorso(false);
-
-    if (!esito.ok) {
-      setErrore(esito.errore);
-      return;
-    }
-    // Il verdetto viaggia come parametri: la schermata dopo non richiama l'API.
-    router.push({
-      pathname: "/verdetto",
-      params: {
-        volo: volo.trim().toUpperCase(),
-        data: iso,
-        esito: esito.esito,
-        motivo: esito.motivo,
-        importo: String(esito.importo ?? ""),
-        ritardo: String(esito.ritardoMinuti ?? ""),
-        previsto: esito.dato.previsto ?? "",
-        effettivo: esito.dato.effettivo ?? "",
-        demo: esito.demo ? "1" : "",
-      },
-    });
+    await chiedi(volo, iso);
   }
 
   return (
@@ -143,6 +174,24 @@ export default function SchermataCheck() {
           />
           <Text style={stili.rassicurazione}>{T.rassicurazione}</Text>
         </View>
+
+        {/* ------------------------------------------------ i tuoi voli */}
+        {salvati.length > 0 && (
+          <View style={stili.voli}>
+            <Text style={stili.voliTitolo}>{TESTI.mieiVoli.titolo}</Text>
+            <Text style={stili.voliSotto}>{TESTI.mieiVoli.sottotitolo}</Text>
+            <View style={stili.voliElenco}>
+              {salvati.map((v) => (
+                <CardVolo
+                  key={`${v.volo}-${v.data}`}
+                  volo={v}
+                  onApri={() => void chiedi(v.volo, v.data)}
+                  onTogli={() => void togliVolo(v.volo, v.data).then(setSalvati)}
+                />
+              ))}
+            </View>
+          </View>
+        )}
 
         {/* ------------------------------------------------ la fiducia */}
         <View style={stili.punti}>
@@ -231,6 +280,21 @@ const stili = StyleSheet.create({
     textAlign: "center",
     marginTop: SPAZIO.m,
   },
+  voli: { marginTop: SPAZIO.xxl },
+  voliTitolo: {
+    fontFamily: FONT.display,
+    fontSize: 21,
+    letterSpacing: -0.6,
+    color: COLORI.inchiostro,
+  },
+  voliSotto: {
+    fontFamily: FONT.testo,
+    fontSize: 13.5,
+    lineHeight: 20,
+    color: COLORI.fumo,
+    marginTop: SPAZIO.xs,
+  },
+  voliElenco: { marginTop: SPAZIO.l, gap: SPAZIO.m },
   punti: { marginTop: SPAZIO.xl, gap: SPAZIO.m },
   punto: { flexDirection: "row", alignItems: "center", gap: SPAZIO.s },
   puntoTesto: { fontFamily: FONT.testo, fontSize: 13.5, color: COLORI.inchiostro, flex: 1 },

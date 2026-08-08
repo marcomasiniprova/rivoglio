@@ -39,6 +39,23 @@ export const TESTI = {
     entra: "Ho già un account",
   },
 
+  /* ---- I TUOI VOLI: salvati sul telefono, si ricontrollano ---- */
+  mieiVoli: {
+    titolo: "I tuoi voli",
+    sottotitolo:
+      "Restano qui. Un volo appena partito non ha ancora un esito: ricontrollalo il giorno dopo.",
+    perPasseggero: "a passeggero",
+    ritardo: "Ritardo",
+    controlla: "Controlla",
+    ricontrolla: "Ricontrolla",
+    togli: "Togli questo volo",
+    esiti: {
+      incerto: "Caso incerto: non si vende",
+      nonIdoneo: "Nessuna compensazione",
+      daControllare: "Non ancora controllato.",
+    },
+  },
+
   /* ---- IL VERDETTO: tre esiti, mai una promessa ---- */
   verdetto: {
     idoneo: {

@@ -95,6 +95,14 @@ social rifatta (era rimasta al prodotto viaggi).
   ricerche, `src/motore/` (punteggio viaggi), tipi e componenti relativi.
   Prove: tipi puliti e 4 prove nuove sul campo data (l'unico punto dove
   un testo diventa un dato per il motore).
+- **I TUOI VOLI nell'app (8/08)**: ogni volo controllato resta salvato sul
+  telefono (AsyncStorage, `src/lib/voliSalvati.ts`) con l'esito copiato dal
+  motore e il bottone "Ricontrolla". È la base delle notifiche push, il
+  pezzo dopo. Scelte di Valerio col popup: (1) le tre funzioni in ordine
+  notifiche → fotocamera carta d'imbarco → tracker; (2) pagamento SUL
+  SITO, mai dentro l'app (Apple e Google trattengono 15-30%); (3) i voli
+  li aggiunge l'utente a mano, niente casella email collegata; (4) prima
+  l'app completa e bella, gli store dopo.
 - **CORS sul check (8/08)**: `/api/verifica` risponde con
   Access-Control-Allow-Origin *. Serve all'app: senza, il browser blocca
   la risposta e l'app dice "sei offline" pur avendo rete.
