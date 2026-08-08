@@ -15,6 +15,12 @@ Mappa: `PIANO.md`. Arretrati: `ARRETRATI.md`. Cosa costruiamo: `SPEC.md`.
 Scelte chiuse: `DECISIONI.md`. Marchio: `BRAND.md`. Social: `CONTENUTI.md`.
 
 ## Come devi lavorare — questa parte è la più importante
+- **A OGNI prompt di Valerio: 4 domande col popup** (regola sua, 8/08,
+  "ogni mio prompt"). Prima di costruire, AskUserQuestion con 4 domande
+  sulle decisioni VERE di quel giro: opzioni concrete, la consigliata
+  marcata, mai domande di riempimento. Se il giro ha meno di 4 decisioni
+  vere, le restanti si usano per scelte di prodotto che prima o poi
+  andranno prese comunque.
 - **Consegna a pezzi, non in blocco.** Se la richiesta contiene più cose, fai la
   prima, dilla, e continua con la successiva senza fermarti ad aspettare. Non
   accumulare dieci lavori in un turno solo: Valerio resta mezz'ora davanti allo

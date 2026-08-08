@@ -63,6 +63,12 @@ export const demo: FornitoreVoli = {
       dataLocale,
       vettoreOperativo: "ZZ Compagnia Demo",
       vettoreMarketing: null,
+      /* Una tratta dimostrativa dichiarata: serve al teatro dello scan
+         (il biglietto si compila) senza fingere una città vera. */
+      partenzaIata: null,
+      partenzaCitta: "Scalo demo A",
+      arrivoIata: null,
+      arrivoCitta: "Scalo demo B",
       arrivoPrevistoUtc: sagoma.stato === "sconosciuto" ? null : previsto,
       arrivoEffettivoUtc: effettivo,
       stato: sagoma.stato,

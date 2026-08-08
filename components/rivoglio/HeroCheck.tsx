@@ -85,7 +85,26 @@ export default function HeroCheck() {
   const [avviso, setAvviso] = useState<{ testo: string; demo: boolean } | null>(null);
   const [fase, setFase] = useState<Fase>("campo");
   const [passo, setPasso] = useState(0);
+  /* I dati VERI del volo, appena il server risponde: il biglietto sotto
+     scansione si compila con questi, campo per campo, al passo giusto. */
+  const [letto, setLetto] = useState<{
+    tratta: string | null;
+    previsto: string | null;
+    effettivo: string | null;
+  }>({ tratta: null, previsto: null, effettivo: null });
   const inCorso = useRef(false);
+
+  /** "2026-08-06T18:35:00+00:00" → "18:35" (UTC, come sul verdetto). */
+  const oraDa = (iso: string | null | undefined): string | null => {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toLocaleTimeString("it-IT", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "UTC",
+    });
+  };
 
   /* Il taglio segue la headline dei 12 mesi: "nell'ultimo anno?" va in
      corsivo con la luce, come il titolo dell'Osservatorio. */
@@ -111,6 +130,7 @@ export default function HeroCheck() {
     setAvviso(null);
     setFase("teatro");
     setPasso(0); // passo 1 acceso: la richiesta è DAVVERO in volo
+    setLetto({ tratta: null, previsto: null, effettivo: null });
 
     /* La sequenza dei passi parte SUBITO e vive per conto suo: la
        richiesta al server corre in parallelo. Alla fine si aspettano a
@@ -132,6 +152,17 @@ export default function HeroCheck() {
         body: JSON.stringify({ volo: volo.trim(), data }),
       });
       const dati = await r.json().catch(() => null);
+
+      /* Appena i dati veri ci sono, il biglietto li riceve: li mostrerà
+         al passo giusto della sequenza, non tutti in un colpo. */
+      if (dati?.ok && dati.dato) {
+        setLetto({
+          tratta:
+            dati.dato.da && dati.dato.a ? `${dati.dato.da} → ${dati.dato.a}` : null,
+          previsto: oraDa(dati.dato.previsto),
+          effettivo: oraDa(dati.dato.effettivo),
+        });
+      }
 
       if (!r.ok || !dati?.ok) {
         /* Un errore non fa aspettare: si torna subito al campo. Il
@@ -404,6 +435,9 @@ export default function HeroCheck() {
                       volo, poi gli orari, e alla fine arriva il timbro. */}
                   <div className="mt-4">
                     <CartaImbarcoScan
+                      tratta={letto.tratta}
+                      arrivoPrevisto={letto.previsto}
+                      arrivoEffettivo={letto.effettivo}
                       volo={volo.trim().toUpperCase()}
                       dataTesto={data}
                       passo={Math.min(3, Math.floor(passo / 2))}

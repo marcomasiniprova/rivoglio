@@ -21,6 +21,12 @@ type Props = {
   volo: string;
   dataTesto: string;
   passo: number;
+  /* I dati VERI del server, quando arrivano: il biglietto si compila
+     campo per campo man mano che l'analisi avanza. Mai inventati: se il
+     server non li ha dati, il campo resta una barra in lettura. */
+  tratta?: string | null;
+  arrivoPrevisto?: string | null;
+  arrivoEffettivo?: string | null;
 };
 
 /** Le tacche del codice a barre: fisse, così il render non cambia mai. */
@@ -33,7 +39,7 @@ function CampoLetto({
   largo,
 }: {
   etichetta: string;
-  valore?: string;
+  valore?: string | null;
   letto: boolean;
   largo: string;
 }) {
@@ -43,9 +49,23 @@ function CampoLetto({
         {etichetta}
       </p>
       {valore ? (
-        <p className="numeri mt-0.5 truncate font-display text-[15px] font-medium tracking-[-0.01em] text-inchiostro">
-          {valore}
-        </p>
+        /* Il valore appena scritto entra con un piccolo assestamento e un
+           lampo di evidenziatore: si vede CHE COSA lo scan ha appena letto. */
+        <motion.p
+          initial={{ opacity: 0, y: 3 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="numeri relative mt-0.5 truncate font-display text-[15px] font-medium tracking-[-0.01em] text-inchiostro"
+        >
+          <motion.span
+            aria-hidden="true"
+            initial={{ opacity: 0.9 }}
+            animate={{ opacity: 0 }}
+            transition={{ duration: 1.1, delay: 0.15 }}
+            className="absolute -inset-x-1 -inset-y-0.5 rounded bg-menta/40"
+          />
+          <span className="relative">{valore}</span>
+        </motion.p>
       ) : (
         <span
           className={`mt-1.5 block h-2 rounded-full transition-colors duration-500 ${largo} ${
@@ -57,7 +77,14 @@ function CampoLetto({
   );
 }
 
-export default function CartaImbarcoScan({ volo, dataTesto, passo }: Props) {
+export default function CartaImbarcoScan({
+  volo,
+  dataTesto,
+  passo,
+  tratta,
+  arrivoPrevisto,
+  arrivoEffettivo,
+}: Props) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-bordo bg-white shadow-[0_1px_2px_rgba(5,46,31,.08),0_24px_48px_-24px_rgba(5,46,31,.35)]">
       {/* la grana della carta: righe finissime, quasi invisibili */}
@@ -107,9 +134,27 @@ export default function CartaImbarcoScan({ volo, dataTesto, passo }: Props) {
           </p>
         </div>
         <CampoLetto etichetta="Data" valore={dataTesto} letto={passo >= 1} largo="w-16" />
-        <CampoLetto etichetta="Tratta" letto={passo >= 1} largo="w-14" />
-        <CampoLetto etichetta="Arrivo previsto" letto={passo >= 2} largo="w-12" />
-        <CampoLetto etichetta="Arrivo effettivo" letto={passo >= 2} largo="w-12" />
+        {/* I campi si compilano AL PASSO GIUSTO, coi dati veri del server:
+            la tratta quando il volo è trovato, gli orari quando vengono
+            confrontati. Se il dato non c'è ancora, la barra resta. */}
+        <CampoLetto
+          etichetta="Tratta"
+          valore={passo >= 1 ? tratta : null}
+          letto={passo >= 1}
+          largo="w-14"
+        />
+        <CampoLetto
+          etichetta="Arrivo previsto"
+          valore={passo >= 2 ? arrivoPrevisto : null}
+          letto={passo >= 2}
+          largo="w-12"
+        />
+        <CampoLetto
+          etichetta="Arrivo effettivo"
+          valore={passo >= 2 ? arrivoEffettivo : null}
+          letto={passo >= 2}
+          largo="w-12"
+        />
         <div className="relative min-w-0">
           <p className="text-[9px] font-medium uppercase tracking-[0.18em] text-fumo-2">
             Verifica
@@ -150,28 +195,28 @@ export default function CartaImbarcoScan({ volo, dataTesto, passo }: Props) {
         </div>
       </div>
 
-      {/* IL RAGGIO: un nucleo netto di luce col suo alone, come una
-          testina di scansione vera. Fermo se il movimento è ridotto. */}
+      {/* LA LUCE: una fascia larga e morbida che scorre lenta, come la
+          testina di uno scanner da ufficio. Niente linea dura: solo un
+          gradiente di luce con un velo più chiaro al centro. Scende in
+          3,4 secondi, riposa mezzo secondo, riparte dall'alto. */}
       <motion.div
         aria-hidden="true"
-        className="scan-raggio pointer-events-none absolute inset-x-0 top-0 h-16"
-        initial={{ y: "-100%" }}
-        animate={{ y: ["-100%", "560%", "-100%"] }}
-        transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+        className="scan-raggio pointer-events-none absolute inset-x-0 top-0 h-28"
+        initial={{ y: "-110%", opacity: 0 }}
+        animate={{ y: ["-110%", "400%"], opacity: [0, 1, 1, 0] }}
+        transition={{
+          duration: 3.4,
+          repeat: Infinity,
+          repeatDelay: 0.5,
+          ease: "linear",
+          opacity: { times: [0, 0.12, 0.85, 1], duration: 3.4, repeat: Infinity, repeatDelay: 0.5 },
+        }}
       >
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, transparent, rgba(10,157,92,.10) 38%, rgba(10,157,92,.26) 50%, rgba(10,157,92,.10) 62%, transparent)",
-          }}
-        />
-        <div
-          className="absolute inset-x-0 top-1/2 h-[2px]"
-          style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(127,232,174,.95) 18%, rgba(10,157,92,.95) 50%, rgba(127,232,174,.95) 82%, transparent)",
-            boxShadow: "0 0 14px 2px rgba(10,157,92,.55)",
+              "linear-gradient(180deg, transparent, rgba(10,157,92,.05) 28%, rgba(10,157,92,.13) 46%, rgba(127,232,174,.20) 52%, rgba(10,157,92,.11) 58%, rgba(10,157,92,.04) 74%, transparent)",
           }}
         />
       </motion.div>

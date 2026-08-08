@@ -215,7 +215,7 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
   }
 
   // ── Strato 3: le regole. Solo codice, mai AI. ────────────────────────
-  const verdetto = valuta(fatto);
+  let verdetto = valuta(fatto);
 
   // ── La memoria dell'imbuto: una riga in `verifiche` per ogni check ───
   let verificaId: string | null = null;
@@ -247,6 +247,26 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
   // Il payload grezzo resta nel database, non esce dall'orchestratore.
   const { payloadGrezzo: _scarta, ...fattoPulito } = fatto;
   void _scarta;
+
+  /* Il caso più comune di "incerto" è un volo APPENA fatto: l'orario
+     certificato arriva ore dopo l'atterraggio, e il messaggio generico
+     ("controlla numero e data") faceva credere a un errore dell'utente.
+     Qui, e solo qui, il motivo diventa una spiegazione onesta: il
+     verdetto resta identico, cambia la frase. Trovato nello stress test
+     dell'8/08: 10 voli freschi, tutti incerti, utente convinto che il
+     sito fosse rotto. */
+  const dueGiorniFa = new Date(Date.now() - 2 * 86_400_000).toISOString().slice(0, 10);
+  if (
+    verdetto.esito === "incerto" &&
+    fatto.stato === "sconosciuto" &&
+    fatto.dataLocale >= dueGiorniFa
+  ) {
+    verdetto = {
+      ...verdetto,
+      motivo:
+        "Questo volo è recente e l'orario di arrivo certificato non è ancora negli archivi: di solito arriva entro un giorno. Ricontrolla domani: il check resta gratuito, e se ci lasci l'email ti avvisiamo noi.",
+    };
+  }
 
   return { ok: true, verificaId, verdetto, fatto: fattoPulito, demo: fatto.fonte === "demo" };
 }
