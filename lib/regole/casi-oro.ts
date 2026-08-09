@@ -29,6 +29,14 @@ function fatto(sovrascrivi: Partial<FattoVolo>): FattoVolo {
     voloIata: "FR8321",
     dataLocale: "2026-07-15",
     vettoreOperativo: "FR",
+    /* La tratta serve al cancello territoriale (art. 3): senza aeroporti
+       il motore non sa se il regolamento si applica e risponde incerto.
+       Bergamo → Palermo, tutto dentro l'Unione: così i casi qui sotto
+       misurano quello che vogliono misurare, cioè soglia e fasce. Nei
+       casi in cui il chilometraggio viene sovrascritto la tratta resta
+       questa: la fascia la decide `kmOrtodromica`, non lo scalo. */
+    partenzaIata: "BGY",
+    arrivoIata: "PMO",
     arrivoPrevistoUtc: "2026-07-15T20:00:00Z",
     arrivoEffettivoUtc: "2026-07-15T20:00:00Z",
     stato: "atterrato",
@@ -134,9 +142,109 @@ export const CASI_ORO: Caso[] = [
       kmOrtodromica: 2758.85,
       orarioVerificato: true,
       vettoreDaDeterminare: false, // codeshareStatus: "IsOperator"
+      partenzaIata: "BGY",
+      arrivoIata: "ACE",
       fonte: "aerodatabox",
     },
     atteso: { esito: "non_idoneo" },
+  },
+
+  /* ---------- IL CANCELLO TERRITORIALE (art. 3, par. 1) ----------
+     Casi aggiunti il 9/08/2026: il motore calcolava ritardo e fascia senza
+     chiedersi se il regolamento si applicasse. Un New York → Toronto usciva
+     idoneo a 600 euro. Questi casi tengono chiusa quella porta. */
+
+  {
+    nome: "AMBITO: New York → Toronto, 4 ore di ritardo: il regolamento non si applica",
+    fatto: conRitardo(240, {
+      voloIata: "AC711",
+      vettoreOperativo: "AC",
+      partenzaIata: "JFK",
+      arrivoIata: "YYZ",
+      kmOrtodromica: 570,
+    }),
+    atteso: { esito: "non_idoneo" },
+  },
+  {
+    nome: "AMBITO: si parte dall'Europa con vettore non europeo (Roma → New York, Delta): coperto",
+    fatto: conRitardo(250, {
+      voloIata: "DL105",
+      vettoreOperativo: "DL",
+      partenzaIata: "FCO",
+      arrivoIata: "JFK",
+      kmOrtodromica: 6866,
+    }),
+    atteso: { esito: "idoneo", importo: 600 },
+  },
+  {
+    nome: "AMBITO: si arriva in Europa con vettore europeo (New York → Roma, ITA): coperto",
+    fatto: conRitardo(250, {
+      voloIata: "AZ611",
+      vettoreOperativo: "AZ",
+      partenzaIata: "JFK",
+      arrivoIata: "FCO",
+      kmOrtodromica: 6866,
+    }),
+    atteso: { esito: "idoneo", importo: 600 },
+  },
+  {
+    /* Leggendo il Regolamento la risposta giusta sarebbe "non idoneo":
+       Delta è statunitense, e in arrivo da un paese terzo il 261 chiede un
+       vettore comunitario. Il motore però risponde INCERTO, ed è corretto
+       che lo faccia: Delta non è fra le compagnie che abbiamo verificato,
+       quindi il codice non sa dire se ha licenza europea e si rifiuta di
+       indovinare. È una vendita persa, non un falso positivo: sbagliamo
+       dalla parte di chi non paga. Si chiude aggiungendo i grandi vettori
+       extra UE alla tabella delle compagnie (segnato in ARRETRATI). */
+    nome: "AMBITO: vettore extra UE non in tabella, in arrivo da paese terzo: incerto (non lo sappiamo)",
+    fatto: conRitardo(250, {
+      voloIata: "DL104",
+      vettoreOperativo: "DL",
+      partenzaIata: "JFK",
+      arrivoIata: "FCO",
+      kmOrtodromica: 6866,
+    }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    /* Qui invece il vettore extra UE lo conosciamo (Emirates è in tabella
+       col paese AE): il no si può dare, ed è un no pulito. */
+    nome: "AMBITO: Emirates da Dubai a Roma: vettore non europeo, fuori ambito",
+    fatto: conRitardo(250, {
+      voloIata: "EK97",
+      vettoreOperativo: "EK",
+      partenzaIata: "DXB",
+      arrivoIata: "FCO",
+      kmOrtodromica: 4344,
+    }),
+    atteso: { esito: "non_idoneo" },
+  },
+  {
+    nome: "AMBITO: vettore sconosciuto in arrivo da un paese terzo: incerto, non si vende",
+    fatto: conRitardo(250, {
+      voloIata: "XX123",
+      vettoreOperativo: "XX",
+      partenzaIata: "JFK",
+      arrivoIata: "FCO",
+      kmOrtodromica: 6866,
+    }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    nome: "AMBITO: aeroporto di partenza non riconosciuto: incerto, non si vende",
+    fatto: conRitardo(250, { partenzaIata: "QQQ", arrivoIata: "FCO" }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    nome: "AMBITO: Canarie sono Unione Europea (Lanzarote → Bergamo): coperto",
+    fatto: conRitardo(200, {
+      voloIata: "FR4000",
+      vettoreOperativo: "FR",
+      partenzaIata: "ACE",
+      arrivoIata: "BGY",
+      kmOrtodromica: 2758,
+    }),
+    atteso: { esito: "idoneo", importo: 400 },
   },
 ];
 

@@ -16,7 +16,9 @@
  * i casi d'oro devono passare tutti.
  */
 
-export const VERSIONE_REGOLE = "2026.08.4";
+import { ambitoCE261, vettoreConLicenzaUE } from "./territorio";
+
+export const VERSIONE_REGOLE = "2026.08.5";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
 const SOGLIA_MINUTI = 180;
@@ -63,6 +65,13 @@ export type FattoVolo = {
    * chi ha OPERATO il volo: il reclamo andrebbe alla compagnia sbagliata.
    */
   vettoreDaDeterminare?: boolean;
+  /**
+   * Vero se chi ha OPERATO il volo ha licenza europea. Serve solo quando si
+   * parte da un paese terzo e si arriva in Europa (art. 3, par. 1, lett. b).
+   * Se manca, il motore lo ricava dalla tabella delle compagnie; se non lo
+   * sa nemmeno lì, il caso resta incerto.
+   */
+  vettoreUE?: boolean | null;
   /**
    * Vero quando la data del volo coincide con uno sciopero del trasporto
    * aereo noto (tabella `scioperi`, fonti pubbliche: CGS, MIT, ENAC).
@@ -127,6 +136,23 @@ export function minutiRitardo(previstoUtc: string, effettivoUtc: string): number
  * La valutazione. Pura: stesso fatto, stesso verdetto, per sempre.
  */
 export function valuta(f: FattoVolo): Verdetto {
+  /* IL CANCELLO TERRITORIALE, PRIMA DI TUTTO IL RESTO (art. 3, par. 1).
+     Se il regolamento non si applica a questo volo, il ritardo non conta
+     niente: un New York → Toronto con quattro ore di ritardo non dà
+     nessuna compensazione europea. Senza questo controllo il motore lo
+     dichiarava idoneo a 600 euro, ed è il falso positivo che la regola
+     numero uno vieta. Dove non siamo sicuri esce incerto, mai idoneo. */
+  const ambito = ambitoCE261(
+    f.partenzaIata,
+    f.arrivoIata,
+    f.vettoreUE ?? vettoreConLicenzaUE(f.vettoreOperativo),
+  );
+  if (!ambito.dentro) {
+    /* Il ritardo non si mostra: fuori ambito è irrilevante, e stamparlo
+       farebbe credere che manchi poco per avere diritto a qualcosa. */
+    return ambito.certo ? nonIdoneo(null, ambito.motivo) : incerto(ambito.motivo);
+  }
+
   // Dati che non combaciano fra fonti: non si vende su un dato conteso.
   if (f.fontiDiscordanti) {
     return incerto(

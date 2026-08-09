@@ -404,6 +404,57 @@ non altro codice.**
   usa il modello del ritardo; va scritta la variante con art. 4 e
   giurisprudenza Folkerts per i due casi nuovi.
 
+## Dal giro #37 (9/08) — dopo il cancello territoriale e la ricerca
+- **I 30 CASI VERI: tocca a te lanciarli.** Un comando solo, dalla cartella
+  del progetto: `npm run banco`. Legge `prove/casi-reali.json` (30 voli veri
+  già scelti), li passa nel motore e stampa quanti risultano idonei. Ci
+  mette circa un minuto. Da qui non posso: l'ambiente blocca AeroDataBox.
+  **È la validazione che il piano mette prima di tutto: senza, non sappiamo
+  quanti voli reali risultano davvero idonei.**
+- **Le due domande al supporto AeroDataBox** (costo zero, sbloccano o
+  chiudono per sempre il retroattivo lungo). In inglese:
+  1. "How far back does the historical flight-by-number archive go on the
+     Pro, Ultra and Mega plans?"
+  2. "Do records older than 12 months still include `arrival.quality =
+     Live` and `arrival.runwayTime`?"
+  Se la risposta alla seconda è no, il retroattivo lungo è chiuso comunque:
+  senza Live il motore non dà verdetti, quindi si pagherebbe un abbonamento
+  per zero pratiche in più. **Non abbonarsi a niente prima della risposta.**
+- **La garanzia dei 90 giorni va ripensata, ed è il rischio più
+  sottovalutato.** Le compagnie rispondono in 8-14 settimane: il giorno 90
+  cade DENTRO quella finestra, quindi clienti onesti chiederanno il rimborso
+  senza che la compagnia abbia ancora deciso. Al 50% di escussioni il
+  margine per pratica scende da 13,66 a circa 6,83 euro. Due strade, decide
+  Valerio: legarla all'ESITO ("se la compagnia rifiuta senza motivo valido o
+  non risponde nei termini, ti rimborsiamo") oppure allungarla a 180 giorni.
+  **Non è un dettaglio di testo: è metà del guadagno.**
+- **La lettera manda tutti all'ENAC, anche chi parte da fuori Italia.**
+  L'art. 16 assegna la competenza all'organismo dello Stato dell'AEROPORTO
+  DI PARTENZA: per un Barcellona-Berlino l'ente è spagnolo, non l'ENAC.
+  Serve una tabella `NEB[paese di partenza]` (circa 31 righe, con nome e
+  link ufficiale verificati) al posto dell'ENAC scritto in chiaro in
+  `lib/lettera/genera.ts`. Va fatto anche restando solo sull'Italia, perché
+  già oggi vendiamo verdetti su partenze non italiane.
+  ⚠️ Nota: il campo `autoritaNazionale` dentro `compagnie.ts` è agganciato
+  alla COMPAGNIA ed è concettualmente sbagliato per lo stesso motivo. Oggi
+  non è usato da nessuna parte, quindi non fa danni: va sostituito, non
+  corretto.
+- **La Svizzera resta fuori dal cancello territoriale, di proposito.**
+  Applica il 261 per accordo bilaterale, non come Stato membro, e non ho
+  una fonte verificata sotto mano. Oggi quei casi escono incerti (vendita
+  persa, mai un falso positivo). Si chiude con una verifica e una riga in
+  `lib/regole/territorio.ts`.
+- **I grandi vettori extra UE non sono in tabella** (Delta, United,
+  American, Air Canada, LATAM...). In arrivo da un paese terzo il motore
+  risponde incerto invece di un no pulito, perché non sa dire se hanno
+  licenza europea. Non è un errore, è una risposta prudente: si chiude
+  aggiungendoli a `lib/lettera/compagnie.ts` col loro paese.
+- **Il dopo-lettera** (dalla ricerca, alto impatto): il 52% dei reclami
+  validi viene respinto alla prima risposta. Oggi Rivolio si ferma alla
+  lettera. Serve il secondo colpo già pronto e incluso nel prezzo: il
+  sollecito e la segnalazione all'ente nazionale precompilata. Abbassa le
+  escussioni della garanzia e giustifica il pagamento anticipato.
+
 ## Dal giro #36 (9/08) — sicurezza e stile
 - **Cancellazione automatica dopo 24 mesi**: la privacy ora PROMETTE che le
   verifiche perdono i dati che identificano l'utente entro 24 mesi. La

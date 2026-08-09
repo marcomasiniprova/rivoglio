@@ -29,6 +29,56 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #37 (9/08): IL CANCELLO TERRITORIALE (un falso positivo vero) +
+  BANCO DI PROVA + LA RICERCA CHE RISPONDE AL PIANO DELL'AMICO.**
+  - 🔴 **TROVATO E CHIUSO UN FALSO POSITIVO VERO.** Il motore calcolava
+    ritardo e fascia senza chiedersi MAI se il Regolamento si applicasse:
+    un **New York → Toronto** con 4 ore di ritardo usciva **idoneo a 600€**.
+    È esattamente il falso positivo che la regola numero uno vieta (si vende
+    una lettera per un diritto che non esiste, poi si rimborsa con la
+    garanzia e si prende una stella). Nato `lib/regole/territorio.ts`:
+    l'art. 3 par. 1 dice che conta **da dove parte l'aereo**. Partenza
+    UE/SEE = coperto sempre, con qualsiasi compagnia; partenza da paese
+    terzo = coperto solo se chi ha operato ha licenza europea; terzo→terzo
+    = mai. Il cancello gira PRIMA di tutto il resto in `valuta()`. Dove non
+    siamo sicuri esce **incerto, mai idoneo**. Regole alla versione
+    **2026.08.5**. Golden set portato da 36 a **43 casi** con 7 casi nuovi
+    di ambito: **43 verdi, falsi positivi 0**.
+    ⚠️ Due prudenze dichiarate: la **Svizzera** non è nell'elenco (applica
+    il 261 per accordo bilaterale, non come Stato membro: senza fonte
+    verificata i suoi casi restano incerti), e i **grandi vettori extra UE
+    non in tabella** (Delta, United, American...) danno incerto invece di
+    un no pulito. Entrambe in ARRETRATI.
+  - **IL BANCO DI PROVA** (`scripts/banco-prova.ts`, `npm run banco`): passa
+    una lista di voli veri dentro il motore e stampa verdetto, ritardo,
+    tratta e importo, col riepilogo idonei/incerti/non idonei e gli esiti
+    salvati in `prove/casi-reali-esiti.json`. **`prove/casi-reali.json` ha i
+    30 casi pronti**: voli VERI (numero, tratta, distanza calcolata in
+    ortodromica sul nostro stesso file scali), sparsi su 12 mesi, con dentro
+    i casi limite (Bergamo-Malaga a 1550 km, appena sopra la soglia) e le
+    prove di ambito (Dublino-Roma, Malpensa-New York con Delta).
+    ⚠️ **Lo deve lanciare Valerio dal suo PC**: da qui l'egress blocca
+    AeroDataBox e anche il sito vivo.
+  - **LA RICERCA (10 agenti, 6 filoni + 3 controlli avversariali).** I punti
+    che cambiano le decisioni:
+    - **"2 paganti su 100 check" NON è conservativo**: è il caso medio-buono
+      da mese sei. Il numero di lavoro è **1% al lancio, 2-3% a regime**.
+      Il collo di bottiglia non è la conversione, **è il traffico**.
+    - **La soglia delle 3 ore è CONFERMATA** dalla riforma approvata a
+      luglio 2026 (Parlamento, 646 voti contro 12). Il rischio che poteva
+      uccidere il progetto è passato. Ma dall'estate 2027 arriva un
+      **termine unico di 9 mesi**: il bacino retroattivo si chiude da solo.
+    - **Il retroattivo lungo non conviene comprarlo**: prima si scrive al
+      supporto AeroDataBox (due domande in ARRETRATI), e comunque la
+      finestra dura circa dodici mesi. **Marketing sui 5 anni spento**: la
+      descrizione social prometteva ancora "ultimi 5 anni" e portava
+      traffico che converte a zero per costruzione (ogni volo vecchio →
+      incerto → non si vende). Ora dice "volo in ritardo o cancellato".
+    - **Italia o Europa: il prodotto copre GIÀ tutta la UE** e non serve
+      aprire una lingua nuova (costo alto, zero visitatori in più). Un
+      millesimo del solo mercato italiano basta per l'obiettivo cassa.
+  - Prove: **350 verdi**, restano le 2 note dell'Osservatorio (la sandbox
+    non raggiunge Supabase). Eval del motore: 43 su 43.
 - **GIRO #36 (9/08): SICUREZZA A TAPPETO + IL GIRO DI STILE CHIESTO.**
   - **LA REPO È BLINDATA (audit del team di Valerio + scan con la skill
     Masriyan/Claude-Code-CyberSecurity-Skill).** Le difese vere, quelle che

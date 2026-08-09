@@ -1,0 +1,35 @@
+[
+  { "volo": "FR4001", "data": "2026-08-06", "nota": "Bergamo-Lanzarote, 2758 km, fascia 400. Il PRIMO caso reale gia' verificato: 155 min, non idoneo. Serve come controprova che il motore non e' cambiato." },
+
+  { "volo": "AZ1709", "data": "2026-08-01", "nota": "Roma-Catania, 539 km, fascia 250. Nazionale, sabato di agosto." },
+  { "volo": "AZ2029", "data": "2026-07-25", "nota": "Milano Linate-Roma, 470 km, fascia 250. La rotta piu' battuta d'Italia." },
+  { "volo": "FR5915", "data": "2026-07-18", "nota": "Napoli-Milano Malpensa, 693 km, fascia 250. Napoli: cancellazioni x12 nel 2026." },
+  { "volo": "U23574", "data": "2026-06-27", "nota": "Napoli-Malpensa easyJet, 693 km, fascia 250." },
+  { "volo": "FR2289", "data": "2026-08-02", "nota": "Bergamo-Palermo, 879 km, fascia 250. Domenica di rientro." },
+  { "volo": "FR5655", "data": "2026-07-11", "nota": "Bergamo-Palma di Maiorca, 887 km, fascia 250. Rotta estiva affollata." },
+  { "volo": "FR280", "data": "2026-05-16", "nota": "Venezia-Catania, 922 km, fascia 250." },
+  { "volo": "FR8121", "data": "2026-04-11", "nota": "Bergamo-Tirana, 935 km, fascia 250." },
+  { "volo": "FR2262", "data": "2026-03-14", "nota": "Catania-Bergamo, 1015 km, fascia 250. Bassa stagione: serve al confronto." },
+  { "volo": "FR1198", "data": "2026-02-21", "nota": "Roma-Atene, 1086 km, fascia 250. Inverno." },
+  { "volo": "FR1455", "data": "2025-12-27", "nota": "Malpensa-Dublino, 1382 km, fascia 250. Ponte di Natale." },
+  { "volo": "U23805", "data": "2025-11-15", "nota": "Malpensa-Parigi CDG, 598 km, fascia 250. Autunno." },
+  { "volo": "NO247", "data": "2025-10-04", "nota": "Bari-Malpensa Norwegian, 818 km, fascia 250." },
+
+  { "volo": "FR2649", "data": "2026-07-04", "nota": "Bergamo-Malaga, 1550 km: CASO LIMITE, appena sopra i 1500. Se il motore sbaglia la soglia si vede qui." },
+  { "volo": "FR820", "data": "2026-08-08", "nota": "Bergamo-Lisbona, 1724 km, fascia 400." },
+  { "volo": "FR5568", "data": "2026-07-31", "nota": "Dublino-Roma, 1886 km, fascia 400. Partenza NON italiana: prova che copriamo tutta la UE." },
+  { "volo": "FR266", "data": "2026-06-13", "nota": "Bergamo-Fuerteventura, 2816 km, fascia 400." },
+  { "volo": "FR5822", "data": "2026-05-02", "nota": "Roma-Gran Canaria, 2935 km, fascia 400." },
+  { "volo": "U23891", "data": "2026-04-25", "nota": "Malpensa-Sharm el Sheikh, 2989 km, fascia 400. Fuori UE, vettore UE." },
+  { "volo": "FR244", "data": "2026-03-07", "nota": "Roma-Tenerife Sud, 3018 km, fascia 400." },
+  { "volo": "FR2830", "data": "2026-01-10", "nota": "Bergamo-Tenerife Sud, 3026 km, fascia 400. Inverno alle Canarie." },
+  { "volo": "NO1674", "data": "2025-09-20", "nota": "Malpensa-Sharm Norwegian, 2989 km, fascia 400." },
+
+  { "volo": "AZ610", "data": "2026-08-05", "nota": "Roma-New York JFK, 6866 km, fascia 600. Lungo raggio di punta." },
+  { "volo": "AZ614", "data": "2026-07-22", "nota": "Roma-Boston, 6569 km, fascia 600." },
+  { "volo": "DL185", "data": "2026-06-06", "nota": "Malpensa-New York Delta, 6413 km. Vettore NON UE in partenza dalla UE: coperto, ed e' una prova importante." },
+  { "volo": "EK98", "data": "2026-05-23", "nota": "Roma-Dubai Emirates, 4344 km, fascia 600. Vettore non UE, partenza UE." },
+  { "volo": "AZ628", "data": "2026-04-18", "nota": "Roma-Chicago, 7742 km, fascia 600." },
+  { "volo": "AZ674", "data": "2026-02-14", "nota": "Roma-San Paolo, 9433 km, fascia 600. Il piu' lungo del gruppo." },
+  { "volo": "AZ793", "data": "2025-11-08", "nota": "Roma-Tokyo Haneda, 9893 km, fascia 600." }
+]

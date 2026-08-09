@@ -63,11 +63,16 @@ export const demo: FornitoreVoli = {
       dataLocale,
       vettoreOperativo: "ZZ Compagnia Demo",
       vettoreMarketing: null,
-      /* Una tratta dimostrativa dichiarata: serve al teatro dello scan
-         (il biglietto si compila) senza fingere una città vera. */
-      partenzaIata: null,
+      /* Una tratta dimostrativa dichiarata: le CITTÀ restano finte, così il
+         teatro dello scan (il biglietto che si compila) non spaccia una
+         città vera per il volo di qualcuno.
+         Gli SCALI invece sono due codici italiani veri, e servono: dal 9/08
+         il motore ha un cancello territoriale (art. 3) e senza aeroporti
+         riconoscibili risponderebbe "incerto" anche al caso dimostrativo,
+         mostrando sulla landing un prodotto che non decide mai. */
+      partenzaIata: "BGY",
       partenzaCitta: "Scalo demo A",
-      arrivoIata: null,
+      arrivoIata: "PMO",
       arrivoCitta: "Scalo demo B",
       arrivoPrevistoUtc: sagoma.stato === "sconosciuto" ? null : previsto,
       arrivoEffettivoUtc: effettivo,

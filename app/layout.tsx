@@ -45,7 +45,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Rivolio",
     description:
-      "Hai preso un volo negli ultimi 5 anni? Forse ti devono fino a 600€. Controllalo gratis in 30 secondi.",
+      /* Il gancio è "ti è appena successo", non più "gli ultimi 5 anni":
+         il check verifica 12 mesi indietro, e un volo più vecchio torna
+         incerto, che per regola non si vende. Promettere 5 anni portava
+         traffico che non poteva convertire per costruzione. */
+      "Volo in ritardo o cancellato? Forse ti devono fino a 600€. Controlla gratis in 30 secondi, col dato ufficiale del tuo volo.",
     locale: "it_IT",
     type: "website",
   },
