@@ -5,7 +5,7 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 /**
  * GET /api/classifica
  *
- * La classifica di chi si è ripreso più soldi con Rivoglio. Costruita
+ * La classifica di chi si è ripreso più soldi con Rivolio. Costruita
  * completa e SPENTA al lancio (scelta di Valerio, 8/08): si accende con
  * CLASSIFICA_ATTIVA=1 su Netlify quando ci sono 10 giorni di vincite
  * vere da mostrare. Da spenta risponde {attiva:false} e l'app nasconde

@@ -63,7 +63,7 @@ export function apriImpostazioni(): Esito {
     return null;
   } catch (e) {
     console.warn("[sistema] impostazioni non aperte:", e);
-    return "Apri le impostazioni del telefono e cerca Rivoglio fra le app.";
+    return "Apri le impostazioni del telefono e cerca Rivolio fra le app.";
   }
 }
 

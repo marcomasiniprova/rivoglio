@@ -3,7 +3,7 @@ import Link from "next/link";
 import PaginaLegale from "@/components/legale/PaginaLegale";
 
 export const metadata: Metadata = {
-  title: "Bagaglio perso, in ritardo o danneggiato: la guida | Rivoglio",
+  title: "Bagaglio perso, in ritardo o danneggiato: la guida | Rivolio",
   description:
     "Cosa fare subito in aeroporto, i termini di 7 e 21 giorni, quanto si può chiedere con la Convenzione di Montreal. Guida gratuita, senza vendita: il reclamo bagagli lo fai da solo.",
 };
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 /**
  * LA GUIDA BAGAGLI (scelta di Valerio col popup, 8/08: guida sì, vendita
  * no). I bagagli stanno sotto la Convenzione di Montreal, non sotto il
- * Reg. CE 261/2004: Rivoglio non vende pratiche bagagli e lo dice subito.
+ * Reg. CE 261/2004: Rivolio non vende pratiche bagagli e lo dice subito.
  * La pagina serve a chi cerca "bagaglio perso cosa fare": risposta onesta,
  * i termini veri, e in fondo il ponte verso il check del volo.
  *
@@ -30,7 +30,7 @@ export default function PaginaGuidaBagagli() {
       <p>
         La versione corta: <strong>per il bagaglio non vale il Regolamento CE 261/2004</strong>{" "}
         (quello dei ritardi dei voli), ma la Convenzione di Montreal. È una pratica che puoi
-        fare da solo, gratis, e i passi sono pochi. Rivoglio non vende pratiche bagagli:
+        fare da solo, gratis, e i passi sono pochi. Rivolio non vende pratiche bagagli:
         questa guida è tutto quello che serve.
       </p>
 
@@ -96,7 +96,7 @@ export default function PaginaGuidaBagagli() {
       <p>
         Quella è un&apos;altra storia, e un&apos;altra legge: il Regolamento CE 261/2004. Se
         il tuo volo è atterrato con 3 ore di ritardo o più, la compensazione va da 250€ a
-        600€ a passeggero, e lì Rivoglio fa il lavoro sporco:{" "}
+        600€ a passeggero, e lì Rivolio fa il lavoro sporco:{" "}
         <Link href="/#controllo">controlla il volo gratis</Link>, il verdetto arriva in
         trenta secondi.
       </p>

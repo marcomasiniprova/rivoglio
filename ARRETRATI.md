@@ -79,15 +79,15 @@ non altro codice.**
 | 31 | **"Costruisci un team di agenti e fammi l'app"** | 8 agenti coordinati (backend, UI, copy, AI, 3 frontend, QA): app in `mobile/` con onboarding in 6 passi, tab Destinazioni/Ricerche/Profilo, dettaglio col conto aperto, punteggio preferenze. Esito verificato due volte: tsc 0 errori, lint pulito, **29 prove su 29**. |
 | 32 | **"Usa Composio"** | Usato per operare sul tuo Supabase vero (la sandbox non lo raggiunge): schema di `profili` verificato colonna per colonna e **migrazione `expo_push_token` applicata e riverificata** in produzione. |
 
-## ✅ CHIUSI il 07-08/08 — sesto giro: il pivot Rivoglio
+## ✅ CHIUSI il 07-08/08 — sesto giro: il pivot Rivolio
 
 | # | Cosa avevi chiesto | Come è stato chiuso |
 |---|---|---|
-| 33 | **"Elimina ogni traccia del vecchio nome, rinomina tutto in Rivoglio"** | Repo GitHub rinominata in `rivoglio` (remote ripuntato, push provato), progetto Supabase rinominato, bundle `it.rivoglio.app`, codice e documenti ripuliti. Via Composio, senza rifare nulla da zero. |
+| 33 | **"Elimina ogni traccia del vecchio nome, rinomina tutto in Rivolio"** | Repo GitHub rinominata in `rivolio` (remote ripuntato, push provato), progetto Supabase rinominato, bundle `it.rivolio.app`, codice e documenti ripuliti. Via Composio, senza rifare nulla da zero. |
 | 34 | **"Esplora il documento e costruisci il prodotto"** | Documento (1432 righe) letto per intero, `SPEC.md` riscritto come bibbia. Costruito tutto: motore EU261 deterministico (`lib/regole/eu261.ts`, 3 stati, l'AI non decide mai), golden set 25 casi + eval bloccante falsi positivi 0, strato voli (AeroDataBox + AviationStack + demo marcata), check gratuito senza login, reveal, Polar (webhook firmato, provato 10/10), lettera coi canali verificati di 10 compagnie, follow-up T+0/2/15/30/60, tracker, `/admin` in shadow mode. Schema (voli, verifiche, pratiche, eventi) applicato sul Supabase vero. |
 | 35 | **"Web app Next + app mobile Expo"** | Web completa (16 pagine). Mobile: pivot minimo a tab Pratiche/Profilo; il tracker completo arriva dopo che il web incassa (il documento è chiaro: l'app non è la porta d'ingresso). |
-| 36 | **"Netlify col connettore collegato a te"** | Progetto `rivoglio` creato via connettore, 5 variabili impostate, `rivoglio.netlify.app` riservato. |
-| 37 | **"/impeccable, poi /taste-skill, poi /seo, prima del deploy"** | Fatti in quest'ordine. Impeccable: schermate desktop/mobile/reveal verificate, detector a 0. Taste: trattini lunghi 0, occhielli 7→4, CTA coerenti. SEO: robots, sitemap, JSON-LD, llms.txt, canonical, metadata Rivoglio (tutti provati con 200 sul server di sviluppo). |
+| 36 | **"Netlify col connettore collegato a te"** | Progetto `rivolio` creato via connettore, 5 variabili impostate, `rivoglio.netlify.app` riservato. |
+| 37 | **"/impeccable, poi /taste-skill, poi /seo, prima del deploy"** | Fatti in quest'ordine. Impeccable: schermate desktop/mobile/reveal verificate, detector a 0. Taste: trattini lunghi 0, occhielli 7→4, CTA coerenti. SEO: robots, sitemap, JSON-LD, llms.txt, canonical, metadata Rivolio (tutti provati con 200 sul server di sviluppo). |
 | 38 | **"Installa le skill di Emil Kowalski"** | 9 skill ufficiali in `.claude/skills/` (animate, apple-design, prototype, review-animations e le altre). |
 | 39 | **"Le 3 fasi: SVILUPPO, DISTRIBUZIONE, MIGLIORAMENTO"** | `PIANO.md` riscritto con le tre fasi come le hai definite + artefatto visivo della fase SVILUPPO consegnato. |
 | 40 | **"UI come le 4 foto di riferimento"** | Direzione registrata in `BRAND.md` (luce e aria, vetro smerigliato, card pulite, stepper): cielo sull'hero, form col bordo che pulsa, reveal col contatore, schermate di conferma consegnate. |
@@ -98,7 +98,7 @@ non altro codice.**
 |---|---|---|
 | 41 | **"Logo nuovo definitivo, posizionalo benissimo e migliora la qualità"** | Sfondo tolto col riempimento dai bordi, solo la lente estratta come componente connesso, upscalata a 1024px e affilata. Montata in nav, footer e card di condivisione via `components/Logo.tsx`; scritta accanto in due toni (Rivo scuro, glio verde) come nel lockup. Icone rifatte: `app/icon.png` 512, `apple-icon.png` 180, favicon.ico, manifest e JSON-LD aggiornati. Vecchio segno (sole e strada) eliminato. |
 | 42 | **"Nel footer l'immagine del telefono come il riferimento, senza sfondo"** | La tua foto ripulita (sfondo a righe tolto, tenuto solo il componente mano+telefono, 878x1257) in una card bianca sul footer scuro: titolo, testo, bottone verde e il telefono che entra dal bordo basso. Come la quarta immagine, coi nostri colori. |
-| 43 | **"La scritta Rivoglio in basso più grande e occupante"** | Maiuscola come nel lockup, fino a 15rem, taglio sul bordo basso, sfumatura menta. Occupa tutta la larghezza. |
+| 43 | **"La scritta Rivolio in basso più grande e occupante"** | Maiuscola come nel lockup, fino a 15rem, taglio sul bordo basso, sfumatura menta. Occupa tutta la larghezza. |
 | 44 | **"FAQ: testo in disparte, centralo"** | Titolo centrato sopra le domande, lista in colonna da 760px. Prima era una griglia con la colonna laterale. |
 | 45 | **"Newsletter schiacciata piccolissima"** | Trovata la causa vera: `flex-1` sul campo email dentro un contenitore in colonna (sul telefono governa l'altezza, non la larghezza): campo a 27px contro i 52 del bottone. Ora `sm:flex-1`: 52px misurati, prova visiva fatta. |
 
@@ -127,7 +127,7 @@ non altro codice.**
 | 54 | **"Anima lo sfondo: colonne geometriche a onda calma"** | Rifatte: spigoli definiti, filo di bordo chiaro, zigzag di tono fra pari e dispari, UN'onda sola che viaggia da sinistra a destra (fase per indice, durata unica 8,4s). Via i respiri casuali. |
 | 55 | **"Pricing esattamente come la reference"** | L'agente art-director l'ha replicata coi nostri colori: occhiello a pillola, card bianche, la centrale (Una pratica 14,90) sollevata con nastro verde "La più scelta", spunte, bottoni pieni a tutta larghezza. Niente toggle (deciso da te). Il confronto col 35% è sotto, come striscia. |
 | 56 | **"Scanner cinematico nel check"** | Il teatro ora è una scansione: carta d'imbarco coi dati VERI inseriti, raggio verde che la percorre, righe che si accendono a ogni passo completato. I passi restano agganciati allo stato vero della richiesta. |
-| 57 | **"Ogni bottone animato e funzionante"** | Pressione fisica globale al click (scale 0.965) su tutti i bottoni del sito; "Entra" in nav ora è pillola di vetro; il sistema variants (pieno/scuro/vetro/contorno) c'era già e resta. "Esci" e i checkout NON erano rotti in codice: sul tuo rivoglioo statico le azioni server non esistono, sul progetto giusto funzionano. |
+| 57 | **"Ogni bottone animato e funzionante"** | Pressione fisica globale al click (scale 0.965) su tutti i bottoni del sito; "Entra" in nav ora è pillola di vetro; il sistema variants (pieno/scuro/vetro/contorno) c'era già e resta. "Esci" e i checkout NON erano rotti in codice: sul tuo rivolioo statico le azioni server non esistono, sul progetto giusto funzionano. |
 | 58 | **"Testi grigi piccoli illeggibili"** | Alzati misura e contrasto dei peggiori: etichette e note del check (13→14,5px, da fumo-2 a fumo/inchiostro), crediti e disclaimer del footer (bianco dal 40-45% al 55-65%). |
 
 ## ✅ CHIUSI l'8/08 — undicesimo giro: micro-animazioni alla Emil
@@ -198,11 +198,11 @@ non altro codice.**
 | 90 | **"Ammorbidisci l'intervista di art-director"** | FASE 0 ora dice: salta le domande già risposte nel brief, chiedi solo ciò che manca, e se non manca niente vai avanti dichiarando cosa hai dedotto. Un brief esplicito e dettagliato vale come conferma per passare alla fase dopo. |
 | 91 | **"Dove si configurano le variabili d'ambiente, mettile una volta sola"** | `.claude/settings.json` (tracciato) con USE_BUILTIN_RIPGREP=0 e ENABLE_TOOL_SEARCH=auto:5: valgono su ogni macchina che apre il repo, PC compreso, senza toccare più nessun file di shell. FIGMA_API_KEY è un segreto, quindi sta in `.claude/settings.local.json` che è in .gitignore (regola #5): sul tuo PC va ricreato, la riga è nel rapporto in chat. |
 
-## ✅ CHIUSI l'8/08 sera — diciottesimo giro: l'app mobile diventa Rivoglio
+## ✅ CHIUSI l'8/08 sera — diciottesimo giro: l'app mobile diventa Rivolio
 
 | # | Cosa avevi chiesto | Come è stato chiuso |
 |---|---|---|
-| 92 | **"Ho aperto l'app ed è ancora quella dei viaggi, fa schifo, non c'è traccia di Rivoglio"** | Vero, ed era scritto in STATO ma andava fatto. Primo pezzo consegnato: la schermata di apertura ora è **il check del volo di Rivoglio** (logo, occhiello, titolo col corsivo, campo volo e data con le barre automatiche, punti di fiducia) e il **verdetto** ha la sua schermata coi tre esiti, orari, ritardo e fascia. Il motore non è duplicato: l'app chiama la stessa API del sito. Provato end-to-end nell'anteprima (ZZ250 → 3h20 di ritardo → fascia 250€). **Restano viaggi**: tab, registrazione, destinazioni, ricerche. Prossimo pezzo. |
+| 92 | **"Ho aperto l'app ed è ancora quella dei viaggi, fa schifo, non c'è traccia di Rivolio"** | Vero, ed era scritto in STATO ma andava fatto. Primo pezzo consegnato: la schermata di apertura ora è **il check del volo di Rivolio** (logo, occhiello, titolo col corsivo, campo volo e data con le barre automatiche, punti di fiducia) e il **verdetto** ha la sua schermata coi tre esiti, orari, ritardo e fascia. Il motore non è duplicato: l'app chiama la stessa API del sito. Provato end-to-end nell'anteprima (ZZ250 → 3h20 di ritardo → fascia 250€). **Restano viaggi**: tab, registrazione, destinazioni, ricerche. Prossimo pezzo. |
 | 93 | **"Voglio vedere l'app come uno sviluppatore serio, col mockup del telefono"** | La cornice iPhone della tua immagine è il simulatore iOS, che su Windows non esiste (Apple lo dà solo su Mac). Le due strade vere: `F12` → `Ctrl+Shift+M` nel browser (misure del telefono in 2 secondi, è quello che usano gli sviluppatori web) oppure l'emulatore Android di Android Studio, che ha la cornice vera. Entrambe nella guida. |
 | 94 | **Il check dell'app diceva "sei offline" pur avendo rete** | Trovato provando davvero: mancavano gli header CORS su `/api/verifica`, e il browser bloccava la risposta. Aggiunti (più la risposta al preflight OPTIONS). Verificato con preflight e POST: 204 e 200 con gli header giusti. |
 
@@ -229,10 +229,10 @@ non altro codice.**
 | # | Cosa avevi chiesto | Come è stato chiuso |
 |---|---|---|
 | 103 | **Scena di scansione nativa nell'app** (il check saltava dritto al verdetto) | `ScenaScan.tsx`: la stessa scena del sito in React Native. 6 passi da 2,4s mai tagliati, biglietto che si compila coi dati veri del server, luce dello scanner (3,4s + pausa), timbro CE a molla, barra e contatore. Scelta popup: identica al sito. Provata end-to-end su Expo web: ZZ250 → scena → verdetto da sola, zero errori. Su 390px la tratta ha una riga sua (le tre colonne del sito la troncavano). |
-| 104 | **Sezione prezzi da rifare esteticamente** | Due carte d'imbarco affiancate (scelta popup): fascia scura col nome e il nastro "La più scelta", strappo coi fori, codice a barre, timbro Rivoglio. Il check gratis è una striscia sopra le carte. Conti e confronto apribili restano (prova landing verde). |
+| 104 | **Sezione prezzi da rifare esteticamente** | Due carte d'imbarco affiancate (scelta popup): fascia scura col nome e il nastro "La più scelta", strappo coi fori, codice a barre, timbro Rivolio. Il check gratis è una striscia sopra le carte. Conti e confronto apribili restano (prova landing verde). |
 | 105 | **Messaggi del motore per cancellato/dirottato** | Riscritti per l'utente: il cancellato dice che il preavviso lo sa solo lui e che rimborso/volo alternativo si chiedono comunque; il dirottato spiega l'atterraggio in un altro scalo e perché il dato non basta. Versione regole 2026.08.4, golden set verde. |
 | 106 | **Pagina guida bagagli** (popup: guida sì, vendita no) | `/guida-bagagli`: PIR, termini 7/21 giorni, perso dopo 21, 2 anni, tetto 1.519 DSP (ICAO dal 28/12/2024) con conversione dichiarata stima, fonti in fondo, ponte al check. Footer (colonna Domande) + sitemap. |
-| 107 | **Testi delle email brandizzate** | Scoperta: l'email di benvenuto alla registrazione era ANCORA quella dei crediti viaggi. Riscritta per Rivoglio (check libero, pratiche, avvisi). Le T+0/2/15/30/60 rilette: già in stile casa. Il ramo email/alert viaggi resta da spegnere (voce qui sotto). |
+| 107 | **Testi delle email brandizzate** | Scoperta: l'email di benvenuto alla registrazione era ANCORA quella dei crediti viaggi. Riscritta per Rivolio (check libero, pratiche, avvisi). Le T+0/2/15/30/60 rilette: già in stile casa. Il ramo email/alert viaggi resta da spegnere (voce qui sotto). |
 | 108 | **QA da utente critico + verify** | Giro visivo con Chromium su app (welcome → check → scena → verdetto), prezzi 1440/390, guida 1440/390: zero errori console, zero scroll orizzontale. Fix piccoli subito (data ISO sul biglietto del sito → GG/MM/AAAA; griglia carta mobile). Il lint mobile era rosso dal giro precedente (ref Animated + require): sistemato con `useValoreAnimato` e import statici. Verify e prove nel commit di chiusura. |
 
 ## ⏳ ANCORA DA FARE
@@ -250,12 +250,12 @@ non altro codice.**
   `lib/email/messaggi.ts` (ricerca attiva, destinazione, crediti, ricevuta)
   sono ancora testi viaggi e restano richiamabili da `creaRicerca`,
   `lib/alert/invia.ts` e dalle rotte `/api/motore/abbina|raccogli`, che
-  però nessun flusso di Rivoglio usa più. Scoperto l'8/08 notte
+  però nessun flusso di Rivolio usa più. Scoperto l'8/08 notte
   ricontrollando i testi: l'unica che partiva DAVVERO (benvenuto, alla
-  registrazione) è stata riscritta subito per Rivoglio. Il resto si
+  registrazione) è stata riscritta subito per Rivolio. Il resto si
   spegne in un giro suo, con calma: rimuovere chiamanti morti e funzioni.
 - **Onboarding dell'app mobile ancora al prodotto viaggi**: va riscritto
-  per Rivoglio (check del volo, non micro-vacanze). Scoperto l'8/08 con
+  per Rivolio (check del volo, non micro-vacanze). Scoperto l'8/08 con
   l'anteprima web. Si fa insieme al tracker mobile completo.
 - **Golden set da 30 a 100+ casi** man mano che passano voli veri (il
   documento chiede casi reali etichettati a mano; il primo, FR4001, è
@@ -284,7 +284,7 @@ non altro codice.**
 5. Fatturazione Gemini su Google AI Studio · UNSPLASH_ACCESS_KEY quando
    approvata · alla prossima fattura AeroDataBox chiedere la profondità
    storica dei piani a pagamento.
-6. Dominio (slot Hostinger) e social @rivoglio (li crei tu, tua scelta).
+6. Dominio (slot Hostinger) e social @rivolio (li crei tu, tua scelta).
 7. Legale: revisione avvocato delle 3 pagine bozza (privacy, condizioni,
    cookie) + cognome e dati societari del titolare da darmi per inserirli
    · commercialista sul regime fiscale.
@@ -339,9 +339,9 @@ non altro codice.**
 ## 📌 COSE CHE VALGONO SEMPRE
 
 - **Obiettivo: fare cassa entro ottobre 2026.** Ogni scelta si giudica così.
-- **Prodotto: Rivoglio**, lo scanner dei rimborsi EU261. Check gratis,
+- **Prodotto: Rivolio**, lo scanner dei rimborsi EU261. Check gratis,
   pratica 14,90€, famiglia 24,90€, garanzia 90 giorni. **Chiuso.**
-- **Nome: Rivoglio**, per esteso. Tagline: *Riprenditi i soldi che ti devono.*
+- **Nome: Rivolio**, per esteso. Tagline: *Riprenditi i soldi che ti devono.*
 - **L'incerto non si vende MAI. I falsi positivi sono 0, bloccante.**
 - **Web-first**: il check e l'incasso stanno sul web; l'app mobile è il
   tracker post-pagamento, non la porta d'ingresso.
@@ -365,6 +365,25 @@ non altro codice.**
   volta sola chiedendo la conferma. Non mandare loro la newsletter
   dandoli per confermati.
 - **RESEND_MITTENTE su Netlify** appena il dominio è verificato:
-  "Valerio di Rivoglio <valerio@DOMINIO>". Finché non c'è, il nome
+  "Valerio di Rivolio <valerio@DOMINIO>". Finché non c'è, il nome
   mostrato è giusto ma l'indirizzo resta quello di prova di Resend e la
   consegna è limitata a valerio@artecai.it.
+
+## Dal giro #34 (9/08)
+- **Migrazione `supabase/2026-08-12-cancellato.sql` DA APPLICARE** sul
+  Supabase vero (3 colonne su `verifiche`: preavviso, alternativa, data
+  della risposta). Senza, il verdetto sui cancellati funziona lo stesso ma
+  le risposte non restano scritte, e quella è la prova se la compagnia
+  contesta.
+- **Il dominio**: appena rivolio.it è attivo e puntato su Netlify, due
+  variabili e basta: NEXT_PUBLIC_SITO sul sito e EXPO_PUBLIC_SITO
+  sull'app. Da quel momento sparisce anche l'ultimo `rivoglio.netlify.app`
+  dal codice. Vanno rinominati anche il progetto Netlify, la repo GitHub e
+  il progetto Supabase, che si chiamano ancora rivoglio.
+- **Negato imbarco e coincidenza persa**: stessa struttura dei cancellati
+  (due domande + albero deterministico). È il prossimo caso del CE 261
+  che vale soldi, e ora c'è il modello da copiare.
+- **Il limite sulla PARTENZA nella riprotezione**: oggi non lo chiediamo e
+  quindi diciamo "non spetta" in qualche caso in cui la legge lo
+  concederebbe. Se un giorno il volume lo giustifica, si aggiunge una
+  terza domanda e si allenta.

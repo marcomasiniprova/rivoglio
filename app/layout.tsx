@@ -38,11 +38,11 @@ const CASA = new URL(
 
 export const metadata: Metadata = {
   metadataBase: CASA,
-  title: "Rivoglio | Riprenditi i soldi che ti devono.",
+  title: "Rivolio | Riprenditi i soldi che ti devono.",
   description:
     "Scopri in 30 secondi se una compagnia ti deve dei soldi. Check gratuito col dato oggettivo del volo; se ti spetta, il reclamo te lo prepariamo noi e tieni il 100%.",
   openGraph: {
-    title: "Rivoglio",
+    title: "Rivolio",
     description:
       "Hai preso un volo negli ultimi 5 anni? Forse ti devono fino a 600€. Controllalo gratis in 30 secondi.",
     locale: "it_IT",
@@ -61,7 +61,7 @@ const DATI_STRUTTURATI = {
     {
       "@type": "Organization",
       "@id": `${CASA.href}#organizzazione`,
-      name: "Rivoglio",
+      name: "Rivolio",
       url: CASA.href,
       logo: `${CASA.href}icon.png`,
       description:
@@ -70,7 +70,7 @@ const DATI_STRUTTURATI = {
     {
       "@type": "WebSite",
       "@id": `${CASA.href}#sito`,
-      name: "Rivoglio",
+      name: "Rivolio",
       url: CASA.href,
       inLanguage: "it-IT",
       publisher: { "@id": `${CASA.href}#organizzazione` },

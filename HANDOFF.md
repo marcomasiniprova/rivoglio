@@ -9,7 +9,7 @@
 2. Sezione prezzi = due carte d'imbarco + striscia del check gratis.
 3. Messaggi cancellato/dirottato riscritti (regole 2026.08.4).
 4. `/guida-bagagli` (Montreal, solo guida): footer + sitemap.
-5. Email benvenuto account riscritta per Rivoglio (era ANCORA quella
+5. Email benvenuto account riscritta per Rivolio (era ANCORA quella
    dei crediti viaggi e partiva a ogni registrazione). T+0..T+60 rilette:
    già giuste.
 6. QA visivo (app, prezzi 1440/390, guida 1440/390): zero errori

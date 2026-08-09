@@ -10,7 +10,7 @@ import { useSessione } from "@/lib/sessione";
 import { TESTI } from "@/lib/testi";
 
 /**
- * Le tab di Rivoglio: Controlla, Pratiche, Classifica, Profilo.
+ * Le tab di Rivolio: Controlla, Pratiche, Classifica, Profilo.
  *
  * Nessuna è protetta: chi non ha l'account controlla lo stesso i voli, e
  * le tab che hanno bisogno dell'accesso lo chiedono da sole con un invito,

@@ -19,7 +19,7 @@ test("motore dal vivo", async ({ page, request }, info) => {
 
   // 2. dentro come admin
   await page.goto("/entra");
-  await page.getByLabel("Email").fill("prova.interna@rivoglio.it");
+  await page.getByLabel("Email").fill("prova.interna@rivolio.it");
   await page.getByLabel("Password").fill("ProvaInterna2026!");
   await page.getByRole("button", { name: "Entra", exact: true }).click();
   await page.waitForURL(/\/app/, { timeout: 30_000 });

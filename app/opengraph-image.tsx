@@ -8,7 +8,7 @@ import { COPY } from "@/lib/copy";
  * il verdetto col dato oggettivo, gli stessi numeri di COPY (il caso
  * costruito di lib/copy.ts, quello marcato demo sulla landing).
  */
-export const alt = "Rivoglio: riprenditi i soldi che ti devono";
+export const alt = "Rivolio: riprenditi i soldi che ti devono";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

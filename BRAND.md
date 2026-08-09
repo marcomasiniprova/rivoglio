@@ -1,4 +1,4 @@
-# BRAND — Rivoglio
+# BRAND — Rivolio
 
 *Le regole del marchio. Se una cosa è scritta qui, non si improvvisa.*
 I valori vivono in `app/globals.css` dentro `@theme`: **quello è l'originale**,
@@ -8,7 +8,7 @@ questo file lo spiega. Se cambi un colore, cambialo lì e aggiorna qui.
 
 ## Il nome
 
-**Rivoglio** — scelto da Valerio il 07/08 (sera), col pivot di prodotto.
+**Rivolio** — scelto da Valerio il 07/08 (sera), col pivot di prodotto.
 Sempre per esteso, iniziale maiuscola, mai abbreviato.
 
 **La tagline:** *Riprenditi i soldi che ti devono.*
@@ -80,7 +80,7 @@ viaggi: non usarlo più.
 I file, generati dall'originale di Valerio (sfondo tolto, upscalato):
 - `public/marchio.png`: solo la lente, fondo trasparente. È quella che gira
   nel sito (nav, footer, card di condivisione).
-- `public/marchio-completo.png`: lockup intero con la scritta RIVOGLIO e la
+- `public/marchio-completo.png`: lockup intero con la scritta RIVOLIO e la
   micro-tagline, trasparente. Per store, social e materiali.
 - `app/icon.png` (512) e `app/apple-icon.png` (180): lente su fondo bianco.
 - La scritta accanto alla lente nel sito è testo vero, in due toni come nel
@@ -145,4 +145,4 @@ rifinitura:
 - **Titoli grandi con UNA parola accentata** a colore o in corsivo: già
   nostro, si tiene.
 - Confronto "vecchio modo contro noi" in due card affiancate
-  (riferimento 4): perfetto per "AirHelp 35% contro Rivoglio 14,90€".
+  (riferimento 4): perfetto per "AirHelp 35% contro Rivolio 14,90€".

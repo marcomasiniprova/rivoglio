@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import HeroCheck from "@/components/rivoglio/HeroCheck";
-import ComeFunziona from "@/components/rivoglio/ComeFunziona";
-import DatoOggettivo from "@/components/rivoglio/DatoOggettivo";
-import Copertura from "@/components/rivoglio/Copertura";
-import ChiFaCosa from "@/components/rivoglio/ChiFaCosa";
-import Garanzia from "@/components/rivoglio/Garanzia";
-import Retroattivo from "@/components/rivoglio/Retroattivo";
-import PrezziRivoglio from "@/components/rivoglio/PrezziRivoglio";
-import NumeriMercato from "@/components/rivoglio/NumeriMercato";
-import FaqRivoglio from "@/components/rivoglio/FaqRivoglio";
-import Osservatorio from "@/components/rivoglio/Osservatorio";
+import HeroCheck from "@/components/rivolio/HeroCheck";
+import ComeFunziona from "@/components/rivolio/ComeFunziona";
+import DatoOggettivo from "@/components/rivolio/DatoOggettivo";
+import Copertura from "@/components/rivolio/Copertura";
+import ChiFaCosa from "@/components/rivolio/ChiFaCosa";
+import Garanzia from "@/components/rivolio/Garanzia";
+import Retroattivo from "@/components/rivolio/Retroattivo";
+import PrezziRivolio from "@/components/rivolio/PrezziRivolio";
+import NumeriMercato from "@/components/rivolio/NumeriMercato";
+import FaqRivolio from "@/components/rivolio/FaqRivolio";
+import Osservatorio from "@/components/rivolio/Osservatorio";
 import { Anima } from "@/components/Anima";
 import { COPY } from "@/lib/copy";
 
 /**
- * La home di Rivoglio: lo scanner dei rimborsi (SPEC §1).
+ * La home di Rivolio: lo scanner dei rimborsi (SPEC §1).
  *
  * L'ordine delle sezioni segue il funnel (SPEC §3): prima il check, che è
  * il prodotto; poi come funziona, cosa c'è dietro il verdetto, la garanzia,
@@ -85,9 +85,9 @@ export default function Home() {
         <ChiFaCosa />
         <Garanzia />
         <Retroattivo />
-        <PrezziRivoglio />
+        <PrezziRivolio />
         <NumeriMercato />
-        <FaqRivoglio />
+        <FaqRivolio />
         <Osservatorio />
         <InvitoBreve />
       </main>

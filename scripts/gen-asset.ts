@@ -1,5 +1,5 @@
 /**
- * Genera gli asset visivi di Rivoglio.
+ * Genera gli asset visivi di Rivolio.
  *
  * Due strade:
  *   1. Immagini generate (luci, sfondi, scene) con l'API Gemini

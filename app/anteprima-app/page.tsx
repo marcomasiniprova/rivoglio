@@ -13,7 +13,7 @@ import type { Metadata } from "next";
  */
 
 export const metadata: Metadata = {
-  title: "Anteprima app | Rivoglio",
+  title: "Anteprima app | Rivolio",
   robots: { index: false, follow: false },
 };
 
@@ -39,14 +39,14 @@ export default function PaginaAnteprimaApp() {
             <span className="absolute left-1/2 top-3 z-10 h-[26px] w-[104px] -translate-x-1/2 rounded-full bg-black" />
             <iframe
               src="/app-anteprima"
-              title="Rivoglio, anteprima dell'app"
+              title="Rivolio, anteprima dell'app"
               className="h-full w-full border-0 bg-white"
             />
           </div>
         </div>
 
         <p className="text-center text-[13px] leading-relaxed text-white/50">
-          Anteprima web dell&apos;app Rivoglio. Si aggiorna a ogni push.
+          Anteprima web dell&apos;app Rivolio. Si aggiorna a ogni push.
           <br />
           Fotocamera e notifiche si provano solo sul telefono vero.
         </p>

@@ -1,5 +1,5 @@
 /**
- * Il ponte verso il motore di Rivoglio.
+ * Il ponte verso il motore di Rivolio.
  *
  * Regola di casa: le regole del Regolamento CE 261/2004 vivono in UN posto
  * solo, sul server (`lib/regole/eu261.ts` del sito). L'app non le duplica

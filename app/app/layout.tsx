@@ -15,7 +15,7 @@ import { COPY } from "@/lib/copy";
  * il check libero; l'elenco pratiche appare solo da collegati.
  */
 export const metadata: Metadata = {
-  title: "La web app | Rivoglio",
+  title: "La web app | Rivolio",
   robots: { index: false },
 };
 

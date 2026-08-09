@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import CartaImbarcoScan from "@/components/rivoglio/CartaImbarcoScan";
+import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
 import { COPY } from "@/lib/copy";
 
 /**
@@ -301,7 +301,7 @@ export default function SchedaCheck() {
       }
 
       await sequenza;
-      sessionStorage.setItem("rivoglio-scan-fatto", "1");
+      sessionStorage.setItem("rivolio-scan-fatto", "1");
       router.push(destinazione);
     } catch {
       setFase("campo");

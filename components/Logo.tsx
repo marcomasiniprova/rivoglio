@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 /**
- * Il segno di Rivoglio: la lente con l'aereo e le barre.
+ * Il segno di Rivolio: la lente con l'aereo e le barre.
  * Definitivo, scelto da Valerio l'8/08. L'originale ad alta risoluzione
  * è `public/marchio.png` (solo segno, fondo trasparente); il lockup
  * completo con la scritta è `public/marchio-completo.png`.
@@ -26,7 +26,7 @@ export default function Logo({ scuro = false }: { scuro?: boolean }) {
     <Link
       href="/"
       className="group flex shrink-0 items-center gap-2.5"
-      aria-label="Rivoglio, lo scanner dei rimborsi"
+      aria-label="Rivolio, lo scanner dei rimborsi"
     >
       <Marchio className="h-9 w-9 shrink-0 transition-transform duration-500 group-hover:-rotate-6" />
       {/* Sotto i 420px il nome per esteso non ci sta accanto al bottone:

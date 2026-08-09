@@ -48,7 +48,7 @@ const dataIt = (iso: string) =>
     timeZone: "UTC",
   });
 
-const CODA = "Ricevi questa email perché hai una pratica aperta su Rivoglio.";
+const CODA = "Ricevi questa email perché hai una pratica aperta su Rivolio.";
 
 /* ------------------------------------------------------------- T+0 */
 /**

@@ -7,7 +7,7 @@ import { COPY } from "@/lib/copy";
  * Il gancio dei 5 anni: un volo di anni fa può valere ancora una pratica.
  * Le finestre sono STIMATE e la sezione lo dice due volte (etichetta sulla
  * card e avvertenza sotto): la prescrizione dichiarata come certezza è
- * esattamente il tipo di promessa che Rivoglio non fa (SPEC §4).
+ * esattamente il tipo di promessa che Rivolio non fa (SPEC §4).
  */
 const SEZIONE = COPY.retroattivo;
 

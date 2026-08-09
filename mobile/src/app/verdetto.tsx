@@ -77,7 +77,7 @@ export default function SchermataVerdetto() {
   return (
     <ScrollView style={stili.pagina} contentContainerStyle={stili.contenuto}>
       <View style={stili.testata}>
-        <Image source={marchio} style={stili.segno} accessibilityLabel="Rivoglio" />
+        <Image source={marchio} style={stili.segno} accessibilityLabel="Rivolio" />
         <Pressable onPress={() => router.back()} accessibilityRole="button">
           <Text style={stili.altro}>{V.altroVolo}</Text>
         </Pressable>

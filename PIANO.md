@@ -1,4 +1,4 @@
-# PIANO — Rivoglio
+# PIANO — Rivolio
 
 *Se leggi un file solo, leggi questo. Risponde a una domanda: **a che punto siamo?***
 *Riscritto il 2026-08-07 (notte) col prodotto definito: lo scanner dei rimborsi.*
@@ -61,11 +61,11 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 
 | | Stato |
 |---|---|
-| Netlify: progetto `rivoglio` creato, variabili impostate, rivoglio.netlify.app | ✅ 07/08 via connettore |
+| Netlify: progetto `rivolio` creato, variabili impostate, rivoglio.netlify.app | ✅ 07/08 via connettore |
 | Primo deploy di produzione | ✅ 8/08: **https://rivoglio.netlify.app** (via workbench + connettore; netlify.toml con build e plugin Next). Il rivoglioo.netlify.app di Valerio è un altro account, senza variabili: da dismettere |
 | Polar: account aperto (Valerio) | ✅ · ⏳ prodotti, webhook, richiesta approvazione organizzazione (2 settimane, farla SUBITO) |
 | Chiavi su Netlify: SUPABASE_SECRET_KEY, RESEND_API_KEY, AERODATABOX, MISTRAL | ✅ 8/08: tutte e 4 online, motore vero collaudato (FR4001) · ⏳ POLAR quando esiste |
-| Dominio di Rivoglio (slot Hostinger gratuito da configurare) | ⏳ **serve Valerio** |
+| Dominio di Rivolio (slot Hostinger gratuito da configurare) | ⏳ **serve Valerio** |
 | Legale: condizioni d'uso + disclaimer da avvocato; commercialista sul fiscale | ⏳ prima del lancio vero |
 
 ## 1.4 L'app mobile (il tracker, NON la porta)
@@ -73,7 +73,7 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | | Stato |
 |---|---|
 | App Expo rinominata, icone, motore, prove | ✅ (base del 07/08) |
-| L'app È Rivoglio: check a 3 modi (foto carta, tratta, numero), voli salvati, verdetto | ✅ 8/08 |
+| L'app È Rivolio: check a 3 modi (foto carta, tratta, numero), voli salvati, verdetto | ✅ 8/08 |
 | Notifiche push sui voli seguiti + tracker pratica DENTRO l'app + profilo + welcome | ✅ 8/08 (l'app non scappa nel sito: fuori solo il pagamento) |
 | Scena di scansione nativa (il teatro del check, identico al sito) | ✅ 8/08 notte, provata end-to-end su Expo web |
 | Store (Apple 99$, Play 25$ + 12 tester × 14 giorni) | ⏳ serve Valerio; prima l'app completa e bella (sua scelta), poi gli store |
@@ -85,7 +85,7 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | | Stato |
 |---|---|
 | Formati video (tabellone, disruption-jacking, check dal vivo, screenshot loop) | ✅ scritti |
-| Account `@rivoglio` su TikTok/IG/YouTube | ⏳ **serve Valerio, subito** |
+| Account `@rivolio` su TikTok/IG/YouTube | ⏳ **serve Valerio, subito** |
 | Primi 10 video girati (si può PRIMA del lancio) | ⏳ Valerio |
 | Newsletter "Osservatorio dei Disservizi" (Brevo) | ⏳ coi primi iscritti |
 

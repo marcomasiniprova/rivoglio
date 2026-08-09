@@ -1,9 +1,9 @@
 @STATO.md
 
-# Rivoglio — regole di progetto
+# Rivolio — regole di progetto
 
 ## Cos'è e qual è l'obiettivo
-**Rivoglio è lo scanner dei rimborsi aerei (Reg. CE 261/2004)**, definito
+**Rivolio è lo scanner dei rimborsi aerei (Reg. CE 261/2004)**, definito
 dal documento di Valerio del 07/08 e COSTRUITO: check gratuito sul web,
 verdetto a tre stati dal motore deterministico (l'AI non decide MAI),
 pratica 14,90 / famiglia 24,90 con Polar, lettera pronta che l'utente
@@ -76,7 +76,7 @@ Valerio NON è tecnico e non deve diventarlo. Quindi:
 
 ## PENSA PER L'UTENTE MEDIO (regola di Valerio, 8/08)
 Prima di costruire qualsiasi cosa, mettiti nei panni di **dieci persone
-normali** che aprono Rivoglio per la prima volta. Non sanno cos'è un
+normali** che aprono Rivolio per la prima volta. Non sanno cos'è un
 numero di volo, non hanno il biglietto sottomano, non leggono le
 istruzioni. Le domande da farsi, ogni volta:
 - **Questa informazione l'utente ce l'ha?** Se per rispondere deve
@@ -94,7 +94,7 @@ soluzione: prima si toglie l'ostacolo.
 Dai del tu, ma **professionale, non da amici al bar**. Frasi corte, zero gergo,
 zero superlativi. **MAI il trattino lungo (—): è il segno più riconoscibile del
 testo scritto da un'AI.** Usa punti e virgole. Ogni numero mostrato dev'essere
-apribile: **la trasparenza è il prodotto.** Marchio per esteso: Rivoglio.
+apribile: **la trasparenza è il prodotto.** Marchio per esteso: Rivolio.
 Tagline: *Riprenditi i soldi che ti devono.*
 
 ## Come si costruisce l'interfaccia (regole d'oro dell'8/08)

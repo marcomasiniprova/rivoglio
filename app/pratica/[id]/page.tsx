@@ -24,7 +24,7 @@ import { COPY } from "@/lib/copy";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "La tua pratica | Rivoglio",
+  title: "La tua pratica | Rivolio",
   robots: { index: false },
 };
 

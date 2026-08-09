@@ -220,7 +220,7 @@ export default function Onboarding({ citta }: { citta: string[] }) {
               className="h-14 text-[17px]"
             />
             <p className="text-xs leading-relaxed text-fumo-2">
-              Scrivi al bot <span className="font-medium text-fumo">@rivoglio_bot</span> e
+              Scrivi al bot <span className="font-medium text-fumo">@rivolio_bot</span> e
               lui ti dà il codice da incollare qui. Se salti questo passo ricevi tutto per email.
             </p>
           </div>

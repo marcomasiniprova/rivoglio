@@ -1,11 +1,11 @@
-# PROGETTO — app mobile Rivoglio
+# PROGETTO — app mobile Rivolio
 
 *Scritto il 2026-08-07. È il contratto fra i pezzi dell'app: chi scrive un
 modulo rispetta le firme scritte qui, chi lo importa si fida di queste firme.*
 
 ## Cosa è
 
-L'app iOS + Android di Rivoglio (Expo SDK 57, expo-router, TypeScript,
+L'app iOS + Android di Rivolio (Expo SDK 57, expo-router, TypeScript,
 Supabase). Imposti da dove parti, la tua soglia a testa, notti e ore di auto.
 Quando esiste una micro-vacanza vera sotto la soglia, arriva una notifica con
 il conto già fatto: alloggio + auto, diviso per le persone, apribile riga per

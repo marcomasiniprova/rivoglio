@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import PaginaLegale from "@/components/legale/PaginaLegale";
 
 export const metadata: Metadata = {
-  title: "Condizioni d'uso | Rivoglio",
+  title: "Condizioni d'uso | Rivolio",
   description:
-    "Cosa fa Rivoglio, cosa compri, cosa garantiamo e cosa no. Le condizioni del servizio, scritte in italiano comprensibile.",
+    "Cosa fa Rivolio, cosa compri, cosa garantiamo e cosa no. Le condizioni del servizio, scritte in italiano comprensibile.",
 };
 
 /**
@@ -17,21 +17,21 @@ export default function PaginaCondizioni() {
   return (
     <PaginaLegale titolo="Condizioni d'uso" aggiornata="8 agosto 2026">
       <p>
-        Queste condizioni regolano l&apos;uso di Rivoglio. Usando il sito le accetti. Sono
+        Queste condizioni regolano l&apos;uso di Rivolio. Usando il sito le accetti. Sono
         scritte per essere capite: se qualcosa non torna, scrivici a{" "}
         <a href="mailto:valerio@artecai.it">valerio@artecai.it</a>.
       </p>
 
-      <h2>Cosa fa Rivoglio</h2>
+      <h2>Cosa fa Rivolio</h2>
       <p>
-        Rivoglio è uno strumento che verifica se un volo rientra nei casi di compensazione
+        Rivolio è uno strumento che verifica se un volo rientra nei casi di compensazione
         previsti dal Regolamento (CE) 261/2004 e, se decidi di acquistare la pratica, prepara
         per te i documenti del reclamo: la lettera con i dati verificati del volo, i
         riferimenti di legge e il canale reclami della compagnia, più i solleciti e le
         istruzioni per i passi successivi.
       </p>
       <p>
-        <strong>Rivoglio non è un&apos;agenzia di reclami e non è un intermediario</strong>:
+        <strong>Rivolio non è un&apos;agenzia di reclami e non è un intermediario</strong>:
         non ci cedi il credito, non firmiamo niente al posto tuo e non tratteniamo
         percentuali. Il reclamo lo invii tu, dalla tua email, e la compensazione arriva
         direttamente a te, per intero. Non siamo uno studio legale e non forniamo consulenza
@@ -81,7 +81,7 @@ export default function PaginaCondizioni() {
       <p>
         Se entro 90 giorni dall&apos;acquisto non ricevi nulla dalla compagnia (né
         compensazione né altra somma legata al reclamo), ti rimborsiamo per intero quello che
-        hai pagato a Rivoglio. Il rimborso parte da noi, senza moduli da compilare. La
+        hai pagato a Rivolio. Il rimborso parte da noi, senza moduli da compilare. La
         garanzia richiede che il reclamo sia stato effettivamente inviato alla compagnia
         seguendo le istruzioni della pratica.
       </p>
@@ -99,7 +99,7 @@ export default function PaginaCondizioni() {
         Facciamo il possibile perché i dati di volo e i documenti siano corretti, ma non
         possiamo garantire l&apos;esito del reclamo né rispondere delle decisioni della
         compagnia. Nei limiti consentiti dalla legge, la nostra responsabilità complessiva
-        verso di te è limitata a quanto hai pagato a Rivoglio per la pratica. Niente in
+        verso di te è limitata a quanto hai pagato a Rivolio per la pratica. Niente in
         queste condizioni limita i diritti che la legge ti riconosce come consumatore.
       </p>
 

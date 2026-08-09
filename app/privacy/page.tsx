@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import PaginaLegale from "@/components/legale/PaginaLegale";
 
 export const metadata: Metadata = {
-  title: "Privacy | Rivoglio",
+  title: "Privacy | Rivolio",
   description:
-    "Come Rivoglio tratta i tuoi dati: quali raccogliamo, perché, per quanto tempo e quali diritti hai.",
+    "Come Rivolio tratta i tuoi dati: quali raccogliamo, perché, per quanto tempo e quali diritti hai.",
 };
 
 /**
@@ -16,15 +16,15 @@ export default function PaginaPrivacy() {
   return (
     <PaginaLegale titolo="Informativa sulla privacy" aggiornata="8 agosto 2026">
       <p>
-        Questa pagina spiega quali dati personali raccoglie Rivoglio, perché li raccoglie,
+        Questa pagina spiega quali dati personali raccoglie Rivolio, perché li raccoglie,
         per quanto li conserva e quali diritti hai. È scritta per essere letta, non per
         spaventare: se qualcosa non è chiaro, scrivici.
       </p>
 
       <h2>Chi è il titolare</h2>
       <p>
-        Il titolare del trattamento è il gestore di Rivoglio, contattabile all&apos;indirizzo{" "}
-        <a href="mailto:valerio@artecai.it">valerio@artecai.it</a>. Rivoglio è un progetto in
+        Il titolare del trattamento è il gestore di Rivolio, contattabile all&apos;indirizzo{" "}
+        <a href="mailto:valerio@artecai.it">valerio@artecai.it</a>. Rivolio è un progetto in
         fase di avvio: questa informativa sarà integrata con i dati societari completi appena
         l&apos;attività sarà formalizzata.
       </p>

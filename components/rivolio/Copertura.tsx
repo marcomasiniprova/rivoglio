@@ -3,7 +3,7 @@ import { Anima, AnimaLista, Figlio } from "@/components/Anima";
 import { COPY } from "@/lib/copy";
 
 /**
- * Cosa copre Rivoglio, in chiaro.
+ * Cosa copre Rivolio, in chiaro.
  *
  * Perché esiste (feedback esterno del 9/08): leggendo la landing si
  * capiva "solo ritardi", e chi aveva avuto un volo cancellato se ne

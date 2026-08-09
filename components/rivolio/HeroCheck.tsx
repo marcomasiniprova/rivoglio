@@ -8,7 +8,7 @@ import SchedaCheck from "@/components/check/SchedaCheck";
 import { COPY } from "@/lib/copy";
 
 /**
- * L'hero di Rivoglio: il gancio, e dentro LA SCHEDA DEL CHECK, che dall'8/08
+ * L'hero di Rivolio: il gancio, e dentro LA SCHEDA DEL CHECK, che dall'8/08
  * è lo standard unico di tutto il prodotto (components/check/SchedaCheck):
  * tratta predefinita, numero per chi lo sa, foto della carta d'imbarco, e
  * il teatro onesto coi sei passi veri e il biglietto che si compila.

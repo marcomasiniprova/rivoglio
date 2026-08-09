@@ -1,22 +1,22 @@
 {
   "expo": {
-    "name": "Rivoglio",
-    "slug": "rivoglio",
+    "name": "Rivolio",
+    "slug": "rivolio",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "rivoglio",
+    "scheme": "rivolio",
     "userInterfaceStyle": "light",
     "ios": {
       "icon": "./assets/images/icon.png",
       "supportsTablet": false,
-      "bundleIdentifier": "it.rivoglio.app",
+      "bundleIdentifier": "it.rivolio.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "it.rivoglio.app",
+      "package": "it.rivolio.app",
       "adaptiveIcon": {
         "backgroundColor": "#0A9D5C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

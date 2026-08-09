@@ -12,8 +12,8 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Rivoglio",
-    short_name: "Rivoglio",
+    name: "Rivolio",
+    short_name: "Rivolio",
     description:
       "Scopri in 30 secondi se una compagnia ti deve dei soldi. Il reclamo te lo prepariamo noi: lo invii tu e tieni il 100%.",
     lang: "it-IT",

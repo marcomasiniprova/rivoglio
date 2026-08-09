@@ -49,7 +49,7 @@ const PANNELLI: { chiave: Pannello; icona: typeof Search; nome: string }[] = [
   { chiave: "profilo", icona: User, nome: T.tab.profilo },
 ];
 
-export default function AppRivoglio({
+export default function AppRivolio({
   email,
   nickname,
   classificaOptin,

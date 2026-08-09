@@ -1,11 +1,11 @@
-# Vedere l'app di Rivoglio dal PC Windows
+# Vedere l'app di Rivolio dal PC Windows
 
 ## In due minuti, se hai già fatto tutto una volta
 
 Apri PowerShell e incolla queste righe una alla volta:
 
 ```powershell
-cd $HOME\rivoglio
+cd $HOME\rivolio
 ```
 ```powershell
 git fetch origin claude/saas-app-repo-analysis-ghehqa
@@ -14,7 +14,7 @@ git fetch origin claude/saas-app-repo-analysis-ghehqa
 git reset --hard origin/claude/saas-app-repo-analysis-ghehqa
 ```
 ```powershell
-cd $HOME\rivoglio\mobile
+cd $HOME\rivolio\mobile
 ```
 ```powershell
 npm install
@@ -67,11 +67,11 @@ cd $HOME
 ```
 
 ```powershell
-git clone -b claude/saas-app-repo-analysis-ghehqa https://github.com/marcomasiniprova/viaggioancheio.git rivoglio
+git clone -b claude/saas-app-repo-analysis-ghehqa https://github.com/marcomasiniprova/viaggioancheio.git rivolio
 ```
 
 `$HOME` è la tua cartella utente: non devi scrivere il tuo nome, ci pensa
-Windows. Alla fine avrai il progetto in `C:\Users\valer\rivoglio`.
+Windows. Alla fine avrai il progetto in `C:\Users\valer\rivolio`.
 
 > **Perché non dentro Documenti:** quella cartella di solito è
 > sincronizzata da OneDrive, e Git non riesce a crearci dentro la
@@ -84,7 +84,7 @@ account: la repository è privata e serve il permesso.
 > **Senza Git, se preferisci:** apri nel browser
 > <https://github.com/marcomasiniprova/viaggioancheio/archive/refs/heads/claude/saas-app-repo-analysis-ghehqa.zip>,
 > estrai lo ZIP in Documenti e rinomina la cartella estratta in
-> `rivoglio`. Funziona uguale, ma per aggiornare dovrai riscaricare
+> `rivolio`. Funziona uguale, ma per aggiornare dovrai riscaricare
 > ogni volta.
 
 ---
@@ -94,7 +94,7 @@ account: la repository è privata e serve il permesso.
 Serve a vedere schermate, testi e colori. Node.js ce l'hai già installato.
 
 ```powershell
-cd $HOME\rivoglio\mobile
+cd $HOME\rivolio\mobile
 ```
 
 ```powershell
@@ -163,7 +163,7 @@ sullo schermo. **Lascialo acceso.**
 ### 3.4 Avvia l'app
 
 ```powershell
-cd $HOME\rivoglio\mobile
+cd $HOME\rivolio\mobile
 ```
 
 ```powershell
@@ -186,7 +186,7 @@ Tre righe, ogni volta che ti dico che ho pushato. Sono queste e non
 sotto) e queste funzionano sempre:
 
 ```powershell
-cd $HOME\rivoglio
+cd $HOME\rivolio
 ```
 
 ```powershell
@@ -220,7 +220,7 @@ glieli tiene occupati, e si ferma a metà. Si spegne quel riordino, una
 volta sola:
 
 ```powershell
-cd $HOME\rivoglio
+cd $HOME\rivolio
 ```
 
 ```powershell
@@ -241,22 +241,22 @@ cd $HOME
 ```
 
 ```powershell
-Rename-Item rivoglio rivoglio-vecchio
+Rename-Item rivolio rivolio-vecchio
 ```
 
 ```powershell
-git clone -b claude/saas-app-repo-analysis-ghehqa https://github.com/marcomasiniprova/rivoglio.git rivoglio
+git clone -b claude/saas-app-repo-analysis-ghehqa https://github.com/marcomasiniprova/rivoglio.git rivolio
 ```
 
 ```powershell
-cd $HOME\rivoglio\mobile
+cd $HOME\rivolio\mobile
 ```
 
 ```powershell
 npm install
 ```
 
-Quando funziona, la cartella `rivoglio-vecchio` si può cancellare.
+Quando funziona, la cartella `rivolio-vecchio` si può cancellare.
 
 **Come capisci a colpo d'occhio se è aggiornata:** apri l'app e guarda la
 prima schermata. Se c'è scritto **"Da dove sei partito"**, è quella
@@ -271,7 +271,7 @@ viaggio, è ancora quella vecchia.
   l'installazione. Fallo e riprova.
 - **`npm error EPERM` o `package.json does not exist`**: sei nella
   cartella sbagliata (probabilmente `system32`). Rifai il `cd` della
-  Fase 2 e guarda che il prompt mostri `...\rivoglio\mobile>`.
+  Fase 2 e guarda che il prompt mostri `...\rivolio\mobile>`.
 - **`exited with non-zero code: 3221225477`**: è il browser predefinito
   che crasha quando Windows prova ad aprirlo. Dai `$env:BROWSER="none"`
   prima di `npx expo start` e apri la pagina a mano.

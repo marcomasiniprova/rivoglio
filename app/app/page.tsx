@@ -1,4 +1,4 @@
-import AppRivoglio, { type CardPratica } from "@/components/app/AppRivoglio";
+import AppRivolio, { type CardPratica } from "@/components/app/AppRivolio";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
@@ -50,7 +50,7 @@ export default async function PaginaApp() {
 
   if (!utente) {
     return (
-      <AppRivoglio
+      <AppRivolio
         email={null}
         nickname={null}
         classificaOptin={false}
@@ -109,7 +109,7 @@ export default async function PaginaApp() {
   });
 
   return (
-    <AppRivoglio
+    <AppRivolio
       email={utente.email ?? null}
       nickname={(profilo?.nickname as string | null) ?? null}
       classificaOptin={Boolean(profilo?.classifica_optin)}

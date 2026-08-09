@@ -1,4 +1,4 @@
--- RIVOGLIO — rinuncia al recesso (#21) e campi veri del tracciamento (#26).
+-- RIVOLIO — rinuncia al recesso (#21) e campi veri del tracciamento (#26).
 -- Idempotente come la 2026-08-07: rieseguirla non fa danni.
 
 -- verifiche: quando e con quale testo (versionato) l'utente ha acconsentito

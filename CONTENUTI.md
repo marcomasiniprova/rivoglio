@@ -1,6 +1,6 @@
 # CONTENUTI — come ti trovano
 
-*Riscritto il 2026-08-07 (notte) per Rivoglio, dal documento di Valerio.
+*Riscritto il 2026-08-07 (notte) per Rivolio, dal documento di Valerio.
 Senza questo, il check non lo fa nessuno e l'incasso è zero.*
 
 ---
@@ -14,7 +14,7 @@ I due ganci che reggono tutto:
 1. **Retroattivo**: *"Hai preso un Ryanair negli ultimi 5 anni? Forse ti
    devono 250€. Controlla gratis in 30 secondi."*
 2. **Il confronto**: *"Famiglia di 4, volo cancellato: 1.600€. Con AirHelp
-   ne perdi 560 di commissione. Con Rivoglio 24,90."* Questo, in un video
+   ne perdi 560 di commissione. Con Rivolio 24,90."* Questo, in un video
    di 15 secondi, è tutta la strategia.
 
 **Cosa non si fa MAI:** promettere "hai diritto a X" (si dice: fascia +

@@ -21,7 +21,7 @@ const SEGRETO =
   process.env.SUPABASE_SERVICE_ROLE_KEY ??
   "";
 const IN_PRODUZIONE = process.env.NODE_ENV === "production";
-const SEGRETO_SVILUPPO = "rivoglio-sviluppo-non-usare-in-produzione";
+const SEGRETO_SVILUPPO = "rivolio-sviluppo-non-usare-in-produzione";
 
 /** Quanto dura un link. Un mese: chi apre la posta tardi non resta fuori. */
 const DURATA_MS = 30 * 24 * 60 * 60 * 1000;

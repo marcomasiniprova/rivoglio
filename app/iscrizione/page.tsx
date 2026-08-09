@@ -3,8 +3,8 @@ import Link from "next/link";
 import { COPY } from "@/lib/copy";
 
 export const metadata: Metadata = {
-  title: "Iscrizione all'Osservatorio | Rivoglio",
-  description: "L'esito della tua iscrizione all'Osservatorio dei Disservizi di Rivoglio.",
+  title: "Iscrizione all'Osservatorio | Rivolio",
+  description: "L'esito della tua iscrizione all'Osservatorio dei Disservizi di Rivolio.",
   robots: { index: false, follow: false },
 };
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { COPY } from "@/lib/copy";
+import BustaAperta from "./BustaAperta";
 
 /**
  * "Non ricordi numero e data? Cercali nella tua posta."
@@ -62,7 +63,13 @@ export default function CercaInPosta() {
         </span>
       </div>
 
-      <div className="p-4 sm:p-5">
+      <div className="relative p-4 sm:p-5">
+        {/* LA SCENA: la busta che si apre quando la ricerca trova. È lei
+            a trasformare un riquadro di testo in una cosa che si guarda. */}
+        <div className="pointer-events-none mx-auto mb-1 h-[86px] w-[118px] sm:h-[96px] sm:w-[132px]">
+          <BustaAperta aperta={trovata} className="h-full w-full" />
+        </div>
+
         {/* il campo di ricerca che si scrive da solo */}
         <div className="flex items-center gap-2.5 rounded-xl border border-bordo bg-nebbia px-3.5 py-2.5">
           <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" aria-hidden="true">

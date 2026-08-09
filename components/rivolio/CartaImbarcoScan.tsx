@@ -6,7 +6,7 @@ import { motion } from "motion/react";
  * LA CARTA D'IMBARCO SOTTO SCANSIONE: il pezzo di teatro condiviso fra
  * l'hero (durante il check) e la pagina del verdetto (arrivo diretto).
  *
- * Realismo da documento vero, onestà da Rivoglio:
+ * Realismo da documento vero, onestà da Rivolio:
  * - i soli dati stampati sono quelli veri (numero volo e data);
  * - tratta e orari NON si inventano: restano campi in lettura (barre)
  *   finché il server non ha davvero risposto;

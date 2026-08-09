@@ -33,7 +33,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   // Il titolo non anticipa il verdetto: il reveal avviene nella pagina.
-  title: "Il risultato del tuo check | Rivoglio",
+  title: "Il risultato del tuo check | Rivolio",
   robots: { index: false },
 };
 

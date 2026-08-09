@@ -14,7 +14,7 @@ const stacco = SEZIONE.titolo.indexOf(", ") + 1;
 const titoloPrima = SEZIONE.titolo.slice(0, stacco);
 const titoloCorsivo = SEZIONE.titolo.slice(stacco + 1);
 
-export default function FaqRivoglio() {
+export default function FaqRivolio() {
   return (
     <section id="domande" className="scroll-mt-24 px-5 py-16 sm:px-8 sm:py-20">
       <div className="mx-auto max-w-[760px]">

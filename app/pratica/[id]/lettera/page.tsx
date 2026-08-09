@@ -28,7 +28,7 @@ import type { Passeggero, TipoPratica } from "@/lib/pratiche/pratiche";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "La tua lettera | Rivoglio",
+  title: "La tua lettera | Rivolio",
   robots: { index: false },
 };
 

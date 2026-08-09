@@ -19,7 +19,7 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Pannello | Rivoglio",
+  title: "Pannello | Rivolio",
   robots: { index: false },
 };
 

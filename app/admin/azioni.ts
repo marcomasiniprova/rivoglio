@@ -96,7 +96,7 @@ export async function confermaVerifica(id: string): Promise<EsitoAdmin> {
           "Restano da verificare le circostanze straordinarie, che può invocare solo la compagnia. Dal risultato apri la pratica quando vuoi.",
         ) +
         bottone("Vedi il tuo risultato", link),
-      coda: "Ricevi questa email perché hai chiesto un controllo su Rivoglio.",
+      coda: "Ricevi questa email perché hai chiesto un controllo su Rivolio.",
     }),
     testo: `Ricontrollato a mano: il verdetto regge.\n\nVolo ${v.volo_iata}${quando}.${dettagli}\n\nRestano da verificare le circostanze straordinarie, che può invocare solo la compagnia.\n\nIl tuo risultato: ${link}`,
   });

@@ -11,7 +11,7 @@ import { COPY } from "../lib/copy";
  */
 
 test.describe("Vetrina", () => {
-  test("il titolo della pagina è quello di Rivoglio", async ({ page }) => {
+  test("il titolo della pagina è quello di Rivolio", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle(new RegExp(`${COPY.comune.marchio}.*${COPY.tagline}`));
   });
@@ -41,7 +41,7 @@ test.describe("Vetrina", () => {
     const r = await request.get("/manifest.webmanifest");
     expect(r.status()).toBe(200);
     const m = await r.json();
-    expect(m.name).toBe("Rivoglio");
+    expect(m.name).toBe("Rivolio");
     // senza standalone si apre dentro il browser e non sembra un'app
     expect(m.display).toBe("standalone");
     expect(m.theme_color).toBe("#0a9d5c");

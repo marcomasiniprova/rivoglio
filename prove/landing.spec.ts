@@ -3,7 +3,7 @@ import { COPY } from "../lib/copy";
 import { apriModoNumero } from "./aiuti";
 
 /**
- * La landing di Rivoglio: lo scanner dei rimborsi (SPEC §1, §3).
+ * La landing di Rivolio: lo scanner dei rimborsi (SPEC §1, §3).
  * L'hero È il prodotto: il form volo+data, senza email e senza account.
  * I testi vengono da lib/copy.ts: le prove agganciano quelli, non stringhe
  * duplicate a mano che poi divergono.
@@ -93,7 +93,7 @@ test.describe("Landing page", () => {
   // fallisce per l'ambiente, non per il codice.
   test("il modulo dell'Osservatorio accetta un'email valida e conferma", async ({ page }) => {
     await page.goto("/#osservatorio");
-    await page.locator("#osservatorio-email").fill(`prova+${Date.now()}@rivoglio.it`);
+    await page.locator("#osservatorio-email").fill(`prova+${Date.now()}@rivolio.it`);
     await page.getByRole("button", { name: COPY.osservatorio.bottone }).click();
     /* Doppio opt-in (9/08): non si è iscritti finché non si clicca il
        link nell'email, e il pannello deve dirlo. La prima frase della

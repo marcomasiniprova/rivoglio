@@ -21,7 +21,7 @@
  * `accettaIntermediari: false` è un dato STRATEGICO: quelle compagnie
  * (Ryanair, easyJet, Wizz Air, Volotea, Norwegian) dichiarano nelle
  * condizioni che lavorano solo il reclamo inviato direttamente dal
- * passeggero. È esattamente il modello di Rivoglio: la lettera la invii
+ * passeggero. È esattamente il modello di Rivolio: la lettera la invii
  * tu, e per quelle compagnie è anche l'unico modo.
  */
 

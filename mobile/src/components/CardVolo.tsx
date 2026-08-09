@@ -161,7 +161,7 @@ export default function CardVolo({
             />
           ))}
         </View>
-        <Text style={stili.timbro}>RIVOGLIO · REG. CE 261/2004</Text>
+        <Text style={stili.timbro}>RIVOLIO · REG. CE 261/2004</Text>
       </View>
     </View>
   );

@@ -1,4 +1,4 @@
--- RIVOGLIO — lo schema del nuovo prodotto (2026-08-07, sera).
+-- RIVOLIO — lo schema del nuovo prodotto (2026-08-07, sera).
 -- Applicata sul progetto vero via Composio la sera stessa: rieseguirla non
 -- fa danni (if not exists ovunque). Le tabelle di viaggio (offerte,
 -- ricerche, invii, strutture) restano: eredità, nessun dato si cancella.

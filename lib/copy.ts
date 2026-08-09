@@ -1,5 +1,5 @@
 /**
- * TUTTI i testi delle superfici web di Rivoglio vivono qui, in un posto solo.
+ * TUTTI i testi delle superfici web di Rivolio vivono qui, in un posto solo.
  * I componenti leggono da COPY: nessuna stringa utente scritta nei componenti.
  *
  * Regole (SPEC.md §3, §5; BRAND.md "Come si parla"):
@@ -27,7 +27,7 @@ export const COPY = {
   tagline: "Riprenditi i soldi che ti devono.",
 
   comune: {
-    marchio: "Rivoglio",
+    marchio: "Rivolio",
     regolamento: "Regolamento CE 261/2004",
     caricamento: "Un attimo.",
     erroreGenerico: "Qualcosa non ha funzionato. Riprova tra poco.",
@@ -146,7 +146,7 @@ export const COPY = {
         supporto: "Scrivici",
       },
       piede:
-        "Rivoglio non è un intermediario: prepara i documenti, il reclamo lo invii tu e la compensazione arriva a te.",
+        "Rivolio non è un intermediario: prepara i documenti, il reclamo lo invii tu e la compensazione arriva a te.",
     },
   },
 
@@ -327,7 +327,7 @@ export const COPY = {
           etichettaVia: "via 210€",
         },
         {
-          nome: "Rivoglio",
+          nome: "Rivolio",
           costo: "costa 14,90€",
           resta: "a te restano 585,10€",
           trattenuto: 14.9,
@@ -394,7 +394,7 @@ export const COPY = {
   },
 
   /**
-   * COSA COPRE RIVOGLIO, detto per esteso.
+   * COSA COPRE RIVOLIO, detto per esteso.
    *
    * Nasce da un feedback esterno del 9/08: leggendo la landing si capiva
    * "solo ritardi", perché di cancellazioni e dirottamenti non si parlava
@@ -425,14 +425,14 @@ export const COPY = {
       },
       {
         stato: "quasi",
-        etichetta: "Riconosciuto, verdetto da completare",
+        etichetta: "Verdetto dopo due domande",
         spiegazione:
-          "Il check li riconosce e prepara la lettera, ma per il verdetto serve una cosa che sai solo tu. Finché resta incerto NON paghi.",
+          "Il check li riconosce, poi ti chiede la cosa che sa solo tu e chiude il verdetto. Se resti nel dubbio NON paghi.",
         voci: [
           {
             nome: "Volo cancellato",
             testo:
-              "La compensazione dipende da quanti giorni prima ti hanno avvisato e da che volo alternativo ti hanno offerto: due cose che negli archivi di volo non esistono. Rimborso del biglietto e volo alternativo, invece, si chiedono comunque.",
+              "Dopo il check ti chiedo due cose che negli archivi non esistono: quando ti hanno avvisato e quanto dopo sei arrivato con l'alternativa. Con quelle il motore applica l'articolo 5 e ti dice se ti spetta, con la sua fascia. Rimborso del biglietto e volo alternativo si chiedono comunque.",
           },
           {
             nome: "Atterrato in un altro aeroporto",
@@ -599,7 +599,7 @@ export const COPY = {
       {
         domanda: "Siete un'agenzia di reclami? Devo cedervi il credito?",
         risposta:
-          "No. Rivoglio genera documenti: niente mandato, niente cessione del credito, niente percentuali. Il reclamo lo invii tu dalla tua email e la compensazione arriva direttamente a te. Con le compagnie ostili agli intermediari è anche un vantaggio: la richiesta arriva dal passeggero, non da una società.",
+          "No. Rivolio genera documenti: niente mandato, niente cessione del credito, niente percentuali. Il reclamo lo invii tu dalla tua email e la compensazione arriva direttamente a te. Con le compagnie ostili agli intermediari è anche un vantaggio: la richiesta arriva dal passeggero, non da una società.",
       },
       {
         domanda: "Fino a quando posso fare richiesta?",
@@ -688,6 +688,51 @@ export const COPY = {
   },
 
   risultato: {
+    /**
+     * LE DUE DOMANDE SUI VOLI CANCELLATI.
+     *
+     * Scritte a fasce, non a date: chi ha volato mesi fa non ricorda "il
+     * 14 marzo", ricorda "una settimana prima". Una domanda a cui si
+     * risponde male vale un reclamo respinto, quindi qui si chiede solo
+     * quello che una persona normale sa ancora dire con sicurezza.
+     */
+    cancellato: {
+      occhiello: "Manca poco",
+      titolo: "Due domande e ti dico se ti spetta.",
+      testo:
+        "Per un volo cancellato la legge guarda due cose che gli archivi non sanno: quando ti hanno avvisato e come ti hanno rimandato a destinazione. Rispondi e il verdetto si chiude.",
+      preavviso: {
+        domanda: "Quando ti hanno detto che il volo era cancellato?",
+        aiuto: "Vale il primo avviso: email, SMS o messaggio della compagnia.",
+        voci: [
+          { valore: "oltre14", testo: "Più di due settimane prima" },
+          { valore: "fra7e13", testo: "Fra una e due settimane prima" },
+          { valore: "meno7", testo: "Meno di una settimana prima" },
+          { valore: "nessuno", testo: "Nessun avviso: l'ho saputo in aeroporto" },
+          { valore: "nonRicordo", testo: "Non me lo ricordo" },
+        ],
+      },
+      alternativa: {
+        domanda: "Con il volo che hai preso davvero, quanto dopo sei arrivato?",
+        aiuto: "Rispetto all'ora di arrivo che c'era sul biglietto cancellato.",
+        voci: [
+          { valore: "nessuna", testo: "Non mi hanno dato nessun volo alternativo" },
+          { valore: "entro2", testo: "Meno di 2 ore dopo" },
+          { valore: "fra2e4", testo: "Fra 2 e 4 ore dopo" },
+          { valore: "oltre4", testo: "Più di 4 ore dopo" },
+          { valore: "nonRicordo", testo: "Non me lo ricordo" },
+        ],
+      },
+      bottone: "Vedi il verdetto",
+      nota: "Le risposte restano sulla tua verifica. Il check resta gratuito.",
+      notaDemo: "Esempio dimostrativo: il verdetto qui non vale per una pratica vera.",
+      titoloChiuso: "Ecco com'è andata.",
+      esitoIdoneo: "Rientri in una fascia",
+      esitoChiuso: "Il verdetto",
+      dopoIdoneo:
+        "Da qui puoi aprire la pratica: prepariamo la lettera con i riferimenti di legge e il canale reclami della compagnia. Il reclamo lo invii tu e la compensazione arriva a te intera.",
+    },
+
     /** IDONEO: fatto oggettivo + fascia + cose da verificare. MAI "hai diritto a". */
     idoneo: {
       occhiello: "Verifica completata",
@@ -824,7 +869,7 @@ export const COPY = {
     card: {
       titoloTemplate: "Fascia da {importo}",
       sottotitoloTemplate: "Volo {volo}, atterrato con {ritardo} di ritardo",
-      piede: "Controlla il tuo gratis su Rivoglio",
+      piede: "Controlla il tuo gratis su Rivolio",
     },
     bottone: "Condividi la card",
     /** Dove navigator.share non c'è, si copia negli appunti e lo si dice. */
@@ -862,7 +907,7 @@ export const COPY = {
     /* ---- la testata dell'area riservata (/app/layout) ---- */
     testata: {
       esci: "Esci",
-      piede: "Rivoglio · lo scanner dei rimborsi",
+      piede: "Rivolio · lo scanner dei rimborsi",
     },
 
     /* ---- l'elenco delle pratiche (/app) ---- */
@@ -1042,14 +1087,14 @@ export const COPY = {
   },
 
   footer: {
-    frase: "Rivoglio è lo scanner dei rimborsi. Oggi i voli. Presto bagagli e treni.",
+    frase: "Rivolio è lo scanner dei rimborsi. Oggi i voli. Presto bagagli e treni.",
     cartolina: {
       titolo: "Il check è gratis.",
       corsivo: "Il ritardo è già tuo.",
       testo:
         "Numero del volo e data: in 30 secondi sai se rientri nelle fasce del CE 261/2004. Senza account, senza carta.",
       bottone: "Controlla il tuo volo",
-      altTelefono: "L'app di Rivoglio in mano: il check del volo sul telefono",
+      altTelefono: "L'app di Rivolio in mano: il check del volo sul telefono",
     },
     colonne: {
       prodotto: {
@@ -1097,10 +1142,10 @@ export const COPY = {
       titolo: "Seguici",
     },
     disclaimer:
-      "Rivoglio genera documenti a partire da dati di volo verificati. Non è un intermediario, non offre consulenza legale, non incassa per conto tuo e non chiede la cessione del credito. Il reclamo lo invii tu, dalla tua email. Gli importi indicati sono le fasce del Regolamento CE 261/2004: l'esito della richiesta dipende dalla compagnia.",
-    /** L'indirizzo vivo oggi: si cambia in uno @rivoglio quando c'è il dominio. */
+      "Rivolio genera documenti a partire da dati di volo verificati. Non è un intermediario, non offre consulenza legale, non incassa per conto tuo e non chiede la cessione del credito. Il reclamo lo invii tu, dalla tua email. Gli importi indicati sono le fasce del Regolamento CE 261/2004: l'esito della richiesta dipende dalla compagnia.",
+    /** L'indirizzo vivo oggi: si cambia in uno @rivolio quando c'è il dominio. */
     supporto: { etichetta: "Supporto", email: "valerio@artecai.it" },
-    copyright: "© 2026 Rivoglio",
+    copyright: "© 2026 Rivolio",
   },
 } as const;
 

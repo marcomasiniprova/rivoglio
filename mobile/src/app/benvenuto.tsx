@@ -35,7 +35,7 @@ import { TESTI } from "@/lib/testi";
 
 const T = TESTI.benvenuto;
 
-export const CHIAVE_BENVENUTO = "rivoglio.benvenuto.v1";
+export const CHIAVE_BENVENUTO = "rivolio.benvenuto.v1";
 
 /** Le colonne del marchio, che respirano piano sul fondo. */
 function Colonna({ x, ritardo, alta }: { x: number; ritardo: number; alta: number }) {
@@ -179,7 +179,7 @@ export default function SchermataBenvenuto() {
       <View style={stili.scena}>
         <Animated.Image
           source={marchio}
-          accessibilityLabel="Rivoglio"
+          accessibilityLabel="Rivolio"
           style={[
             stili.logo,
             {

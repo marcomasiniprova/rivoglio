@@ -1,12 +1,13 @@
-# STATO — Rivoglio
+# STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #33: firma del footer a tutta larghezza,
+**Aggiornato:** 2026-08-09 (giro #34: il marchio è RIVOLIO, i voli
+cancellati hanno un verdetto vero, social veri, velo nero tolto · giro #33: firma del footer a tutta larghezza,
 mano che entra in scena, check gratis con la sua scheda, confronto con le
 banconote, casella che si cerca da sola, barre della scadenza, sezioni
 "Cosa copre" e "Chi fa cosa" dal feedback esterno · giro #32: mockup del footer con l'app VERA,
 monumenti sulle card dell'Osservatorio, doppio opt-in con conferma e
 disdetta, tasti muti dell'anteprima app, skill copertura-prompt)
-**RIVOGLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
+**RIVOLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
 Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
 verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
 reclamo pronta, sequenza di follow-up, tracker, admin in shadow mode.
@@ -19,15 +20,51 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #34 (9/08): IL NOME CAMBIA E I CANCELLATI PAGANO.**
+  - **RIVOGLIO È DIVENTATO RIVOLIO OVUNQUE** (scelta di Valerio, 9/08):
+    rivoglio.it risultava già registrato (risponde a un indirizzo di
+    parcheggio) e rivoglio.com è di una gelateria, mentre rivolio.it è
+    libero e combacia coi suoi profili @rivolio_ai. Rinominati 88 file
+    più la cartella `components/rivolio/`; la tagline e tutto il resto
+    NON si toccano, era la sua condizione.
+    ⚠️ RESTA `rivoglio.netlify.app` in una manciata di punti, ed è
+    voluto: quello è l'indirizzo VERO della macchina dove gira il sito
+    oggi. Il giorno che rivolio.it punta su Netlify si cambiano due
+    variabili (NEXT_PUBLIC_SITO sul sito, EXPO_PUBLIC_SITO sull'app) e
+    sparisce anche quello. Cambiare la stringa prima significherebbe
+    mandare l'app su un indirizzo che non esiste.
+  - **I VOLI CANCELLATI NON SONO PIÙ UN VICOLO CIECO.** Finivano tutti
+    "incerto" perché l'art. 5 del CE 261/2004 lega la compensazione a due
+    fatti che nessun archivio conosce. Ora la pagina del verdetto li
+    chiede: quando ti hanno avvisato (a fasce, non a date: la gente
+    ricorda "una settimana prima", non "il 14 marzo") e quanto dopo sei
+    arrivato con l'alternativa. `lib/regole/cancellato.ts` applica
+    l'albero e chiude il caso. Chi non ricorda resta incerto e non paga.
+    ⚠️ Siamo PIÙ SEVERI della legge di proposito: la legge esclude la
+    compensazione solo se la riprotezione rispetta anche un limite sulla
+    PARTENZA, che non chiediamo. Sbagliamo dalla parte di chi non paga.
+    Rotta `/api/verifica/cancellato`, risposte scritte sulla riga di
+    `verifiche` (servono come prova), 14 prove nuove.
+    Migrazione `2026-08-12-cancellato.sql` DA APPLICARE.
+  - **IL BLOCCO NERO DELL'ANIMAZIONE**: sopra lo schermo del telefono
+    c'era un velo scuro che faceva lo "schermo spento", e a metà
+    scorrimento si vedeva come un rettangolo nero. Tolto: resta la lama
+    di luce, che racconta la stessa cosa e non può sporcare niente.
+  - **SOCIAL VERI**: solo Instagram e TikTok @rivolio_ai. YouTube e
+    Telegram tolti: un'icona che porta a un account inesistente è una
+    promessa rotta al primo clic.
+  - **LA BUSTA CHE SI APRE** nel riquadro "cercala nella tua posta":
+    l'aletta si alza e la lettera esce (`BustaAperta.tsx`), poi parte la
+    ricerca che si scrive da sola.
 - **GIRO #33 (9/08)**: il giro estetico chiesto da Valerio più i due
   limiti segnalati da un esperto esterno.
-  - **LA FIRMA "RIVOGLIO"** in fondo tocca i due bordi su qualsiasi
+  - **LA FIRMA "RIVOLIO"** in fondo tocca i due bordi su qualsiasi
     schermo. Non è tentata: nel font display quella parola è larga 4,23
     volte la propria dimensione, quindi la misura è
     `min(calc((100vw - margini) / 4.23), 293px)` (classe
     `.marchio-gigante` in globals.css). Alzata di un filo: prima il
     taglio in basso se ne mangiava un quarto.
-  - **LA MANO ENTRA IN SCENA** (`components/rivoglio/ManoRivelata.tsx`):
+  - **LA MANO ENTRA IN SCENA** (`components/rivolio/ManoRivelata.tsx`):
     alone verde che si apre da terra, mano che sale ruotando appena, e
     SOLO DOPO lo schermo che si accende con una lama di luce in
     diagonale. Tutto in codice, zero peso aggiunto. La finestra dello
@@ -82,7 +119,7 @@ social rifatta (era rimasta al prodotto viaggi).
     chiaro. Mai più un tocco senza risposta.
   - **LE CARD DELL'OSSERVATORIO HANNO UN MONUMENTO**: Colosseo, Duomo,
     Campanone, Campanile, Vesuvio, Etna, Due Torri, disegnati in SVG
-    (`components/rivoglio/Monumenti.tsx`), tinti col colore della
+    (`components/rivolio/Monumenti.tsx`), tinti col colore della
     giornata, più cinque tacche e il giudizio in parole. I buchi (archi,
     finestre) sono in verde notte pieno: con una trasparenza dello
     stesso colore sparivano e il Colosseo era un barattolo.
@@ -99,7 +136,7 @@ social rifatta (era rimasta al prodotto viaggi).
   - **EMAIL RIVESTITE**: testata col marchio a parole, corpo pulito, un
     solo bottone verde, link di disdetta in fondo (la landing promette
     "si annulla con un clic": adesso è vero). Mittente mostrato:
-    "Valerio di Rivoglio" (scelta sua). Anteprima in sviluppo su
+    "Valerio di Rivolio" (scelta sua). Anteprima in sviluppo su
     `/api/email-anteprima?q=conferma|benvenuto`, che chiama le stesse
     funzioni delle email vere: non può divergere.
   - **"Milan" è diventato "Milano"**: l'archivio scrive i nomi in
@@ -126,7 +163,7 @@ social rifatta (era rimasta al prodotto viaggi).
   - **La sezione prezzi è due carte d'imbarco** (scelta popup): pratica
     evidenziata col nastro "La più scelta" nella fascia scura, famiglia
     accanto, strappo coi fori, codice a barre derivato dal nome, timbro
-    "Rivoglio · Reg. CE 261/2004". Il check gratis è una striscia sopra
+    "Rivolio · Reg. CE 261/2004". Il check gratis è una striscia sopra
     le carte, non un terzo biglietto. Confronto coi portali e conti
     apribili invariati (la prova landing li blinda).
   - **Cancellato e dirottato parlano all'utente** (versione regole
@@ -141,7 +178,7 @@ social rifatta (era rimasta al prodotto viaggi).
     (colonna Domande) e in sitemap. In fondo il ponte al check EU261.
   - **L'email di benvenuto era ANCORA del prodotto viaggi** (crediti,
     destinazioni) e partiva a ogni registrazione: riscritta per
-    Rivoglio. Le T+0/2/15/30/60 della pratica rilette: già giuste. Il
+    Rivolio. Le T+0/2/15/30/60 della pratica rilette: già giuste. Il
     ramo email/alert viaggi (ricerca attiva, destinazione, crediti,
     ricevuta + chiamanti) è segnato in ARRETRATI da spegnere.
   - **La data sul biglietto in scansione del sito** era l'ISO grezza
@@ -227,7 +264,7 @@ social rifatta (era rimasta al prodotto viaggi).
   da 10 a 20 canali reclamo, riverificati l'8/08 da una squadra di ricerca
   (entità legale, paese, NEB, indirizzo postale, fonti). FR, U2, W6, V7 e
   DY dichiarano per iscritto che lavorano solo il reclamo inviato dal
-  passeggero: il modello di Rivoglio con loro è l'unico che funziona.
+  passeggero: il modello di Rivolio con loro è l'unico che funziona.
   Tabella `scioperi` sul Supabase vero con 10 scioperi giugno-settembre
   2026 (migrazione `20260809_scioperi`, fonti ENAC e testate; il cruscotto
   MIT dalla sandbox è bloccato, da riverificare dal PC). Meteo storico
@@ -239,7 +276,7 @@ social rifatta (era rimasta al prodotto viaggi).
   firma Standard Webhooks provata su 10 casi); lettera deterministica coi
   canali reclamo verificati di 10 compagnie; email T+0/2/15/30/60; garanzia
   90 giorni; tracker web; `/admin` = conferma umana (shadow mode acceso).
-- **Prove**: web 306/308 Playwright (9/08, dopo il giro #33). Le 2 rosse sono lo stesso
+- **Prove**: web 320/322 Playwright (9/08, dopo il giro #34: dentro ci sono le 14 nuove sui voli cancellati). Le 2 rosse sono lo stesso
   test su desktop e telefono, "il modulo dell'Osservatorio accetta
   un'email valida e conferma": la sandbox non arriva a Supabase (`Host
   not in allowlist`), quindi il salvataggio dell'iscritto risponde 500 e
@@ -254,7 +291,7 @@ social rifatta (era rimasta al prodotto viaggi).
 - **Schema dati applicato sul Supabase vero** (voli, verifiche, pratiche,
   eventi + RLS) via Composio, come migrazione tracciata.
 - **SEO/GEO**: robots, sitemap, JSON-LD Organization+WebSite, llms.txt,
-  canonical, metadata Rivoglio ovunque.
+  canonical, metadata Rivolio ovunque.
 - **ONLINE: https://rivoglio.netlify.app COL MOTORE VERO COLLAUDATO**
   (8/08 alba): il "FR4001 non funziona" di Valerio era SOLO la chiave
   AERODATABOX_API_KEY mancante su Netlify (il sito girava in demo).
@@ -271,7 +308,7 @@ social rifatta (era rimasta al prodotto viaggi).
 - **La web app è APERTA A TUTTI dall'8/08** (decisione di Valerio, ribaltata
   la scelta del pivot): `/app` senza account col check libero (CheckRapido),
   link "Entra" in nav e "La web app" nel footer. `/admin` resta chiuso.
-- **L'APP MOBILE È RIVOGLIO (8/08, due giri)**: niente più tracce del
+- **L'APP MOBILE È RIVOLIO (8/08, due giri)**: niente più tracce del
   prodotto viaggi. Tre tab: **Controlla** (il check, prima schermata),
   **Pratiche**, **Profilo**. Nessuna tab è protetta: il check funziona
   senza account, come sul sito; le pratiche invitano a entrare invece di
@@ -353,11 +390,11 @@ social rifatta (era rimasta al prodotto viaggi).
 
 ## Serve Valerio (in ordine)
 0. **DUE COSE SOLO TUE, e sbloccano le email:**
-   a. **Il dominio.** Finché `rivoglio.it` (o quello che scegli) non è
+   a. **Il dominio.** Finché `rivolio.it` (o quello che scegli) non è
       verificato su Resend, le email partono SOLO verso
       valerio@artecai.it: lo decide Resend, non il nostro codice. Dammi
       il dominio dello slot gratuito Hostinger e ti do i 3 record DNS.
-      Poi su Netlify: RESEND_MITTENTE = "Valerio di Rivoglio
+      Poi su Netlify: RESEND_MITTENTE = "Valerio di Rivolio
       <valerio@TUODOMINIO>".
    b. **La migrazione del doppio opt-in** (`supabase/2026-08-11-doppio-
       optin.sql`) va applicata sul Supabase vero, altrimenti il clic di
@@ -377,8 +414,8 @@ social rifatta (era rimasta al prodotto viaggi).
    col piano Open-Meteo Professional (~99 USD/mese): decidi quando ci sono
    incassi. Alla prossima fattura AeroDataBox chiedi la profondità storica.
    Poi 30 casi reali a mano per il golden set.
-5. **Dominio** per Rivoglio (slot gratuito Hostinger da configurare) e
-   account social `@rivoglio`.
+5. **Dominio** per Rivolio (slot gratuito Hostinger da configurare) e
+   account social `@rivolio`.
 6. Legale: le 3 pagine (privacy, condizioni, cookie) sono una PRIMA BOZZA
    scritta l'8/08: falle rivedere da un avvocato e dammi cognome e dati
    societari del titolare da inserire. Commercialista sul regime fiscale

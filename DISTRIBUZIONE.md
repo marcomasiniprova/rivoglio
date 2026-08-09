@@ -1,6 +1,6 @@
 # DISTRIBUZIONE — FASE 2
 
-*Riscritto il 2026-08-07 (notte) per Rivoglio. I formati e gli script
+*Riscritto il 2026-08-07 (notte) per Rivolio. I formati e gli script
 stanno in `CONTENUTI.md`. Dal documento di Valerio: la distribuzione vale
 il 65% dell'energia. Il prodotto si finisce in giorni, la distribuzione
 non finisce mai.*
@@ -67,8 +67,8 @@ Il disruption-jacking non ha calendario: si fa quando succede, entro 2 ore.
 
 | | Perché |
 |---|---|
-| Account `@rivoglio` su TikTok, Instagram, YouTube | i video devono uscire da qualche parte. Prendili SUBITO anche se non pubblichi |
-| Dominio di Rivoglio | senza, il link nei video è un netlify.app |
+| Account `@rivolio` su TikTok, Instagram, YouTube | i video devono uscire da qualche parte. Prendili SUBITO anche se non pubblichi |
+| Dominio di Rivolio | senza, il link nei video è un netlify.app |
 | Un pomeriggio in aeroporto col telefono | il formato tabellone è il più forte e costa un biglietto del treno |
 | Account Reddit con un po' di storia | uno nuovo che promuove viene bannato |
 

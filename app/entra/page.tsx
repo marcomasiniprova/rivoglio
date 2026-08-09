@@ -5,7 +5,7 @@ import Logo from "@/components/Logo";
 import ModuloEntra from "@/components/ModuloEntra";
 
 export const metadata: Metadata = {
-  title: "Entra | Rivoglio",
+  title: "Entra | Rivolio",
   description: "Entra nel tuo account e segui le tue pratiche.",
   robots: { index: false },
 };
@@ -70,7 +70,7 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
                 <span className="size-4 rounded-full bg-verde" aria-hidden="true" />
               </span>
               <div>
-                <p className="text-[15px] font-semibold text-inchiostro">Rivoglio</p>
+                <p className="text-[15px] font-semibold text-inchiostro">Rivolio</p>
                 <p className="text-[13px] text-fumo">Regolamento CE 261/2004</p>
               </div>
             </div>

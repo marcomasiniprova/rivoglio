@@ -216,7 +216,7 @@ export default function ScenaScan({
   const compiuti = Math.min(passo, T.passi.length);
 
   const [altezzaCarta, setAltezzaCarta] = useState(0);
-  const tacche = useMemo(() => barre(volo || "RIVOGLIO"), [volo]);
+  const tacche = useMemo(() => barre(volo || "RIVOLIO"), [volo]);
 
   /* La luce dello scanner: scende in 3,4 secondi, riposa mezzo secondo,
      riparte dall'alto. Stessi tempi del sito. */

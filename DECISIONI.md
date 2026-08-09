@@ -10,7 +10,7 @@ con la data e si marca la vecchia `[SUPERATA]`.
 | 2026-08-06 | Nessuno stack scelto prima della spec approvata | Scegliere la tecnologia prima di sapere cosa si costruisce fa buttare lavoro |
 | 2026-08-06 | `[SUPERATA il 07/08: si fa la mobile app negli store]` **Web app, non app nativa** (iOS/Android) | Apple chiede €99/anno + In-App Purchase obbligatorio sugli abbonamenti digitali (15-30% di commissione); Google Play $25 + review. Con Stripe su web la commissione è ~1,5% + €0,25. Un alert non ha bisogno di un'app: email/Telegram/push arrivano lo stesso. La web app è online in giornata a €0. Reversibile: l'app nativa si aggiunge dopo, quando gli abbonati la pagano |
 | 2026-08-06 | **Ingestione offerte = innesto sostituibile** (`source` adapter) | La scelta della fonte prezzi è rimandata (Valerio, 06/08). Il resto del prodotto non deve dipenderne: le offerte entrano in una tabella `offerte` con un campo `fonte`, e ogni fonte è un modulo separato che si può aggiungere o togliere senza toccare il motore di match né gli alert |
-| 2026-08-06 | `[SUPERATA il 07/08 sera: il nome è Rivoglio]` **Nome: `Viaggio Anche Io`**, per esteso ovunque | Scelto da Valerio. Nasce dal dato di partenza: 40 milioni di italiani non partono ad agosto — "anche io" è la rivendicazione di chi ci va lo stesso, col suo budget. Avevo obiettato sulla lunghezza (14 lettere) e proposto il marchio corto `Anche Io` + payoff: **Valerio ha confermato la forma estesa. Chiuso.** |
+| 2026-08-06 | `[SUPERATA il 07/08 sera: il nome è Rivolio]` **Nome: `Viaggio Anche Io`**, per esteso ovunque | Scelto da Valerio. Nasce dal dato di partenza: 40 milioni di italiani non partono ad agosto — "anche io" è la rivendicazione di chi ci va lo stesso, col suo budget. Avevo obiettato sulla lunghezza (14 lettere) e proposto il marchio corto `Anche Io` + payoff: **Valerio ha confermato la forma estesa. Chiuso.** |
 | 2026-08-06 | **Tono: amico diretto, si dà del tu** | Pubblico 25-45 che arriva dai social. Voce: *"Dimmi da dove parti e quanto vuoi spendere. Al resto ci penso io."* Frasi corte, zero gergo, zero superlativi pubblicitari |
 | 2026-08-06 | **Tutta Italia dal giorno 1**, partenza per comune/CAP e non da un menù di città | Deciso da Valerio. Non costa quanto sembra: un'offerta è un punto sulla mappa, non appartiene a una città — un agriturismo in Toscana serve chi parte da Milano, Bologna, Firenze e Roma insieme. In più le iscrizioni dicono dove sta davvero la domanda. **Buco noto: le isole** (vedi SPEC §9) |
 | 2026-08-06 | **Pricing: crediti. 1 credito = 1 alert ricevuto.** 5/€3,99 · 20/€12,99 · 50/€24,99. Nessun abbonamento | Deciso da Valerio. Avevo obiettato due cose — l'incentivo si inverte (guadagni mandandone di più, l'utente ne vuole meno e migliori) e l'utente non sa quanto spenderà — e avevo proposto di vendere la "caccia da 30 giorni". **Valerio ha scelto i crediti avendo le obiezioni sotto gli occhi. Chiuso, si implementa così.** Mitigazione concordata dentro il suo modello: **tetto di alert/settimana scelto dall'utente** |
@@ -123,7 +123,7 @@ decise insieme al pivot:
 | **Permesso notifiche chiesto DOPO la creazione della prima ricerca**, mai al primo avvio, con schermata di spiegazione prima del prompt nativo. Chi rifiuta riceve via email. | Ricerca onboarding 07/08 (pattern Hopper): al primo avvio è la prima causa di rifiuto del permesso. |
 | **Onboarding in 6 passi, valore prima dell'account**: benvenuto → conto di esempio (marcato demo) → criteri senza account → aggancio → registrazione → avvisi. | Ricerca 07/08: le app che mostrano il valore prima della registrazione convertono di più. Il nostro aha è il conto aperto. |
 | **Crediti dentro l'app = acquisti in-app di Apple e Google, quando si accenderanno.** Polar può vendere solo sul web: non ha acquisti in-app. | Verificato il 07/08: i crediti sono beni digitali consumabili, guideline Apple 3.1.1 e Play Billing obbligatori (15% sotto il milione col programma small business). Le vie UE del DMA esistono ma con commissioni comunque dovute e obblighi di rendicontazione: non per la v1. **V1 senza acquisti**: si parte coi 3 crediti gratis. |
-| `[SUPERATA il 07/08 sera dal pivot Rivoglio]` **Dominio comprato da Valerio: `ancheioviaggio.it`** (07/08). | Era il dominio dell'idea viaggi. Col nome nuovo non serve più: il dominio per Rivoglio è da prendere. Nel Hostinger di Valerio c'è uno slot dominio gratuito ancora da configurare (verificato via Composio il 07/08). |
+| `[SUPERATA il 07/08 sera dal pivot Rivolio]` **Dominio comprato da Valerio: `ancheioviaggio.it`** (07/08). | Era il dominio dell'idea viaggi. Col nome nuovo non serve più: il dominio per Rivolio è da prendere. Nel Hostinger di Valerio c'è uno slot dominio gratuito ancora da configurare (verificato via Composio il 07/08). |
 
 ### Vincoli store VERIFICATI il 07/08 — non riaprire
 - **Apple Developer individuale**: 99 USD/anno, si apre da privato senza partita IVA, approvazione 24-48h, review app tipica 24-72h. Prima app: 1-2 settimane realistiche con un rifiuto messo in conto.
@@ -131,7 +131,7 @@ decise insieme al pivot:
 - **Sign in with Apple**: obbligatorio (guideline 4.8) se offriamo "Continua con Google" nell'app.
 - **EAS Build gratuito**: 30 build/mese (max 15 iOS), coda lenta nelle ore di punta USA. Le notifiche remote NON si provano su Expo Go né sul simulatore iOS: serve una build di sviluppo su un iPhone vero.
 
-## Chiusa il 07/08 (sera) — IL PIVOT: da Viaggio Anche Io a Rivoglio
+## Chiusa il 07/08 (sera) — IL PIVOT: da Viaggio Anche Io a Rivolio
 
 **Scelta di Valerio.** Ha trovato concorrenti più grandi che fanno la stessa
 identica cosa: l'idea viaggi è chiusa. Il pivot è di PRODOTTO, non di
@@ -140,15 +140,15 @@ struttura né di sviluppo:
 - **Si tiene TUTTO**: landing Next, app mobile Expo, Supabase (stesso
   progetto, stesse tabelle), motore, pannello, componenti, prove, documenti,
   modo di lavorare. Niente si rifà da zero.
-- **Nome nuovo: Rivoglio.** Rinominato ovunque: codice web e mobile, bundle
-  (`it.rivoglio.app`), pacchetti, documenti, repo GitHub e progetto Supabase.
+- **Nome nuovo: Rivolio.** Rinominato ovunque: codice web e mobile, bundle
+  (`it.rivolio.app`), pacchetti, documenti, repo GitHub e progetto Supabase.
 - **Cosa fa il nuovo prodotto lo definisce Valerio a breve.** Fino ad allora
   i testi descrivono ancora l'idea vecchia: si riscrivono in blocco alla
   definizione, non a pezzi prima.
 - Il registro qui sopra NON si riscrive: le decisioni superate restano
   marcate `[SUPERATA]`, come da regola del file. La storia è storia.
 
-## Chiuse il 07/08 (notte) — RIVOGLIO È DEFINITO: lo scanner dei rimborsi
+## Chiuse il 07/08 (notte) — RIVOLIO È DEFINITO: lo scanner dei rimborsi
 
 **Il documento completo di Valerio definisce il prodotto.** SPEC.md riscritta
 da lì. Le scelte strutturali, chiuse:
@@ -161,10 +161,10 @@ da lì. Le scelte strutturali, chiuse:
 | **Shadow mode al lancio**: ogni idoneo aspetta la conferma umana in `/admin` prima che si possa pagare. Si spegne dopo 100 verdetti di fila senza correzioni. | Dal documento (fase C). Ogni correzione è un caso nuovo per il golden set. |
 | **Prezzi: check gratis / 1 pratica 14,90€ / famiglia stesso volo (fino a 5) 24,90€.** Nessun altro SKU. | Meno scelte, più conversione. La famiglia è il margine. |
 | **Garanzia 90 giorni: "Se la compagnia non paga, non paghi neanche tu."** | I conti del documento: con garanzia il netto è uguale ma tieni recensioni e marchio. Non si toglie. |
-| **Lettera deterministica in v1, senza LLM.** Modello rigido con i dati del volo, artt. 5-7 CE 261/2004. L'utente la invia DALLA SUA email: Rivoglio è un generatore di documenti, non un intermediario. | Zero allucinazioni normative possibili. Ryanair è ostile agli intermediari: l'invio in proprio è un vantaggio, si vende. |
+| **Lettera deterministica in v1, senza LLM.** Modello rigido con i dati del volo, artt. 5-7 CE 261/2004. L'utente la invia DALLA SUA email: Rivolio è un generatore di documenti, non un intermediario. | Zero allucinazioni normative possibili. Ryanair è ostile agli intermediari: l'invio in proprio è un vantaggio, si vende. |
 | **Dati volo: AeroDataBox primario, AviationStack riserva, cache per volo+data, payload grezzo archiviato sempre.** OpenSky VIETATO (licenza non commerciale). | Il fatto oggettivo è il prodotto. Doppia fonte discordante >15 min = incerto. |
 | **Pagamenti: Polar (Merchant of Record), account di Valerio già aperto.** Checkout link + webhook. ⚠️ Polar solleva dall'IVA UE ma NON dal dichiarare il reddito: il documento stesso dice di sentire un commercialista. Non è validato qui il "10k/mese senza partita IVA". | Partenza immediata senza OSS. Tetto pratico ~15-20k€/mese, poi Stripe. |
-| **Deploy su Netlify** (progetto `rivoglio`, sito rivoglio.netlify.app, creato via connettore il 07/08). Il documento suggeriva Vercel: Valerio ha scelto Netlify, che è già in DECISIONI dal 06/08. | Scelta di Valerio, connettore diretto disponibile. |
+| **Deploy su Netlify** (progetto `rivolio`, sito rivoglio.netlify.app, creato via connettore il 07/08). Il documento suggeriva Vercel: Valerio ha scelto Netlify, che è già in DECISIONI dal 06/08. | Scelta di Valerio, connettore diretto disponibile. |
 | **Design system tenuto** (verde, Geist/Poppins, corsivo): il verde è il colore dei soldi che tornano. Il documento suggeriva font nuovi: non si rifà quello che funziona. | Pivot di prodotto, non di struttura. |
 | **Niente gamification, mai.** Niente streak, badge, reward variabili. | Prodotto sui diritti: la ricompensa deve essere prevedibile e verificabile. La fiducia è l'unica moneta. |
 | Tabelle viaggi (offerte, ricerche, invii, strutture) = eredità: restano nel DB, il prodotto non le usa. Il motore viaggi resta nel codice, spento. | Nessun dato si butta. |
@@ -177,9 +177,9 @@ Vivono in `SPEC.md` → "Domande aperte". Appena chiuse, scendono qui.
 - **Polar: i due checkout link** (pratica 14,90, famiglia 24,90) e il
   segreto del webhook, dall'account di Valerio. E l'approvazione
   dell'organizzazione va richiesta SUBITO: ci vogliono ~2 settimane.
-- **Dominio per Rivoglio**: `rivoglio.it` da verificare e prendere (slot
+- **Dominio per Rivolio**: `rivolio.it` da verificare e prendere (slot
   gratuito Hostinger da configurare).
 - **Account store** (per il tracker mobile, dopo): Apple 99$/anno, Play 25$
-  + 12 tester × 14 giorni. Bundle `it.rivoglio.app` già pronto.
+  + 12 tester × 14 giorni. Bundle `it.rivolio.app` già pronto.
 - **Legale**: condizioni d'uso e disclaimer da far leggere a un avvocato
   prima del lancio; commercialista sul regime fiscale.

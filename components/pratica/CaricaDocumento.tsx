@@ -5,7 +5,7 @@ import { COPY } from "@/lib/copy";
 
 /**
  * La seconda fonte, in mano all'utente: carica la carta d'imbarco o
- * l'email della compagnia, Rivoglio la incrocia coi dati verificati.
+ * l'email della compagnia, Rivolio la incrocia coi dati verificati.
  * Concorde = riga verde. Discorde = onestà: verifica umana, ti scriviamo.
  */
 const T = COPY.pratica.documenti;

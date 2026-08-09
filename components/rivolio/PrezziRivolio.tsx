@@ -79,7 +79,7 @@ function Strappo({ evidenza }: { evidenza: boolean }) {
   );
 }
 
-export default function PrezziRivoglio() {
+export default function PrezziRivolio() {
   return (
     <section id="prezzi" className="scroll-mt-24 px-5 py-16 sm:px-8 sm:py-20">
       <div className="mx-auto max-w-[1200px]">
@@ -101,7 +101,7 @@ export default function PrezziRivoglio() {
 
         {/* IL CHECK GRATUITO HA LA SUA SCHEDA, ed è la più grande della
             sezione (richiesta di Valerio, 9/08): è la cosa che distingue
-            Rivoglio da chi ti fa pagare per sapere se hai diritto. Prima
+            Rivolio da chi ti fa pagare per sapere se hai diritto. Prima
             era una strisciolina sopra i biglietti e si leggeva come una
             nota a piè di pagina. */}
         <Anima ritardo={0.05} className="mx-auto mt-12 max-w-[880px]">
@@ -248,7 +248,7 @@ export default function PrezziRivoglio() {
                   <div className="mt-4 flex items-end justify-between gap-4">
                     <Barre seme={p.nome} />
                     <p className="numeri shrink-0 text-[9.5px] uppercase tracking-[0.2em] text-fumo-2">
-                      Rivoglio · Reg. CE 261/2004
+                      Rivolio · Reg. CE 261/2004
                     </p>
                   </div>
                 </div>

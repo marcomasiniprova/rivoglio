@@ -17,7 +17,7 @@
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const CHIAVE = "rivoglio.voli.v1";
+const CHIAVE = "rivolio.voli.v1";
 const MASSIMO = 50;
 
 export type EsitoSalvato = "idoneo" | "incerto" | "non_idoneo";

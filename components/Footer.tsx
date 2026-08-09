@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { Marchio } from "./Logo";
 import BadgeStore from "./BadgeStore";
-import ManoRivelata from "./rivoglio/ManoRivelata";
+import ManoRivelata from "./rivolio/ManoRivelata";
 import { COPY } from "@/lib/copy";
 
 /**
- * Il footer di Rivoglio.
+ * Il footer di Rivolio.
  *
  * Struttura presa dai SaaS di riferimento: colonne di link in alto, riga
  * di crediti in basso, e il nome del marchio scritto enorme che chiude la
@@ -35,10 +35,13 @@ type Social = {
   punto?: { cx: number; cy: number; r: number };
 };
 
+/* I due profili veri di Valerio (9/08). YouTube e Telegram sono stati
+   tolti: un'icona che porta a un account inesistente è una promessa
+   rotta al primo clic, e si vede subito. */
 const SOCIAL: Social[] = [
   {
     nome: "Instagram",
-    href: "https://instagram.com/rivoglio",
+    href: "https://www.instagram.com/rivolio_ai/",
     // disegnata a contorno, non a pieno: a pieno diventa una macchia
     contorno:
       "M7.2 3h9.6A4.2 4.2 0 0 1 21 7.2v9.6a4.2 4.2 0 0 1-4.2 4.2H7.2A4.2 4.2 0 0 1 3 16.8V7.2A4.2 4.2 0 0 1 7.2 3Z",
@@ -47,18 +50,8 @@ const SOCIAL: Social[] = [
   },
   {
     nome: "TikTok",
-    href: "https://tiktok.com/@rivoglio",
+    href: "https://www.tiktok.com/@rivolio_ai",
     d: "M15.4 3.2h2.5a5.2 5.2 0 0 0 4.1 4.4v2.6a7.9 7.9 0 0 1-4.1-1.3v6.4a5.9 5.9 0 1 1-5.9-5.9c.3 0 .6 0 .9.06v2.7a3.2 3.2 0 1 0 2.3 3.1V3.2Z",
-  },
-  {
-    nome: "YouTube",
-    href: "https://youtube.com/@rivoglio",
-    d: "M21.6 7.4a2.5 2.5 0 0 0-1.75-1.76C18.3 5.2 12 5.2 12 5.2s-6.3 0-7.85.44A2.5 2.5 0 0 0 2.4 7.4C2 9 2 12 2 12s0 3 .4 4.6a2.5 2.5 0 0 0 1.75 1.76C5.7 18.8 12 18.8 12 18.8s6.3 0 7.85-.44a2.5 2.5 0 0 0 1.75-1.76C22 15 22 12 22 12s0-3-.4-4.6ZM10.1 15V9l5.2 3-5.2 3Z",
-  },
-  {
-    nome: "Telegram",
-    href: "https://t.me/rivoglio",
-    d: "M21.3 4.3 2.9 11.4c-.9.35-.88 1.63.03 1.95l4.5 1.58 1.74 5.24c.24.72 1.16.92 1.68.36l2.5-2.66 4.7 3.46c.72.53 1.75.13 1.93-.75l3-14.3c.2-.94-.72-1.72-1.6-1.4ZM9.6 14.1l8.3-5.5-6.8 6.3-.3 3.2-1.2-4Z",
   },
 ];
 

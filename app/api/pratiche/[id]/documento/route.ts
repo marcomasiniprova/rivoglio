@@ -10,7 +10,7 @@ import {
 
 /**
  * La seconda fonte, dentro la pratica: l'utente carica la carta
- * d'imbarco (o l'email della compagnia) e Rivoglio la incrocia coi dati
+ * d'imbarco (o l'email della compagnia) e Rivolio la incrocia coi dati
  * verificati del volo.
  *
  * Il FILE NON SI SALVA: si estraggono i campi (deterministico, regex su

@@ -129,12 +129,14 @@ export function valuta(f: FattoVolo): Verdetto {
   }
 
   /* Cancellazione: l'eleggibilità dipende da QUANDO la compagnia ti ha
-     avvisato (meno di 14 giorni prima), e questo un'API non può saperlo:
-     lo sai solo tu. Finché non raccogliamo quel dato dall'utente (v1.1),
-     un volo cancellato è per definizione incerto: MAI vendere sul giallo. */
+     avvisato e da com'è andata la riprotezione (art. 5), e un'API non può
+     saperlo: lo sai solo tu. Qui il verdetto resta incerto, ma NON è un
+     vicolo cieco: la pagina del risultato fa le due domande e chiude il
+     caso con `lib/regole/cancellato.ts`. La frase "risulta cancellato" è
+     il segnale che quel componente cerca: non cambiarla alla leggera. */
   if (f.stato === "cancellato") {
     return incerto(
-      "Questo volo risulta cancellato. La compensazione dipende da quando la compagnia ti ha avvisato e dal volo alternativo che ti ha proposto: dati che hai solo tu, non gli archivi di volo. Quindi il caso è incerto e non paghi niente. Il rimborso del biglietto o un volo alternativo, invece, si chiedono comunque alla compagnia.",
+      "Questo volo risulta cancellato. La compensazione dipende da quando la compagnia ti ha avvisato e dal volo alternativo che ti ha proposto: due cose che negli archivi di volo non esistono, le sai solo tu. Rispondi alle due domande qui sotto e ti dico subito se ti spetta. Il rimborso del biglietto o un volo alternativo, invece, si chiedono comunque alla compagnia.",
     );
   }
 

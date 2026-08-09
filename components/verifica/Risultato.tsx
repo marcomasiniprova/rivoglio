@@ -14,8 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { COPY } from "@/lib/copy";
+import DomandeCancellato from "./DomandeCancellato";
 import CardCondivisione from "./CardCondivisione";
-import CartaImbarcoScan from "@/components/rivoglio/CartaImbarcoScan";
+import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
 
 /**
  * La pagina del risultato, lato client. TRE stati, mai due (SPEC §4):
@@ -594,29 +595,53 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
 
 function Incerto({ dati }: { dati: DatiVerifica }) {
   const t = COPY.risultato.incerto;
+  /* Un cancellato non è un incerto qualsiasi: gli mancano DUE risposte,
+     e quelle le può dare solo chi c'era. Invece di fermarsi, si chiedono. */
+  const cancellato = (dati.motivo ?? "").toLowerCase().includes("risulta cancellato");
+  /* Quando le due domande chiudono il caso, il titolo "qui ci fermiamo"
+     diventa falso: la pagina se ne accorge e cambia faccia. */
+  const [chiuso, setChiuso] = useState<"idoneo" | "incerto" | "non_idoneo" | null>(null);
   return (
     <div className="flex flex-col gap-6">
       <Anima>
         <Occhiello testo={t.occhiello} demo={dati.demo} />
         <h1 className="luce-testo mt-4 font-display text-[clamp(1.9rem,6.4vw,2.9rem)] leading-[1.04] tracking-[-0.04em]">
-          {t.titolo}
+          {chiuso && chiuso !== "incerto" ? COPY.risultato.cancellato.titoloChiuso : t.titolo}
         </h1>
       </Anima>
 
-      <Anima ritardo={0.1}>
-        <Card>
-          {/* La spiegazione viene dal motivo del motore: mai vaga. */}
-          <p className="text-[1.05rem] leading-relaxed">
-            {dati.motivo ?? t.motivi.datoMancante}
-          </p>
-          <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{t.testo}</p>
-          <p className="mt-3 border-t border-bordo pt-3 text-[0.95rem] leading-relaxed text-fumo">
-            {t.alternativa}
-          </p>
-        </Card>
-      </Anima>
+      {!chiuso && (
+        <Anima ritardo={0.1}>
+          <Card>
+            {/* La spiegazione viene dal motivo del motore: mai vaga. */}
+            <p className="text-[1.05rem] leading-relaxed">
+              {dati.motivo ?? t.motivi.datoMancante}
+            </p>
+            <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{t.testo}</p>
+            <p className="mt-3 border-t border-bordo pt-3 text-[0.95rem] leading-relaxed text-fumo">
+              {t.alternativa}
+            </p>
+          </Card>
+        </Anima>
+      )}
 
-      {/* Niente vendita sul giallo, MAI. Solo l'avviso se il dato si sblocca. */}
+      {/* IL CANCELLATO SI CHIUDE, non resta appeso: due domande e il
+          motore dà il verdetto vero (art. 5 CE 261/2004). */}
+      {cancellato && (
+        <Anima ritardo={0.14}>
+          <DomandeCancellato
+            volo={dati.volo}
+            dataVolo={dati.dataVolo}
+            idVerifica={dati.idVerifica}
+            demo={dati.demo}
+            avvisa={setChiuso}
+          />
+        </Anima>
+      )}
+
+      {/* Niente vendita sul giallo, MAI. Solo l'avviso se il dato si
+          sblocca: a caso chiuso non serve più. */}
+      {!chiuso && (
       <Anima ritardo={0.16}>
         <CatturaEmail
           idVerifica={dati.idVerifica}
@@ -628,6 +653,7 @@ function Incerto({ dati }: { dati: DatiVerifica }) {
           conferma={t.avviso.conferma}
         />
       </Anima>
+      )}
 
       <Anima ritardo={0.2}>
         <Button asChild size="lg" className="h-auto w-full py-4 text-base">
@@ -718,8 +744,8 @@ export default function Risultato({ dati }: { dati: DatiVerifica }) {
      (arrivo diretto, niente flag dal check, movimento non ridotto). */
   const [scansione, setScansione] = useState(false);
   useEffect(() => {
-    const dalCheck = sessionStorage.getItem("rivoglio-scan-fatto") === "1";
-    sessionStorage.removeItem("rivoglio-scan-fatto");
+    const dalCheck = sessionStorage.getItem("rivolio-scan-fatto") === "1";
+    sessionStorage.removeItem("rivolio-scan-fatto");
     const fermo = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (dalCheck || fermo) return;
     // la decisione vive SOLO nel browser (sessionStorage): partire spenti

@@ -73,7 +73,7 @@ export function testoAvviso(v: {
 
   return {
     titolo: tratta,
-    corpo: `${ritardo}Un volo così rientra nella fascia da ${v.importo}€ a passeggero. Apri Rivoglio per vedere il dato.`,
+    corpo: `${ritardo}Un volo così rientra nella fascia da ${v.importo}€ a passeggero. Apri Rivolio per vedere il dato.`,
   };
 }
 

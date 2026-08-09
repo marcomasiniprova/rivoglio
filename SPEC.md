@@ -1,7 +1,7 @@
-# SPEC — Rivoglio
+# SPEC — Rivolio
 
 *Riscritta il 2026-08-07 (sera) dal documento completo di Valerio
-(`RIVOGLIO_DOCUMENTO_COMPLETO.md`). Le scelte chiuse stanno in `DECISIONI.md`.
+(`RIVOLIO_DOCUMENTO_COMPLETO.md`). Le scelte chiuse stanno in `DECISIONI.md`.
 La SPEC vecchia (micro-vacanze) è superata: resta solo nella storia di git.*
 
 ## 1. Il prodotto, in una riga
@@ -9,7 +9,7 @@ La SPEC vecchia (micro-vacanze) è superata: resta solo nella storia di git.*
 > Scopri in 30 secondi se una compagnia ti deve dei soldi. Se sì, il reclamo
 > te lo preparo io. Tu lo mandi e tieni il 100%.
 
-Rivoglio è lo scanner dei rimborsi. Verticale numero 1: **voli**
+Rivolio è lo scanner dei rimborsi. Verticale numero 1: **voli**
 (Reg. CE 261/2004). Poi bagagli (settembre), treni gratis come calamita
 (ottobre), bollette e altro (2027). Il nome è neutro apposta: il marchio è
 "l'app italiana che ti recupera i soldi che ti devono", non "app rimborsi voli".
@@ -143,7 +143,7 @@ fare tutto gratis da solo, e come. Non vendiamo ignoranza.
    - stagionale: "hai volato quest'estate? Controlla gratis"
 4. Tracker della pratica: sul web e nell'app mobile.
 
-**Perimetro legale (il modello pulito):** Rivoglio è un GENERATORE DI
+**Perimetro legale (il modello pulito):** Rivolio è un GENERATORE DI
 DOCUMENTI. Niente mandato, niente incasso per conto terzi, niente moduli
 giudiziari in v1. Ryanair è ostile agli intermediari: che l'utente invii da
 solo È un vantaggio tecnico, si vende esplicitamente. Condizioni d'uso e

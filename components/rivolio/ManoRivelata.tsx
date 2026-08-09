@@ -11,9 +11,14 @@ import { motion, useReducedMotion } from "motion/react";
  * 2. la mano sale dal basso ruotando appena e si posa (1,1s): è il
  *    movimento vero di una mano che entra nell'inquadratura, non uno
  *    scivolamento da robot;
- * 3. lo SCHERMO SI ACCENDE (0,9s dopo): un velo scuro se ne va mentre
- *    una lama di luce lo attraversa in diagonale. È il momento che fa
- *    sembrare l'immagine un video invece di una figura.
+ * 3. lo SCHERMO SI ACCENDE (1s dopo): una lama di luce lo attraversa in
+ *    diagonale. È il momento che fa sembrare l'immagine un video invece
+ *    di una figura.
+ *
+ * ⚠️ Qui NON ci va un velo scuro sopra lo schermo. C'era, per fare lo
+ * "schermo spento", e sul telefono si vedeva come un blocco nero che
+ * spuntava a metà scorrimento: su una foto chiara qualunque rettangolo
+ * scuro si legge come un difetto, non come un effetto.
  *
  * Perché in codice e non un video: un video di questa scena pesa
  * qualche MB, su rete lenta arriva dopo tutto il resto e su iOS parte
@@ -96,21 +101,11 @@ export default function ManoRivelata({
           className="mb-[-2px] h-[320px] w-auto object-contain object-bottom sm:h-[380px] md:h-[440px]"
         />
 
-        {/* 3. lo schermo che si accende: prima è spento… */}
-        <motion.span
-          aria-hidden="true"
-          className="pointer-events-none absolute bg-verde-notte"
-          style={SCHERMO}
-          variants={{
-            fermo: { opacity: fermo ? 0 : 0.72 },
-            vivo: {
-              opacity: 0,
-              transition: { duration: 0.75, ease: "easeOut", delay: fermo ? 0 : 0.95 },
-            },
-          }}
-        />
-
-        {/* …e una lama di luce lo attraversa una volta sola */}
+        {/* 3. lo schermo si accende: SOLO una lama di luce che lo
+            attraversa. Prima c'era anche un velo scuro sopra lo schermo
+            (lo schermo "spento") e sul telefono si vedeva come un blocco
+            nero che spuntava a metà scorrimento: tolto. La luce da sola
+            racconta la stessa cosa e non può sporcare niente. */}
         <span
           aria-hidden="true"
           className="pointer-events-none absolute overflow-hidden"

@@ -17,7 +17,7 @@ apri e la guardi. Se non la guardi, non hai verificato: hai solo creato un file.
 
 ### 1. Accendi il server
 ```
-preview_start con { name: "rivoglio" }
+preview_start con { name: "rivolio" }
 ```
 Se dice che la porta è occupata, un server sta già girando: usalo, non
 ammazzarlo. Next rifiuta un secondo `next dev` sulla stessa cartella, quindi

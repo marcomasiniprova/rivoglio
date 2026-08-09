@@ -25,7 +25,7 @@ c'è scritto che marketing, design, sviluppo web e **consulenza in
 generale** non sono ammessi: accettano prodotti digitali e software che
 si consegnano da soli, subito, in automatico.
 
-Rivoglio sta dalla parte giusta **se lo presenti per quello che è**: un
+Rivolio sta dalla parte giusta **se lo presenti per quello che è**: un
 software che incrocia i dati del volo e genera la lettera di reclamo, e
 te la consegna subito. Non è una consulenza, non siamo intermediari, il
 reclamo lo mandi tu. Questo è già scritto sul sito, ed è vero.
@@ -129,7 +129,7 @@ inventarti una risposta e non fartela dare da me.
 ## La procedura, passo per passo
 
 **1. Crea l'account e l'organizzazione**
-Vai su polar.sh, registrati, crea l'organizzazione. Chiamala `rivoglio`.
+Vai su polar.sh, registrati, crea l'organizzazione. Chiamala `rivolio`.
 
 **2. Attiva la sandbox e provaci dentro**
 Polar ha un ambiente di prova separato (sandbox.polar.sh). Le carte

@@ -93,10 +93,10 @@ export function vestito({
 
     <tr><td style="padding:22px 12px 0;">
       <p style="margin:0 0 10px;font-family:${FONT};font-size:12.5px;line-height:1.65;color:${C.fumo2};">
-        ${coda ?? "Ricevi questa email perché hai un account su Rivoglio."}
+        ${coda ?? "Ricevi questa email perché hai un account su Rivolio."}
       </p>
       <p style="margin:0;font-family:${FONT};font-size:12.5px;line-height:1.65;color:${C.fumo2};">
-        Rivoglio prepara i documenti: il reclamo lo invii tu, dalla tua email, e la compensazione arriva a te. Non siamo un intermediario e non diamo consulenza legale.
+        Rivolio prepara i documenti: il reclamo lo invii tu, dalla tua email, e la compensazione arriva a te. Non siamo un intermediario e non diamo consulenza legale.
         ${disdetta ? `<br><a href="${disdetta}" style="color:${C.fumo2};text-decoration:underline;">Non voglio più ricevere queste email</a>` : ""}
       </p>
     </td></tr>

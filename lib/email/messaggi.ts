@@ -5,7 +5,7 @@ import { linkConferma, linkDisdetta } from "@/lib/iscritti/gettone";
 /**
  * Le email di servizio, una funzione ciascuna.
  *
- * VIVE (le mandano i flussi di Rivoglio):
+ * VIVE (le mandano i flussi di Rivolio):
  *   0. chiedi conferma dell'iscrizione → chiediConferma  (doppio opt-in)
  *   1. iscrizione confermata           → benvenutoLista
  *   2. creazione dell'account          → benvenuto
@@ -14,7 +14,7 @@ import { linkConferma, linkDisdetta } from "@/lib/iscritti/gettone";
  * Le email della PRATICA (T+0/2/15/30/60) stanno in `pratiche.ts`.
  *
  * EREDITÀ del prodotto viaggi (5-8: ricercaAttiva, alert, creditiFiniti,
- * ricevuta): nessun flusso di Rivoglio le manda più; le richiama solo il
+ * ricevuta): nessun flusso di Rivolio le manda più; le richiama solo il
  * vecchio ramo ricerche/alert, da spegnere (voce in ARRETRATI). Non
  * riusarle per testi nuovi.
  *
@@ -105,7 +105,7 @@ export function componiBenvenuto(scali: ScaloOggi[], disdetta: string | null) {
         p(
           `<strong style="color:${C.inchiostro}">Intanto una cosa utile:</strong> se nell'ultimo anno hai preso un volo atterrato con più di 3 ore di ritardo, il check dice in trenta secondi in che fascia rientri (250, 400 o 600 euro). Non serve account.`,
         ),
-      coda: "Ricevi questa email perché hai confermato l'iscrizione all'Osservatorio dei Disservizi di Rivoglio.",
+      coda: "Ricevi questa email perché hai confermato l'iscrizione all'Osservatorio dei Disservizi di Rivolio.",
       disdetta,
     }),
     testo:
@@ -126,7 +126,7 @@ export function benvenutoLista(a: string, scali: ScaloOggi[] = []): Promise<Esit
 export function benvenuto(a: string): Promise<Esito> {
   return spedisci({
     a,
-    oggetto: "Il tuo account Rivoglio è pronto.",
+    oggetto: "Il tuo account Rivolio è pronto.",
     html: vestito({
       titolo: "Benvenuto",
       corpo:
@@ -146,7 +146,7 @@ export function benvenuto(a: string): Promise<Esito> {
         p(
           "Nessun abbonamento e nessun addebito: si paga solo se apri una pratica, una volta sola. Se questo account non l'hai chiesto tu, rispondi a questa email e lo cancelliamo.",
         ),
-      coda: "Ricevi questa email perché è stato creato un account Rivoglio con questo indirizzo.",
+      coda: "Ricevi questa email perché è stato creato un account Rivolio con questo indirizzo.",
     }),
     testo: `Il tuo account è pronto.\n\nIl check dei voli resta gratis e senza account. L'account serve al resto:\n1. Le pratiche si seguono passo per passo, dal sito e dall'app.\n2. I voli che salvi nell'app li ricontrolliamo il giorno dopo: se rientrano in una fascia, ti avvisiamo noi.\n3. Con questa email ritrovi tutto, su sito e app.\n\nControlla un volo, gratis: ${casa()}/app\n\nNessun abbonamento e nessun addebito: si paga solo se apri una pratica, una volta sola.`,
   });
@@ -166,7 +166,7 @@ export function conferma(a: string, link: string): Promise<Esito> {
         p(
           `Se non hai chiesto tu questa registrazione, ignora questa email: senza il clic non succede niente.`,
         ),
-      coda: "Ricevi questa email perché qualcuno ha usato questo indirizzo per registrarsi su rivoglio.it.",
+      coda: "Ricevi questa email perché qualcuno ha usato questo indirizzo per registrarsi su rivolio.it.",
     }),
     testo: `Un clic e sei dentro.\n\nConferma il tuo indirizzo: ${link}\n\nSe non hai chiesto tu questa registrazione, ignora questa email.`,
   });
@@ -305,7 +305,7 @@ export function ricevuta(
          </table>` +
         p("I crediti sono già sul tuo account e non scadono.") +
         bottone("Torna alle tue ricerche", `${casa()}/app`),
-      coda: "Ricevi questa email perché hai acquistato crediti su Rivoglio.",
+      coda: "Ricevi questa email perché hai acquistato crediti su Rivolio.",
     }),
     testo: `Crediti aggiunti.\n\nCrediti: ${t.crediti}\nImporto: ${t.importo}€\nRiferimento: ${t.riferimento}\n\nI crediti non scadono.\n${casa()}/app`,
   });

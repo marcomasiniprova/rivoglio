@@ -1,5 +1,5 @@
 /**
- * LA CLASSIFICA: chi si è ripreso più soldi con Rivoglio.
+ * LA CLASSIFICA: chi si è ripreso più soldi con Rivolio.
  *
  * Richiesta di Valerio (8/08): una gara vera, che dia il senso di
  * un'app che aiuta a riprendersi dei soldi, non di un giochino. Regole

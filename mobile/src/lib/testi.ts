@@ -214,7 +214,7 @@ export const TESTI = {
   },
 
   comune: {
-    marchio: "Rivoglio",
+    marchio: "Rivolio",
     tagline: "Riprenditi i soldi che ti devono.",
     avanti: "Avanti",
     indietro: "Torna indietro",
@@ -317,10 +317,10 @@ export const TESTI = {
     },
     invita: {
       titolo: "Fai controllare un volo a chi ami",
-      testo: "Il check è gratis: passa Rivoglio a chi ha preso un volo in ritardo.",
+      testo: "Il check è gratis: passa Rivolio a chi ha preso un volo in ritardo.",
       // Il messaggio che parte con la condivisione. Niente promesse.
       messaggio:
-        "Ho controllato il mio volo con Rivoglio: se è atterrato in ritardo ti dice subito se rientra in una fascia di compensazione fino a 600€. Gratis: https://rivoglio.netlify.app",
+        "Ho controllato il mio volo con Rivolio: se è atterrato in ritardo ti dice subito se rientra in una fascia di compensazione fino a 600€. Gratis: https://rivoglio.netlify.app",
     },
     voci: {
       dati: "Dati personali",
@@ -333,11 +333,11 @@ export const TESTI = {
       condizioniSotto: "Il contratto, in chiaro",
       supporto: "Scrivici",
       supportoSotto: "Rispondiamo per email",
-      sito: "Rivoglio sul web",
+      sito: "Rivolio sul web",
       sitoSotto: "rivoglio.netlify.app",
     },
     piede:
-      "Rivoglio non è un intermediario: prepara i documenti, il reclamo lo invii tu e la compensazione arriva a te.",
+      "Rivolio non è un intermediario: prepara i documenti, il reclamo lo invii tu e la compensazione arriva a te.",
   },
 
   /* ---- modifica del profilo: nome pubblico e classifica ---- */

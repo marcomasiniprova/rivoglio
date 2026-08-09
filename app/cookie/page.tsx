@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import PaginaLegale from "@/components/legale/PaginaLegale";
 
 export const metadata: Metadata = {
-  title: "Cookie | Rivoglio",
+  title: "Cookie | Rivolio",
   description:
-    "Rivoglio usa solo cookie tecnici: niente profilazione, niente pubblicità, niente banner. Ecco quali e perché.",
+    "Rivolio usa solo cookie tecnici: niente profilazione, niente pubblicità, niente banner. Ecco quali e perché.",
 };
 
 /**
@@ -16,7 +16,7 @@ export default function PaginaCookie() {
   return (
     <PaginaLegale titolo="Cookie" aggiornata="8 agosto 2026">
       <p>
-        La versione corta: <strong>Rivoglio usa solo cookie tecnici</strong>. Niente
+        La versione corta: <strong>Rivolio usa solo cookie tecnici</strong>. Niente
         profilazione, niente pubblicità, niente tracciamento fra siti. Per questo non vedi
         nessun banner: per i soli cookie tecnici le Linee guida del Garante per la protezione
         dei dati personali (10 giugno 2021) richiedono l&apos;informativa, non il consenso.

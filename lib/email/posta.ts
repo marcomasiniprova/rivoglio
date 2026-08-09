@@ -13,7 +13,7 @@ import { Resend } from "resend";
  * ⚠️ FINCHÉ NON C'È IL DOMINIO: Resend consente di spedire solo verso
  * l'indirizzo del proprietario dell'account, usando `onboarding@resend.dev`
  * come mittente. Serve per provare, non per lanciare. Appena
- * `rivoglio.it` è verificato su Resend, si cambia MITTENTE qui sotto
+ * `rivolio.it` è verificato su Resend, si cambia MITTENTE qui sotto
  * e parte tutto.
  */
 
@@ -24,17 +24,17 @@ export const POSTA_ATTIVA = Boolean(CHIAVE);
 
 /**
  * Il mittente. Il NOME mostrato è una persona, non un marchio (scelta di
- * Valerio, 9/08): "Valerio di Rivoglio" apre più di "Rivoglio", e chi
+ * Valerio, 9/08): "Valerio di Rivolio" apre più di "Rivolio", e chi
  * risponde trova qualcuno dall'altra parte.
  *
  * L'INDIRIZZO invece resta quello di prova di Resend finché il dominio
  * non è verificato: da lì si può spedire solo al proprietario
- * dell'account. Appena `rivoglio.it` è verificato, su Netlify si mette
- * RESEND_MITTENTE = "Valerio di Rivoglio <valerio@rivoglio.it>" e parte
+ * dell'account. Appena `rivolio.it` è verificato, su Netlify si mette
+ * RESEND_MITTENTE = "Valerio di Rivolio <valerio@rivolio.it>" e parte
  * tutto, senza toccare una riga di codice.
  */
 export const MITTENTE =
-  process.env.RESEND_MITTENTE ?? "Valerio di Rivoglio <onboarding@resend.dev>";
+  process.env.RESEND_MITTENTE ?? "Valerio di Rivolio <onboarding@resend.dev>";
 
 /** Dove torna la gente che clicca. */
 export function casa() {

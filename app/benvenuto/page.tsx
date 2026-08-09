@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 /**
  * Qui viveva l'onboarding dell'idea viaggi (base di partenza, criteri).
- * Col pivot a Rivoglio non c'è più niente da chiedere all'ingresso: la
+ * Col pivot a Rivolio non c'è più niente da chiedere all'ingresso: la
  * pratica nasce dal check e dal pagamento, non da un questionario.
  *
  * Il file resta SOLO perché /benvenuto è in giro in email e link vecchi:

@@ -1,7 +1,7 @@
 /**
  * La prima schermata dell'app: IL CHECK DEL VOLO.
  *
- * Rifatta l'8/08 per Rivoglio (prima era l'onboarding del vecchio prodotto
+ * Rifatta l'8/08 per Rivolio (prima era l'onboarding del vecchio prodotto
  * viaggi). Regole del prodotto, identiche al sito:
  * - il check è gratis e NON richiede account: si scrive volo e data e basta;
  * - il verdetto lo dà il motore sul server, mai l'app (lib/api.ts);
@@ -285,7 +285,7 @@ export default function SchermataCheck() {
       >
         {/* ------------------------------------------------ il marchio */}
         <View style={stili.marchio}>
-          <Image source={marchio} style={stili.segno} accessibilityLabel="Rivoglio" />
+          <Image source={marchio} style={stili.segno} accessibilityLabel="Rivolio" />
           <Text style={stili.nomeMarchio}>
             Rivo<Text style={stili.nomeVerde}>glio</Text>
           </Text>
