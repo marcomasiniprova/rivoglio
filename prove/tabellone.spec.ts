@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 import { COPERTINE } from "../components/tabellone/Copertine";
 import { NOME_BLOG, PER_PAGINA, quantePagine, tutti } from "../lib/tabellone/indice";
@@ -58,6 +58,16 @@ function testoVisibile(blocchi: Blocco[]): string {
 }
 
 test.describe("Il Tabellone: la redazione", () => {
+  test("in `public/` non restano immagini sparse", () => {
+    /* Le copertine stanno tutte in `public/assets/tabellone/`. Il 9/08 due
+       file `image-<numero>.webp` erano finiti nella radice di `public/`:
+       erano le schermate del blog di riferimento, e da lì il sito le
+       avrebbe servite pubblicamente sotto il nostro dominio. Questa prova
+       esiste perché è successo. */
+    const sparse = readdirSync("public").filter((f) => /^image-\d+\./.test(f));
+    expect(sparse, `immagini sparse in public/: ${sparse.join(", ")}`).toEqual([]);
+  });
+
   test("ci sono dieci articoli, con slug e titoli unici", () => {
     expect(ARTICOLI.length).toBe(10);
     expect(SLUG.size).toBe(ARTICOLI.length);
