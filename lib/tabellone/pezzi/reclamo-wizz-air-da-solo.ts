@@ -20,6 +20,7 @@ export const ARTICOLO: Articolo = {
   tipo: "compagnia",
   tag: ["compagnie", "cancellazione", "rimborsi"],
   copertina: "imbarco-negato",
+  foto: "/assets/tabellone/reclamo-wizz.webp",
   minuti: 7,
   correlati: [
     "volo-in-ritardo-250-400-600-euro",

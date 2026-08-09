@@ -1,6 +1,7 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #41: LE PAGINE EVENTO e l'autopilot degli
+**Aggiornato:** 2026-08-09 (giro #42: LE FOTO VERE sulle copertine del blog ·
+giro #41: LE PAGINE EVENTO e l'autopilot degli
 scioperi · giro #40: IL TABELLONE, il blog · più un
 falso positivo sull'IMPORTO chiuso nel motore (art. 7 lett. b) ·
 giro #39: test dei due prezzi · giro #38: garanzia legata all'ESITO invece
@@ -37,6 +38,39 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #42 (9/08 sera): LE COPERTINE DEL BLOG SONO FOTO VERE.**
+  - Valerio ha generato le dieci immagini coi prompt di `COPERTINE.md` e le
+    ha spinte su `main`, a 2624x1632 e 8 MB l'una. Da lì le ho prese,
+    lavorate e montate: **nove su dieci sono online** al posto delle
+    illustrazioni. Il blog adesso somiglia al riferimento non solo nella
+    struttura ma anche nel materiale.
+  - **LA FILIGRANA GEMINI NON STA NELL'ANGOLO**, e questo cambia il taglio:
+    è una stellina larga un centinaio di pixel piazzata *dentro*
+    l'immagine, a 230 pixel dal bordo destro e 190 dal basso. Tagliare la
+    striscia in fondo (la scelta iniziale di Valerio) sarebbe costato il
+    19% dell'altezza; tagliando da destra ne basta l'11%. Si taglia da
+    destra, poi si riporta l'inquadratura a 16:10 togliendo il resto dal
+    basso, dove c'è solo pavimento. Lo fa `scripts/copertine.mjs`, che
+    **si ferma e non pubblica** se il ritaglio comprende la filigrana.
+    ⚠️ La filigrana INVISIBILE (SynthID) resta dentro i pixel: non si
+    toglie e non si vede.
+  - **CONTROLLO FATTO**: ho guardato l'angolo in basso a destra di tutte e
+    nove le copertine lavorate, una per una. Pulite. Ogni file è 1600x1000
+    WebP fra i 73 e i 315 KB.
+  - 🟡 **LA DECIMA NON È USABILE E NON L'HO MESSA.** La foto per l'articolo
+    easyJet inquadra due pile di fogli con titoli leggibili che parlano di
+    un report sull'energia rinnovabile, e sotto un testo finto: a
+    dimensione di copertina si legge, e fa sembrare la pagina montata a
+    caso. Quell'articolo tiene l'illustrazione. In `COPERTINE.md` il
+    prompt numero 4 è stato riscritto per pretendere fogli **bianchi e
+    vuoti**: si rigenera solo quella.
+  - Una prova nuova: se un articolo dichiara una foto e il file non c'è, la
+    suite si ferma. Senza, la card resterebbe vuota e nessuno se ne
+    accorgerebbe finché non lo vede un lettore.
+  - ⚠️ **Le dieci immagini originali (84 MB) sono nella radice di `main`.**
+    Vanno tolte da lì: gonfiano ogni clone. La cartella giusta è
+    `public/assets/tabellone/originali/`, che è di scarico e si svuota.
+  - Prove: **578 verdi** (restano le 2 note dell'Osservatorio).
 - **GIRO #41 (9/08): LE PAGINE EVENTO, E GLI SCIOPERI CHE SI AGGIORNANO DA SOLI.**
   - **TRE FAMIGLIE DI PAGINE che si costruiscono dai nostri dati**, senza
     scrivere una riga a mano (scelta di Valerio: tutte e tre).
@@ -775,9 +809,10 @@ social rifatta (era rimasta al prodotto viaggi).
    delle fonti. Se qualcosa non va ti arriva comunque un'email da solo.
    Facoltative: `TELEGRAM_ADMIN_CHAT` (per l'allarme anche su Telegram) e
    `ALERT_EMAIL` (se vuoi l'allarme a un indirizzo diverso dal tuo).
-5-bis. **Le copertine del blog**: dieci prompt pronti in `COPERTINE.md`.
-   Generi le immagini, me le mandi in WebP e le monto: una riga per
-   articolo. In alternativa dammi `UNSPLASH_ACCESS_KEY` e le prendo io.
+5-bis. **Rigenera SOLO la copertina numero 4 (easyJet)**: il prompt in
+   `COPERTINE.md` è già corretto e pretende fogli bianchi e vuoti. Le
+   altre nove sono montate. Poi **togli le dieci immagini originali dalla
+   radice di `main`**: sono 84 MB che tutti si portano dietro a ogni clone.
    Poi: **riapri dal tuo PC le fonti citate negli articoli** (ENAC, AGCM,
    Eurocontrol, le condizioni di trasporto delle compagnie) e conferma i
    numeri. Da qui l'uscita di rete è bloccata e le pagine non si aprono:

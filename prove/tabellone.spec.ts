@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 import { COPERTINE } from "../components/tabellone/Copertine";
 import { NOME_BLOG, PER_PAGINA, quantePagine, tutti } from "../lib/tabellone/indice";
@@ -98,6 +99,15 @@ test.describe("Il Tabellone: la redazione", () => {
 
       test("ha una copertina che esiste e tag validi", () => {
         expect(Object.keys(COPERTINE), `copertina ${a.copertina}`).toContain(a.copertina);
+        /* La foto vince sul disegno, quindi se il file non c'è la card resta
+           vuota e nessuno se ne accorge finché non lo vede un lettore. */
+        if (a.foto) {
+          expect(a.foto).toMatch(/^\/assets\/tabellone\/[a-z0-9-]+\.webp$/);
+          expect(
+            existsSync(`public${a.foto}`),
+            `la foto dichiarata non esiste: public${a.foto}`,
+          ).toBe(true);
+        }
         expect(a.tag.length).toBeGreaterThanOrEqual(2);
         for (const t of a.tag) expect(Object.keys(TAG)).toContain(t);
       });

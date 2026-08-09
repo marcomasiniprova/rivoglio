@@ -22,6 +22,7 @@ export const ARTICOLO: Articolo = {
   tipo: "dati",
   tag: ["dati", "aeroporti", "ritardo"],
   copertina: "mappa-ritardi",
+  foto: "/assets/tabellone/scali-italiani.webp",
   minuti: 7,
   correlati: [
     "dati-ritardi-europa-2025",

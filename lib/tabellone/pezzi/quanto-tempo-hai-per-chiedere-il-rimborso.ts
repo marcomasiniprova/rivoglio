@@ -21,6 +21,7 @@ export const ARTICOLO: Articolo = {
   tipo: "situazione",
   tag: ["rimborsi", "diritti", "guida"],
   copertina: "stelle-riforma",
+  foto: "/assets/tabellone/quanto-tempo.webp",
   minuti: 7,
   correlati: [
     "volo-in-ritardo-250-400-600-euro",

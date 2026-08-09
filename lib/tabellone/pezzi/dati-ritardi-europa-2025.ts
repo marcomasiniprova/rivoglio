@@ -21,6 +21,7 @@ export const ARTICOLO: Articolo = {
   tipo: "dati",
   tag: ["dati", "ritardo", "aeroporti"],
   copertina: "tabellone-partenze",
+  foto: "/assets/tabellone/dati-europa.webp",
   minuti: 8,
   correlati: [
     "volo-in-ritardo-250-400-600-euro",

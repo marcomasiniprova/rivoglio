@@ -1,11 +1,20 @@
 # Le copertine del Tabellone: i 10 prompt
 
-*Scritto il 9/08/2026, giro #40.*
+*Scritto il 9/08/2026, giro #40. Aggiornato il 9/08 sera, giro #41.*
 
-Il blog è online con dieci copertine disegnate da noi (illustrazioni
-editoriali in SVG, coi tuoi colori). Funzionano e pesano zero, ma se vuoi
-le **fotografie** di persone come nel riferimento, qui sotto ci sono i dieci
-prompt, uno per articolo, già scritti per essere incollati.
+## ✅ Stato: nove foto su dieci sono montate
+
+Valerio ha generato le dieci immagini e le ha spinte; nove sono online al
+posto delle illustrazioni. La stellina della filigrana Gemini è stata
+tolta tagliando l'11% del lato destro (la stellina non sta nell'angolo:
+sta dentro l'immagine, a 230 pixel dal bordo destro).
+
+**Manca solo la numero 4, easyJet.** Quella generata inquadra due pile di
+fogli con titoli leggibili che parlano di un report sull'energia, e sotto
+un testo finto: a dimensione di copertina si legge, e fa sembrare la
+pagina montata a caso. Quell'articolo tiene l'illustrazione finché non
+arriva una foto senza testo dentro. **Il prompt 4 qui sotto è già
+corretto**: rigenera solo quella.
 
 ---
 
@@ -137,23 +146,29 @@ deve essere il centro, e sullo schermo non deve leggersi niente.
 **Nome file:** `reclamo-easyjet.webp`
 
 > Editorial photograph, 16:10 horizontal. Flat lay, shot straight down on
-> a cream-colored desk surface (#FBF9EF). Two separate stacks of plain
-> paper documents sit side by side with a clear gap between them, each
-> stack held by a different colored paper clip: one deep green
-> (#052E1F), one mint green (#7FE8AE). Between the stacks, a printed
-> receipt curls slightly and a small coffee cup ring stains the desk. A
-> person's hand enters from the right edge of the frame, index finger
-> resting on the right-hand stack, as if choosing. Only the hand and part
-> of the forearm are visible. The paper is blank: no printed text
-> anywhere. Even, soft daylight from a window on the left, gentle
-> shadows.
+> a cream-colored desk surface (#FBF9EF). Two separate stacks of
+> COMPLETELY BLANK white paper sit side by side with a clear gap between
+> them, each stack held by a different colored paper clip: one deep green
+> (#052E1F), one mint green (#7FE8AE). The sheets are empty: no printing,
+> no headings, no charts, no lines, no lorem ipsum, nothing. Between the
+> stacks, a small coffee cup ring stains the desk. A person's hand enters
+> from the right edge of the frame, index finger resting on the
+> right-hand stack, as if choosing. Only the hand and part of the forearm
+> are visible. Even, soft daylight from a window on the left, gentle
+> shadows, the paper edges catching the light.
 > Shot on 50mm, f/4, natural diffused light, faint film grain, editorial
 > still life, calm and orderly.
-> Negative: no text, no readable documents, no logos, no faces, no
-> laptop, no phone, no bright colors, no watermark.
+> Negative: NO TEXT OF ANY KIND, no printed documents, no headings, no
+> charts, no graphs, no tables, no numbers, no lorem ipsum, no logos, no
+> faces, no laptop, no phone, no bright colors, no watermark.
 
 **Cosa deve venire fuori:** due strade separate, e una mano che ne indica
 una. È la metafora dei due moduli diversi.
+
+⚠️ **La cosa su cui è andata storta la prima volta:** i fogli devono essere
+BIANCHI E VUOTI. Se il generatore ci stampa sopra dei titoli, quelli si
+leggono sulla pagina dell'articolo e parlano di un'altra cosa. Se esce
+ancora con del testo sopra, rigenerala.
 
 ---
 

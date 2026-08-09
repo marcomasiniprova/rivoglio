@@ -21,6 +21,12 @@ export const ARTICOLO: Articolo = {
   tipo: "compagnia",
   tag: ["compagnie", "rimborsi", "cancellazione"],
   copertina: "fetta-commissione",
+  /* NIENTE FOTO, per adesso, ed è una scelta. La foto generata per questo
+     pezzo inquadra due pile di fogli con dei titoli leggibili che parlano
+     d'altro (un report sull'energia) e sotto un testo finto: a dimensione
+     di copertina si legge, e fa sembrare la pagina montata a caso. Meglio
+     l'illustrazione, finché non arriva una foto senza testo dentro. Il
+     prompt corretto sta in COPERTINE.md, numero 4. */
   minuti: 7,
   correlati: [
     "volo-in-ritardo-250-400-600-euro",

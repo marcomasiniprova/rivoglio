@@ -21,6 +21,7 @@ export const ARTICOLO: Articolo = {
   tipo: "emergenza",
   tag: ["scioperi", "emergenza", "cancellazione"],
   copertina: "giorno-sciopero",
+  foto: "/assets/tabellone/sciopero-aerei.webp",
   minuti: 7,
   correlati: [
     "volo-cancellato-primi-60-minuti",

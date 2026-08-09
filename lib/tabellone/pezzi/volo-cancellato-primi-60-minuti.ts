@@ -21,6 +21,7 @@ export const ARTICOLO: Articolo = {
   tipo: "emergenza",
   tag: ["cancellazione", "emergenza", "rimborsi"],
   copertina: "gate-telefono",
+  foto: "/assets/tabellone/volo-cancellato.webp",
   minuti: 7,
   correlati: [
     "volo-in-ritardo-250-400-600-euro",

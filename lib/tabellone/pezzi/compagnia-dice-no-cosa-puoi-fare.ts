@@ -21,6 +21,7 @@ export const ARTICOLO: Articolo = {
   tipo: "pilastro",
   tag: ["diritti", "rimborsi", "guida"],
   copertina: "busta-ufficiale",
+  foto: "/assets/tabellone/compagnia-dice-no.webp",
   minuti: 8,
   inEvidenza: true,
   correlati: [

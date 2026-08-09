@@ -20,6 +20,7 @@ export const ARTICOLO: Articolo = {
   tipo: "pilastro",
   tag: ["diritti", "ritardo", "guida"],
   copertina: "soglia-tre-ore",
+  foto: "/assets/tabellone/volo-in-ritardo.webp",
   minuti: 9,
   inEvidenza: true,
   correlati: [

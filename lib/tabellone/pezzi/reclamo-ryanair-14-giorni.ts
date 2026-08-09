@@ -22,6 +22,7 @@ export const ARTICOLO: Articolo = {
   tipo: "compagnia",
   tag: ["compagnie", "ritardo", "rimborsi"],
   copertina: "modulo-respinto",
+  foto: "/assets/tabellone/reclamo-ryanair.webp",
   minuti: 7,
   inEvidenza: true,
   correlati: [
