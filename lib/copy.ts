@@ -44,6 +44,9 @@ export const COPY = {
       { testo: "Garanzia", ancora: "#garanzia" },
       { testo: "Prezzi", ancora: "#prezzi" },
       { testo: "Domande", ancora: "#domande" },
+      /* Il blog: dalla nav si arriva al Tabellone, e dal Tabellone si
+         torna al check. È il canale di acquisizione, non un extra. */
+      { testo: "Il Tabellone", ancora: "/tabellone" },
     ],
     cta: "Controlla il tuo volo",
     entra: "Entra",
@@ -1174,6 +1177,7 @@ export const COPY = {
           { testo: "La web app", ancora: "/app" },
           { testo: "Come funziona", ancora: "#come-funziona" },
           { testo: "Prezzi", ancora: "#prezzi" },
+          { testo: "Il Tabellone (blog)", ancora: "/tabellone" },
           { testo: "Osservatorio", ancora: "#osservatorio" },
         ],
       },

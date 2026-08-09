@@ -16,9 +16,9 @@
  * i casi d'oro devono passare tutti.
  */
 
-import { ambitoCE261, vettoreConLicenzaUE } from "./territorio";
+import { ambitoCE261, vettoreConLicenzaUE, zonaDiScalo } from "./territorio";
 
-export const VERSIONE_REGOLE = "2026.08.5";
+export const VERSIONE_REGOLE = "2026.08.6";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
 const SOGLIA_MINUTI = 180;
@@ -238,14 +238,26 @@ export function valuta(f: FattoVolo): Verdetto {
     );
   }
 
-  /* Le fasce del Regolamento: fino a 1500 km → 250€; fra 1500 e 3500 → 400€;
-     oltre 3500 → 600€, MA ridotto del 50% (300€) se il ritardo è sotto le
-     4 ore. La riduzione esiste solo sul lungo raggio. */
+  /* Le fasce del Regolamento (art. 7 par. 1): fino a 1500 km → 250€;
+     oltre 3500 → 600€, MA ridotto del 50% (300€) se il ritardo è sotto
+     le 4 ore; in mezzo → 400€.
+
+     ⚠️ L'ECCEZIONE CHE MANCAVA (trovata il 9/08 scrivendo la guida). La
+     lettera b) dice "tutte le tratte INTRACOMUNITARIE superiori a 1500 km
+     E tutte le altre tratte fra 1500 e 3500 km": quindi un volo che parte
+     e arriva dentro lo spazio europeo resta a 400€ ANCHE se è lunghissimo.
+     Parigi → Riunione fa 9.300 km ed è Francia-Francia: valgono 400 euro,
+     non 600. Prima uscivano 600, cioè si prometteva al passeggero la metà
+     in più di quanto la norma gli riconosce. È un falso positivo
+     sull'IMPORTO, e la regola numero uno del progetto lo vieta come vieta
+     quelli sull'esito. */
   const km = f.kmOrtodromica;
+  const intraUe =
+    zonaDiScalo(f.partenzaIata) === "ue" && zonaDiScalo(f.arrivoIata) === "ue";
   const importo =
     km <= SOGLIA_CORTO_RAGGIO_KM
       ? (250 as const)
-      : km <= SOGLIA_LUNGO_RAGGIO_KM
+      : intraUe || km <= SOGLIA_LUNGO_RAGGIO_KM
         ? (400 as const)
         : ritardo < SOGLIA_RIDUZIONE_MINUTI
           ? (300 as const)

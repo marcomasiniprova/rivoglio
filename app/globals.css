@@ -23,6 +23,16 @@
 
   --color-sole: #f5c451;
 
+  /* LA CARTA DEL TABELLONE (il blog, giro #40).
+     Il resto del sito vive su `nebbia`, un grigio freddo da interfaccia.
+     Il blog no: è una rivista, e una rivista si stampa su carta calda.
+     Questa crema è l'unico posto dove il fondo cambia, ed è voluto:
+     entrando nel Tabellone si capisce con gli occhi di essere passati
+     dal prodotto alla lettura. Il verde resta il nostro. */
+  --color-carta: #fbf9ef;
+  --color-carta-2: #f3efdf;
+  --color-carta-bordo: #e5dfc9;
+
   --font-display: var(--font-geist), ui-sans-serif, sans-serif;
   --font-sans: var(--font-poppins), ui-sans-serif, sans-serif;
   --font-corsivo: var(--font-serif), ui-serif, Georgia, serif;
@@ -557,4 +567,165 @@ a[class*="rounded-pillola"]:active {
   .marchio-gigante {
     font-size: min(calc((100vw - 64px) / 4.23), 293px);
   }
+}
+
+/* ============================================================
+   IL TABELLONE — il blog (giro #40)
+   Riferimento: il journal di Untitled UI. Stessa architettura
+   (fondo carta, verde scuro, titoli display col corsivo serif in
+   coda, card con la cornice sfalsata), colori nostri.
+   ============================================================ */
+
+/* Il fondo carta vale su tutta la pagina, non solo dentro il
+   contenitore: se lo mettessi su un div, oltre il fondo pagina
+   ricomparirebbe il grigio del sito e si vedrebbe la giunta. */
+body:has(.tabellone) {
+  background: var(--color-carta);
+}
+.tabellone {
+  background: var(--color-carta);
+  color: var(--color-verde-notte);
+}
+
+/* La cornice sfalsata delle copertine: nel riferimento l'immagine ha
+   un rettangolo verde che sbuca in basso a destra, come una seconda
+   stampa sotto la prima. Si muove all'entrata del puntatore. */
+.cornice-sfalsata {
+  position: relative;
+  isolation: isolate;
+}
+.cornice-sfalsata::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--color-verde-notte);
+  /* A riposo sta esattamente sotto l'immagine, quindi non si vede.
+     Esce solo quando il puntatore entra: nel riferimento il blocco
+     verde compare sulla card sotto il cursore, non su tutte. */
+  transform: translate(0, 0);
+  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cornice-sfalsata:hover::after,
+a:hover .cornice-sfalsata::after,
+a:focus-visible .cornice-sfalsata::after {
+  transform: translate(10px, 10px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cornice-sfalsata::after {
+    transition: none;
+  }
+}
+
+/* ---------- il corpo di un articolo ----------
+   Misura di riga corta, interlinea alta, gerarchia netta: si legge
+   dal telefono in aeroporto, non su un monitor da ufficio. */
+.articolo {
+  font-size: 17.5px;
+  line-height: 1.75;
+  color: color-mix(in srgb, var(--color-verde-notte) 82%, transparent);
+}
+.articolo > * + * {
+  margin-top: 1.15rem;
+}
+/* `:not(.not-prose *)` non e' pignoleria: i riquadri (il check, il
+   confronto, la newsletter, le domande) stanno DENTRO l'articolo ma hanno
+   una loro tipografia, spesso su fondo scuro. Senza questa esclusione il
+   colore qui sotto vinceva sulle classi del riquadro e il titolo del box
+   del check usciva verde notte su verde notte, cioe' invisibile. */
+.articolo h2:not(.not-prose *) {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.2vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--color-verde-notte);
+  margin-top: 3rem;
+  scroll-margin-top: 6rem;
+}
+.articolo h3:not(.not-prose *) {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--color-verde-notte);
+  margin-top: 2rem;
+}
+.articolo strong {
+  font-weight: 600;
+  color: var(--color-verde-notte);
+}
+.articolo a {
+  color: var(--color-verde-scuro);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+  transition: color 0.2s;
+}
+.articolo a:hover {
+  color: var(--color-verde);
+}
+.articolo ul,
+.articolo ol {
+  padding-left: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.articolo ul {
+  list-style: none;
+}
+.articolo ul > li {
+  position: relative;
+}
+.articolo ul > li::before {
+  content: "";
+  position: absolute;
+  left: -1.15rem;
+  top: 0.72em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--color-verde);
+}
+.articolo ol {
+  list-style: decimal;
+}
+.articolo ol > li::marker {
+  font-weight: 600;
+  color: var(--color-verde-scuro);
+}
+.articolo blockquote {
+  border-left: 3px solid var(--color-verde);
+  padding-left: 1.1rem;
+  font-family: var(--font-corsivo);
+  font-style: italic;
+  font-size: 1.16em;
+  line-height: 1.55;
+  color: var(--color-verde-notte);
+}
+.articolo table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93em;
+}
+.articolo th,
+.articolo td {
+  border-bottom: 1px solid var(--color-carta-bordo);
+  padding: 0.72rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+.articolo th {
+  font-weight: 600;
+  color: var(--color-verde-notte);
+  border-bottom-color: color-mix(in srgb, var(--color-verde-notte) 30%, transparent);
+}
+
+/* Sotto i 640px una tabella larga sfonda la pagina: scorre da sola. */
+.tabella-scorrevole {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }

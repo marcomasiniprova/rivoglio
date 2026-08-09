@@ -42,6 +42,7 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | Seconda fonte: documenti dell'utente via OCR Mistral dentro la pratica | ✅ 8/08 (concorde/discorde/illeggibile; discorde = conferma umana; file mai salvato) |
 | **Prova delle 2 ore: chiave AeroDataBox su voli reali** | ✅ 8/08: dati solidi con Live fino a 11 mesi (AZ610); oltre 365 giorni il BASIC rifiuta → vetrina onesta sui 12 mesi |
 | Golden set esteso a 500 casi reali (gruppi FB, amici) | ⏳ man mano che passano voli veri |
+| **Art. 7 lett. b): le tratte intracomunitarie lunghe restano a 400€** | ✅ 9/08 giro #40, regole 2026.08.6, golden set 45 su 45 |
 
 ## 1.2 Le superfici web
 
@@ -88,6 +89,11 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | Account `@rivolio` su TikTok/IG/YouTube | ⏳ **serve Valerio, subito** |
 | Primi 10 video girati (si può PRIMA del lancio) | ⏳ Valerio |
 | Newsletter "Osservatorio dei Disservizi" (Brevo) | ⏳ coi primi iscritti |
+| **Il Tabellone**: il blog su `/tabellone`, hub and spoke, 10 articoli | ✅ 9/08 giro #40 |
+| Copertine fotografiche degli articoli (10 prompt pronti in `COPERTINE.md`) | ⏳ **serve Valerio** |
+| Fonti degli articoli riaperte e confermate dal PC di Valerio | ⏳ **serve Valerio** (da qui la rete è chiusa) |
+| Pagine evento (sciopero e aeroporto), generate dai nostri dati | ⏸️ **fermate da Valerio il 9/08**: da rispiegare |
+| Un articolo nuovo a settimana, sempre lo stesso giorno | ⏳ da qui in avanti |
 
 # FASE 3 — MIGLIORAMENTO, ITERAZIONE E MANTENIMENTO
 
@@ -113,7 +119,14 @@ Niente gamification, mai: si torna perché "mi devono dei soldi" succede
  deploy dell'ultimo ramo (Valerio) ──→ online anche design nuovo e Osservatorio dati veri
  dominio ──→ Resend verificato ──→ email a chiunque + link puliti nei video
  account social ──→ FASE 2
+ blog online ──→ traffico da Google che non costa niente (mesi, non giorni)
 ```
+
+**Sul blog, una cosa da sapere.** Il traffico organico non arriva la
+settimana dopo: le pagine vanno indicizzate, poi salgono. Il Tabellone è
+un investimento sui mesi, non la leva per ottobre. La leva per ottobre
+resta la distribuzione video. Il blog serve perché a gennaio quel traffico
+c'è già e non si paga.
 
 **La prova AeroDataBox è fatta (8/08, chiave vera su voli reali): non
 restano rischi tecnici aperti.** Tutto il resto è esecuzione.

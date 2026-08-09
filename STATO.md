@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #38: garanzia legata all'ESITO invece
+**Aggiornato:** 2026-08-09 (giro #40: IL TABELLONE, il blog · più un
+falso positivo sull'IMPORTO chiuso nel motore (art. 7 lett. b) ·
+giro #39: test dei due prezzi · giro #38: garanzia legata all'ESITO invece
 che ai 90 giorni, enti nazionali per paese di partenza nella lettera,
 l'app ha finalmente i casi cancellato/negato imbarco/coincidenza persa ·
 giro #37: cancello territoriale, chiuso un falso positivo vero (New York
@@ -34,6 +36,69 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #40 (9/08): IL TABELLONE, IL BLOG. E UN FALSO POSITIVO SULL'IMPORTO,
+  TROVATO SCRIVENDOLO.**
+  - 🔴 **IL MOTORE PROMETTEVA 600 EURO DOVE LA NORMA NE DÀ 400.** L'art. 7
+    lett. b) tiene a 400€ **tutte** le tratte intracomunitarie sopra i 1500 km,
+    quanto lunghe siano: Parigi → Riunione fa 9.300 km ed è Francia-Francia.
+    Il motore guardava solo il chilometraggio e usciva con 600. È un falso
+    positivo sull'IMPORTO, cioè la stessa famiglia del New York → Toronto del
+    giro #37: si promette al passeggero la metà in più di quanto gli
+    riconosce il Regolamento, e la differenza la scopre la compagnia.
+    Chiuso in `lib/regole/eu261.ts` col cancello `zonaDiScalo` già esistente;
+    regole alla versione **2026.08.6**; golden set con **2 casi nuovi**
+    (Parigi → Riunione e Helsinki → Canarie) e i tre casi di lungo raggio
+    riscritti su tratte extra UE, se no misuravano il contrario di quello che
+    dicevano. **45 su 45, falsi positivi 0.** Trovato scrivendo l'articolo
+    pilastro: è il motivo per cui il blog serve anche a noi.
+  - **IL BLOG SI CHIAMA «IL TABELLONE»** (scelta di Valerio col popup) e vive
+    su `/tabellone`. È ricostruito **elemento per elemento sul riferimento
+    Untitled UI** che Valerio ha allegato: testata piatta col menu argomenti,
+    apertura con occhiello, titolo grosso e la seconda parte in corsivo serif,
+    campo email, adesivo olografico, "Gli ultimi articoli" col pezzo grande a
+    sinistra e due orizzontali a destra, "Tutti gli articoli" a tre colonne,
+    paginazione Precedente/Successivo. Colori nostri: il fondo è una **carta
+    calda** (`--color-carta`), l'unico posto del sito dove il fondo cambia,
+    e serve a far capire con gli occhi che si è passati dal prodotto alla
+    lettura.
+  - **LA SEZIONE NEWSLETTER È LO STESSO BLOCCO DELL'APERTURA**, come chiesto:
+    stessi elementi, stesso adesivo, stesso campo; cambiano solo il fondo
+    (verde notte) e le parole. Non è una lista nuova: chiama la stessa
+    `/api/iscriviti` dell'Osservatorio, quindi vale il doppio opt-in di sempre.
+  - **DIECI ARTICOLI VERI**, non due: 2 guide pilastro, 3 per compagnia
+    (Ryanair, easyJet, Wizz Air), 1 di situazione (la prescrizione), 2 di
+    emergenza (sciopero e volo cancellato, scritti per lo schermo di un
+    telefono in aeroporto) e 2 sui dati (Eurocontrol/ENAC 2025 e gli scali
+    italiani 2026). Ognuno ha il check VERO dentro il testo a metà articolo
+    (non un rimando: lo stesso componente dell'hero), il confronto coi
+    portali, l'invito all'Osservatorio, le domande in fondo e **le fonti
+    dichiarate una per una**.
+  - **LA REGOLA DEI NUMERI È DIVENTATA UNA PROVA.** `prove/tabellone.spec.ts`
+    (162 prove) vieta il trattino lungo e "hai diritto a" in ogni articolo,
+    controlla che ogni copertina esista, che ogni link interno porti a una
+    pagina vera, che ogni articolo abbia il suo gancio e le sue fonti, e che
+    ogni pezzo rimandi a un pilastro. **Fuori dagli articoli sono rimaste solo
+    cifre con la fonte:** le percentuali dei portali sono state tolte tutte
+    (nessun listino è stato riaperto oggi), resta il solo dato che Ryanair
+    scrive sul proprio sito (oltre il 40% trattenuto su un reclamo da 250€).
+  - ⚠️ **I PREZZI NON SI SCRIVONO PIÙ NEGLI ARTICOLI.** Erano hardcoded a
+    14,90/24,90: con il test dei due prezzi acceso, metà dei lettori avrebbe
+    letto un prezzo e trovato l'altro alla cassa. Ora gli articoli dicono
+    "prezzo fisso, scritto prima" e linkano `/#prezzi`; i box del confronto
+    leggono il listino dal cookie della variante.
+  - **Copertine:** dieci illustrazioni editoriali in SVG, disegnate qui (in
+    questo ambiente non si generano immagini e non si scaricano). Il sistema
+    preferisce la foto appena c'è: `COPERTINE.md` porta i **dieci prompt
+    dettagliati** per generarle e una riga per articolo per sostituirle.
+  - **SEO:** sitemap con tutti gli articoli e le pagine argomento, JSON-LD
+    (Blog, BlogPosting con le citazioni, BreadcrumbList, FAQPage dove le
+    domande esistono), canonical, feed RSS su `/tabellone/feed.xml`,
+    immagine social generata dal titolo vero di ogni articolo, llms.txt
+    aggiornato. Le pagine di archivio sono `noindex`: sono elenchi.
+  - ⚠️ **LE PAGINE EVENTO SONO FERME PER SCELTA DI VALERIO** ("non ho capito
+    come si intrecciano col blog"). Da rispiegare e riproporre: in ARRETRATI.
+  - Prove: **538 verdi** (restano le 2 note dell'Osservatorio, che nella
+    sandbox non raggiunge Supabase). Eval del motore: 45 su 45.
 - **GIRO #39 (9/08): IL TEST DEI DUE PREZZI, ACCESO.**
   - **Metà del pubblico vede 14,90 / 24,90, metà 24,90 / 39,90** (scelta di
     Valerio col popup: "provo due prezzi"). Il motivo è aritmetico: alzare
@@ -655,6 +720,14 @@ social rifatta (era rimasta al prodotto viaggi).
    Poi 30 casi reali a mano per il golden set.
 5. **Dominio** per Rivolio (slot gratuito Hostinger da configurare) e
    account social `@rivolio`.
+5-bis. **Le copertine del blog**: dieci prompt pronti in `COPERTINE.md`.
+   Generi le immagini, me le mandi in WebP e le monto: una riga per
+   articolo. In alternativa dammi `UNSPLASH_ACCESS_KEY` e le prendo io.
+   Poi: **riapri dal tuo PC le fonti citate negli articoli** (ENAC, AGCM,
+   Eurocontrol, le condizioni di trasporto delle compagnie) e conferma i
+   numeri. Da qui l'uscita di rete è bloccata e le pagine non si aprono:
+   i numeri vengono dagli estratti dei motori di ricerca, e in un blog che
+   vende trasparenza vanno riletti sulla pagina.
 6. Legale: le 3 pagine (privacy, condizioni, cookie) sono una PRIMA BOZZA
    scritta l'8/08: falle rivedere da un avvocato e dammi cognome e dati
    societari del titolare da inserire. Commercialista sul regime fiscale

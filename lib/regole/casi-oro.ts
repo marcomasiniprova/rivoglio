@@ -65,10 +65,22 @@ export const CASI_ORO: Caso[] = [
   { nome: "appena oltre i 1500 km (1501)", fatto: conRitardo(200, { kmOrtodromica: 1501 }), atteso: { esito: "idoneo", importo: 400 } },
   { nome: "medio raggio, 3500 km esatti", fatto: conRitardo(210, { kmOrtodromica: 3500 }), atteso: { esito: "idoneo", importo: 400 } },
   { nome: "medio raggio, 4 ore", fatto: conRitardo(240, { kmOrtodromica: 2000 }), atteso: { esito: "idoneo", importo: 400 } },
-  // >3500 km: 3-4h → 300€ (riduzione 50%), ≥4h → 600€
-  { nome: "lungo raggio, 239 minuti: importo dimezzato", fatto: conRitardo(239, { kmOrtodromica: 3501 }), atteso: { esito: "idoneo", importo: 300 } },
-  { nome: "lungo raggio, 240 minuti esatti: pieno", fatto: conRitardo(240, { kmOrtodromica: 6000 }), atteso: { esito: "idoneo", importo: 600 } },
-  { nome: "lungo raggio, ritardo di una notte", fatto: conRitardo(500, { kmOrtodromica: 8000 }), atteso: { esito: "idoneo", importo: 600 } },
+  /* >3500 km FUORI dall'Unione: 3-4h → 300€ (riduzione 50%), ≥4h → 600€.
+     La tratta va sovrascritta con uno scalo extra UE: la lettera b)
+     dell'art. 7 tiene a 400€ TUTTE le tratte intracomunitarie sopra i
+     1500 km, quanto lunghe siano. Con Bergamo → Palermo questi tre casi
+     misurerebbero l'esatto contrario di quello che dicono. */
+  { nome: "lungo raggio extra UE, 239 minuti: importo dimezzato", fatto: conRitardo(239, { partenzaIata: "FCO", arrivoIata: "JFK", kmOrtodromica: 3501 }), atteso: { esito: "idoneo", importo: 300 } },
+  { nome: "lungo raggio extra UE, 240 minuti esatti: pieno", fatto: conRitardo(240, { partenzaIata: "FCO", arrivoIata: "JFK", kmOrtodromica: 6000 }), atteso: { esito: "idoneo", importo: 600 } },
+  { nome: "lungo raggio extra UE, ritardo di una notte", fatto: conRitardo(500, { partenzaIata: "FCO", arrivoIata: "BKK", kmOrtodromica: 8000 }), atteso: { esito: "idoneo", importo: 600 } },
+
+  /* LA LETTERA b) DELL'ART. 7 (trovata mancante il 9/08). Una tratta che
+     parte e arriva dentro lo spazio europeo resta a 400€ anche se è
+     lunghissima: Parigi → Riunione fa 9.300 km ed è Francia-Francia.
+     Prima il motore diceva 600, cioè prometteva il 50% in più di quanto
+     la norma riconosce: falso positivo sull'importo. */
+  { nome: "ART. 7 b): intracomunitario oltre 3500 km (Parigi → Riunione), restano 400€", fatto: conRitardo(300, { voloIata: "AF640", vettoreOperativo: "AF", partenzaIata: "CDG", arrivoIata: "RUN", kmOrtodromica: 9346 }), atteso: { esito: "idoneo", importo: 400 } },
+  { nome: "ART. 7 b): intracomunitario lungo, 3h05: 400€ pieni, nessuna riduzione", fatto: conRitardo(185, { voloIata: "AY1", vettoreOperativo: "AY", partenzaIata: "HEL", arrivoIata: "LPA", kmOrtodromica: 4900 }), atteso: { esito: "idoneo", importo: 400 } },
 
   // ---------- NON IDONEI (9) — sotto soglia: risposta chiara e gratis ----------
   { nome: "179 minuti: un minuto sotto la soglia", fatto: conRitardo(179, { kmOrtodromica: 700 }), atteso: { esito: "non_idoneo" } },

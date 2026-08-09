@@ -8,6 +8,19 @@ stato fatto o senza che Valerio dica di lasciar perdere.**
 
 ---
 
+## 🔴 APERTI dal giro #40 (9/08)
+
+| # | Cosa | Perché è qui |
+|---|---|---|
+| A | **Le pagine evento** (`/sciopero/<data>` e `/aeroporto/<iata>`) | **Fermate da Valerio il 9/08**: "non ho ancora capito come questa cosa dell'evento si intreccia col blog e se sono la stessa cosa o no". Vanno rispiegate e riproposte al prossimo giro. Il piano resta: si generano da sole dalla tabella `scioperi` e dai dati dell'Osservatorio, entrano in sitemap, hanno il check dentro. Non sono articoli: sono pagine di dati che si aggiornano da sole, mentre il blog è scritto a mano. |
+| B | **Le copertine fotografiche del blog** | Le dieci copertine di oggi sono illustrazioni disegnate da noi: qui non si generano immagini (quota Gemini a zero) e non si scaricano (manca `UNSPLASH_ACCESS_KEY`, e l'uscita di rete è chiusa). I dieci prompt sono pronti in `COPERTINE.md`. Serve Valerio. |
+| C | **Riverificare le fonti degli articoli dal PC di Valerio** | Il proxy di questo ambiente non apre nessuna delle pagine citate (ENAC, AGCM, Eurocontrol, condizioni delle compagnie, Corte di giustizia). Gli indirizzi sono reali e i numeri vengono dagli estratti dei motori di ricerca, ma su un blog che vende trasparenza vanno riletti sulla pagina, con la data di consultazione. |
+| D | **I dettagli della riforma europea del 261** | Il controllo avversariale ha bocciato numero di voti, data del via libera del Consiglio e nuovi termini in mesi: le fonti divergono fra loro. Negli articoli è rimasta la sola frase che regge ("nel luglio 2026 il Parlamento ha adottato la propria posizione respingendo l'innalzamento a 4 ore, e il testo non è ancora applicabile"). Da riaprire sui comunicati ufficiali. |
+| E | **Le percentuali dei portali concorrenti** | Nessun listino di AirHelp, Flightright o Skycop è stato riaperto oggi, quindi negli articoli non compare nessuna loro percentuale. L'unico dato pubblicato è quello che Ryanair scrive sul proprio sito. Per usarne altri servono le pagine tariffe ufficiali, con data e schermata. |
+| F | **La Svizzera e i grandi vettori extra UE fuori tabella** | Restano dal giro #37: i loro casi escono incerti invece che con un sì o un no puliti. |
+
+---
+
 ## ✅ CHIUSI il 06/08
 
 | # | Cosa avevi chiesto | Come è stato chiuso |

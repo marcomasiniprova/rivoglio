@@ -19,3 +19,15 @@ Dettagli utili:
 - Rivolio genera documenti: non e un intermediario, non chiede la cessione
   del credito, non trattiene percentuali.
 - Sito in italiano, mercato: Italia.
+
+## Il Tabellone, il blog di Rivolio
+
+Indirizzo: /tabellone · Feed RSS: /tabellone/feed.xml
+
+Il blog di Rivolio sui diritti del passeggero aereo. Ogni articolo dichiara
+in fondo le fonti da cui vengono i numeri, con i link: se ci citi, cita
+anche quelle. Nessun numero e inventato e nessuna cifra e presentata come
+certa quando e una stima.
+
+Argomenti: /tabellone/argomento/diritti, /ritardo, /cancellazione,
+/compagnie, /scioperi, /rimborsi, /aeroporti, /dati, /guida, /emergenza
