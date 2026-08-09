@@ -1,6 +1,7 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #40: IL TABELLONE, il blog · più un
+**Aggiornato:** 2026-08-09 (giro #41: LE PAGINE EVENTO e l'autopilot degli
+scioperi · giro #40: IL TABELLONE, il blog · più un
 falso positivo sull'IMPORTO chiuso nel motore (art. 7 lett. b) ·
 giro #39: test dei due prezzi · giro #38: garanzia legata all'ESITO invece
 che ai 90 giorni, enti nazionali per paese di partenza nella lettera,
@@ -36,6 +37,53 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #41 (9/08): LE PAGINE EVENTO, E GLI SCIOPERI CHE SI AGGIORNANO DA SOLI.**
+  - **TRE FAMIGLIE DI PAGINE che si costruiscono dai nostri dati**, senza
+    scrivere una riga a mano (scelta di Valerio: tutte e tre).
+    1. **`/sciopero-aerei`**: la pagina fissa che risponde a "sciopero aerei
+       oggi". È la più importante: quel giorno lì la gente cerca quello, non
+       "reclamo Ryanair", e il blog quella ricerca non la prende perché non
+       può avere un articolo per ogni giorno del calendario. Dice com'è messa
+       oggi, elenca le date proclamate, spiega cosa spetta comunque.
+    2. **`/sciopero-aerei/<data>`**: una pagina per ogni sciopero in tabella.
+       Cambia testo secondo il momento: prima serve a chi ha il biglietto,
+       il giorno stesso a chi è bloccato, dopo a chi vuole i soldi.
+    3. **`/aeroporto/<sigla>`**: otto pagine, una per scalo dell'Osservatorio,
+       coi ritardi della giornata. "Ritardi Fiumicino oggi" si cerca 365
+       giorni all'anno, anche senza scioperi.
+    Dentro ognuna c'è il check VERO (lo stesso componente dell'hero), il
+    blocco "cosa ti spetta comunque", la tabella dei tipi di sciopero, i
+    ponti verso gli articoli del Tabellone e le fonti dichiarate.
+  - **LA DISTINZIONE CHE VALE I SOLDI, scritta nero su bianco**: lo sciopero
+    del personale DELLA COMPAGNIA in linea di principio non è circostanza
+    eccezionale (la compensazione di solito spetta); quello dei controllori
+    viene da fuori e di solito lo è. In ogni caso deve essere la compagnia a
+    provare il legame col TUO volo. I portali si fermano a "lo sciopero è
+    circostanza eccezionale", che è la versione comoda per loro.
+  - **L'AUTOPILOT** (`lib/scioperi/raccolta.ts` + `/api/motore/scioperi` +
+    `netlify/functions/scioperi.mjs`, ogni giorno alle 4:20 UTC). Scarica le
+    pagine pubbliche (cruscotto MIT, Commissione di Garanzia, ENAC), le fa
+    trascrivere a un modello e fa passare OGNI riga da un filtro
+    deterministico prima del database: data valida e in una finestra
+    credibile, testo che parla davvero di volo, codici compagnia in formato
+    IATA, link alla fonte obbligatorio. Non cancella mai niente.
+    ⚠️ **Perché qui l'AI è ammessa** mentre nel verdetto non lo è mai: un
+    errore di questo modulo può solo segnare come sciopero un giorno che non
+    lo era, e allora il motore diventa PIÙ prudente (quel volo esce incerto,
+    e un caso incerto non si vende). Sbaglia dalla parte di chi non paga.
+    ⚠️ **Non l'ho potuto provare da qui**: il proxy non apre nessuna delle
+    fonti. Per questo NON fallisce in silenzio: se non legge niente manda
+    un'email di allarme (e un Telegram, se c'è il canale), e si può lanciare
+    a mano da `/api/motore/scioperi?segreto=...` per guardarlo funzionare.
+    **Il primo giro vero lo deve fare Valerio dopo il deploy.**
+  - **UNA CERTEZZA INVENTATA, CHIUSA**: con il database irraggiungibile la
+    pagina scriveva "oggi non risultano scioperi", che è una cosa che non
+    sappiamo. Ora la lettura distingue "letto e non c'è niente" da "non si è
+    aperto", e nel secondo caso lo dice.
+  - Prove: **578 verdi** (restano le 2 note dell'Osservatorio). Le 40 nuove
+    sono quasi tutte sul filtro dell'autopilot: è l'unico punto del progetto
+    dove un modello scrive nel database, e quello che scrive finisce su una
+    pagina pubblica col nostro nome sopra.
 - **GIRO #40 (9/08): IL TABELLONE, IL BLOG. E UN FALSO POSITIVO SULL'IMPORTO,
   TROVATO SCRIVENDOLO.**
   - 🔴 **IL MOTORE PROMETTEVA 600 EURO DOVE LA NORMA NE DÀ 400.** L'art. 7
@@ -720,6 +768,13 @@ social rifatta (era rimasta al prodotto viaggi).
    Poi 30 casi reali a mano per il golden set.
 5. **Dominio** per Rivolio (slot gratuito Hostinger da configurare) e
    account social `@rivolio`.
+4-bis. **L'autopilot degli scioperi, primo giro a mano.** Dopo il deploy
+   apri una volta `https://<il-sito>/api/motore/scioperi?segreto=<MOTORE_SEGRETO>`
+   e guarda cosa risponde: dice quante fonti si sono aperte e quante righe
+   sono entrate. Da qui non l'ho potuto provare, il proxy non apre nessuna
+   delle fonti. Se qualcosa non va ti arriva comunque un'email da solo.
+   Facoltative: `TELEGRAM_ADMIN_CHAT` (per l'allarme anche su Telegram) e
+   `ALERT_EMAIL` (se vuoi l'allarme a un indirizzo diverso dal tuo).
 5-bis. **Le copertine del blog**: dieci prompt pronti in `COPERTINE.md`.
    Generi le immagini, me le mandi in WebP e le monto: una riga per
    articolo. In alternativa dammi `UNSPLASH_ACCESS_KEY` e le prendo io.

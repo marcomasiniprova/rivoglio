@@ -1178,6 +1178,7 @@ export const COPY = {
           { testo: "Come funziona", ancora: "#come-funziona" },
           { testo: "Prezzi", ancora: "#prezzi" },
           { testo: "Il Tabellone (blog)", ancora: "/tabellone" },
+          { testo: "Sciopero aerei oggi", ancora: "/sciopero-aerei" },
           { testo: "Osservatorio", ancora: "#osservatorio" },
         ],
       },

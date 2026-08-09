@@ -92,7 +92,8 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | **Il Tabellone**: il blog su `/tabellone`, hub and spoke, 10 articoli | ✅ 9/08 giro #40 |
 | Copertine fotografiche degli articoli (10 prompt pronti in `COPERTINE.md`) | ⏳ **serve Valerio** |
 | Fonti degli articoli riaperte e confermate dal PC di Valerio | ⏳ **serve Valerio** (da qui la rete è chiusa) |
-| Pagine evento (sciopero e aeroporto), generate dai nostri dati | ⏸️ **fermate da Valerio il 9/08**: da rispiegare |
+| Pagine evento: `/sciopero-aerei`, `/sciopero-aerei/<data>`, `/aeroporto/<sigla>` | ✅ 9/08 giro #41 |
+| Autopilot: gli scioperi si aggiornano da soli ogni notte, con allarme se si rompe | ✅ 9/08 giro #41 · ⏳ primo giro vero dopo il deploy |
 | Un articolo nuovo a settimana, sempre lo stesso giorno | ⏳ da qui in avanti |
 
 # FASE 3 — MIGLIORAMENTO, ITERAZIONE E MANTENIMENTO

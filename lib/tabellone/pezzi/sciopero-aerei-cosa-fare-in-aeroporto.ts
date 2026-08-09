@@ -97,7 +97,7 @@ export const ARTICOLO: Articolo = {
       tipo: "elenco",
       voci: [
         "**Cerca il tuo numero di volo in quell'elenco** prima di dare per perso il viaggio: se c'è, parte, e la corsa al banco te la risparmi.",
-        "**Non fidarti dei siti che elencano gli scioperi**, compreso questo articolo: le date cambiano, gli scioperi si revocano il giorno prima. L'unica lista che conta è quella ufficiale ENAC del giorno, insieme alla pagina della tua compagnia.",
+        "**Non fidarti dei siti che elencano gli scioperi**, compreso questo articolo: le date cambiano, gli scioperi si revocano il giorno prima. L'unica lista che conta è quella ufficiale ENAC del giorno, insieme alla pagina della tua compagnia. Noi teniamo aggiornato il [calendario degli scioperi](/sciopero-aerei), che si rinnova da solo ogni giorno e porta il link alla proclamazione di ognuno.",
         "**Se il tuo volo è in fascia protetta ma parte tardissimo lo stesso**, il conto del ritardo va avanti come sempre: la fascia protegge la partenza, non ti toglie niente.",
       ],
     },

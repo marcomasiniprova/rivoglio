@@ -53,3 +53,120 @@ export async function scioperoInData(
     return false;
   }
 }
+
+/* ────────────────────────────────────────────────────────────────
+   LE PAGINE EVENTO (giro #41).
+
+   Le stesse righe che servono al motore servono anche a farsi
+   trovare: il giorno di uno sciopero la gente cerca "sciopero aerei
+   oggi", non "reclamo Ryanair", e un blog non può avere un articolo
+   per ogni giorno dell'anno. Queste funzioni alimentano
+   /sciopero-aerei e /sciopero-aerei/<data>.
+
+   FAIL-OPEN come sopra: senza database le pagine mostrano quello che
+   sanno da sole (le regole, le fasce, il check) e non muoiono.
+   ──────────────────────────────────────────────────────────────── */
+
+/** Una riga della tabella, con l'identificativo: serve alle pagine. */
+export type ScioperoPubblico = Sciopero & { id: string };
+
+const CAMPI = "id, data, settore, descrizione, compagnie, tipo, fonte_url";
+
+function riga(r: Record<string, unknown>): ScioperoPubblico {
+  return {
+    id: String(r.id),
+    data: String(r.data),
+    settore: String(r.settore ?? ""),
+    descrizione: String(r.descrizione ?? ""),
+    compagnie: (r.compagnie as string[] | null) ?? [],
+    tipo: r.tipo as Sciopero["tipo"],
+    fonteUrl: String(r.fonte_url ?? ""),
+  };
+}
+
+/** Oggi in Italia, come lo scrive la tabella (AAAA-MM-GG). */
+export function oggiInItalia(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Rome",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+/**
+ * ⚠️ `null` NON è la stessa cosa di lista vuota, ed è il motivo per cui
+ * queste due funzioni non tornano un array e basta.
+ *
+ * Lista vuota = abbiamo letto il calendario e non c'è niente: possiamo
+ * scrivere "oggi non risultano scioperi", ed è vero.
+ * `null` = il calendario non si è aperto: NON possiamo scrivere niente
+ * sul fatto che ci siano o non ci siano agitazioni, perché non lo
+ * sappiamo. Dire "oggi non ci sono scioperi" quando il database è giù
+ * è esattamente il tipo di certezza inventata che questo progetto vieta.
+ */
+export async function scioperiInArrivo(limite = 12): Promise<ScioperoPubblico[] | null> {
+  if (!SERVIZIO_ATTIVO) return null;
+  try {
+    const { data, error } = await supabaseServizio()
+      .from("scioperi")
+      .select(CAMPI)
+      .gte("data", oggiInItalia())
+      .order("data", { ascending: true })
+      .limit(limite);
+    if (error || !data) return null;
+    return data.map(riga);
+  } catch {
+    return null;
+  }
+}
+
+/** Quelli già passati, dal più recente: servono all'archivio. */
+export async function scioperiPassati(limite = 12): Promise<ScioperoPubblico[] | null> {
+  if (!SERVIZIO_ATTIVO) return null;
+  try {
+    const { data, error } = await supabaseServizio()
+      .from("scioperi")
+      .select(CAMPI)
+      .lt("data", oggiInItalia())
+      .order("data", { ascending: false })
+      .limit(limite);
+    if (error || !data) return null;
+    return data.map(riga);
+  } catch {
+    return null;
+  }
+}
+
+/** Tutte le agitazioni di un giorno preciso. Vuoto = quel giorno non c'è. */
+export async function scioperiDelGiorno(data: string): Promise<ScioperoPubblico[]> {
+  if (!SERVIZIO_ATTIVO) return [];
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data)) return [];
+  try {
+    const { data: righe, error } = await supabaseServizio()
+      .from("scioperi")
+      .select(CAMPI)
+      .eq("data", data)
+      .order("settore", { ascending: true });
+    if (error || !righe) return [];
+    return righe.map(riga);
+  } catch {
+    return [];
+  }
+}
+
+/** Le date che hanno una pagina. Serve alla sitemap. */
+export async function dateConSciopero(limite = 200): Promise<string[]> {
+  if (!SERVIZIO_ATTIVO) return [];
+  try {
+    const { data, error } = await supabaseServizio()
+      .from("scioperi")
+      .select("data")
+      .order("data", { ascending: false })
+      .limit(limite);
+    if (error || !data) return [];
+    return [...new Set(data.map((r) => String(r.data)))];
+  } catch {
+    return [];
+  }
+}

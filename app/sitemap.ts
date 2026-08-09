@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { RADICE, tagUsati, tutti } from "@/lib/tabellone/indice";
+import { AEROPORTI_OSSERVATI } from "@/lib/osservatorio/ritardi";
+import { dateConSciopero } from "@/lib/scioperi/scioperi";
 
 /**
  * La mappa del sito. Il prodotto È la home col check; da lì scendono le
@@ -10,7 +12,7 @@ import { RADICE, tagUsati, tutti } from "@/lib/tabellone/indice";
  * Le pagine di archivio (2, 3, 4...) NON entrano: sono elenchi, non
  * contenuto, e in sitemap farebbero solo rumore.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const casa = (
     process.env.NEXT_PUBLIC_SITO ??
     process.env.URL ??
@@ -19,6 +21,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const articoli = tutti();
   const ultimoArticolo = articoli[0]?.data;
+
+  /* Le pagine evento vengono dal database. Se non risponde (o in una build
+     senza credenziali) l'elenco esce vuoto e la sitemap resta valida: mai
+     far fallire la mappa del sito per una tabella. */
+  const dateSciopero = await dateConSciopero();
 
   return [
     {
@@ -46,6 +53,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: ultimoArticolo ? new Date(`${ultimoArticolo}T09:00:00Z`) : new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.6,
+    })),
+    // LE PAGINE EVENTO: si generano dai nostri dati e portano traffico nel
+    // momento esatto in cui la gente cerca. La pagina fissa degli scioperi
+    // vale quanto il blog, perché risponde a "sciopero aerei oggi".
+    {
+      url: `${casa}/sciopero-aerei`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.9,
+    },
+    ...dateSciopero.map((giorno) => ({
+      url: `${casa}/sciopero-aerei/${giorno}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+    ...AEROPORTI_OSSERVATI.map((a) => ({
+      url: `${casa}/aeroporto/${a.iata.toLowerCase()}`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.7,
     })),
     // le guide: contenuto da ricerca, vale più delle pagine legali
     {

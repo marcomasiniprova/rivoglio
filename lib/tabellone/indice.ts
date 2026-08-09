@@ -83,31 +83,7 @@ export function correlati(articolo: Articolo, quanti = 3): Articolo[] {
   return [...dichiarati, ...affini].slice(0, quanti);
 }
 
-const MESI = [
-  "gennaio",
-  "febbraio",
-  "marzo",
-  "aprile",
-  "maggio",
-  "giugno",
-  "luglio",
-  "agosto",
-  "settembre",
-  "ottobre",
-  "novembre",
-  "dicembre",
-];
-
-/** "2026-08-09" → "9 agosto 2026". Mai la data all'americana. */
-export function dataInItaliano(iso: string): string {
-  const [anno, mese, giorno] = iso.split("-").map(Number);
-  if (!anno || !mese || !giorno) return iso;
-  return `${giorno} ${MESI[mese - 1]} ${anno}`;
-}
-
-/** La forma corta per le card: "9 ago 2026". */
-export function dataCorta(iso: string): string {
-  const [anno, mese, giorno] = iso.split("-").map(Number);
-  if (!anno || !mese || !giorno) return iso;
-  return `${giorno} ${MESI[mese - 1].slice(0, 3)} ${anno}`;
-}
+/* Le date stanno in `lib/date.ts`: le usano anche le pagine evento, e
+   importarle da qui si tirerebbe dietro tutti e dieci gli articoli per
+   formattare un giorno. Qui si ri-esportano e basta. */
+export { dataInItaliano, dataCorta } from "../date";

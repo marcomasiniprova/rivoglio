@@ -136,7 +136,17 @@ test.describe("Il Tabellone: la redazione", () => {
                che esistono davvero. Un refuso qui manda il lettore su un 404
                proprio nel momento in cui stava per convertire. */
             expect(
-              ["/", "/app", "/entra", "/guida-bagagli", "/privacy", "/condizioni", "/cookie"].some(
+              [
+                "/",
+                "/app",
+                "/entra",
+                "/guida-bagagli",
+                "/privacy",
+                "/condizioni",
+                "/cookie",
+                "/sciopero-aerei",
+                "/aeroporto",
+              ].some(
                 (p) => dove === p || dove.startsWith(`${p}#`) || dove.startsWith("/#"),
               ),
               `link interno sconosciuto: ${dove}`,
