@@ -1,6 +1,7 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #42: LE FOTO VERE sulle copertine del blog ·
+**Aggiornato:** 2026-08-09 (giro #43: IL CANCELLO TERRITORIALE LASCIAVA SOLDI
+SUL TAVOLO, chiuso · giro #42: LE FOTO VERE sulle copertine del blog ·
 giro #41: LE PAGINE EVENTO e l'autopilot degli
 scioperi · giro #40: IL TABELLONE, il blog · più un
 falso positivo sull'IMPORTO chiuso nel motore (art. 7 lett. b) ·
@@ -38,6 +39,50 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #43 (9/08 notte): «NON RICONOSCIAMO L'AEROPORTO DI PARTENZA» ERA
+  UN BUCO NOSTRO, NON UN LIMITE DEI DATI.**
+  - Valerio ha fatto un check e gli è uscito «Non riconosciamo l'aeroporto
+    di partenza». Aveva ragione a incazzarsi: erano **tre buchi diversi**,
+    tutti nella direzione sbagliata, cioè quella che perde vendite vere.
+  - 🔴 **1. L'archivio degli scali è una fotografia del 2017.** Il cancello
+    territoriale cercava il paese confrontando i NOMI dentro
+    `aeroporti.json`, che viene da OpenFlights e non si aggiorna dal 2017:
+    **Berlino Brandeburgo, aperto nel 2020, non c'era**. Un Milano →
+    Berlino con quattro ore di ritardo usciva incerto. Ora il paese arriva
+    **insieme al volo**, dal fornitore (`countryCode`), che è un dato di
+    prima mano e non invecchia; l'archivio resta come seconda strada, e
+    BER è stato aggiunto.
+  - 🔴 **2. Senza sigla IATA il motore si fermava.** Se il fornitore non
+    manda la sigla dello scalo (succede), non c'era altra strada. Ora ce
+    ne sono tre in fila: il paese dal fornitore, poi l'archivio per sigla,
+    poi il **prefisso ICAO** (LI = Italia, ED = Germania, LF = Francia...).
+    L'ICAO può solo dire «sì, è Europa»: non lo usiamo mai per dire di no.
+  - 🔴 **3. La scorciatoia che mancava.** Se si ATTERRA in Europa e chi ha
+    operato il volo ha licenza europea, il volo è coperto **comunque**: o
+    partiva dall'Europa (lettera a) o partiva da un paese terzo con vettore
+    comunitario (lettera b), e le due strade portano allo stesso posto.
+    Non serve sapere da dove è decollato. Prima, con la partenza ignota,
+    quel caso usciva incerto pur avendo una risposta certa.
+  - **UNA ETICHETTA DEL GOLDEN SET ERA SBAGLIATA, e si è cambiata lei.**
+    Il caso «aeroporto di partenza non riconosciuto» era etichettato
+    incerto: ma quel volo atterra a Roma con Ryanair, ed è coperto. La
+    vecchia etichetta fotografava un limite del nostro codice, non il
+    Regolamento. È il primo caso in cui si tocca un'etichetta, e il perché
+    sta scritto nel file accanto alla riga.
+  - **PRUDENZA NUOVA SULLA SVIZZERA**: prima usciva un no secco, adesso
+    esce incerto. La Svizzera applica il Regolamento per accordo
+    bilaterale e non come Stato membro: dire di no su quei casi era una
+    risposta sbagliata data con sicurezza. Resta da verificare (ARRETRATI).
+  - **DUE VOLI DIMOSTRATIVI NON DIMOSTRAVANO PIÙ NIENTE**: dopo il fix
+    dell'art. 7 lett. b) del giro #40, ZZ300 e ZZ600 (tratta Bergamo →
+    Palermo, tutta dentro l'Unione) mostravano 400€ invece di 300 e 600.
+    Ora volano Roma → New York, e **una prova lega la descrizione di ogni
+    volo demo al verdetto vero**: se un domani divergono, la suite si
+    ferma.
+  - Regole alla versione **2026.08.7**. Golden set da 45 a **52 casi**,
+    con dentro Berlino, il volo senza sigla IATA, quello col solo ICAO e
+    la scorciatoia. **52 su 52, falsi positivi 0.**
+  - Prove: **596 verdi** (restano le 2 note dell'Osservatorio).
 - **GIRO #42 (9/08 sera): LE COPERTINE DEL BLOG SONO FOTO VERE.**
   - Valerio ha generato le dieci immagini coi prompt di `COPERTINE.md` e le
     ha spinte su `main`, a 2624x1632 e 8 MB l'una. Da lì le ho prese,

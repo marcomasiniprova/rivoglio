@@ -32,8 +32,8 @@
 import aeroporti from "@/lib/dati/aeroporti.json";
 import { compagniaPerVettore } from "@/lib/lettera/compagnie";
 
-type Scalo = { paese: string };
-const SCALI = aeroporti as Record<string, Scalo | undefined>;
+type RigaArchivio = { paese: string };
+const SCALI = aeroporti as Record<string, RigaArchivio | undefined>;
 
 /**
  * I paesi (codice ISO a due lettere, come in `compagnie.ts`) la cui licenza
@@ -86,14 +86,140 @@ const SPAZIO_UE = new Set<string>([
   "Guadeloupe", "Martinique", "French Guiana", "Reunion", "Mayotte",
 ]);
 
+/**
+ * GLI STESSI PAESI, IN CODICE ISO A DUE LETTERE.
+ *
+ * Perché ne servono due liste. `SPAZIO_UE` qui sopra confronta i NOMI come
+ * li scrive il nostro archivio, che è una fotografia di OpenFlights ferma
+ * al 2017: se il fornitore ci manda uno scalo che quell'archivio non ha
+ * (Berlino Brandeburgo, aperto nel 2020, per dirne uno), il confronto per
+ * nome non trova niente e il caso esce incerto anche quando è chiarissimo.
+ * Questa lista invece confronta il PAESE che ci dice il fornitore insieme
+ * al volo, che è un dato di prima mano e non invecchia.
+ *
+ * Ci sono dentro anche le cinque regioni ultraperiferiche che hanno un
+ * codice loro (art. 349 TFUE): Guadalupa, Martinica, Guyana francese,
+ * Riunione e Mayotte SONO Unione Europea, e senza queste righe un
+ * Parigi → Riunione uscirebbe "fuori ambito", che è falso.
+ */
+const SPAZIO_UE_ISO = new Set<string>([
+  "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR",
+  "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK",
+  "SI", "ES", "SE",
+  // Spazio economico europeo
+  "IS", "NO", "LI",
+  // Regioni ultraperiferiche con codice proprio
+  "GP", "MQ", "GF", "RE", "YT",
+]);
+
+/**
+ * I casi su cui NON ci sbilanciamo, in nessuna delle due direzioni.
+ *
+ * La Svizzera applica il Regolamento per accordo bilaterale e non come
+ * Stato membro: chiamarla "paese terzo" produrrebbe un no secco su casi
+ * che probabilmente valgono, chiamarla Unione sarebbe una nostra
+ * invenzione. Finché non c'è una fonte verificata sotto mano, quei voli
+ * escono INCERTI, che è la nostra direzione di errore di sempre.
+ * Saint-Martin sta qui per lo stesso motivo: è un caso di confine fra
+ * regione ultraperiferica e territorio d'oltremare.
+ */
+const PAESI_INCERTI_ISO = new Set<string>(["CH", "MF"]);
+const PAESI_INCERTI_NOME = new Set<string>(["Switzerland"]);
+
+/**
+ * I prefissi ICAO che valgono come "siamo in Europa".
+ *
+ * Servono come ULTIMA spiaggia, quando manca sia la sigla IATA sia il
+ * paese: i codici ICAO sono assegnati per area geografica e le prime due
+ * lettere bastano. ⚠️ Questa lista dice solo SÌ, mai NO: un prefisso che
+ * non c'è non prova che il volo sia fuori dall'Europa, prova solo che
+ * questa strada non lo sa. Le regioni ultraperiferiche hanno prefissi
+ * loro (GC per le Canarie, TF per le Antille francesi, FM per la
+ * Riunione) e stanno fuori di proposito: lì il rischio di sbagliare è
+ * alto e il guadagno minimo.
+ */
+const ICAO_UE = new Set<string>([
+  "LI", // Italia
+  "LF", // Francia
+  "LE", // Spagna
+  "LP", // Portogallo (Madeira e Azzorre comprese)
+  "ED", "ET", // Germania
+  "EH", // Paesi Bassi
+  "EB", // Belgio
+  "EL", // Lussemburgo
+  "EI", // Irlanda
+  "EK", // Danimarca
+  "EN", // Norvegia
+  "ES", // Svezia
+  "EF", // Finlandia
+  "EE", // Estonia
+  "EV", // Lettonia
+  "EY", // Lituania
+  "EP", // Polonia
+  "LK", // Cechia
+  "LZ", // Slovacchia
+  "LH", // Ungheria
+  "LJ", // Slovenia
+  "LD", // Croazia
+  "LB", // Bulgaria
+  "LR", // Romania
+  "LG", // Grecia
+  "LC", // Cipro
+  "LM", // Malta
+  "LO", // Austria
+  "BI", // Islanda
+]);
+
 export type ZonaScalo = "ue" | "terzo" | "sconosciuto";
 
-/** In che zona sta uno scalo, dal suo codice IATA. */
-export function zonaDiScalo(iata: string | null | undefined): ZonaScalo {
-  if (!iata) return "sconosciuto";
-  const scalo = SCALI[iata.trim().toUpperCase()];
-  if (!scalo?.paese) return "sconosciuto";
-  return SPAZIO_UE.has(scalo.paese) ? "ue" : "terzo";
+/** Quello che sappiamo di uno scalo. Più campi arrivano, meglio si decide. */
+export type Scalo = {
+  iata?: string | null;
+  /** Codice paese ISO a due lettere, come lo manda il fornitore del volo. */
+  paese?: string | null;
+  icao?: string | null;
+};
+
+/**
+ * In che zona sta uno scalo. Si prova in ordine, dal dato più solido:
+ *
+ *  1. il PAESE che ci ha mandato il fornitore insieme al volo;
+ *  2. il nostro archivio degli scali, cercando per sigla IATA;
+ *  3. il prefisso ICAO, che può solo dire "sì, è Europa".
+ *
+ * Prima esisteva solo il punto 2, e questo costava vendite vere: uno scalo
+ * fuori dall'archivio, o un volo senza sigla IATA, faceva uscire "non
+ * riconosciamo l'aeroporto di partenza" anche su un Milano → Berlino.
+ */
+export function zonaDiScalo(
+  iataOScalo: string | Scalo | null | undefined,
+  paeseIso?: string | null,
+): ZonaScalo {
+  const scalo: Scalo =
+    typeof iataOScalo === "string" || iataOScalo == null
+      ? { iata: iataOScalo, paese: paeseIso }
+      : iataOScalo;
+
+  // 1. il paese dal fornitore
+  const iso = (scalo.paese ?? "").trim().toUpperCase();
+  if (/^[A-Z]{2}$/.test(iso)) {
+    if (PAESI_INCERTI_ISO.has(iso)) return "sconosciuto";
+    return SPAZIO_UE_ISO.has(iso) ? "ue" : "terzo";
+  }
+
+  // 2. il nostro archivio, per sigla IATA
+  const sigla = (scalo.iata ?? "").trim().toUpperCase();
+  const riga = sigla ? SCALI[sigla] : undefined;
+  if (riga?.paese) {
+    if (PAESI_INCERTI_NOME.has(riga.paese)) return "sconosciuto";
+    return SPAZIO_UE.has(riga.paese) ? "ue" : "terzo";
+  }
+
+  // 3. il prefisso ICAO: può solo aggiungere un sì
+  const icao = (scalo.icao ?? "").trim().toUpperCase();
+  if (/^[A-Z]{4}$/.test(icao) && ICAO_UE.has(icao.slice(0, 2))) return "ue";
+
+  return "sconosciuto";
 }
 
 /** Il paese di uno scalo, come lo scrive l'archivio. Serve alla lettera. */
@@ -119,15 +245,24 @@ export type EsitoAmbito =
  * incerti: meglio una vendita persa che una lettera inutile.
  */
 export function ambitoCE261(
-  partenzaIata: string | null | undefined,
-  arrivoIata: string | null | undefined,
+  partenzaScalo: string | Scalo | null | undefined,
+  arrivoScalo: string | Scalo | null | undefined,
   vettoreUE: boolean | null | undefined,
 ): EsitoAmbito {
-  const partenza = zonaDiScalo(partenzaIata);
-  const arrivo = zonaDiScalo(arrivoIata);
+  const partenza = zonaDiScalo(partenzaScalo);
+  const arrivo = zonaDiScalo(arrivoScalo);
 
   // a) si parte dall'Europa: coperto sempre, con qualsiasi compagnia.
   if (partenza === "ue") return { dentro: true };
+
+  /* LA SCORCIATOIA CHE VALE VENDITE (trovata il 9/08).
+     Se si ATTERRA in Europa e chi ha operato il volo ha licenza europea,
+     il volo è coperto in ogni caso, e non serve sapere da dove è partito:
+     o partiva dall'Europa (lettera a) o partiva da un paese terzo con
+     vettore comunitario (lettera b). Le due strade portano allo stesso
+     posto. Prima, con la partenza sconosciuta, il caso usciva incerto
+     anche quando la risposta era certa. */
+  if (arrivo === "ue" && vettoreUE === true) return { dentro: true };
 
   if (partenza === "sconosciuto") {
     return {

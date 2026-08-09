@@ -18,7 +18,7 @@
 
 import { ambitoCE261, vettoreConLicenzaUE, zonaDiScalo } from "./territorio";
 
-export const VERSIONE_REGOLE = "2026.08.6";
+export const VERSIONE_REGOLE = "2026.08.7";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
 const SOGLIA_MINUTI = 180;
@@ -45,6 +45,18 @@ export type FattoVolo = {
   partenzaCitta?: string | null;
   arrivoIata?: string | null;
   arrivoCitta?: string | null;
+  /**
+   * Il PAESE dei due scali in codice ISO a due lettere, e la sigla ICAO,
+   * come li manda il fornitore insieme al volo. Servono al cancello
+   * territoriale: il nostro archivio degli scali è fermo al 2017 e uno
+   * scalo che non ha (Berlino Brandeburgo, per dirne uno) faceva uscire
+   * "non riconosciamo l'aeroporto di partenza" su un volo chiarissimo.
+   * Il paese arriva dalla stessa risposta del volo: non invecchia.
+   */
+  partenzaPaese?: string | null;
+  arrivoPaese?: string | null;
+  partenzaIcao?: string | null;
+  arrivoIcao?: string | null;
   arrivoPrevistoUtc: string | null;
   arrivoEffettivoUtc: string | null;
   stato: "atterrato" | "cancellato" | "dirottato" | "sconosciuto";
@@ -142,9 +154,15 @@ export function valuta(f: FattoVolo): Verdetto {
      nessuna compensazione europea. Senza questo controllo il motore lo
      dichiarava idoneo a 600 euro, ed è il falso positivo che la regola
      numero uno vieta. Dove non siamo sicuri esce incerto, mai idoneo. */
+  const partenza = {
+    iata: f.partenzaIata,
+    paese: f.partenzaPaese,
+    icao: f.partenzaIcao,
+  };
+  const arrivo = { iata: f.arrivoIata, paese: f.arrivoPaese, icao: f.arrivoIcao };
   const ambito = ambitoCE261(
-    f.partenzaIata,
-    f.arrivoIata,
+    partenza,
+    arrivo,
     f.vettoreUE ?? vettoreConLicenzaUE(f.vettoreOperativo),
   );
   if (!ambito.dentro) {
@@ -252,8 +270,7 @@ export function valuta(f: FattoVolo): Verdetto {
      sull'IMPORTO, e la regola numero uno del progetto lo vieta come vieta
      quelli sull'esito. */
   const km = f.kmOrtodromica;
-  const intraUe =
-    zonaDiScalo(f.partenzaIata) === "ue" && zonaDiScalo(f.arrivoIata) === "ue";
+  const intraUe = zonaDiScalo(partenza) === "ue" && zonaDiScalo(arrivo) === "ue";
   const importo =
     km <= SOGLIA_CORTO_RAGGIO_KM
       ? (250 as const)

@@ -29,8 +29,14 @@ type MovimentoAdb = {
      ("Bergamo Orio al Serio"): all'utente serve la città. */
   airport?: {
     iata?: string | null;
+    icao?: string | null;
     name?: string | null;
     municipalityName?: string | null;
+    /* Il paese in codice ISO a due lettere. È il dato con cui il cancello
+       territoriale decide se il Regolamento si applica, ed è meglio della
+       nostra tabella degli scali: quella è ferma al 2017, questo arriva
+       insieme al volo. */
+    countryCode?: string | null;
   } | null;
   scheduledTime?: OrarioAdb;
   revisedTime?: OrarioAdb;
@@ -156,9 +162,13 @@ export const aerodatabox: FornitoreVoli = {
       partenzaIata: volo.departure?.airport?.iata ?? null,
       partenzaCitta:
         volo.departure?.airport?.municipalityName ?? volo.departure?.airport?.name ?? null,
+      partenzaPaese: volo.departure?.airport?.countryCode ?? null,
+      partenzaIcao: volo.departure?.airport?.icao ?? null,
       arrivoIata: volo.arrival?.airport?.iata ?? null,
       arrivoCitta:
         volo.arrival?.airport?.municipalityName ?? volo.arrival?.airport?.name ?? null,
+      arrivoPaese: volo.arrival?.airport?.countryCode ?? null,
+      arrivoIcao: volo.arrival?.airport?.icao ?? null,
       arrivoPrevistoUtc: utcIso(volo.arrival?.scheduledTime),
       arrivoEffettivoUtc: stato === "atterrato" ? effettivo : null,
       stato,

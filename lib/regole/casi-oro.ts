@@ -243,8 +243,107 @@ export const CASI_ORO: Caso[] = [
     atteso: { esito: "incerto" },
   },
   {
-    nome: "AMBITO: aeroporto di partenza non riconosciuto: incerto, non si vende",
+    /* ⚠️ ETICHETTA CAMBIATA IL 9/08, dopo aver riletto l'art. 3.
+       Diceva "incerto", e per mesi è stata la risposta del motore. Ma la
+       norma non la vede così: qui si atterra a Roma con Ryanair, che ha
+       licenza irlandese. Delle due l'una, e portano allo stesso posto:
+       o il volo partiva dall'Europa (lettera a, coperto sempre) o partiva
+       da un paese terzo con vettore comunitario (lettera b, coperto).
+       Sapere da dove è decollato non cambia la risposta. L'etichetta
+       vecchia fotografava un limite del nostro codice, non il Regolamento:
+       si cambia l'etichetta solo quando è lei a essere sbagliata, e questo
+       è uno di quei casi. */
+    nome: "AMBITO: scalo di partenza ignoto, ma si atterra in Europa con vettore europeo",
     fatto: conRitardo(250, { partenzaIata: "QQQ", arrivoIata: "FCO" }),
+    atteso: { esito: "idoneo", importo: 250 },
+  },
+  /* ─────────── I BUCHI DEL CANCELLO, TROVATI DA VALERIO IL 9/08 ───────────
+     Il check gli usciva "non riconosciamo l'aeroporto di partenza" su voli
+     normalissimi. Due cause diverse, tutte e due costavano vendite vere:
+     il fornitore non manda sempre la sigla IATA, e il nostro archivio
+     degli scali è una fotografia del 2017 (Berlino Brandeburgo, aperto nel
+     2020, non c'era). Ora il paese arriva insieme al volo. */
+  {
+    nome: "SCALO NUOVO: Milano → Berlino Brandeburgo, scalo che l'archivio non aveva",
+    fatto: conRitardo(240, {
+      voloIata: "FR8541",
+      partenzaIata: "MXP",
+      arrivoIata: "BER",
+      kmOrtodromica: 840,
+    }),
+    atteso: { esito: "idoneo", importo: 250 },
+  },
+  {
+    nome: "SENZA SIGLA IATA: basta il paese che manda il fornitore",
+    fatto: conRitardo(200, {
+      voloIata: "AZ1234",
+      vettoreOperativo: "AZ",
+      partenzaIata: null,
+      arrivoIata: null,
+      partenzaPaese: "IT",
+      arrivoPaese: "ES",
+      kmOrtodromica: 1200,
+    }),
+    atteso: { esito: "idoneo", importo: 250 },
+  },
+  {
+    nome: "SENZA SIGLA IATA E SENZA PAESE: resta la sigla ICAO",
+    fatto: conRitardo(200, {
+      voloIata: "FR1000",
+      partenzaIata: null,
+      arrivoIata: null,
+      partenzaIcao: "LIRF",
+      arrivoIcao: "EDDB",
+      kmOrtodromica: 1180,
+    }),
+    atteso: { esito: "idoneo", importo: 250 },
+  },
+  {
+    nome: "IL PAESE VINCE SULL'ARCHIVIO: partenza dagli Stati Uniti, vettore non europeo",
+    fatto: conRitardo(300, {
+      voloIata: "EK202",
+      vettoreOperativo: "EK",
+      partenzaIata: "JFK",
+      partenzaPaese: "US",
+      arrivoIata: "FCO",
+      arrivoPaese: "IT",
+      kmOrtodromica: 6866,
+    }),
+    atteso: { esito: "non_idoneo" },
+  },
+  {
+    nome: "SCORCIATOIA: partenza ignota ma si atterra in Europa con vettore europeo",
+    fatto: conRitardo(250, {
+      voloIata: "AZ611",
+      vettoreOperativo: "AZ",
+      partenzaIata: null,
+      arrivoIata: "FCO",
+      kmOrtodromica: 6866,
+    }),
+    atteso: { esito: "idoneo", importo: 600 },
+  },
+  {
+    nome: "SCORCIATOIA: non vale col vettore non europeo (Emirates da Dubai)",
+    fatto: conRitardo(250, {
+      voloIata: "EK205",
+      vettoreOperativo: "EK",
+      partenzaIata: null,
+      arrivoIata: "FCO",
+      kmOrtodromica: 4300,
+    }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    nome: "PRUDENZA: la Svizzera resta incerta, non un no secco",
+    fatto: conRitardo(300, {
+      voloIata: "LX1234",
+      vettoreOperativo: "LX",
+      partenzaIata: "ZRH",
+      partenzaPaese: "CH",
+      arrivoIata: "FCO",
+      arrivoPaese: "IT",
+      kmOrtodromica: 690,
+    }),
     atteso: { esito: "incerto" },
   },
   {

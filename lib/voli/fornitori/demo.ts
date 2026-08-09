@@ -26,13 +26,22 @@ type SagomaDemo = {
   /** Ritardo effettivo in minuti rispetto al previsto. Negativo = anticipo. */
   ritardoMinuti?: number;
   km?: number;
+  /**
+   * Gli scali, quando quel caso ha bisogno di una tratta sua.
+   * Servono ai due casi di lungo raggio: dal 9/08 l'art. 7 lett. b) tiene
+   * a 400€ tutte le tratte intracomunitarie, e con Bergamo → Palermo i
+   * voli che dovevano mostrare 300€ e 600€ mostravano 400€, cioè
+   * dimostravano il contrario di quello che dicono.
+   */
+  partenza?: string;
+  arrivo?: string;
 };
 
 export const VOLI_DEMO: SagomaDemo[] = [
   { voloIata: "ZZ250", copre: "idoneo, fascia 250 (corto raggio, 3h20 di ritardo)", stato: "atterrato", previstoOre: "20:00", ritardoMinuti: 200, km: 980 },
   { voloIata: "ZZ400", copre: "idoneo, fascia 400 (medio raggio, 3h30 di ritardo)", stato: "atterrato", previstoOre: "20:00", ritardoMinuti: 210, km: 2300 },
-  { voloIata: "ZZ300", copre: "idoneo, fascia 300 (lungo raggio, 3h40: sotto le 4h scatta la riduzione)", stato: "atterrato", previstoOre: "18:00", ritardoMinuti: 220, km: 4200 },
-  { voloIata: "ZZ600", copre: "idoneo, fascia 600 (lungo raggio, 5h05 di ritardo)", stato: "atterrato", previstoOre: "18:00", ritardoMinuti: 305, km: 6500 },
+  { voloIata: "ZZ300", copre: "idoneo, fascia 300 (lungo raggio fuori UE, 3h40: sotto le 4h scatta la riduzione)", stato: "atterrato", previstoOre: "18:00", ritardoMinuti: 220, km: 4200, partenza: "FCO", arrivo: "JFK" },
+  { voloIata: "ZZ600", copre: "idoneo, fascia 600 (lungo raggio fuori UE, 5h05 di ritardo)", stato: "atterrato", previstoOre: "18:00", ritardoMinuti: 305, km: 6500, partenza: "FCO", arrivo: "JFK" },
   { voloIata: "ZZ180", copre: "non idoneo per un minuto: 2h59 di ritardo", stato: "atterrato", previstoOre: "20:00", ritardoMinuti: 179, km: 800 },
   { voloIata: "ZZ10", copre: "non idoneo, arrivato in anticipo", stato: "atterrato", previstoOre: "20:00", ritardoMinuti: -5, km: 1200 },
   { voloIata: "ZZ777", copre: "cancellato: esito incerto, non si vende", stato: "cancellato", km: 1100 },
@@ -70,9 +79,9 @@ export const demo: FornitoreVoli = {
          il motore ha un cancello territoriale (art. 3) e senza aeroporti
          riconoscibili risponderebbe "incerto" anche al caso dimostrativo,
          mostrando sulla landing un prodotto che non decide mai. */
-      partenzaIata: "BGY",
+      partenzaIata: sagoma.partenza ?? "BGY",
       partenzaCitta: "Scalo demo A",
-      arrivoIata: "PMO",
+      arrivoIata: sagoma.arrivo ?? "PMO",
       arrivoCitta: "Scalo demo B",
       arrivoPrevistoUtc: sagoma.stato === "sconosciuto" ? null : previsto,
       arrivoEffettivoUtc: effettivo,

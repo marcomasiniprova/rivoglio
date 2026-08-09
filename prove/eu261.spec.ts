@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { valuta, scadenzaStimata, VERSIONE_REGOLE } from "../lib/regole/eu261";
 import { CASI_ORO } from "../lib/regole/casi-oro";
+import { demo, VOLI_DEMO } from "../lib/voli/fornitori/demo";
 
 /**
  * L'EVAL DEL MOTORE (SPEC §4). La metrica che governa tutto:
@@ -45,6 +46,37 @@ test.describe("Motore EU261 — golden set", () => {
     if (v.esito !== "idoneo") throw new Error("il primo caso d'oro deve essere idoneo");
     expect(v.motivo).toContain("ritardo");
     expect(v.motivo).toContain("€");
+  });
+
+  /* I voli dimostrativi sono l'unica cosa che la gente vede sulla landing
+     quando non c'è la chiave del fornitore, e la loro descrizione promette
+     un esito preciso. Il 9/08 il fix sull'art. 7 lett. b) li ha zittiti
+     senza che nessuno se ne accorgesse: ZZ300 e ZZ600 mostravano 400€
+     invece di 300 e 600, perché la loro tratta era tutta dentro l'Unione.
+     Questa prova lega la descrizione al verdetto vero. */
+  test("ogni volo dimostrativo dimostra davvero quello che dichiara", async () => {
+    const attesi: Record<string, { esito: string; importo?: number }> = {
+      ZZ250: { esito: "idoneo", importo: 250 },
+      ZZ400: { esito: "idoneo", importo: 400 },
+      ZZ300: { esito: "idoneo", importo: 300 },
+      ZZ600: { esito: "idoneo", importo: 600 },
+      ZZ180: { esito: "non_idoneo" },
+      ZZ10: { esito: "non_idoneo" },
+      ZZ777: { esito: "incerto" },
+      ZZ404: { esito: "incerto" },
+    };
+    expect(Object.keys(attesi).sort()).toEqual(VOLI_DEMO.map((v) => v.voloIata).sort());
+
+    for (const sagoma of VOLI_DEMO) {
+      const fatto = await demo.cerca(sagoma.voloIata, "2026-07-15");
+      expect(fatto, `il volo demo ${sagoma.voloIata} non esiste più`).toBeTruthy();
+      const v = valuta(fatto!);
+      const atteso = attesi[sagoma.voloIata];
+      expect(v.esito, `${sagoma.voloIata}: ${sagoma.copre}`).toBe(atteso.esito);
+      if (atteso.importo !== undefined && v.esito === "idoneo") {
+        expect(v.importo, `${sagoma.voloIata}: ${sagoma.copre}`).toBe(atteso.importo);
+      }
+    }
   });
 
   test("la scadenza è una stima dichiarata, con l'avvertenza", () => {
