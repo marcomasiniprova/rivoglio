@@ -93,12 +93,12 @@ test.describe("Accesso", () => {
     ).toBeVisible();
   });
 
-  test("la landing porta alla web app (decisione dell'8/08)", async ({ page }) => {
-    // Valerio l'8/08 ha ribaltato la scelta di prima: la web app va
-    // linkata dal sito. In nav c'è "Entra" verso /app, nel footer la
-    // voce "La web app". Il check resta comunque senza account.
+  test("Entra porta al login, la web app resta nel footer (9/08)", async ({ page }) => {
+    /* Il 9/08 Valerio ha chiuso il labirinto: "Entra" in nav va DRITTO
+       alla pagina di accesso, niente doppio Entra. La web app resta
+       raggiungibile dal footer ("La web app") e dal check, senza account. */
     await page.goto("/");
-    await expect(page.locator('header a[href="/app"]').first()).toBeVisible();
+    await expect(page.locator('header a[href="/entra"]').first()).toBeVisible();
     await expect(page.locator('footer a[href="/app"]').first()).toHaveCount(1);
   });
 });

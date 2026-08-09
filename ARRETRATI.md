@@ -96,7 +96,7 @@ non altro codice.**
 
 | # | Cosa avevi chiesto | Come è stato chiuso |
 |---|---|---|
-| 41 | **"Logo nuovo definitivo, posizionalo benissimo e migliora la qualità"** | Sfondo tolto col riempimento dai bordi, solo la lente estratta come componente connesso, upscalata a 1024px e affilata. Montata in nav, footer e card di condivisione via `components/Logo.tsx`; scritta accanto in due toni (Rivo scuro, glio verde) come nel lockup. Icone rifatte: `app/icon.png` 512, `apple-icon.png` 180, favicon.ico, manifest e JSON-LD aggiornati. Vecchio segno (sole e strada) eliminato. |
+| 41 | **"Logo nuovo definitivo, posizionalo benissimo e migliora la qualità"** | Sfondo tolto col riempimento dai bordi, solo la lente estratta come componente connesso, upscalata a 1024px e affilata. Montata in nav, footer e card di condivisione via `components/Logo.tsx`; scritta accanto in due toni (Rivo scuro, lio verde) come nel lockup. Icone rifatte: `app/icon.png` 512, `apple-icon.png` 180, favicon.ico, manifest e JSON-LD aggiornati. Vecchio segno (sole e strada) eliminato. |
 | 42 | **"Nel footer l'immagine del telefono come il riferimento, senza sfondo"** | La tua foto ripulita (sfondo a righe tolto, tenuto solo il componente mano+telefono, 878x1257) in una card bianca sul footer scuro: titolo, testo, bottone verde e il telefono che entra dal bordo basso. Come la quarta immagine, coi nostri colori. |
 | 43 | **"La scritta Rivolio in basso più grande e occupante"** | Maiuscola come nel lockup, fino a 15rem, taglio sul bordo basso, sfumatura menta. Occupa tutta la larghezza. |
 | 44 | **"FAQ: testo in disparte, centralo"** | Titolo centrato sopra le domande, lista in colonna da 760px. Prima era una griglia con la colonna laterale. |
@@ -387,3 +387,19 @@ non altro codice.**
   quindi diciamo "non spetta" in qualche caso in cui la legge lo
   concederebbe. Se un giorno il volume lo giustifica, si aggiunge una
   terza domanda e si allenta.
+
+## Dal giro #35 (9/08)
+- **Migrazione `supabase/2026-08-13-dichiarati.sql` DA APPLICARE** sul
+  Supabase vero (caso_dichiarato, dichiarazione jsonb, dichiarato_il su
+  `verifiche`): senza, i verdetti su negato imbarco e coincidenza
+  funzionano ma la dichiarazione non resta scritta come prova.
+- **Testimonial**: Valerio vuole la sezione dal blocco Efferd
+  `@efferd/testimonials-8`. STOP obbligato: serve EFFERD_REGISTRY_TOKEN
+  (Efferd Pro, efferd.com/account?tab=registry-token) e il progetto non
+  è ancora shadcn (manca components.json). Quando c'è il token:
+  npx shadcn@latest init, registry @efferd in components.json, poi
+  npx shadcn@latest add @efferd/testimonials-8. Recensioni VERE che
+  fornirà lui: mai inventate (regola 3).
+- **Lettera per negato/coincidenza**: oggi il verdetto c'è, la lettera
+  usa il modello del ritardo; va scritta la variante con art. 4 e
+  giurisprudenza Folkerts per i due casi nuovi.

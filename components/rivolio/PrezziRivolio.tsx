@@ -34,35 +34,6 @@ const CARTE = [
   { ...SEZIONE.piani.famiglia, evidenza: false, nastro: null },
 ] as const;
 
-/**
- * Le tacche del codice a barre, derivate dal nome del piano come su
- * CardVolo dell'app: deterministiche, stesso biglietto = stesso disegno.
- * Grafica da documento, non un dato che finge di essere vero.
- */
-function tacche(seme: string): number[] {
-  const larghezze: number[] = [];
-  let x = 0;
-  for (let i = 0; i < 30; i++) {
-    x = (x * 31 + seme.charCodeAt(i % seme.length) + i) % 7;
-    larghezze.push(1 + (x % 3));
-  }
-  return larghezze;
-}
-
-function Barre({ seme }: { seme: string }) {
-  return (
-    <div aria-hidden="true" className="flex h-6 items-stretch gap-px opacity-75">
-      {tacche(seme).map((b, i) => (
-        <span
-          key={i}
-          className="bg-inchiostro/85"
-          style={{ width: b, marginRight: b % 2 ? 1 : 2 }}
-        />
-      ))}
-    </div>
-  );
-}
-
 /** Lo strappo del biglietto: tratteggio e due fori che escono dai bordi. */
 function Strappo({ evidenza }: { evidenza: boolean }) {
   const bordo = evidenza ? "border-verde" : "border-bordo";
@@ -245,12 +216,11 @@ export default function PrezziRivolio() {
                   >
                     {p.bottone}
                   </a>
-                  <div className="mt-4 flex items-end justify-between gap-4">
-                    <Barre seme={p.nome} />
-                    <p className="numeri shrink-0 text-[9.5px] uppercase tracking-[0.2em] text-fumo-2">
-                      Rivolio · Reg. CE 261/2004
-                    </p>
-                  </div>
+                  {/* Il timbro, centrato. Il codice a barre che c'era
+                      qui sembrava un'etichetta da supermercato: via. */}
+                  <p className="numeri mt-4 text-center text-[9.5px] uppercase tracking-[0.2em] text-fumo-2">
+                    Rivolio · Reg. CE 261/2004
+                  </p>
                 </div>
               </div>
             </Figlio>

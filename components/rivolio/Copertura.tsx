@@ -18,20 +18,34 @@ import { COPY } from "@/lib/copy";
  */
 const S = COPY.copertura;
 
+/**
+ * Tre carte, tre pesi: la prima è VERDE NOTTE pieno (è il prodotto), la
+ * seconda calda, la terza si fa da parte. Prima erano tre veli slavati
+ * sullo stesso bianco e sembravano tre versioni della stessa scusa.
+ */
 const STILI = {
   pronto: {
-    riquadro: "border-verde/35 bg-menta-tenue/60",
-    pillola: "bg-verde text-white",
+    riquadro: "border-verde-notte bg-verde-notte text-white shadow-[0_30px_60px_-30px_rgba(5,46,31,.55)]",
+    pillola: "bg-menta text-verde-notte",
+    testoVoce: "text-white",
+    testoSotto: "text-white/65",
+    bordoLista: "border-white/12",
     segno: "M4 10.5 8 14.5 16 5.5",
   },
   quasi: {
-    riquadro: "border-sole/45 bg-sole/10",
+    riquadro: "border-sole/50 bg-[linear-gradient(180deg,rgba(245,196,81,.16),#ffffff_70%)]",
     pillola: "bg-sole text-inchiostro",
+    testoVoce: "text-inchiostro",
+    testoSotto: "text-fumo",
+    bordoLista: "border-inchiostro/8",
     segno: "M10 4.6v6.2M10 14.4v.2",
   },
   arrivo: {
-    riquadro: "border-bordo bg-nebbia",
+    riquadro: "border-bordo bg-nebbia/70",
     pillola: "bg-fumo-2/25 text-fumo",
+    testoVoce: "text-inchiostro",
+    testoSotto: "text-fumo",
+    bordoLista: "border-inchiostro/8",
     segno: "M10 5.5v5l3.2 2",
   },
 } as const;
@@ -73,19 +87,19 @@ export default function Copertura() {
                     </svg>
                     {g.etichetta}
                   </span>
-                  <p className="mt-3 text-[13.5px] leading-relaxed text-fumo">{g.spiegazione}</p>
+                  <p className={`mt-3 text-[13.5px] leading-relaxed ${stile.testoSotto}`}>{g.spiegazione}</p>
 
-                  <ul className="mt-5 flex-1 space-y-5 border-t border-inchiostro/8 pt-5">
+                  <ul className={`mt-5 flex-1 space-y-5 border-t pt-5 ${stile.bordoLista}`}>
                     {g.voci.map((v) => (
                       <li key={v.nome}>
-                        <p className="text-[15.5px] font-semibold leading-snug text-inchiostro">
+                        <p className={`text-[15.5px] font-semibold leading-snug ${stile.testoVoce}`}>
                           {v.nome}
                         </p>
-                        <p className="mt-1.5 text-[13.5px] leading-relaxed text-fumo">{v.testo}</p>
+                        <p className={`mt-1.5 text-[13.5px] leading-relaxed ${stile.testoSotto}`}>{v.testo}</p>
                         {"link" in v && v.link && (
                           <Link
                             href={v.link.dove}
-                            className="mt-2 inline-flex items-center gap-1 text-[13px] font-medium text-verde underline decoration-dotted underline-offset-4 transition-colors hover:text-verde-scuro"
+                            className="mt-2 inline-flex items-center gap-1 text-[13px] font-medium text-verde-scuro underline decoration-dotted underline-offset-4 transition-colors hover:text-verde-scuro"
                           >
                             {v.link.testo}
                             <span aria-hidden="true">→</span>

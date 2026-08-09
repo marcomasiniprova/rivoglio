@@ -63,8 +63,8 @@ test.describe("Il check dalla home", () => {
     await compilaECont(page, nonIdoneoPerUnMinuto.voloIata);
     await page.waitForURL(/\/verifica\//, { timeout: 45_000 });
     await expect(page.getByText(COPY.risultato.nonIdoneo.titolo).first()).toBeVisible();
-    // il dato mostrato: 179 minuti sono 2h59
-    await expect(page.getByText(/2h59/).first()).toBeVisible();
+    // il dato mostrato: 179 minuti, nel formato leggibile (9/08)
+    await expect(page.getByText(/2 h e 59 min/).first()).toBeVisible();
     await expect(page.getByText(/14,90/)).toHaveCount(0);
   });
 
@@ -90,8 +90,8 @@ test.describe("La pagina del risultato (id demo, senza chiavi)", () => {
     });
     // il fatto oggettivo: atterrato alle X invece delle Y
     await expect(page.getByText(/atterrato alle .+ invece delle/).first()).toBeVisible();
-    // il ritardo, bene in vista nel titolo (200 minuti = 3h20)
-    await expect(page.getByText(/3h20/).first()).toBeVisible();
+    // il ritardo, bene in vista nel titolo (200 minuti, formato leggibile)
+    await expect(page.getByText(/3 h e 20 min/).first()).toBeVisible();
     // la scadenza è una stima DICHIARATA: l'avvertenza del motore c'è
     await expect(page.getByText(/Stima prudente/).first()).toBeVisible();
     // il badge demo, onesto e visibile
@@ -137,7 +137,7 @@ test.describe("La pagina del risultato (id demo, senza chiavi)", () => {
   test("NON IDONEO: risposta chiara, il dato mostrato, invito a riprovare", async ({ page }) => {
     await page.goto(urlDemo(nonIdoneoPerUnMinuto.voloIata));
     await expect(page.getByText(COPY.risultato.nonIdoneo.titolo).first()).toBeVisible();
-    await expect(page.getByText(/2h59/).first()).toBeVisible();
+    await expect(page.getByText(/2 h e 59 min/).first()).toBeVisible();
     await expect(
       page.getByRole("link", { name: COPY.risultato.nonIdoneo.cta }).first(),
     ).toBeVisible();

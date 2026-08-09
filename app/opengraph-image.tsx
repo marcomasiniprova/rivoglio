@@ -58,7 +58,7 @@ export default async function Anteprima() {
             {segno && <img src={segno} alt="" width={46} height={46} />}
           </div>
           <span style={{ color: "#fff", fontSize: 32, fontWeight: 600 }}>
-            Rivo<span style={{ color: "#7fe8ae" }}>glio</span>
+            Rivo<span style={{ color: "#7fe8ae" }}>lio</span>
           </span>
         </div>
 

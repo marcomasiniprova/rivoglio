@@ -103,6 +103,18 @@ const nonIdoneo = (ritardoMinuti: number | null, motivo: string): Verdetto => ({
   versioneRegole: VERSIONE_REGOLE,
 });
 
+/**
+ * Da minuti a parole: "3 h e 52 min". Prima era "3h52", e Valerio ha
+ * ragione: appiccicato non si capisce. Un'ora tonda resta "3 h".
+ */
+export function formattaMinuti(min: number): string {
+  const h = Math.floor(Math.abs(min) / 60);
+  const m = Math.abs(min) % 60;
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h} h`;
+  return `${h} h e ${m} min`;
+}
+
 /** Minuti fra previsto ed effettivo. Positivo = in ritardo. */
 export function minutiRitardo(previstoUtc: string, effettivoUtc: string): number | null {
   const p = Date.parse(previstoUtc);
@@ -217,7 +229,7 @@ export function valuta(f: FattoVolo): Verdetto {
     esito: "idoneo",
     importo,
     ritardoMinuti: ritardo,
-    motivo: `Arrivo con ${Math.floor(ritardo / 60)}h${String(ritardo % 60).padStart(2, "0")} di ritardo su una tratta di ${Math.round(km)} km: fascia da ${importo}€. Restano da verificare le circostanze straordinarie, che può invocare solo la compagnia.`,
+    motivo: `Arrivo con ${formattaMinuti(ritardo)} di ritardo su una tratta di ${Math.round(km)} km: fascia da ${importo}€. Restano da verificare le circostanze straordinarie, che può invocare solo la compagnia.`,
     versioneRegole: VERSIONE_REGOLE,
   };
 }

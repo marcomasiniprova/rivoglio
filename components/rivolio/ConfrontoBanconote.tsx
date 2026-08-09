@@ -1,33 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { COPY } from "@/lib/copy";
 
 /**
- * Il confronto coi portali a percentuale, fatto con le BANCONOTE.
+ * Il confronto coi portali: BANCONOTE VERE, non disegnini.
  *
- * Prima era un riquadro con due righe di testo: giusto nei numeri e
- * invisibile agli occhi. La differenza fra "trattiene 210€" e "costa
- * 14,90€" è la cosa più importante che abbiamo da dire, e leggerla non
- * è come vederla.
+ * La 100€ è la riproduzione ufficiale da Wikimedia Commons
+ * (`/assets/banconota-100.webp`, 460px: dimensione da anteprima, entro le
+ * regole BCE sulle riproduzioni). Richiesta esplicita di Valerio (9/08):
+ * un elemento visivo REALE, non codificato.
  *
- * Come funziona la scena, quando entra in vista:
- * 12 banconote da 50€ fanno i 600€ della compensazione. Nella riga del
- * portale QUATTRO E MEZZA se ne volano via ruotando; nella nostra se ne
- * va un angolo di una sola. Poi il numero che resta sale contando.
+ * La scena: sei banconote vere a ventaglio fanno i 600€. Dal portale DUE
+ * volano via con rotazione e caduta; da Rivolio si stacca solo un
+ * angolino (il 2,5%). Poi il numero sale contando. Le proporzioni escono
+ * dagli stessi numeri della riga di testo (210/600 e 14,90/600), mai a
+ * occhio.
  *
- * Le proporzioni non sono a occhio: 210/600 e 14,90/600 vengono da
- * COPY.prezzi.confronto, gli stessi numeri della riga di testo.
- *
- * Senza JavaScript, o con le animazioni ridotte nel sistema operativo,
- * si vede la scena già finita: stessa informazione, zero movimento.
+ * Con le animazioni ridotte si vede la scena già finita. Il contatore
+ * parte SEMPRE dal valore vero: mai "0€ restano a te" per chi non scorre.
  */
 
 const C = COPY.prezzi.confronto;
-/* SEI banconote da 100€ fanno i 600€. Con dodici da 50 ognuna diventava
-   larga 25px sul telefono: a quella misura non si capiva più che erano
-   soldi, sembravano tessere. Sei si leggono. */
 const QUANTE = 6;
 const CURVA = [0.16, 1, 0.3, 1] as const;
 
@@ -35,60 +31,9 @@ const euro = (n: number) =>
   n.toLocaleString("it-IT", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }) +
   "€";
 
-/** Una banconota: fascia, cifra e il tondo del ritratto. Niente foto. */
-function Banconota({ via, nostra }: { via: boolean; nostra: boolean }) {
-  return (
-    <svg viewBox="0 0 40 22" className="h-full w-full" aria-hidden="true">
-      <rect
-        x="0.6"
-        y="0.6"
-        width="38.8"
-        height="20.8"
-        rx="2.4"
-        className={
-          via
-            ? nostra
-              ? "fill-verde/25 stroke-verde/50"
-              : "fill-red-100 stroke-red-300"
-            : "fill-menta-tenue stroke-verde/35"
-        }
-        strokeWidth="1"
-      />
-      <circle
-        cx="11"
-        cy="11"
-        r="4.6"
-        className={via && !nostra ? "fill-red-200/70" : "fill-verde/20"}
-      />
-      <text
-        x="26.5"
-        y="14.4"
-        textAnchor="middle"
-        className={via && !nostra ? "fill-red-400/80" : "fill-verde/55"}
-        style={{ font: "600 9px ui-sans-serif, system-ui, sans-serif" }}
-      >
-        100€
-      </text>
-    </svg>
-  );
-}
-
-/**
- * Il numero che sale contando.
- *
- * ATTENZIONE, e c'è un motivo se è scritto qui: il valore di partenza è
- * quello VERO, non zero. Prima partiva da zero e restava zero per chi non
- * scorreva fin qui: una prova ha beccato "0€ restano a te" nella pagina,
- * che è esattamente il tipo di numero sbagliato che questo sito non può
- * permettersi. Il conto parte solo quando la sezione entra in vista
- * DOPO essere stata fuori: chi ci atterra sopra vede subito la cifra
- * giusta, senza il tuffo a zero.
- */
 function Contatore({ a, parti }: { a: number; parti: boolean }) {
   const fermo = useReducedMotion();
   const [n, setN] = useState(a);
-  /* Se al primo giro la sezione era già davanti agli occhi, non si
-     anima: si mostra e basta. */
   const eraGiaLì = useRef<boolean | null>(null);
 
   useEffect(() => {
@@ -101,7 +46,6 @@ function Contatore({ a, parti }: { a: number; parti: boolean }) {
     const passo = (ora: number) => {
       if (!vivo) return;
       const t = Math.min(1, (ora - inizio) / durata);
-      /* stessa sensazione della curva del sito: parte veloce, si posa */
       setN(a * (1 - Math.pow(1 - t, 3)));
       if (t < 1) requestAnimationFrame(passo);
     };
@@ -115,6 +59,88 @@ function Contatore({ a, parti }: { a: number; parti: boolean }) {
   return <>{euro(Math.round(n * 100) / 100)}</>;
 }
 
+/** Il ventaglio di banconote vere. `via` = quante se ne volano. */
+function Ventaglio({
+  via,
+  parziale,
+  parti,
+  ritardo,
+}: {
+  via: number;
+  /** Vero quando se ne va solo un angolino, non una banconota intera. */
+  parziale: boolean;
+  parti: boolean;
+  ritardo: number;
+}) {
+  const fermo = useReducedMotion();
+  return (
+    <div className="relative mx-auto h-[92px] w-[210px] sm:h-[104px] sm:w-[240px]">
+      {Array.from({ length: QUANTE }, (_, i) => {
+        const vola = !parziale && i >= QUANTE - via;
+        /* il ventaglio: ognuna ruotata e spostata un filo */
+        const base = {
+          rotate: -9 + i * 3.6,
+          x: i * 14,
+          y: Math.abs(i - 2.5) * 2.2,
+        };
+        return (
+          <motion.div
+            key={i}
+            className="absolute left-2 top-3 w-[128px] overflow-hidden rounded-[4px] shadow-[0_2px_10px_rgba(5,46,31,.22)] sm:w-[146px]"
+            style={{ zIndex: i, transformOrigin: "20% 90%" }}
+            initial={false}
+            animate={
+              parti && vola && !fermo
+                ? {
+                    ...base,
+                    x: base.x + 46 + (i % 2) * 26,
+                    y: base.y - 64 - (i % 3) * 14,
+                    rotate: base.rotate + 32 + (i % 2) * 16,
+                    opacity: 0,
+                  }
+                : { ...base, opacity: vola && (fermo || parti) ? 0 : 1 }
+            }
+            transition={{ duration: 0.95, ease: CURVA, delay: ritardo + (vola ? 0.08 * i : 0) }}
+          >
+            <Image
+              src="/assets/banconota-100.webp"
+              alt=""
+              width={460}
+              height={257}
+              sizes="146px"
+              className="h-auto w-full"
+            />
+          </motion.div>
+        );
+      })}
+
+      {/* l'angolino che si stacca da Rivolio: la quota vera, 14,90 su 600 */}
+      {parziale && (
+        <motion.span
+          aria-hidden="true"
+          className="absolute right-[8px] top-[6px] z-20 h-[26px] w-[34px] overflow-hidden rounded-[3px] shadow-[0_2px_8px_rgba(5,46,31,.3)]"
+          initial={false}
+          animate={
+            parti && !fermo
+              ? { x: 34, y: -34, rotate: 38, opacity: 0 }
+              : { x: 0, y: 0, rotate: 0, opacity: parti || fermo ? 0 : 1 }
+          }
+          transition={{ duration: 0.9, ease: CURVA, delay: ritardo + 0.15 }}
+        >
+          <Image
+            src="/assets/banconota-100.webp"
+            alt=""
+            width={460}
+            height={257}
+            sizes="120px"
+            className="h-auto w-[120px] max-w-none -translate-x-[86px] -translate-y-[2px]"
+          />
+        </motion.span>
+      )}
+    </div>
+  );
+}
+
 function Riga({
   voce,
   nostra,
@@ -126,68 +152,27 @@ function Riga({
   parti: boolean;
   ritardo: number;
 }) {
-  const fermo = useReducedMotion();
-  /* Quante banconote se ne vanno: la quota vera, non un'idea. */
-  const quoteVia = (voce.trattenuto / C.compensazione) * QUANTE;
-
+  const quanteVia = Math.round((voce.trattenuto / C.compensazione) * QUANTE);
   return (
     <div
-      className={`rounded-2xl border p-4 sm:p-5 ${
-        nostra ? "border-verde/35 bg-menta-tenue/70" : "border-bordo bg-nebbia"
+      className={`rounded-2xl border p-4 text-center sm:p-5 ${
+        nostra ? "border-verde/40 bg-menta-tenue/70" : "border-bordo bg-nebbia"
       }`}
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-left">
         <p className="text-[14px] font-semibold text-inchiostro">{voce.nome}</p>
-        <p
-          className={`text-[12.5px] font-medium ${nostra ? "text-verde-scuro" : "text-red-500"}`}
-        >
+        <p className={`text-[12.5px] font-medium ${nostra ? "text-verde-scuro" : "text-red-500"}`}>
           {voce.etichettaVia}
         </p>
       </div>
 
-      {/* le dodici banconote: quelle che se ne vanno volano via */}
-      <div className="mt-3 flex h-[34px] items-stretch gap-[5px] sm:h-[38px]">
-        {Array.from({ length: QUANTE }, (_, i) => {
-          /* Da noi se ne va MENO di una banconota: ne parte comunque una,
-             ma rimpicciolita alla frazione vera. Senza, sulla nostra riga
-             non si muoveva niente e il confronto perdeva il suo colpo. */
-          const quante = nostra ? 1 : Math.round(quoteVia);
-          const via = i >= QUANTE - quante;
-          /* La frazione di banconota: il pezzetto che tocca a noi non è
-             una nota intera, ed è giusto che si veda che è un angolo. */
-          const frazione = !nostra ? 1 : quoteVia % 1;
-          const parziale = nostra && via;
-          return (
-            <motion.span
-              key={i}
-              className="relative block h-full flex-1 origin-bottom"
-              initial={false}
-              animate={
-                parti && via && !fermo
-                  ? {
-                      x: parziale ? 6 : 10 + (i % 3) * 8,
-                      y: parziale ? -14 : -26 - (i % 3) * 7,
-                      rotate: parziale ? 14 : 16 + (i % 4) * 7,
-                      opacity: 0,
-                      scale: parziale ? Math.max(0.25, frazione) : 0.9,
-                    }
-                  : { x: 0, y: 0, rotate: 0, opacity: 1, scale: 1 }
-              }
-              transition={{
-                duration: 0.85,
-                ease: CURVA,
-                delay: ritardo + (via ? 0.06 * (QUANTE - i) : 0),
-              }}
-            >
-              <Banconota via={via} nostra={nostra} />
-            </motion.span>
-          );
-        })}
+      <div className="mt-4">
+        <Ventaglio via={quanteVia} parziale={nostra} parti={parti} ritardo={ritardo} />
       </div>
 
-      <p className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+      <p className="mt-4 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5">
         <span
-          className={`numeri font-display text-[26px] font-medium leading-none tracking-[-0.03em] sm:text-[30px] ${
+          className={`numeri font-display text-[28px] font-medium leading-none tracking-[-0.03em] sm:text-[32px] ${
             nostra ? "text-verde" : "text-inchiostro"
           }`}
         >
@@ -218,7 +203,7 @@ export default function ConfrontoBanconote() {
             voce={v}
             nostra={i === C.voci.length - 1}
             parti={dentro}
-            ritardo={0.15 + i * 0.35}
+            ritardo={0.15 + i * 0.3}
           />
         ))}
       </div>

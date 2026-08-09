@@ -1,6 +1,9 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #34: il marchio è RIVOLIO, i voli
+**Aggiornato:** 2026-08-09 (giro #35: Rivoglio estinto anche nei
+lockup spezzati e nel mockup, negato imbarco e coincidenza persa con
+verdetto, banconote VERE nel confronto, aerei in volo sulle scadenze,
+Entra dritto al login, ritardo in parole · giro #34: il marchio è RIVOLIO, i voli
 cancellati hanno un verdetto vero, social veri, velo nero tolto · giro #33: firma del footer a tutta larghezza,
 mano che entra in scena, check gratis con la sua scheda, confronto con le
 banconote, casella che si cerca da sola, barre della scadenza, sezioni
@@ -20,6 +23,48 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #35 (9/08): GLI ULTIMI DUE CASI CE 261 E IL GIRO DI STILE.**
+  - **RIVOGLIO È DAVVERO ESTINTO.** La passata del giro #34 non poteva
+    vedere i lockup SPEZZATI in due stringhe ("Rivo"+"glio"): nav del
+    sito (Logo.tsx), hero e welcome dell'app, testata delle email,
+    immagine social (opengraph-image.tsx). Sistemati tutti, anteprima
+    app riesportata e mockup del telefono RIFATTO con la cattura nuova
+    (dentro c'era ancora la scritta vecchia). Restano SOLO gli indirizzi
+    veri delle macchine (rivoglio.netlify.app), come da nota del #34.
+  - **NEGATO IMBARCO E COINCIDENZA PERSA HANNO IL VERDETTO**
+    (`lib/regole/dichiarati.ts`, rotta `/api/verifica/dichiara`,
+    migrazione `2026-08-13-dichiarati.sql` DA APPLICARE). Sono i casi
+    che gli archivi NON vedono: il volo può risultare in orario mentre
+    tu sei rimasto al gate. Invito discreto sotto i verdetti non idoneo
+    e incerto ("Ti hanno lasciato a terra o hai perso una coincidenza?"),
+    scelte chiuse, verdetto dal motore sul server. Negato (art. 4):
+    volontario = no; involontario + in orario = compensazione SUBITO
+    sulla distanza del volo. Coincidenza (Folkerts C-11/11): biglietti
+    separati = no; unica prenotazione + arrivo finale ≥3h = fascia
+    sull'INTERO viaggio, con destinazione finale chiesta col campo di
+    ricerca scali e distanza calcolata da OpenFlights. Chi non ricorda
+    resta incerto e non paga. 14 prove nuove.
+  - **IL CONFRONTO HA LE BANCONOTE VERE**: riproduzione ufficiale della
+    100€ da Wikimedia Commons (`/assets/banconota-100.webp`, 460px, entro
+    le regole BCE), a ventaglio; dal portale due volano via, da Rivolio
+    si stacca un angolino. Richiesta esplicita di Valerio: elemento
+    visivo REALE, non disegnato in codice.
+  - **LE SCADENZE SONO CIELI CON L'AEREO IN VOLO**: aereo in rilievo che
+    decolla da "oggi" e vola sulla rotta tratteggiata fino alla sua
+    finestra, bandierina del paese della legge (Italia/UE), tacca del
+    primo anno = archivio. Niente loghi delle compagnie: marchi
+    registrati (scelta col popup).
+  - **LA BUSTA È UNA BUSTA** (semafori colorati, avatar del mittente,
+    lettera che esce) e la scheda del check gratis, la Copertura a tre
+    pesi (verde notte pieno la prima), il timbro senza codice a barre.
+  - **ENTRA VA DRITTO AL LOGIN** (nav → /entra): prima portava alla web
+    app dove c'era un ALTRO Entra. Il labirinto è chiuso; la web app
+    resta dal footer e dal check.
+  - **IL RITARDO SI LEGGE**: "3 h e 52 min", mai più "3h52"
+    (`formattaMinuti` in eu261.ts, usato da motore, verdetto, landing).
+  - Prove: le nuove sui casi dichiarati verdi; suite piena verde tranne
+    le 2 note della sandbox. Prove aggiornate: il formato del ritardo e
+    "Entra → /entra" sono il comportamento voluto.
 - **GIRO #34 (9/08): IL NOME CAMBIA E I CANCELLATI PAGANO.**
   - **RIVOGLIO È DIVENTATO RIVOLIO OVUNQUE** (scelta di Valerio, 9/08):
     rivoglio.it risultava già registrato (risponde a un indirizzo di

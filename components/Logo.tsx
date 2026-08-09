@@ -36,9 +36,9 @@ export default function Logo({ scuro = false }: { scuro?: boolean }) {
           scuro ? "text-white" : "text-inchiostro"
         }`}
       >
-        {/* due toni come nel lockup: Rivo scuro, glio verde */}
+        {/* due toni come nel lockup: Rivo scuro, lio verde */}
         Rivo
-        <span className={scuro ? "text-menta" : "text-verde"}>glio</span>
+        <span className={scuro ? "text-menta" : "text-verde"}>lio</span>
       </span>
     </Link>
   );

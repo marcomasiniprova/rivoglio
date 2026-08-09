@@ -84,7 +84,7 @@ I file, generati dall'originale di Valerio (sfondo tolto, upscalato):
   micro-tagline, trasparente. Per store, social e materiali.
 - `app/icon.png` (512) e `app/apple-icon.png` (180): lente su fondo bianco.
 - La scritta accanto alla lente nel sito è testo vero, in due toni come nel
-  lockup: "Rivo" scuro, "glio" verde.
+  lockup: "Rivo" scuro, "lio" verde.
 
 ### La regola che comanda su tutte
 **Deve reggere a 24 pixel.** È lì che verrà visto quasi sempre: favicon del

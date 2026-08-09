@@ -287,7 +287,7 @@ export default function SchermataCheck() {
         <View style={stili.marchio}>
           <Image source={marchio} style={stili.segno} accessibilityLabel="Rivolio" />
           <Text style={stili.nomeMarchio}>
-            Rivo<Text style={stili.nomeVerde}>glio</Text>
+            Rivo<Text style={stili.nomeVerde}>lio</Text>
           </Text>
         </View>
 

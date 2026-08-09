@@ -5,46 +5,145 @@ import { motion, useInView, useReducedMotion } from "motion/react";
 import { COPY } from "@/lib/copy";
 
 /**
- * Quanto tempo hai ancora: le finestre di prescrizione, disegnate.
+ * Quanto tempo hai ancora: la finestra di prescrizione VOLATA, non scritta.
  *
- * Prima erano due riquadri bianchi con un numero grande a destra. Il
- * numero c'era, ma "2 anni" e "5-6 anni" restavano due etichette: non si
- * capiva quanto sono lunghi rispetto a oggi, né dove finisce quello che
- * il check copre adesso.
+ * Ogni compagnia ha la sua card con un cielo: un aereo in rilievo decolla
+ * da "oggi" e vola lungo la rotta tratteggiata fino a dove arriva la sua
+ * finestra (2 anni, o 5-6). La scia se la lascia dietro, la bandierina
+ * dice il paese della legge che comanda (Italia / Unione Europea), e la
+ * tacca verticale al primo anno è il nostro archivio di oggi.
  *
- * Ora ogni riga ha la sua BARRA DEL TEMPO che si riempie entrando in
- * vista, tutte sulla stessa scala (0 → 6 anni): a colpo d'occhio si vede
- * che con un vettore estero la finestra è tre volte quella italiana. La
- * tacca a un anno è la profondità del nostro archivio, ed è marcata per
- * quello che è: quello che possiamo verificare oggi, non il diritto.
- *
- * Le finestre restano STIME dichiarate, come in COPY: qui cambia il
- * disegno, non la promessa.
+ * L'aereo è NOSTRO, disegnato col rilievo dei monumenti (faccia in luce,
+ * fianco in ombra): i loghi delle compagnie sono marchi registrati e un
+ * logo rifatto male è peggio di niente (deciso con Valerio, 9/08).
  */
 
 const S = COPY.retroattivo;
 const CURVA = [0.16, 1, 0.3, 1] as const;
-/** La scala comune di tutte le barre. Sei anni è la finestra più lunga. */
 const SCALA_ANNI = 6;
 
-function Barra({ anni, ritardo, parti }: { anni: number; ritardo: number; parti: boolean }) {
-  const fermo = useReducedMotion();
-  const quota = Math.min(1, anni / SCALA_ANNI);
+/** L'aereo in rilievo, muso a destra. Vola lui, non un'icona qualsiasi. */
+function Aereo({ className }: { className?: string }) {
   return (
-    <div className="relative mt-4 h-2.5 w-full overflow-hidden rounded-full bg-nebbia">
-      <motion.span
-        className="absolute inset-y-0 left-0 rounded-full bg-[linear-gradient(90deg,var(--color-verde),var(--color-menta))]"
-        initial={false}
-        animate={{ width: parti || fermo ? `${quota * 100}%` : "0%" }}
-        transition={{ duration: fermo ? 0 : 1.05, ease: CURVA, delay: fermo ? 0 : ritardo }}
+    <svg viewBox="0 0 64 40" className={className} aria-hidden="true">
+      {/* fusoliera */}
+      <path
+        d="M4 22c14-4 34-5 47-4 4.4.4 8 1.8 9 3.4-1 1.6-4.6 3-9 3.4-13 1-33 0-47-4Z"
+        className="fill-verde"
       />
-      {/* la tacca del primo anno: fin lì arriva l'archivio, oggi */}
-      <span
-        aria-hidden="true"
-        className="absolute inset-y-0 w-[2px] bg-white/90"
-        style={{ left: `${(1 / SCALA_ANNI) * 100}%` }}
+      {/* la pancia in ombra */}
+      <path
+        d="M4 22c14 2.6 34 3.6 47 2.6 4.4-.3 8-1 9-1.2-1 1.6-4.6 3-9 3.4-13 1-33 0-47-4Z"
+        className="fill-verde-scuro"
       />
-    </div>
+      {/* la coda */}
+      <path d="M10 21.5 2 8h5.5l9 12.6Z" className="fill-verde-scuro" />
+      {/* l'ala, verso chi guarda */}
+      <path d="M28 21 20 34h6.5l9.5-12.4Z" className="fill-verde-scuro" />
+      {/* i finestrini */}
+      <g className="fill-white/85">
+        <circle cx="40" cy="20" r="1.3" />
+        <circle cx="45" cy="20" r="1.3" />
+        <circle cx="50" cy="20" r="1.3" />
+      </g>
+      {/* il muso vetrato */}
+      <path d="M56.5 19.2c1.8.3 3 .8 3.5 1.4-.5.6-1.7 1.1-3.5 1.4Z" className="fill-menta" />
+    </svg>
+  );
+}
+
+/** La bandierina del paese della legge: Italia o Unione Europea. */
+function Bandiera({ paese }: { paese: "it" | "eu" }) {
+  if (paese === "it") {
+    return (
+      <svg viewBox="0 0 24 16" className="h-3 w-[18px] overflow-hidden rounded-[2px]" aria-hidden="true">
+        <rect width="8" height="16" fill="#009246" />
+        <rect x="8" width="8" height="16" fill="#ffffff" />
+        <rect x="16" width="8" height="16" fill="#ce2b37" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 16" className="h-3 w-[18px] overflow-hidden rounded-[2px]" aria-hidden="true">
+      <rect width="24" height="16" fill="#003399" />
+      {Array.from({ length: 12 }, (_, i) => {
+        const a = (i / 12) * Math.PI * 2;
+        return (
+          <circle key={i} cx={12 + Math.sin(a) * 5} cy={8 - Math.cos(a) * 5} r="0.8" fill="#FFCC00" />
+        );
+      })}
+    </svg>
+  );
+}
+
+function Card({
+  f,
+  i,
+  dentro,
+}: {
+  f: (typeof S.finestre)[number];
+  i: number;
+  dentro: boolean;
+}) {
+  const fermo = useReducedMotion();
+  const quota = Math.min(1, f.anniStimati / SCALA_ANNI);
+  const vola = dentro || fermo;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 22 }}
+      animate={dentro ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
+      transition={{ duration: 0.7, ease: CURVA, delay: i * 0.12 }}
+      className="overflow-hidden rounded-[1.5rem] bg-white shadow-[0_1px_2px_rgba(5,46,31,.06),0_12px_28px_-20px_rgba(5,46,31,.28)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(5,46,31,.07),0_28px_56px_-26px_rgba(5,46,31,.4)]"
+    >
+      <div className="flex items-start justify-between gap-6 px-6 pt-6 sm:px-7">
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 text-[16px] font-medium leading-snug">
+            <Bandiera paese={f.paese} />
+            {f.compagnie}
+          </p>
+          <p className="mt-1 text-[13px] leading-relaxed text-fumo">{f.nota}</p>
+        </div>
+        <p className="numeri shrink-0 text-right font-display text-[clamp(1.7rem,3.4vw,2.3rem)] font-medium leading-none tracking-[-0.04em] text-verde">
+          {f.finestra}
+        </p>
+      </div>
+
+      {/* IL CIELO: la striscia dove vola l'aereo. Sfuma verso l'alto,
+          la rotta è tratteggiata, la tacca al primo anno è l'archivio. */}
+      <div className="relative mx-6 mb-5 mt-4 h-[64px] overflow-hidden rounded-xl bg-[linear-gradient(180deg,var(--color-menta-tenue),#ffffff_78%)] sm:mx-7">
+        {/* la rotta completa, tenue */}
+        <div className="absolute inset-x-4 top-1/2 border-t-2 border-dashed border-verde/20" />
+        {/* la scia: si allunga fin dove arriva la finestra */}
+        <motion.div
+          className="absolute left-4 top-1/2 border-t-2 border-dashed border-verde"
+          style={{ right: undefined }}
+          initial={false}
+          animate={{ width: vola ? `calc((100% - 32px) * ${quota})` : "0%" }}
+          transition={{ duration: fermo ? 0 : 1.3, ease: CURVA, delay: fermo ? 0 : 0.25 + i * 0.15 }}
+        />
+        {/* la tacca del primo anno: fin lì arriva l'archivio, oggi */}
+        <div
+          aria-hidden="true"
+          className="absolute top-[10px] bottom-[10px] w-[2px] rounded bg-verde-scuro/30"
+          style={{ left: `calc(16px + (100% - 32px) * ${1 / SCALA_ANNI})` }}
+        />
+        {/* l'aereo che vola fino alla fine della finestra */}
+        <motion.div
+          className="absolute top-1/2 -mt-[14px] -ml-[46px]"
+          initial={false}
+          animate={{ left: vola ? `calc(16px + (100% - 32px) * ${quota})` : "16px" }}
+          transition={{ duration: fermo ? 0 : 1.3, ease: CURVA, delay: fermo ? 0 : 0.25 + i * 0.15 }}
+        >
+          <Aereo className="h-[28px] w-[46px] drop-shadow-[0_3px_4px_rgba(5,46,31,.25)]" />
+        </motion.div>
+      </div>
+
+      <div className="flex items-center justify-between px-6 pb-5 text-[11.5px] text-fumo-2 sm:px-7">
+        <span>{S.scalaOggi}</span>
+        <span className="numeri">{S.scalaFine}</span>
+      </div>
+    </motion.div>
   );
 }
 
@@ -55,30 +154,7 @@ export default function FinestreScadenza() {
   return (
     <div ref={zona} className="space-y-4">
       {S.finestre.map((f, i) => (
-        <motion.div
-          key={f.compagnie}
-          initial={{ opacity: 0, y: 22 }}
-          animate={dentro ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
-          transition={{ duration: 0.7, ease: CURVA, delay: i * 0.12 }}
-          className="rounded-[1.5rem] bg-white p-6 shadow-[0_1px_2px_rgba(5,46,31,.06),0_12px_28px_-20px_rgba(5,46,31,.28)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(5,46,31,.07),0_28px_56px_-26px_rgba(5,46,31,.4)] sm:p-7"
-        >
-          <div className="flex items-start justify-between gap-6">
-            <div className="min-w-0">
-              <p className="text-[16px] font-medium leading-snug">{f.compagnie}</p>
-              <p className="mt-1 text-[13px] leading-relaxed text-fumo">{f.nota}</p>
-            </div>
-            <p className="numeri shrink-0 text-right font-display text-[clamp(1.7rem,3.4vw,2.3rem)] font-medium leading-none tracking-[-0.04em] text-verde">
-              {f.finestra}
-            </p>
-          </div>
-
-          <Barra anni={f.anniStimati} ritardo={0.2 + i * 0.15} parti={dentro} />
-
-          <div className="mt-2 flex items-center justify-between text-[11.5px] text-fumo-2">
-            <span>{S.scalaOggi}</span>
-            <span className="numeri">{S.scalaFine}</span>
-          </div>
-        </motion.div>
+        <Card key={f.compagnie} f={f} i={i} dentro={dentro} />
       ))}
     </div>
   );

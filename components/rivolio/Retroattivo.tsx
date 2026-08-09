@@ -45,8 +45,9 @@ export default function Retroattivo() {
             <CercaInPosta />
           </div>
 
-          {/* Centrato su telefono (fix 8/08); a sinistra col testo su desktop. */}
-          <div className="mt-7 flex justify-center lg:justify-start">
+          {/* Centrato SEMPRE (richiesta di Valerio, 9/08): allineato a
+              sinistra su desktop sembrava scappato dal riquadro sopra. */}
+          <div className="mt-7 flex justify-center">
             <a
               href="#controllo"
               className="riflesso group inline-flex items-center gap-2 rounded-bottone bg-verde px-7 py-4 text-[15.5px] font-medium text-white shadow-[0_12px_28px_-12px_rgba(6,122,70,.75),0_2px_0_0_rgba(255,255,255,.22)_inset] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro"

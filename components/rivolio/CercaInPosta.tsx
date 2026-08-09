@@ -53,9 +53,10 @@ export default function CercaInPosta() {
       {/* la testata della finta casella */}
       <div className="flex items-center gap-2 border-b border-bordo/70 bg-nebbia px-4 py-2.5">
         <span aria-hidden="true" className="flex gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-bordo" />
-          <span className="h-2 w-2 rounded-full bg-bordo" />
-          <span className="h-2 w-2 rounded-full bg-bordo" />
+          {/* i semafori veri di una finestra: grigi sembravano spenti */}
+          <span className="h-2 w-2 rounded-full bg-[#ff5f57]" />
+          <span className="h-2 w-2 rounded-full bg-[#febc2e]" />
+          <span className="h-2 w-2 rounded-full bg-[#28c840]" />
         </span>
         <p className="ml-1 truncate text-[11.5px] font-medium text-fumo-2">{S.casella}</p>
         <span className="ml-auto shrink-0 whitespace-nowrap rounded-pillola bg-white px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.1em] text-fumo-2">
@@ -96,8 +97,18 @@ export default function CercaInPosta() {
           transition={{ duration: 0.55, ease: CURVA }}
           className="mt-3 rounded-xl border border-verde/25 bg-menta-tenue/70 p-3.5"
         >
-          <p className="text-[13px] font-semibold text-inchiostro">{S.mittente}</p>
-          <p className="mt-1 text-[13.5px] leading-snug text-fumo">
+          <div className="flex items-center gap-2.5">
+            {/* l'avatar del mittente, come in una casella vera */}
+            <span
+              aria-hidden="true"
+              className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-verde text-[11px] font-bold text-white"
+            >
+              ✈
+            </span>
+            <p className="text-[13px] font-semibold text-inchiostro">{S.mittente}</p>
+            <span className="ml-auto text-[11px] text-fumo-2">12:38</span>
+          </div>
+          <p className="mt-1.5 text-[13.5px] leading-snug text-fumo">
             {S.oggettoPrima}
             <mark className="rounded bg-verde/25 px-1 font-semibold text-inchiostro">
               {S.numero}

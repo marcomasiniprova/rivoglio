@@ -14,7 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { COPY } from "@/lib/copy";
+import { formattaMinuti } from "@/lib/regole/eu261";
 import DomandeCancellato from "./DomandeCancellato";
+import DichiaraCaso from "./DichiaraCaso";
 import CardCondivisione from "./CardCondivisione";
 import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
 
@@ -68,7 +70,7 @@ function riempi(modello: string, valori: Record<string, string>): string {
 /** 200 → "3h20". */
 function ritardoUmano(minuti: number): string {
   const m = Math.abs(Math.round(minuti));
-  return `${Math.floor(m / 60)}h${String(m % 60).padStart(2, "0")}`;
+  return formattaMinuti(m);
 }
 
 /** "2026-08-06" → "6 agosto 2026". */
@@ -639,6 +641,19 @@ function Incerto({ dati }: { dati: DatiVerifica }) {
         </Anima>
       )}
 
+      {/* Anche sull'incerto: lasciato a terra o coincidenza persa si
+          dichiarano, il tracciamento non li vede. */}
+      {!chiuso && !cancellato && (
+        <Anima ritardo={0.15}>
+          <DichiaraCaso
+            volo={dati.volo}
+            dataVolo={dati.dataVolo}
+            idVerifica={dati.idVerifica}
+            demo={dati.demo}
+          />
+        </Anima>
+      )}
+
       {/* Niente vendita sul giallo, MAI. Solo l'avviso se il dato si
           sblocca: a caso chiuso non serve più. */}
       {!chiuso && (
@@ -700,6 +715,17 @@ function NonIdoneo({ dati }: { dati: DatiVerifica }) {
             {COPY.retroattivo.suggerimento}
           </p>
         </Card>
+      </Anima>
+
+      {/* Il "no" del tracciamento non chiude i casi che gli archivi non
+          vedono: negato imbarco e coincidenza persa si dichiarano qui. */}
+      <Anima ritardo={0.14}>
+        <DichiaraCaso
+          volo={dati.volo}
+          dataVolo={dati.dataVolo}
+          idVerifica={dati.idVerifica}
+          demo={dati.demo}
+        />
       </Anima>
 
       <Anima ritardo={0.16}>

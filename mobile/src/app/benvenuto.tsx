@@ -204,7 +204,7 @@ export default function SchermataBenvenuto() {
             },
           ]}
         >
-          Rivo<Text style={stili.nomeMenta}>glio</Text>
+          Rivo<Text style={stili.nomeMenta}>lio</Text>
         </Animated.Text>
 
         <Animated.Text

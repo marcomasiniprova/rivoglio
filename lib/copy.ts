@@ -268,7 +268,7 @@ export const COPY = {
     /**
      * La vetrina di COME appare un verdetto. È un caso costruito, SEMPRE
      * marcato con comune.demo (regola CLAUDE.md #3). I conti tornano con
-     * lib/regole/eu261.ts: dalle 22:55 alle 02:47 passano 3h52 (232 minuti,
+     * lib/regole/eu261.ts: dalle 22:55 alle 02:47 passano 3 h e 52 min (232 minuti,
      * sopra la soglia dei 180) e fino a 1.500 km la fascia è 250€.
      */
     esempio: {
@@ -276,7 +276,7 @@ export const COPY = {
       volo: "Volo di esempio",
       tratta: "tratta fino a 1.500 km",
       occhiello: "Verifica completata",
-      titolo: "Atterrato con 3h52 di ritardo.",
+      titolo: "Atterrato con 3 h e 52 min di ritardo.",
       previstoEtichetta: "Arrivo previsto",
       previsto: "22:55",
       effettivoEtichetta: "Arrivo effettivo",
@@ -511,14 +511,16 @@ export const COPY = {
         compagnie: "ITA Airways, Aeroitalia",
         finestra: "2 anni",
         nota: "termine di legge italiano (art. 949 cod. nav.)",
-        /* Serve alla barra del tempo: tutte sulla stessa scala 0-6 anni. */
+        /* Servono al cielo della card: scala 0-6 anni e bandierina. */
         anniStimati: 2,
+        paese: "it" as const,
       },
       {
         compagnie: "Ryanair, Wizz Air e altri vettori esteri",
         finestra: "5-6 anni",
         nota: "stima: dipende dal paese della compagnia",
         anniStimati: 5.5,
+        paese: "eu" as const,
       },
     ],
     /** Le due estremità della barra del tempo. */
@@ -688,6 +690,71 @@ export const COPY = {
   },
 
   risultato: {
+    /**
+     * I CASI CHE GLI ARCHIVI NON VEDONO: negato imbarco e coincidenza.
+     * Un volo partito in orario non dice niente su chi è rimasto al
+     * gate: si apre da un invito discreto sotto il verdetto.
+     */
+    dichiara: {
+      invito: "Ti hanno lasciato a terra o hai perso una coincidenza?",
+      invitoSotto:
+        "Sono casi che gli archivi di volo non vedono: il tuo aereo può risultare in orario. Dimmelo tu e ti dico se ti spetta qualcosa.",
+      negato: {
+        scheda: "Mi hanno lasciato a terra",
+        titolo: "Negato imbarco",
+        presenza: {
+          domanda: "Ti sei presentato all'imbarco in orario, con prenotazione confermata?",
+          voci: [
+            { valore: "inOrario", testo: "Sì, ero in orario al gate" },
+            { valore: "tardi", testo: "No, sono arrivato oltre l'orario d'imbarco" },
+            { valore: "nonRicordo", testo: "Non ne sono sicuro" },
+          ],
+        },
+        volonta: {
+          domanda: "Com'è andata al gate?",
+          voci: [
+            {
+              valore: "involontario",
+              testo: "Mi hanno lasciato a terra contro la mia volontà (overbooking o simili)",
+            },
+            {
+              valore: "volontario",
+              testo: "Ho ceduto io il posto in cambio di benefici (voucher, riprotezione)",
+            },
+          ],
+        },
+      },
+      coincidenza: {
+        scheda: "Ho perso una coincidenza",
+        titolo: "Coincidenza persa",
+        unica: {
+          domanda: "I voli erano sulla stessa prenotazione?",
+          aiuto: "Guarda l'email di conferma: un solo codice di prenotazione per tutti i voli = sì.",
+          voci: [
+            { valore: "si", testo: "Sì, un'unica prenotazione" },
+            { valore: "no", testo: "No, biglietti comprati separatamente" },
+            { valore: "nonSo", testo: "Non lo so" },
+          ],
+        },
+        destinazione: {
+          domanda: "Qual era la destinazione finale del viaggio?",
+          segnaposto: "Città o aeroporto",
+        },
+        ritardo: {
+          domanda: "Con quanto ritardo sei arrivato alla destinazione finale?",
+          voci: [
+            { valore: "meno3", testo: "Meno di 3 ore" },
+            { valore: "fra3e4", testo: "Fra 3 e 4 ore" },
+            { valore: "oltre4", testo: "Più di 4 ore" },
+            { valore: "nonRicordo", testo: "Non me lo ricordo" },
+          ],
+        },
+      },
+      bottone: "Vedi il verdetto",
+      nota: "Le risposte restano sulla tua verifica come dichiarazione. Il check resta gratuito.",
+      notaDemo: "Esempio dimostrativo: il verdetto qui non vale per una pratica vera.",
+    },
+
     /**
      * LE DUE DOMANDE SUI VOLI CANCELLATI.
      *

@@ -83,7 +83,7 @@ export function vestito({
   <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;">
 
     <tr><td style="padding:0 4px 20px;">
-      <a href="${sito}" style="text-decoration:none;font-family:${FONT};font-size:19px;font-weight:700;letter-spacing:-0.4px;color:${C.inchiostro};">Rivo<span style="color:${C.verde};">glio</span></a>
+      <a href="${sito}" style="text-decoration:none;font-family:${FONT};font-size:19px;font-weight:700;letter-spacing:-0.4px;color:${C.inchiostro};">Rivo<span style="color:${C.verde};">lio</span></a>
       <span style="font-family:${FONT};font-size:13px;color:${C.fumo2};margin-left:10px;">Lo scanner dei rimborsi</span>
     </td></tr>
 
