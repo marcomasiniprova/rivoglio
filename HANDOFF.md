@@ -1,37 +1,49 @@
-# HANDOFF — per la prossima sessione
+# HANDOFF — fine giro #40 (9/08/2026)
 
-*Aggiornato: 2026-08-08, notte fonda (giro #31 CHIUSO per intero).*
+## Stato
 
-## Il giro #31 è finito: tutti i 6 pezzi del vecchio handoff
-1. Scena di scansione NATIVA nell'app (`ScenaScan.tsx`): identica al
-   sito, provata end-to-end su Expo web (ZZ250 → 15s di scena → verdetto
-   da sola). Tratta su riga sua, data intera, timbro a molla.
-2. Sezione prezzi = due carte d'imbarco + striscia del check gratis.
-3. Messaggi cancellato/dirottato riscritti (regole 2026.08.4).
-4. `/guida-bagagli` (Montreal, solo guida): footer + sitemap.
-5. Email benvenuto account riscritta per Rivolio (era ANCORA quella
-   dei crediti viaggi e partiva a ogni registrazione). T+0..T+60 rilette:
-   già giuste.
-6. QA visivo (app, prezzi 1440/390, guida 1440/390): zero errori
-   console, zero scroll orizzontale. Lint mobile risanato (era rosso
-   dal giro della welcome: `useValoreAnimato` + import statici .png).
-   Anteprima `/anteprima-app` rigenerata con la scena nuova.
+Il blog **Il Tabellone** è costruito, provato e spinto su
+`claude/saas-app-repo-analysis-ghehqa` (commit `f570467`).
+`npm run verify`: **538 prove verdi**, le 2 rosse sono le solite
+dell'Osservatorio che nella sandbox non raggiunge Supabase.
+Eval del motore: **45 su 45, falsi positivi 0**.
 
-## Trappole nuove scritte in STATO ("Da non rifare")
-- Metro nella sandbox NON vede gli edit: riavviare Expo con `--clear`.
-- Il giro visivo si fa con script Node su `node_modules/playwright`
-  (il MCP Playwright vuole un Chrome che qui non c'è).
-- MAI `npm run ... | tail`: la pipe maschera l'exit code (pagato).
+## Decisioni prese in questo giro (col popup)
 
-## Cosa resta a Valerio (invariato + 2 novità)
-1. Risposta di Polar alla mail; poi prodotti + checkout link + segreto.
-2. Dopo il deploy automatico di questo push: riprovare la newsletter
-   (deve arrivare a valerio@artecai.it) e aprire /anteprima-app per
-   VEDERE la scena di scansione nell'app.
-3. Il resto è in STATO ("Serve Valerio") e ARRETRATI ("Tocca a Valerio").
+1. Il blog si chiama **Il Tabellone**, vive su `/tabellone`.
+2. Le copertine sono **illustrazioni nostre in SVG**, più i dieci prompt
+   consegnati in `COPERTINE.md` per sostituirle con le foto.
+3. Gli articoli sono firmati **"La redazione di Rivolio"**.
+4. Le **pagine evento sono ferme**: Valerio ha scritto "non ho ancora
+   capito come si intreccia col blog e se sono la stessa cosa o no".
+   Vanno rispiegate e riproposte al prossimo giro (ARRETRATI, voce A).
 
-## Prossimi pezzi di codice (da decidere con Valerio, popup)
-- Spegnere il ramo email/alert del prodotto viaggi (voce in ARRETRATI).
-- Golden set oltre i 32 casi coi voli veri.
-- Eventuale verticale bagagli VENDITA (settembre, da documento): oggi
-  esiste solo la guida, per scelta.
+## File toccati
+
+- **Nuovi**: `app/tabellone/**` (indice, articolo, argomento, archivio,
+  feed RSS, immagine social), `components/tabellone/**` (14 componenti),
+  `lib/tabellone/**` (tipi, indice, seo, i 10 articoli in `pezzi/`),
+  `prove/tabellone.spec.ts`, `COPERTINE.md`.
+- **Modificati**: `lib/regole/eu261.ts` e `lib/regole/casi-oro.ts` (il
+  falso positivo sull'importo, vedi sotto), `app/globals.css` (la carta
+  del blog, la tipografia dell'articolo, la cornice sfalsata),
+  `app/sitemap.ts`, `lib/copy.ts` (Tabellone in nav e footer),
+  `public/llms.txt`, `STATO.md`, `PIANO.md`, `ARRETRATI.md`.
+
+## La cosa da non perdere di vista
+
+Scrivendo l'articolo pilastro è saltato fuori che **il motore prometteva
+600 euro dove il Regolamento ne dà 400**: l'art. 7 lett. b) tiene a 400
+tutte le tratte intracomunitarie sopra i 1500 km, per quanto lunghe.
+Chiuso, regole alla **2026.08.6**, due casi d'oro nuovi. Se qualcuno tocca
+le fasce in `eu261.ts`, quella riga (`intraUe`) non si tocca.
+
+## Cosa resta
+
+Tutto in `ARRETRATI.md`, voci da A a F. Le due che servono davvero:
+
+- **A**: rispiegare le pagine evento e riproporle.
+- **B e C**: le foto di copertina (prompt pronti) e la riverifica delle
+  fonti degli articoli dal PC di Valerio. Da qui la rete è chiusa e
+  nessuna delle pagine citate si apre: gli indirizzi sono reali, i numeri
+  vengono dagli estratti dei motori di ricerca.
