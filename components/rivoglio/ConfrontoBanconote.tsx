@@ -76,13 +76,14 @@ function Banconota({ via, nostra }: { via: boolean; nostra: boolean }) {
 /** Il numero che sale contando: un conto vero, non un'etichetta ferma. */
 function Contatore({ a, parti }: { a: number; parti: boolean }) {
   const fermo = useReducedMotion();
-  const [n, setN] = useState(fermo ? a : 0);
+  const [n, setN] = useState(0);
+  /* Con le animazioni ridotte il numero è già quello finale: si decide
+     in render, non con un setState dentro l'effetto (quello innescava
+     un secondo giro di render per niente). */
+  const mostrato = fermo ? a : n;
 
   useEffect(() => {
-    if (!parti || fermo) {
-      if (fermo) setN(a);
-      return;
-    }
+    if (!parti || fermo) return;
     let vivo = true;
     const durata = 900;
     const inizio = performance.now();
@@ -100,7 +101,7 @@ function Contatore({ a, parti }: { a: number; parti: boolean }) {
     };
   }, [a, parti, fermo]);
 
-  return <>{euro(Math.round(n * 100) / 100)}</>;
+  return <>{euro(Math.round(mostrato * 100) / 100)}</>;
 }
 
 function Riga({

@@ -404,13 +404,32 @@ export const COPY = {
         compagnie: "ITA Airways, Aeroitalia",
         finestra: "2 anni",
         nota: "termine di legge italiano (art. 949 cod. nav.)",
+        /* Serve alla barra del tempo: tutte sulla stessa scala 0-6 anni. */
+        anniStimati: 2,
       },
       {
         compagnie: "Ryanair, Wizz Air e altri vettori esteri",
         finestra: "5-6 anni",
         nota: "stima: dipende dal paese della compagnia",
+        anniStimati: 5.5,
       },
     ],
+    /** Le due estremità della barra del tempo. */
+    scalaOggi: "oggi · la tacca è il nostro archivio (12 mesi)",
+    scalaFine: "6 anni",
+    /** La finta casella email che si cerca da sola. */
+    posta: {
+      casella: "La tua casella email",
+      esempio: "Esempio",
+      ricerca: "conferma volo",
+      mittente: "La tua compagnia aerea",
+      oggettoPrima: "Prenotazione confermata, volo ",
+      numero: "FR 8321",
+      oggettoMezzo: " del ",
+      data: "12 marzo",
+      spiegazione:
+        "Numero e data sono lì dentro, nell'email che ti hanno mandato quando hai prenotato. Non serve altro: il check parte da questi due dati.",
+    },
     avvertenza:
       "La scadenza è una finestra stimata, dipende dalla compagnia: la dichiariamo caso per caso dentro la tua verifica. Il check online oggi copre i voli degli ultimi 12 mesi.",
     suggerimento:
