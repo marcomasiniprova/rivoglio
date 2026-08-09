@@ -59,6 +59,11 @@ type RigaVolo = {
   /** NULL = riga scritta prima della regola "senza Live niente vendita". */
   orario_verificato: boolean | null;
   vettore_da_determinare: boolean | null;
+  /** NULL = riga scritta prima del cancello territoriale (colonne del 14/08). */
+  partenza_paese?: string | null;
+  arrivo_paese?: string | null;
+  partenza_icao?: string | null;
+  arrivo_icao?: string | null;
 };
 
 function fattoDaRiga(riga: RigaVolo): FattoVolo {
@@ -71,6 +76,10 @@ function fattoDaRiga(riga: RigaVolo): FattoVolo {
     partenzaCitta: riga.partenza_citta,
     arrivoIata: riga.arrivo_iata,
     arrivoCitta: riga.arrivo_citta,
+    partenzaPaese: riga.partenza_paese ?? null,
+    arrivoPaese: riga.arrivo_paese ?? null,
+    partenzaIcao: riga.partenza_icao ?? null,
+    arrivoIcao: riga.arrivo_icao ?? null,
     arrivoPrevistoUtc: riga.arrivo_previsto_utc,
     arrivoEffettivoUtc: riga.arrivo_effettivo_utc,
     stato: riga.stato,
@@ -80,6 +89,53 @@ function fattoDaRiga(riga: RigaVolo): FattoVolo {
     vettoreDaDeterminare: riga.vettore_da_determinare ?? undefined,
     fonte: riga.fonte,
   };
+}
+
+/**
+ * LA RIGA IN CACHE VALE SOLO SE SA RISPONDERE ALLA PRIMA DOMANDA DEL
+ * MOTORE, cioè "da dove parte e dove arriva questo aereo".
+ *
+ * Perché esiste questo controllo: il cancello territoriale è nato il
+ * 9/08, la cache è nata il 7/08. Tutte le righe scritte in mezzo non
+ * hanno gli scali, e senza scali il verdetto è "non riconosciamo
+ * l'aeroporto di partenza" PER SEMPRE: la cache è una fotografia, e una
+ * fotografia sbagliata non si corregge da sola. È il caso di FR4001 del
+ * 6 agosto, il volo che ha provato Valerio.
+ *
+ * Non è un problema di ieri: vale ogni volta che il motore impara a
+ * usare un dato nuovo. Da qui in avanti una riga che non porta quel dato
+ * viene scartata e il volo si richiede al fornitore, che costa una
+ * chiamata e chiude il caso, invece di zero chiamate e un utente perso.
+ */
+export function rigaUsabile(riga: RigaVolo): boolean {
+  const scaloNoto = (iata: string | null, paese?: string | null, icao?: string | null) =>
+    Boolean(iata?.trim() || paese?.trim() || icao?.trim());
+
+  if (!scaloNoto(riga.partenza_iata, riga.partenza_paese, riga.partenza_icao)) return false;
+  if (!scaloNoto(riga.arrivo_iata, riga.arrivo_paese, riga.arrivo_icao)) return false;
+
+  /* La distanza decide l'importo. Un volo atterrato senza distanza in
+     cache dà "non conosciamo la distanza della tratta", che è un altro
+     incerto evitabile: il fornitore la sa. Sui cancellati e sui dirottati
+     non serve: quei verdetti non passano mai dalle fasce. */
+  if (riga.stato === "atterrato" && !(riga.km_ortodromica && riga.km_ortodromica > 0)) return false;
+
+  return true;
+}
+
+const COLONNE_CACHE_BASE =
+  "id, volo_iata, data_locale, vettore_operativo, vettore_marketing, partenza_iata, partenza_citta, arrivo_iata, arrivo_citta, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, orario_verificato, vettore_da_determinare";
+const COLONNE_CACHE = `${COLONNE_CACHE_BASE}, partenza_paese, arrivo_paese, partenza_icao, arrivo_icao`;
+
+/**
+ * Postgres dice "column x does not exist" (42703) quando la migrazione non
+ * è ancora passata. Riconoscerlo serve a NON spegnere la cache in quella
+ * finestra: senza cache ogni passeggero dello stesso volo costa una
+ * chiamata al fornitore.
+ */
+function colonnaMancante(messaggio: string | undefined): boolean {
+  const m = (messaggio ?? "").toLowerCase();
+  return m.includes("does not exist") || m.includes("could not find") || m.includes("schema cache");
 }
 
 /**
@@ -108,14 +164,22 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
   let voloId: string | null = null;
   if (sb) {
     try {
-      const { data: riga } = await sb
-        .from("voli")
-        .select(
-          "id, volo_iata, data_locale, vettore_operativo, vettore_marketing, partenza_iata, partenza_citta, arrivo_iata, arrivo_citta, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, orario_verificato, vettore_da_determinare",
-        )
-        .eq("volo_iata", volo.valore)
-        .eq("data_locale", data.valore)
-        .maybeSingle<RigaVolo>();
+      const leggi = (colonne: string) =>
+        sb
+          .from("voli")
+          .select(colonne)
+          .eq("volo_iata", volo.valore)
+          .eq("data_locale", data.valore)
+          .maybeSingle<RigaVolo>();
+
+      const primoGiro = await leggi(COLONNE_CACHE);
+      /* Le quattro colonne del paese e dell'ICAO sono del 14/08: finché la
+         migrazione non è applicata sul database vero, chiederle fa fallire
+         tutta la lettura. Meglio riprovare senza che perdere la cache. */
+      const riga =
+        primoGiro.error && colonnaMancante(primoGiro.error.message)
+          ? (await leggi(COLONNE_CACHE_BASE)).data
+          : primoGiro.data;
       /* Uno "sconosciuto" in cache non fa fede: magari il volo è atterrato
          dopo l'ultima chiamata. E un "atterrato" senza il tracciamento
          verificato (o scritto prima che la colonna esistesse) si richiede:
@@ -123,7 +187,8 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
       if (
         riga &&
         riga.stato !== "sconosciuto" &&
-        !(riga.stato === "atterrato" && riga.orario_verificato !== true)
+        !(riga.stato === "atterrato" && riga.orario_verificato !== true) &&
+        rigaUsabile(riga)
       ) {
         fatto = fattoDaRiga(riga);
         voloId = riga.id;
@@ -166,33 +231,49 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
 
       if (sb) {
         try {
-          const { data: rigaNuova, error } = await sb
-            .from("voli")
-            .upsert(
-              {
-                volo_iata: fatto.voloIata,
-                data_locale: fatto.dataLocale,
-                vettore_operativo: fatto.vettoreOperativo,
-                vettore_marketing: fatto.vettoreMarketing ?? null,
-                partenza_iata: fatto.partenzaIata ?? null,
-                partenza_citta: fatto.partenzaCitta ?? null,
-                arrivo_iata: fatto.arrivoIata ?? null,
-                arrivo_citta: fatto.arrivoCitta ?? null,
-                arrivo_previsto_utc: fatto.arrivoPrevistoUtc,
-                arrivo_effettivo_utc: fatto.arrivoEffettivoUtc,
-                stato: fatto.stato,
-                km_ortodromica: fatto.kmOrtodromica,
-                fonte: fatto.fonte,
-                fonti_discordanti: fatto.fontiDiscordanti ?? false,
-                orario_verificato: fatto.orarioVerificato ?? null,
-                vettore_da_determinare: fatto.vettoreDaDeterminare ?? false,
-                payload_grezzo: fatto.payloadGrezzo ?? null,
-                recuperato_il: new Date().toISOString(),
-              },
-              { onConflict: "volo_iata,data_locale" },
-            )
-            .select("id")
-            .single();
+          const base = {
+            volo_iata: fatto.voloIata,
+            data_locale: fatto.dataLocale,
+            vettore_operativo: fatto.vettoreOperativo,
+            vettore_marketing: fatto.vettoreMarketing ?? null,
+            partenza_iata: fatto.partenzaIata ?? null,
+            partenza_citta: fatto.partenzaCitta ?? null,
+            arrivo_iata: fatto.arrivoIata ?? null,
+            arrivo_citta: fatto.arrivoCitta ?? null,
+            arrivo_previsto_utc: fatto.arrivoPrevistoUtc,
+            arrivo_effettivo_utc: fatto.arrivoEffettivoUtc,
+            stato: fatto.stato,
+            km_ortodromica: fatto.kmOrtodromica,
+            fonte: fatto.fonte,
+            fonti_discordanti: fatto.fontiDiscordanti ?? false,
+            orario_verificato: fatto.orarioVerificato ?? null,
+            vettore_da_determinare: fatto.vettoreDaDeterminare ?? false,
+            payload_grezzo: fatto.payloadGrezzo ?? null,
+            recuperato_il: new Date().toISOString(),
+          };
+          /* Il paese e l'ICAO degli scali si SALVANO, non solo si leggono:
+             se restassero fuori dalla cache, il secondo passeggero dello
+             stesso volo ripartirebbe senza il dato che ha appena chiuso il
+             caso al primo. */
+          const conScali = {
+            ...base,
+            partenza_paese: fatto.partenzaPaese ?? null,
+            arrivo_paese: fatto.arrivoPaese ?? null,
+            partenza_icao: fatto.partenzaIcao ?? null,
+            arrivo_icao: fatto.arrivoIcao ?? null,
+          };
+
+          const scrivi = (riga: Record<string, unknown>) =>
+            sb
+              .from("voli")
+              .upsert(riga, { onConflict: "volo_iata,data_locale" })
+              .select("id")
+              .single();
+
+          let { data: rigaNuova, error } = await scrivi(conScali);
+          if (error && colonnaMancante(error.message)) {
+            ({ data: rigaNuova, error } = await scrivi(base));
+          }
           if (error) console.warn("[verifica] cache non scrivibile:", error.message);
           voloId = rigaNuova?.id ?? null;
         } catch (e) {

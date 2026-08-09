@@ -804,6 +804,29 @@ export const COPY = {
         "Da qui puoi aprire la pratica: prepariamo la lettera con i riferimenti di legge e il canale reclami della compagnia. Il reclamo lo invii tu e la compensazione arriva a te intera.",
     },
 
+    /**
+     * CODESHARE: il numero è di una compagnia, l'aereo era di un'altra.
+     * Una parola come "codeshare" o "vettore operativo" qui non compare:
+     * si chiede quello che la persona ha visto con i suoi occhi.
+     */
+    operativo: {
+      occhiello: "Una domanda sola",
+      titolo: "Di che compagnia era l'aereo?",
+      testo:
+        "Questo biglietto è venduto da una compagnia, ma il volo lo fa un'altra. Il reclamo va a chi l'ha fatto volare: se sbagliamo destinatario, la risposta è un no e basta.",
+      aiuto:
+        "Guarda la carta d'imbarco: di solito c'è scritto \"operato da\". Oppure ricorda il nome sulla fiancata dell'aereo o sulla divisa dell'equipaggio.",
+      etichetta: "La compagnia che ha fatto il volo",
+      segnaposto: "Scrivi il nome, per esempio Delta",
+      nessuna: "Nessuna compagnia con questo nome fra quelle che conosciamo.",
+      bottone: "Vedi il verdetto",
+      nota: "La tua risposta resta sulla verifica. Il check resta gratuito.",
+      notaDemo: "Esempio dimostrativo: il verdetto qui non vale per una pratica vera.",
+      nonSo: "Non me lo ricordo",
+      nonSoTesto:
+        "Va bene lo stesso: il caso resta incerto e non paghi niente. Se ritrovi la carta d'imbarco, torna e rifai il check.",
+    },
+
     /** IDONEO: fatto oggettivo + fascia + cose da verificare. MAI "hai diritto a". */
     idoneo: {
       occhiello: "Verifica completata",

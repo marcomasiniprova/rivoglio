@@ -31,8 +31,9 @@
  */
 import aeroporti from "@/lib/dati/aeroporti.json";
 import { compagniaPerVettore } from "@/lib/lettera/compagnie";
+import { paeseVettore } from "./vettori";
 
-type RigaArchivio = { paese: string };
+type RigaArchivio = { paese: string; iso?: string | null };
 const SCALI = aeroporti as Record<string, RigaArchivio | undefined>;
 
 /**
@@ -61,9 +62,16 @@ export function vettoreConLicenzaUE(
   vettoreONumero: string | null | undefined,
 ): boolean | null {
   const c = compagniaPerVettore(vettoreONumero);
-  /* Compagnia non in tabella, o in tabella ma senza paese: non si indovina. */
-  if (!c?.paese) return null;
-  return LICENZA_UE.has(c.paese);
+  /* Prima le compagnie con la scheda completa (canale reclami e indirizzo
+     verificati), poi quelle che conosciamo solo di nome e paese. */
+  const paese = c?.paese ?? paeseVettore(vettoreONumero);
+  /* Compagnia che non conosciamo: non si indovina, il caso resta incerto. */
+  if (!paese) return null;
+  /* La Svizzera resta un punto interrogativo dichiarato: applica il
+     Regolamento per accordo bilaterale e non come Stato membro. Dire di
+     no sarebbe una risposta sbagliata data con sicurezza. */
+  if (PAESI_INCERTI_ISO.has(paese)) return null;
+  return LICENZA_UE.has(paese);
 }
 
 /**
@@ -210,6 +218,16 @@ export function zonaDiScalo(
   // 2. il nostro archivio, per sigla IATA
   const sigla = (scalo.iata ?? "").trim().toUpperCase();
   const riga = sigla ? SCALI[sigla] : undefined;
+  /* Prima il codice, poi il nome. Il codice è quello che l'archivio si
+     porta dietro dalla fonte, il nome è come lo scriviamo noi: se un
+     aggiornamento cambiasse "Czech Republic" in "Czechia", il confronto
+     per nome smetterebbe di funzionare in silenzio e i voli da Praga
+     uscirebbero incerti. Il codice non ha grafie. */
+  const isoArchivio = (riga?.iso ?? "").trim().toUpperCase();
+  if (/^[A-Z]{2}$/.test(isoArchivio)) {
+    if (PAESI_INCERTI_ISO.has(isoArchivio)) return "sconosciuto";
+    return SPAZIO_UE_ISO.has(isoArchivio) ? "ue" : "terzo";
+  }
   if (riga?.paese) {
     if (PAESI_INCERTI_NOME.has(riga.paese)) return "sconosciuto";
     return SPAZIO_UE.has(riga.paese) ? "ue" : "terzo";

@@ -1,6 +1,9 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #43: IL CANCELLO TERRITORIALE LASCIAVA SOLDI
+**Aggiornato:** 2026-08-09 (giro #44: IL MOTORE CHE NON LASCIA PIÙ NESSUNO
+SENZA RISPOSTA (la cache che congelava gli incerti, gli aeroporti che si
+aggiornano da soli, i vettori extra UE, il codeshare che si chiede) ·
+giro #43: IL CANCELLO TERRITORIALE LASCIAVA SOLDI
 SUL TAVOLO, chiuso · giro #42: LE FOTO VERE sulle copertine del blog ·
 giro #41: LE PAGINE EVENTO e l'autopilot degli
 scioperi · giro #40: IL TABELLONE, il blog · più un
@@ -39,6 +42,85 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #44 (9/08 notte): PERCHÉ FR4001 NON FUNZIONAVA, E LE ALTRE TRE
+  COSE CHE LASCIAVANO GENTE SENZA RISPOSTA.**
+  - 🔴 **LA CACHE POTEVA CONGELARE UN "INCERTO" PER SEMPRE.** È questo il
+    motivo di FR4001 del 6 agosto, il volo che ha provato Valerio. La riga
+    di quel volo era stata salvata l'8/08, quando il cancello territoriale
+    non esisteva ancora e gli scali non si scrivevano. Da quel momento
+    OGNI check su quel volo, di chiunque, rispondeva "non riconosciamo
+    l'aeroporto di partenza": il fornitore non veniva più interpellato,
+    quindi il dato buono non poteva arrivare. **La cache è una fotografia,
+    e una fotografia sbagliata non si corregge da sola.** Ora
+    `rigaUsabile` (in `lib/voli/verifica.ts`) butta la riga che non sa
+    dire da dove si parte, dove si arriva o quanto è lunga la tratta, e il
+    volo si richiede. Non è un problema di ieri: vale ogni volta che il
+    motore impara a usare un dato nuovo. **8 prove.**
+  - 🔴 **IL PAESE DEGLI SCALI NON VENIVA SALVATO.** Il fornitore lo manda,
+    il motore lo usa, ma in cache non ci finiva: il primo passeggero
+    chiudeva il caso, il secondo ripartiva senza. Quattro colonne nuove su
+    `voli` (`partenza_paese`, `arrivo_paese`, `partenza_icao`,
+    `arrivo_icao`). ⚠️ Finché la migrazione non è applicata, il codice se
+    ne accorge e riprova senza quelle colonne: la cache non si spegne.
+  - **GLI AEROPORTI NON SONO PIÙ FERMI AL 2017.** L'archivio veniva da
+    OpenFlights, che ha smesso di aggiornarsi: ogni scalo nuovo del mondo
+    era una vendita persa. Ora c'è **l'autopilot**
+    (`.github/workflows/aeroporti.yml` + `scripts/aeroporti-aggiorna.mjs`):
+    ogni lunedì alle 5:10 UTC GitHub scarica l'elenco pubblico di
+    OurAirports, lo converte, **lo controlla** e committa solo se è sano.
+    Netlify vede il commit e ricostruisce. Se il file arriva monco o la
+    fonte cambia colonne, il lavoro fallisce e non pubblica niente: meglio
+    un archivio vecchio di una settimana che uno rotto in produzione.
+    ⚠️ **Da qui non l'ho potuto provare sul dato vero**: il proxy risponde
+    403 a OurAirports. Il primo giro lo fa GitHub (in ARRETRATI come
+    forzarlo a mano).
+  - **OGNI SCALO HA IL SUO CODICE PAESE** (6.068 su 6.073; i 5 senza sono
+    le vecchie Antille Olandesi, uno Stato che non esiste più dal 2010).
+    Il cancello territoriale adesso legge il CODICE, non la grafia del
+    nome: se un aggiornamento scrivesse "Czechia" al posto di "Czech
+    Republic", il confronto per nome smetterebbe di funzionare in silenzio
+    e i voli da Praga uscirebbero incerti.
+    ⚠️ **Una prova ha trovato un errore vero mentre lo costruivo:** la
+    tabella dei paesi di Node risponde "Germany" anche al codice della
+    Germania Est (DD, ritirato), e girando l'alfabeto in ordine DD si era
+    preso il posto di DE. Berlino Brandeburgo si era ritrovata in un paese
+    che non è nell'Unione. Chiuso confrontando ogni codice con la sua
+    forma canonica.
+  - **I GRANDI VETTORI EXTRA UE SI RICONOSCONO** (`lib/regole/vettori.ts`,
+    55 compagnie con nome e paese della licenza). Prima un New York → Roma
+    con Delta usciva incerto: non perché il caso fosse dubbio, ma perché
+    il codice non sapeva che Delta è americana. Ora esce un no pulito.
+    Stanno FUORI da `compagnie.ts` di proposito: quel file dichiara canali
+    reclamo verificati a mano, e per queste non li abbiamo.
+    ⚠️ **La Svizzera resta incerta di proposito**, anche dal lato
+    compagnia: applica il Regolamento per accordo bilaterale e senza una
+    fonte verificata non ci sbilanciamo. Serve Valerio (ARRETRATI G).
+  - **IL CODESHARE SI CHIUDE CON UNA DOMANDA.** Quando il fornitore non sa
+    chi ha operato il volo, il reclamo rischia di partire verso la
+    compagnia sbagliata e il motore si ferma. Ma quella risposta l'utente
+    ce l'ha sotto gli occhi, sulla carta d'imbarco. Ora gliela chiediamo:
+    "Di che compagnia era l'aereo?", con la ricerca per nome sulle 55+20
+    compagnie che conosciamo. **La parola "codeshare" all'utente non
+    compare mai.** La scelta è chiusa, il verdetto resta del server
+    (`lib/regole/operativo.ts` + `/api/verifica/operativo`).
+  - **UNA ETICHETTA DEL GOLDEN SET CAMBIATA, la seconda volta in assoluto.**
+    Il caso Delta New York → Roma era etichettato incerto: ma quella
+    etichetta fotografava un limite del nostro codice, non il Regolamento.
+    Il verso del cambiamento è sicuro: da "non lo so" a "no", mai a "sì".
+    Golden set da 52 a **55 casi**, **55 su 55, falsi positivi 0**.
+  - **`MOTORE.md`: di cosa è fatto il motore, spiegato senza gergo.**
+    Cinque pezzi, uno solo usa l'AI, Python non c'è. Dentro c'è anche la
+    risposta alla domanda di Valerio: **sì, sito e app usano lo stesso
+    Supabase, ed è uno solo.** Il check l'app non lo calcola, lo chiede al
+    sito: il motore è uno, e se cambia una regola cambia per tutti e due
+    nello stesso istante.
+  - **`supabase/DA-APPLICARE.sql`: le quattro migrazioni in un file solo**,
+    con le istruzioni passo passo e il controllo finale. Si può rilanciare
+    quante volte si vuole. ⚠️ **Da qui non si applica**: l'egress blocca
+    `*.supabase.co` e il connettore Composio, che Valerio ha indicato, non
+    si può autorizzare in una sessione senza schermo (serve il login).
+  - Prove: **682 verdi** (restano le 2 note dell'Osservatorio). Le nuove
+    sono 41: cache, archivio scali, codeshare e licenze.
 - **GIRO #43 (9/08 notte): «NON RICONOSCIAMO L'AEROPORTO DI PARTENZA» ERA
   UN BUCO NOSTRO, NON UN LIMITE DEI DATI.**
   - Valerio ha fatto un check e gli è uscito «Non riconosciamo l'aeroporto
@@ -707,7 +789,7 @@ social rifatta (era rimasta al prodotto viaggi).
   firma Standard Webhooks provata su 10 casi); lettera deterministica coi
   canali reclamo verificati di 10 compagnie; email T+0/2/15/30/60; garanzia
   90 giorni; tracker web; `/admin` = conferma umana (shadow mode acceso).
-- **Prove**: web 320/322 Playwright (9/08, dopo il giro #34: dentro ci sono le 14 nuove sui voli cancellati). Le 2 rosse sono lo stesso
+- **Prove**: web 682/684 Playwright (9/08, dopo il giro #44: dentro ci sono le 41 nuove su cache, archivio scali, codeshare e licenze). Storico (giro #34: dentro ci sono le 14 nuove sui voli cancellati). Le 2 rosse sono lo stesso
   test su desktop e telefono, "il modulo dell'Osservatorio accetta
   un'email valida e conferma": la sandbox non arriva a Supabase (`Host
   not in allowlist`), quindi il salvataggio dell'iscritto risponde 500 e
@@ -820,6 +902,15 @@ social rifatta (era rimasta al prodotto viaggi).
   (Android Studio + emulatore, oppure `expo start --web` in 2 minuti).
 
 ## Serve Valerio (in ordine)
+0-bis. **LE MIGRAZIONI DEL DATABASE, tutte insieme, 2 minuti.** Apri
+   supabase.com/dashboard → il progetto di Rivolio → **SQL Editor** →
+   **New query**, incolla tutto `supabase/DA-APPLICARE.sql` e premi Run.
+   Dentro ci sono le quattro cose che mancano (doppio opt-in, cancellati,
+   negato imbarco, paese degli scali). Si può rilanciare quante volte
+   vuoi: non cancella niente. Deve rispondere "Success. No rows returned".
+   ⚠️ Il connettore Composio che mi hai indicato non si può autorizzare da
+   qui: la sessione non ha uno schermo per il login, quindi il file lo
+   applichi tu.
 0. **DUE COSE SOLO TUE, e sbloccano le email:**
    a. **Il dominio.** Finché `rivolio.it` (o quello che scegli) non è
       verificato su Resend, le email partono SOLO verso
@@ -887,6 +978,21 @@ social rifatta (era rimasta al prodotto viaggi).
 - Le 2 prove dell'Osservatorio falliscono SOLO nella sandbox: l'egress
   blocca *.supabase.co ("Host not in allowlist"). Non è un bug del
   codice e non va "sistemato": sul PC di Valerio e su Netlify passano.
+- **La cache dei voli non è una verità, è una fotografia.** Ogni volta
+  che il motore impara a usare un campo nuovo, le righe salvate prima non
+  ce l'hanno, e senza un controllo continuerebbero a produrre lo stesso
+  verdetto sbagliato per sempre (è stato il caso di FR4001). Il controllo
+  sta in `rigaUsabile`, dentro `lib/voli/verifica.ts`: quando aggiungi un
+  campo che serve al verdetto, aggiungilo anche lì.
+- **Le compagnie extra UE stanno in `lib/regole/vettori.ts`, non in
+  `compagnie.ts`.** Non è disordine: `compagnie.ts` dichiara canali
+  reclamo VERIFICATI uno per uno, e per quelle 55 non li abbiamo.
+  Metterle lì significherebbe dire "verificato" di una cosa non
+  verificata.
+- **In `vettori.ts` non si aggiunge una compagnia "a occhio".** Se scrivi
+  europea una che non lo è, hai fatto un falso positivo, cioè la cosa che
+  la regola numero uno vieta. Nel dubbio si lascia fuori: resta incerto,
+  come prima.
 - Le tabelle viaggi (offerte, ricerche, invii, strutture) sono eredità nel
   DB: non usarle, non cancellarle.
 - Resend in prova spedisce SOLO a valerio@artecai.it finché il dominio non

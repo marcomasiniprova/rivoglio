@@ -43,6 +43,13 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | **Prova delle 2 ore: chiave AeroDataBox su voli reali** | ✅ 8/08: dati solidi con Live fino a 11 mesi (AZ610); oltre 365 giorni il BASIC rifiuta → vetrina onesta sui 12 mesi |
 | Golden set esteso a 500 casi reali (gruppi FB, amici) | ⏳ man mano che passano voli veri |
 | **Art. 7 lett. b): le tratte intracomunitarie lunghe restano a 400€** | ✅ 9/08 giro #40, regole 2026.08.6, golden set 45 su 45 |
+| **Cancello territoriale (art. 3 par. 1): paese dal fornitore, archivio, prefisso ICAO** | ✅ 9/08 giro #43, regole 2026.08.7 |
+| **La cache non può congelare un incerto** (`rigaUsabile`) | ✅ 9/08 giro #44: era il motivo di FR4001 |
+| **Archivio aeroporti che si aggiorna da solo** (OurAirports, ogni lunedì) | ✅ 9/08 giro #44, con freno se il file arriva rotto |
+| **I grandi vettori extra UE riconosciuti** (55 compagnie) | ✅ 9/08 giro #44: New York → Roma con Delta esce un no pulito |
+| **Il codeshare si chiude chiedendo chi ha operato** | ✅ 9/08 giro #44, `/api/verifica/operativo` |
+| **La Svizzera: serve una fonte verificata** | ⏳ resta incerta di proposito, serve Valerio (ARRETRATI G) |
+| Golden set | ✅ **55 casi, 55 su 55, falsi positivi 0** |
 
 ## 1.2 Le superfici web
 
@@ -133,5 +140,11 @@ c'è già e non si paga.
 restano rischi tecnici aperti.** Tutto il resto è esecuzione.
 
 ## Prossimo pezzo di codice
-Deploy dell'ultimo ramo, poi #25 (Osservatorio con statistiche ritardi
-vere). Le cose chieste e non fatte: `ARRETRATI.md`.
+Il motore è chiuso: da qui il collo di bottiglia non è più il prodotto,
+**è il traffico** (dalla ricerca del giro #37: la conversione di lavoro è
+1% al lancio, 2-3% a regime, e il traffico è quello che manca).
+Quindi: deploy, le due cose che sbloccano le email (dominio su Resend e
+migrazioni), poi FASE 2, distribuzione. Il dopo-lettera (sollecito e
+segnalazione all'ente già pronti) è il pezzo di prodotto con più valore
+rimasto: il 52% dei reclami validi viene respinto al primo colpo.
+Le cose chieste e non fatte: `ARRETRATI.md`.

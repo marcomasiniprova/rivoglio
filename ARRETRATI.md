@@ -18,7 +18,10 @@ stato fatto o senza che Valerio dica di lasciar perdere.**
 | C | **Riverificare le fonti degli articoli dal PC di Valerio** | Il proxy di questo ambiente non apre nessuna delle pagine citate (ENAC, AGCM, Eurocontrol, condizioni delle compagnie, Corte di giustizia). Gli indirizzi sono reali e i numeri vengono dagli estratti dei motori di ricerca, ma su un blog che vende trasparenza vanno riletti sulla pagina, con la data di consultazione. |
 | D | **I dettagli della riforma europea del 261** | Il controllo avversariale ha bocciato numero di voti, data del via libera del Consiglio e nuovi termini in mesi: le fonti divergono fra loro. Negli articoli è rimasta la sola frase che regge ("nel luglio 2026 il Parlamento ha adottato la propria posizione respingendo l'innalzamento a 4 ore, e il testo non è ancora applicabile"). Da riaprire sui comunicati ufficiali. |
 | E | **Le percentuali dei portali concorrenti** | Nessun listino di AirHelp, Flightright o Skycop è stato riaperto oggi, quindi negli articoli non compare nessuna loro percentuale. L'unico dato pubblicato è quello che Ryanair scrive sul proprio sito. Per usarne altri servono le pagine tariffe ufficiali, con data e schermata. |
-| F | **La Svizzera e i grandi vettori extra UE fuori tabella** | Restano dal giro #37: i loro casi escono incerti invece che con un sì o un no puliti. |
+| F | ~~La Svizzera e i grandi vettori extra UE fuori tabella~~ | 🟡 **META' CHIUSA il 9/08, giro #44.** I grandi vettori extra UE sono in tabella (`lib/regole/vettori.ts`, 55 compagnie con nome e paese): New York → Roma con Delta adesso esce con un no pulito. **La Svizzera resta incerta di proposito** e serve Valerio: la fonte va aperta dal suo PC (vedi G). |
+| G | **La Svizzera: serve una fonte verificata** | Applica il Regolamento per accordo bilaterale, non come Stato membro. Finché non c'è una fonte letta e citata, i suoi casi restano incerti: chiamarla "paese terzo" darebbe un no secco a casi che probabilmente valgono, chiamarla Unione sarebbe una nostra invenzione. Da riaprire su EUR-Lex e sul sito dell'UFAC svizzero, che da qui non si aprono. |
+| H | **Il primo giro a mano dell'autopilot aeroporti** | Il lavoro settimanale (`.github/workflows/aeroporti.yml`) è scritto e il convertitore è coperto da 17 prove, ma da qui OurAirports non si apre (il proxy risponde 403). Il primo scarico vero lo fa GitHub, e si può forzare a mano: scheda **Actions** del repo → "Aeroporti sempre aggiornati" → **Run workflow**. Se il file arriva rotto, il lavoro fallisce e non committa niente. |
+| I | **Le migrazioni Supabase, tutte in un file** | `supabase/DA-APPLICARE.sql` raccoglie le quattro migrazioni che mancano sul database vero (doppio opt-in, cancellati, negato imbarco, paese degli scali + compagnia dichiarata). Si può rilanciare quante volte si vuole. Da qui non si applica: l'egress blocca `*.supabase.co` e il connettore Composio non si può autorizzare in una sessione senza schermo. |
 
 ---
 
@@ -469,13 +472,17 @@ non altro codice.**
 - **La Svizzera resta fuori dal cancello territoriale, di proposito.**
   Applica il 261 per accordo bilaterale, non come Stato membro, e non ho
   una fonte verificata sotto mano. Oggi quei casi escono incerti (vendita
-  persa, mai un falso positivo). Si chiude con una verifica e una riga in
-  `lib/regole/territorio.ts`.
-- **I grandi vettori extra UE non sono in tabella** (Delta, United,
-  American, Air Canada, LATAM...). In arrivo da un paese terzo il motore
-  risponde incerto invece di un no pulito, perché non sa dire se hanno
-  licenza europea. Non è un errore, è una risposta prudente: si chiude
-  aggiungendoli a `lib/lettera/compagnie.ts` col loro paese.
+  persa, mai un falso positivo). **Ancora aperta al 9/08**: la fonte va
+  aperta dal PC di Valerio, il proxy di qui non ci arriva. Dal giro #44
+  vale anche dal lato compagnia: Swiss in arrivo da un paese terzo non
+  produce né un sì né un no.
+- ~~I grandi vettori extra UE non sono in tabella~~ **CHIUSO il 9/08
+  (giro #44)**: `lib/regole/vettori.ts` porta 55 compagnie extra UE con
+  nome e paese della licenza, e `vettoreConLicenzaUE` le legge dopo le
+  schede complete. Un New York → Roma con Delta esce non idoneo invece
+  che incerto. La tabella sta fuori da `compagnie.ts` di proposito:
+  quel file dichiara canali reclamo VERIFICATI, e per queste compagnie
+  non li abbiamo.
 - **Il dopo-lettera** (dalla ricerca, alto impatto): il 52% dei reclami
   validi viene respinto alla prima risposta. Oggi Rivolio si ferma alla
   lettera. Serve il secondo colpo già pronto e incluso nel prezzo: il

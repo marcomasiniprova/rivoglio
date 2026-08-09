@@ -1,0 +1,51 @@
+# L'ARCHIVIO DEGLI AEROPORTI SI AGGIORNA DA SOLO.
+#
+# Ogni lunedì mattina GitHub scarica l'elenco pubblico di OurAirports, lo
+# converte, lo controlla e, se qualcosa è cambiato, fa un commit. Netlify
+# vede il commit e ricostruisce il sito: nessuno deve fare niente.
+#
+# Perché serve: l'archivio di prima era fermo al 2017 e non aveva
+# Berlino Brandeburgo. Ogni scalo nuovo del mondo era un check che usciva
+# "non riconosciamo l'aeroporto di partenza", cioè una vendita persa.
+#
+# Se il controllo non passa (fonte tagliata, colonne cambiate) il lavoro
+# fallisce e NON committa niente: meglio un archivio vecchio di una
+# settimana che uno rotto in produzione. GitHub manda l'email da solo.
+
+name: Aeroporti sempre aggiornati
+
+on:
+  schedule:
+    # Lunedì alle 5:10 UTC. Prima che si svegli chiunque.
+    - cron: "10 5 * * 1"
+  # Si può lanciare a mano dalla scheda Actions, tasto "Run workflow".
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  aggiorna:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Scarica e converti
+        run: node scripts/aeroporti-aggiorna.mjs
+
+      - name: Committa solo se è cambiato qualcosa
+        run: |
+          if git diff --quiet -- lib/dati/aeroporti.json; then
+            echo "Nessuna novità: non committo."
+            exit 0
+          fi
+          git config user.name "Rivolio"
+          git config user.email "noreply@rivolio.it"
+          quanti=$(node -e "console.log(Object.keys(require('./lib/dati/aeroporti.json')).length)")
+          git add lib/dati/aeroporti.json
+          git commit -m "Aeroporti aggiornati da OurAirports ($quanti scali)"
+          git push

@@ -18,6 +18,7 @@ import { LISTINO_BASE } from "@/lib/prezzi";
 import { formattaMinuti } from "@/lib/regole/eu261";
 import DomandeCancellato from "./DomandeCancellato";
 import DichiaraCaso from "./DichiaraCaso";
+import ChiHaOperato from "./ChiHaOperato";
 import CardCondivisione from "./CardCondivisione";
 import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
 
@@ -610,6 +611,9 @@ function Incerto({ dati }: { dati: DatiVerifica }) {
   /* Un cancellato non è un incerto qualsiasi: gli mancano DUE risposte,
      e quelle le può dare solo chi c'era. Invece di fermarsi, si chiedono. */
   const cancellato = (dati.motivo ?? "").toLowerCase().includes("risulta cancellato");
+  /* Stessa idea per il codeshare: il motore lo dichiara nel motivo, e la
+     risposta che manca ce l'ha l'utente sulla carta d'imbarco. */
+  const codeshare = (dati.motivo ?? "").toLowerCase().includes("codeshare");
   /* Quando le due domande chiudono il caso, il titolo "qui ci fermiamo"
      diventa falso: la pagina se ne accorge e cambia faccia. */
   const [chiuso, setChiuso] = useState<"idoneo" | "incerto" | "non_idoneo" | null>(null);
@@ -651,9 +655,23 @@ function Incerto({ dati }: { dati: DatiVerifica }) {
         </Anima>
       )}
 
+      {/* IL CODESHARE SI CHIUDE con una domanda sola: chi ha fatto volare
+          l'aereo. Senza, il reclamo partirebbe alla compagnia sbagliata. */}
+      {codeshare && !cancellato && (
+        <Anima ritardo={0.14}>
+          <ChiHaOperato
+            volo={dati.volo}
+            dataVolo={dati.dataVolo}
+            idVerifica={dati.idVerifica}
+            demo={dati.demo}
+            avvisa={setChiuso}
+          />
+        </Anima>
+      )}
+
       {/* Anche sull'incerto: lasciato a terra o coincidenza persa si
           dichiarano, il tracciamento non li vede. */}
-      {!chiuso && !cancellato && (
+      {!chiuso && !cancellato && !codeshare && (
         <Anima ritardo={0.15}>
           <DichiaraCaso
             volo={dati.volo}

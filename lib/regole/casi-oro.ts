@@ -202,19 +202,52 @@ export const CASI_ORO: Caso[] = [
   {
     /* Leggendo il Regolamento la risposta giusta sarebbe "non idoneo":
        Delta è statunitense, e in arrivo da un paese terzo il 261 chiede un
-       vettore comunitario. Il motore però risponde INCERTO, ed è corretto
-       che lo faccia: Delta non è fra le compagnie che abbiamo verificato,
-       quindi il codice non sa dire se ha licenza europea e si rifiuta di
-       indovinare. È una vendita persa, non un falso positivo: sbagliamo
-       dalla parte di chi non paga. Si chiude aggiungendo i grandi vettori
-       extra UE alla tabella delle compagnie (segnato in ARRETRATI). */
-    nome: "AMBITO: vettore extra UE non in tabella, in arrivo da paese terzo: incerto (non lo sappiamo)",
+       vettore comunitario: non è coperto, e il "no" è pacifico.
+
+       ⚠️ ETICHETTA CAMBIATA IL 9/08, ed è la seconda volta che succede.
+       Prima diceva "incerto", perché Delta non era in nessuna nostra
+       tabella e il codice non sapeva dire di che paese fosse la licenza.
+       Ma quell'etichetta fotografava un limite nostro, non il
+       Regolamento: che Delta sia americana non è un dubbio giuridico, è
+       un fatto. Con `lib/regole/vettori.ts` il caso si chiude con un no
+       pulito, che è la risposta giusta. Il verso del cambiamento è
+       sicuro: si passa da "non lo so" a "no", mai a "sì". */
+    nome: "AMBITO: Delta da New York a Roma: vettore non europeo, fuori ambito",
     fatto: conRitardo(250, {
       voloIata: "DL104",
       vettoreOperativo: "DL",
       partenzaIata: "JFK",
       arrivoIata: "FCO",
       kmOrtodromica: 6866,
+    }),
+    atteso: { esito: "non_idoneo" },
+  },
+  {
+    /* La compagnia che NON conosciamo resta un incerto, e deve restarlo:
+       inventare la nazionalità di un vettore mai sentito è esattamente il
+       modo di produrre un falso positivo. "QZ" è Indonesia AirAsia, che
+       in tabella non c'è. */
+    nome: "AMBITO: vettore sconosciuto in arrivo da paese terzo: incerto (non lo sappiamo)",
+    fatto: conRitardo(250, {
+      voloIata: "QZ8501",
+      vettoreOperativo: "QZ",
+      partenzaIata: "SIN",
+      arrivoIata: "FCO",
+      kmOrtodromica: 10050,
+    }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    /* La Svizzera resta un punto interrogativo DICHIARATO anche dal lato
+       della compagnia: Swiss in arrivo da un paese terzo non produce né
+       un sì né un no. Serve una fonte verificata, ed è in ARRETRATI. */
+    nome: "AMBITO: Swiss da New York a Zurigo: la Svizzera resta incerta",
+    fatto: conRitardo(250, {
+      voloIata: "LX15",
+      vettoreOperativo: "LX",
+      partenzaIata: "JFK",
+      arrivoIata: "ZRH",
+      kmOrtodromica: 6327,
     }),
     atteso: { esito: "incerto" },
   },

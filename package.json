@@ -13,7 +13,8 @@
     "verify": "npm run build && npm run tipi && npm run lint && npm run prove",
     "eval": "playwright test prove/eu261.spec.ts --project=desktop",
     "asset": "npx -y tsx scripts/gen-asset.ts",
-    "banco": "npx -y tsx scripts/banco-prova.ts"
+    "banco": "npx -y tsx scripts/banco-prova.ts",
+    "aeroporti": "node scripts/aeroporti-aggiorna.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",

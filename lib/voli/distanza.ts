@@ -14,7 +14,16 @@ export type Aeroporto = {
   icao: string | null;
   nome: string;
   citta: string;
+  /** Il nome del paese in inglese: serve a farlo leggere, non a decidere. */
   paese: string;
+  /**
+   * Il codice ISO a due lettere. È QUESTO che guarda il cancello
+   * territoriale: il nome cambia grafia fra un archivio e l'altro
+   * ("Czech Republic" oggi, "Czechia" nello standard di adesso) e una
+   * differenza di grafia non deve poter cambiare un verdetto.
+   * `null` solo dove il paese non esiste più (le vecchie Antille Olandesi).
+   */
+  iso: string | null;
   lat: number;
   lon: number;
   tz: string | null;
