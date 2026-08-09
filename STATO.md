@@ -239,7 +239,7 @@ social rifatta (era rimasta al prodotto viaggi).
   firma Standard Webhooks provata su 10 casi); lettera deterministica coi
   canali reclamo verificati di 10 compagnie; email T+0/2/15/30/60; garanzia
   90 giorni; tracker web; `/admin` = conferma umana (shadow mode acceso).
-- **Prove**: web 306/308 Playwright (9/08). Le 2 rosse sono lo stesso
+- **Prove**: web 306/308 Playwright (9/08, dopo il giro #33). Le 2 rosse sono lo stesso
   test su desktop e telefono, "il modulo dell'Osservatorio accetta
   un'email valida e conferma": la sandbox non arriva a Supabase (`Host
   not in allowlist`), quindi il salvataggio dell'iscritto risponde 500 e
