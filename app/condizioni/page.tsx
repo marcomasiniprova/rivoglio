@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 /**
  * Condizioni d'uso: PRIMA BOZZA operativa dell'8/08. Descrivono il
  * servizio COME È COSTRUITO davvero (check gratuito, verdetto a tre
- * stati, lettera che invii tu, garanzia 90 giorni, rinuncia al recesso
+ * stati, lettera che invii tu, garanzia legata all'esito, rinuncia al recesso
  * ex art. 59 Cod. Consumo). Revisione legale segnata in ARRETRATI.
  */
 export default function PaginaCondizioni() {
@@ -77,13 +77,28 @@ export default function PaginaCondizioni() {
         garanzia qui sotto, che è più forte del recesso.
       </p>
 
-      <h2>La garanzia dei 90 giorni</h2>
+      <h2>La garanzia</h2>
       <p>
-        Se entro 90 giorni dall&apos;acquisto non ricevi nulla dalla compagnia (né
-        compensazione né altra somma legata al reclamo), ti rimborsiamo per intero quello che
-        hai pagato a Rivolio. Il rimborso parte da noi, senza moduli da compilare. La
-        garanzia richiede che il reclamo sia stato effettivamente inviato alla compagnia
-        seguendo le istruzioni della pratica.
+        Se la compagnia <strong>rifiuta il reclamo senza un motivo valido</strong>, oppure{" "}
+        <strong>non risponde entro i termini previsti dalla legge</strong>, ti rimborsiamo per
+        intero quello che hai pagato a Rivolio. Vale anche se la compagnia non ti riconosce
+        nulla per una ragione che smentisce i dati verificati del volo.
+      </p>
+      <p>
+        La garanzia è legata all&apos;esito e non a una scadenza sul calendario, e la ragione
+        è a tuo favore: le compagnie rispondono spesso dopo due o tre mesi, e un termine breve
+        ti farebbe chiedere il rimborso mentre la tua pratica è ancora viva.
+      </p>
+      <p>
+        Come funziona in pratica: ti scriviamo noi per chiederti com&apos;è andata, e il
+        rimborso parte da noi senza moduli da compilare. Ti chiediamo solo due cose: che il
+        reclamo sia stato davvero inviato alla compagnia seguendo le istruzioni della pratica,
+        e che ci dica com&apos;è andata quando te lo chiediamo, perché l&apos;esito lo conosci
+        solo tu.
+      </p>
+      <p>
+        Un caso in cui la garanzia non si applica: se la compagnia ti paga, il servizio ha
+        funzionato, e il prezzo della pratica resta dovuto.
       </p>
 
       <h2>Le tue responsabilità</h2>

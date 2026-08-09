@@ -291,14 +291,14 @@ export const COPY = {
     occhiello: "La garanzia",
     titolo: "Se la compagnia non paga, non paghi neanche tu.",
     testo:
-      "Se entro 90 giorni non ricevi nulla dalla compagnia, ti rimborsiamo per intero quello che hai pagato. E il rimborso parte da noi: non devi chiederlo.",
+      "Se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di legge, ti rimborsiamo per intero quello che hai pagato. Ti scriviamo noi per sapere com'è andata: il rimborso non devi chiederlo.",
     punti: [
       "Rimborso integrale, non un buono",
-      "Parte da noi al giorno 90, senza moduli da compilare",
+      "Legata all'esito, non a una scadenza sul calendario",
       "Vale per ogni pratica, singola o famiglia",
     ],
     notaOnesta:
-      "Possiamo permettercela perché vendiamo solo i casi in cui il dato è solido. Quelli incerti non li vendiamo.",
+      "Non mettiamo una scadenza a giorni perché le compagnie rispondono anche dopo due o tre mesi: un limite corto ti farebbe chiedere il rimborso mentre la tua pratica è ancora viva. Possiamo permettercela perché vendiamo solo i casi in cui il dato è solido: quelli incerti non li vendiamo.",
   },
 
   prezzi: {
@@ -390,7 +390,7 @@ export const COPY = {
       },
     },
     /** La garanzia, dentro le card: è l'obiezione numero uno di chi paga. */
-    garanziaCarta: "Garanzia 90 giorni: se non ottieni nulla, ti rimborsiamo per intero.",
+    garanziaCarta: "Garanzia: se la compagnia non paga, ti rimborsiamo per intero.",
     promemoria: "Nessun abbonamento, nessuna percentuale, nessun altro costo.",
   },
 
@@ -494,7 +494,7 @@ export const COPY = {
         "Verifico l'orario certificato di atterraggio e calcolo la fascia.",
         "Scrivo la lettera col riferimento di legge e il canale reclami giusto di quella compagnia.",
         "Ti ricordo io le scadenze: promemoria a 14 e 30 giorni, col sollecito già pronto.",
-        "Tengo la pratica aggiornata, e se in 90 giorni non ottieni niente ti restituisco i soldi.",
+        "Tengo la pratica aggiornata, e se la compagnia non paga ti restituisco i soldi.",
       ],
     },
     perche:
@@ -587,7 +587,7 @@ export const COPY = {
       {
         domanda: "E allora cosa pago, esattamente?",
         risposta:
-          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, letto dal tracciamento del volo e archiviato come prova. Il secondo colpo: il sollecito già pronto al giorno 15, il punto esatto in cui la maggior parte delle persone lascia perdere. La garanzia: se entro 90 giorni non ricevi nulla, ti rimborsiamo per intero.",
+          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, letto dal tracciamento del volo e archiviato come prova. Il secondo colpo: il sollecito già pronto al giorno 15, il punto esatto in cui la maggior parte delle persone lascia perdere. La garanzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, ti rimborsiamo per intero.",
       },
       {
         domanda: "Quanto ricevo, se va a buon fine?",
@@ -848,7 +848,7 @@ export const COPY = {
        */
       recesso: {
         etichetta: TESTO_RINUNCIA,
-        nota: "La garanzia non cambia: se entro 90 giorni la compagnia non ti paga, ti rimborsiamo per intero.",
+        nota: "La garanzia non cambia: se la compagnia non ti paga, ti rimborsiamo per intero.",
         blocco:
           "Per proseguire metti la spunta qui sopra: senza il tuo consenso non possiamo preparare la pratica subito.",
         errore: "Non siamo riusciti a registrare il consenso. Riprova tra qualche secondo.",
@@ -1054,7 +1054,7 @@ export const COPY = {
         nome: "Rifiutata",
         descrizione: "La compagnia ha rifiutato la richiesta.",
         prossimoPasso:
-          "Vale la garanzia: se entro la data indicata qui sotto non ricevi nulla, ti rimborsiamo la pratica per intero.",
+          "Vale la garanzia: se la compagnia non ti paga, ti rimborsiamo la pratica per intero.",
       },
       rimborsata: {
         nome: "Rimborsata",
@@ -1128,7 +1128,7 @@ export const COPY = {
       template:
         "Se entro il {data} la compagnia non ti ha pagato, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
       senzaData:
-        "Se entro 90 giorni la compagnia non ti ha pagato, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
+        "Se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di legge, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
     },
 
     scadenza: {

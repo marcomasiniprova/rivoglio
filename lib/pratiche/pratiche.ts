@@ -118,7 +118,7 @@ async function trovaOCreaUtente(
 
 /**
  * Apre la pratica: utente auth (creato se non esiste), riga in `pratiche`
- * con scadenza stimata e garanzia a 90 giorni, evento `creata`.
+ * con scadenza stimata, evento `creata`.
  *
  * NON controlla l'esito della verifica: quel cancello ("non si vende sul
  * giallo, mai") sta nel webhook, PRIMA di arrivare qui.
@@ -182,6 +182,13 @@ export async function creaPratica({
         importo_fascia: verifica.importo ?? null,
         email,
         scadenza_stimata: scadenza.dataStimata,
+        /* ⚠️ NON è più la promessa fatta al cliente. Dal 9/08/2026 la
+           garanzia è legata all'ESITO (rifiuto senza motivo valido o
+           silenzio oltre i termini), non a una data. Questa colonna resta
+           per non richiedere una migrazione e vale come promemoria interno:
+           passato questo giorno la pratica va guardata, perché una
+           compagnia che tace da tre mesi ha di fatto taciuto. Nessun testo
+           mostrato all'utente la usa più. */
         garanzia_fino_al: giornoFra(90),
       })
       .select()

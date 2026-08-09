@@ -510,8 +510,8 @@ export const TESTI = {
       nota: "Premilo DOPO averla inviata: da quel giorno partono i tempi del sollecito e dell'ENAC.",
       grazie: "Registrato. Da oggi contiamo i giorni per te.",
     },
-    // {data} da dataBreve().
-    garanzia: "Garanzia attiva fino al {data}: se la compagnia non paga, riavere i 14,90€ è un tuo diritto.",
+    garanzia:
+      "Garanzia attiva: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, ti rimborsiamo per intero. Dimmi com'è andata e ci penso io.",
     cronologia: "La cronologia",
     caricamento: "Sto leggendo la pratica",
     entraPrima: "Per vedere la pratica devi entrare con l'email con cui l'hai aperta.",

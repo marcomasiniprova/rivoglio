@@ -117,8 +117,12 @@ Prescrizione: data di scadenza STIMATA per caso, con avvertenza esplicita.
 Niente altri SKU al lancio. Meno scelte = più conversione.
 
 **La garanzia (obbligatoria, non si discute):** "Se la compagnia non paga,
-non paghi neanche tu." Rimborso integrale se entro 90 giorni non arriva
-nulla. Costa ~35% del lordo e RENDE: conversione +37%, chargeback quasi
+non paghi neanche tu." Rimborso integrale se la compagnia rifiuta senza un
+motivo valido o non risponde entro i termini di legge.
+⚠️ Dal 9/08/2026 è legata all'ESITO, non più a 90 giorni di calendario: le
+compagnie rispondono in 8-14 settimane, quindi il giorno 90 cadeva DENTRO
+l'attesa e un cliente onesto avrebbe chiesto il rimborso mentre la pratica
+era ancora viva. A metà del margine, per un problema di calendario. Costa ~35% del lordo e RENDE: conversione +37%, chargeback quasi
 zero, recensioni vive. È ciò che permette di vendere un fatto certo su un
 esito incerto senza essere disonesti.
 

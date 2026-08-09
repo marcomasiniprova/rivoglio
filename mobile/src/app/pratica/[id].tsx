@@ -399,7 +399,7 @@ export default function SchermataPratica() {
 
           {p.garanziaFinoAl && (
             <Text style={stili.garanzia}>
-              {riempi(T.garanzia, { data: dataBreve(p.garanziaFinoAl) })}
+              {T.garanzia}
             </Text>
           )}
         </>

@@ -7,7 +7,7 @@
 dal documento di Valerio del 07/08 e COSTRUITO: check gratuito sul web,
 verdetto a tre stati dal motore deterministico (l'AI non decide MAI),
 pratica 14,90 / famiglia 24,90 con Polar, lettera pronta che l'utente
-invia da sé (non siamo intermediari), garanzia 90 giorni, admin in shadow
+invia da sé (non siamo intermediari), garanzia legata all'esito, admin in shadow
 mode. Online: **rivoglio.netlify.app**. L'idea viaggi è morta il 07/08.
 **Obiettivo di Valerio: fare cassa entro ottobre 2026.** Ogni scelta si
 giudica così: avvicina il primo utente pagante?
