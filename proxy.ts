@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { CHIAVE_PUBBLICA, SUPABASE_CONFIGURATO, URL_SUPABASE } from "@/lib/supabase/chiavi";
+import { COOKIE_PREZZO, tiraLaMoneta, varianteValida } from "@/lib/prezzi";
 
 /** Pagine che esistono solo per chi è collegato. La web app (/app) NON
  * è più qui: dall'8/08 il check è aperto a tutti (decisione di Valerio),
@@ -22,8 +23,30 @@ const RISERVATE = ["/admin"];
 export async function proxy(request: NextRequest) {
   let risposta = NextResponse.next({ request });
 
+  /* IL TEST DEI DUE PREZZI: la moneta si tira una volta sola per
+     visitatore e resta nel cookie per sei mesi. Chi vede 24,90 sulla
+     landing deve trovare 24,90 anche alla cassa, se no il test misura la
+     nostra incoerenza invece del prezzo.
+     ATTENZIONE all'ordine: il cookie NON si può scrivere qui, perché il
+     client Supabase più sotto rifà la risposta da capo e se lo mangerebbe.
+     Si decide adesso e si scrive su OGNI risposta che esce (conPrezzo). */
+  const prezzoDaScrivere = varianteValida(request.cookies.get(COOKIE_PREZZO)?.value)
+    ? null
+    : tiraLaMoneta();
+
+  const conPrezzo = (res: NextResponse) => {
+    if (prezzoDaScrivere) {
+      res.cookies.set(COOKIE_PREZZO, prezzoDaScrivere, {
+        maxAge: 60 * 60 * 24 * 180,
+        sameSite: "lax",
+        path: "/",
+      });
+    }
+    return res;
+  };
+
   // Senza .env.local il sito deve comunque funzionare: la landing è pubblica.
-  if (!SUPABASE_CONFIGURATO) return risposta;
+  if (!SUPABASE_CONFIGURATO) return conPrezzo(risposta);
 
   const supabase = createServerClient(URL_SUPABASE, CHIAVE_PUBBLICA, {
     cookies: {
@@ -51,7 +74,7 @@ export async function proxy(request: NextRequest) {
     entra.pathname = "/entra";
     // dopo il login lo riportiamo dove voleva andare
     entra.searchParams.set("poi", percorso);
-    return NextResponse.redirect(entra);
+    return conPrezzo(NextResponse.redirect(entra));
   }
 
   // già collegato: la pagina di login non ha senso, vai all'app
@@ -59,10 +82,10 @@ export async function proxy(request: NextRequest) {
     const app = request.nextUrl.clone();
     app.pathname = "/app";
     app.search = "";
-    return NextResponse.redirect(app);
+    return conPrezzo(NextResponse.redirect(app));
   }
 
-  return risposta;
+  return conPrezzo(risposta);
 }
 
 export const config = {

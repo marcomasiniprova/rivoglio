@@ -34,6 +34,32 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #39 (9/08): IL TEST DEI DUE PREZZI, ACCESO.**
+  - **Metà del pubblico vede 14,90 / 24,90, metà 24,90 / 39,90** (scelta di
+    Valerio col popup: "provo due prezzi"). Il motivo è aritmetico: alzare
+    il prezzo **taglia del 40% il traffico necessario** per lo stesso
+    incasso, ed è la leva più veloce che c'è. Su un rimborso da 400€ anche
+    24,90 resta sedici volte meno del valore consegnato, e AirHelp per lo
+    stesso lavoro ne trattiene 100-140.
+  - Come funziona: il proxy tira **una moneta alla prima visita** e la
+    scrive in un cookie che dura sei mesi. Chi vede 24,90 sulla landing
+    trova 24,90 anche alla cassa: prezzi delle card, CTA del verdetto,
+    confronto con le banconote e link Polar seguono tutti la stessa
+    variante. Se il cookie manca o è sporco si serve il listino di sempre.
+  - **Come si legge il risultato senza toccare il database**: la divisione è
+    50 e 50, quindi quanti hanno VISTO i due prezzi è lo stesso numero e
+    basta contare le vendite. A 24,90 ne bastano 60 per battere 100 vendite
+    da 14,90. Il prodotto Polar comprato dice da solo in che variante era il
+    cliente: nessuna migrazione, nessuna colonna nuova.
+  - ⚠️ **SERVE VALERIO**: su Polar vanno creati **QUATTRO prodotti**, non
+    due (`Pratica` 14,90 · `Pratica 25` 24,90 · `Pratica famiglia` 24,90 ·
+    `Pratica famiglia 40` 39,90) e i due link nuovi vanno in
+    `POLAR_CHECKOUT_PRATICA_B` e `POLAR_CHECKOUT_FAMIGLIA_B`. Senza quelli
+    il sito serve il listino basso a tutti: il test non parte, ma niente si
+    rompe e nessuno finisce su una cassa che non esiste.
+  - 5 prove nuove. Le prove vecchie che asserivano un prezzo ora **fissano
+    la variante**, se no passavano a testa o croce.
+  - Prove: **372 verdi** (restano le 2 note dell'Osservatorio).
 - **GIRO #38 (9/08): GARANZIA SULL'ESITO, ENTI NAZIONALI PER PAESE,
   E L'APP NON È PIÙ UN VICOLO CIECO.**
   - **LA GARANZIA È LEGATA ALL'ESITO** (scelta di Valerio col popup). Non

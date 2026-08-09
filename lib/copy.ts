@@ -834,8 +834,10 @@ export const COPY = {
       /** Shadow mode (SPEC §4): al posto dei bottoni finché l'umano non conferma. */
       shadow:
         "Un controllo umano conferma il verdetto entro poche ore: lascia l'email e ti scriviamo noi.",
-      cta: "Prepara la pratica a 14,90€",
-      ctaFamiglia: "Eravate in più sullo stesso volo? Fino a 5 passeggeri a 24,90€",
+      /* {prezzo} e {prezzoFamiglia} li riempie Risultato col listino che
+         quella persona sta vedendo (test dei due prezzi, 9/08). */
+      cta: "Prepara la pratica a {prezzo}",
+      ctaFamiglia: "Eravate in più sullo stesso volo? Fino a 5 passeggeri a {prezzoFamiglia}",
       garanziaBreve: "Se la compagnia non paga, non paghi neanche tu.",
       /** Onestà quando i link Polar non sono configurati o il caso è demo. */
       checkoutNonAttivo:

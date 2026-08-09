@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { linkCheckout } from "@/lib/polar";
+import { COOKIE_PREZZO, varianteValida } from "@/lib/prezzi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 
 /**
@@ -26,7 +27,7 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 const UUID_OK = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DEMO_OK = /^demo-[a-z0-9]{2,8}-[0-9]{4}-[0-9]{2}-[0-9]{2}$/i;
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const id = url.searchParams.get("verifica") ?? "";
   const tipo = url.searchParams.get("tipo") === "famiglia" ? "famiglia" : "singola";
@@ -72,7 +73,12 @@ export async function GET(req: Request) {
        per chi arriva con l'URL diretto: il cancello sta sul server. */
     if (!verifica.rinuncia_recesso_il) return paginaRisultato("recesso");
 
-    const link = linkCheckout(tipo, verifica.id, verifica.email);
+    /* Il prezzo che questa persona ha visto da quando è arrivata: il
+       cookie lo scrive il proxy alla prima visita. Se manca (o è sporco)
+       si serve il listino di sempre. */
+    const variante =
+      varianteValida(req.cookies.get(COOKIE_PREZZO)?.value) ?? "a";
+    const link = linkCheckout(tipo, verifica.id, verifica.email, variante);
     if (!link) return paginaRisultato("non-attivo");
 
     return NextResponse.redirect(link);

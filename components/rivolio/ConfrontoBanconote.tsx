@@ -225,7 +225,15 @@ function Riga({
   parti,
   ritardo,
 }: {
-  voce: (typeof C.voci)[number];
+  /* Non `(typeof C.voci)[number]`: i valori della riga nostra si
+     ricalcolano sul prezzo del test, quindi sono numeri, non le costanti
+     letterali di COPY. */
+  voce: {
+    nome: string;
+    etichettaVia: string;
+    trattenuto: number;
+    restano: number;
+  };
   nostra: boolean;
   parti: boolean;
   ritardo: number;
@@ -265,9 +273,25 @@ function Riga({
   );
 }
 
-export default function ConfrontoBanconote() {
+export default function ConfrontoBanconote({
+  /* Il prezzo che questa persona sta vedendo (test dei due prezzi, 9/08).
+     Senza, resta quello di sempre e la sezione non cambia. */
+  prezzoNostro,
+}: {
+  prezzoNostro?: number;
+}) {
   const zona = useRef<HTMLDivElement>(null);
   const dentro = useInView(zona, { once: true, amount: 0.4 });
+
+  /* La riga "Rivolio" si ricalcola sul prezzo vero: se la card dicesse
+     24,90 e qui restasse 585,10, il conto non tornerebbe e la trasparenza
+     è il prodotto. */
+  const voci = C.voci.map((v, i) => {
+    const nostra = i === C.voci.length - 1;
+    if (!nostra || prezzoNostro === undefined) return v;
+    const restano = Math.round((C.compensazione - prezzoNostro) * 100) / 100;
+    return { ...v, trattenuto: prezzoNostro, restano, etichettaVia: `via ${euro(prezzoNostro)}` };
+  });
 
   return (
     <div ref={zona}>
@@ -275,11 +299,11 @@ export default function ConfrontoBanconote() {
         {C.base}
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2 sm:gap-4">
-        {C.voci.map((v, i) => (
+        {voci.map((v, i) => (
           <Riga
             key={v.nome}
             voce={v}
-            nostra={i === C.voci.length - 1}
+            nostra={i === voci.length - 1}
             parti={dentro}
             ritardo={0.15 + i * 0.3}
           />

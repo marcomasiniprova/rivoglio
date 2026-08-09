@@ -2,6 +2,7 @@ import { Check } from "lucide-react";
 import { Anima, AnimaLista, Figlio } from "@/components/Anima";
 import ConfrontoBanconote from "./ConfrontoBanconote";
 import { COPY } from "@/lib/copy";
+import { listinoCorrente } from "@/lib/prezzi-server";
 
 /**
  * I prezzi (SPEC §5, chiusi): check gratis, pratica 14,90€, famiglia 24,90€.
@@ -50,7 +51,13 @@ function Strappo({ evidenza }: { evidenza: boolean }) {
   );
 }
 
-export default function PrezziRivolio() {
+export default async function PrezziRivolio() {
+  /* IL TEST DEI DUE PREZZI: le cifre qui sopra vengono dal listino che
+     questa persona sta vedendo, non da COPY. Se il cookie manca è il
+     listino di sempre, quindi la pagina non cambia. */
+  const { listino } = await listinoCorrente();
+  const prezzoDi = (nome: string) =>
+    nome === COPY.prezzi.piani.famiglia.nome ? listino.famigliaTesto : listino.singolaTesto;
   return (
     <section id="prezzi" className="scroll-mt-24 px-5 py-16 sm:px-8 sm:py-20">
       <div className="mx-auto max-w-[1200px]">
@@ -165,7 +172,7 @@ export default function PrezziRivolio() {
                   {/* Il prezzo grande col suffisso attaccato: "una volta
                       sola" sta accanto alla cifra, non a fondo pagina. */}
                   <p className="numeri mt-5 font-display text-[40px] font-medium leading-none tracking-[-0.04em] text-inchiostro">
-                    {p.prezzo}
+                    {prezzoDi(p.nome)}
                     <span className="ml-2 font-sans text-[13px] font-normal tracking-normal text-fumo-2">
                       {p.periodo}
                     </span>
@@ -246,7 +253,7 @@ export default function PrezziRivolio() {
             Il "come nasce" apre la matematica dichiarata, come sempre. */}
         <Anima ritardo={0.08} className="mx-auto mt-10 max-w-3xl">
           <div className="rounded-2xl border border-bordo/70 bg-white p-5 sm:p-6">
-            <ConfrontoBanconote />
+            <ConfrontoBanconote prezzoNostro={listino.singola} />
             <details className="group mt-5 border-t border-bordo/60 pt-4">
               <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 text-[13px] font-medium text-fumo underline decoration-dotted underline-offset-4 transition-colors marker:hidden hover:text-verde">
                 {COPY.comune.apriIlConto}

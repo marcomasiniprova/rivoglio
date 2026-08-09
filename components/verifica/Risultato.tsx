@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { COPY } from "@/lib/copy";
+import { LISTINO_BASE } from "@/lib/prezzi";
 import { formattaMinuti } from "@/lib/regole/eu261";
 import DomandeCancellato from "./DomandeCancellato";
 import DichiaraCaso from "./DichiaraCaso";
@@ -48,6 +49,8 @@ export type DatiVerifica = {
   motivo: string | null;
   /** Vero se il dato viene dal fornitore dimostrativo: il badge è obbligatorio. */
   demo: boolean;
+  /** Il listino che questa persona vede: test dei due prezzi (9/08). */
+  listino?: { singolaTesto: string; famigliaTesto: string };
   /** Shadow mode: verdetto in attesa della conferma umana, niente vendita. */
   inAttesa: boolean;
   arrivoPrevistoUtc: string | null;
@@ -480,6 +483,13 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
  * checkout: qui l'esperienza, lì la legge.
  */
 function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
+  /* I due prezzi del test (9/08): se la pagina non passa il listino si usa
+     quello di sempre, così niente si rompe e nessuno vede un segnaposto. */
+  const conPrezzo = (modello: string) =>
+    modello
+      .replace("{prezzo}", dati.listino?.singolaTesto ?? LISTINO_BASE.singolaTesto)
+      .replace("{prezzoFamiglia}", dati.listino?.famigliaTesto ?? LISTINO_BASE.famigliaTesto);
+
   const t = COPY.risultato.idoneo;
   const idSpunta = useId();
   const [accettato, setAccettato] = useState(false);
@@ -566,7 +576,7 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
             void vai("singola");
           }}
         >
-          {inCorso ? t.recesso.attesa : t.cta}
+          {inCorso ? t.recesso.attesa : conPrezzo(t.cta)}
         </a>
       </Button>
       {compraFamiglia && (
@@ -585,7 +595,7 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
               void vai("famiglia");
             }}
           >
-            {t.ctaFamiglia}
+            {conPrezzo(t.ctaFamiglia)}
           </a>
         </Button>
       )}

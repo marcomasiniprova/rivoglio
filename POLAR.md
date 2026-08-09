@@ -136,7 +136,21 @@ Polar ha un ambiente di prova separato (sandbox.polar.sh). Le carte
 finte funzionano lì. Tutto quello che segue lo fai prima lì, poi in
 produzione.
 
-**3. Crea i due prodotti**
+**3. Crea i prodotti (QUATTRO, non due)**
+⚠️ Dal 9/08 testiamo due prezzi: metà del pubblico vede il listino basso,
+metà quello alto, e il mercato ci dice quale rende di più. Servono quindi
+quattro prodotti e quattro link. I NOMI vanno scritti esatti: il nostro
+codice riconosce la famiglia dalla parola "famiglia".
+
+| Nome esatto | Prezzo |
+|---|---|
+| `Pratica` | 14,90 € |
+| `Pratica 25` | 24,90 € |
+| `Pratica famiglia` | 24,90 € |
+| `Pratica famiglia 40` | 39,90 € |
+
+Le due righe qui sotto restano la descrizione da usare per tutti e quattro.
+
 - **Pratica** · pagamento singolo · **14,90 €**
   Descrizione: la lettera di reclamo pronta per un passeggero, i
   documenti a supporto e la sequenza di promemoria.

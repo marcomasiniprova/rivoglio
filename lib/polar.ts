@@ -11,6 +11,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  *    Polar, secondo lo standard "Standard Webhooks" che Polar segue.
  */
 
+import type { Variante } from "@/lib/prezzi";
+
 /* ------------------------------------------------------- checkout link */
 
 /**
@@ -18,12 +20,25 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  * nel pannello Polar e si mettono qui come URL COMPLETI. Sono l'unico SKU
  * doppio del prodotto: niente altri (SPEC §5).
  */
-const ENV_LINK: Record<"singola" | "famiglia", string | undefined> = {
-  get singola() {
-    return process.env.POLAR_CHECKOUT_PRATICA;
+const ENV_LINK: Record<Variante, Record<"singola" | "famiglia", string | undefined>> = {
+  a: {
+    get singola() {
+      return process.env.POLAR_CHECKOUT_PRATICA;
+    },
+    get famiglia() {
+      return process.env.POLAR_CHECKOUT_FAMIGLIA;
+    },
   },
-  get famiglia() {
-    return process.env.POLAR_CHECKOUT_FAMIGLIA;
+  /* Il prezzo alto del test. Se questi due link mancano si serve la
+     variante A a tutti: il test non parte, ma non si rompe niente e
+     soprattutto non si manda nessuno su una cassa che non esiste. */
+  b: {
+    get singola() {
+      return process.env.POLAR_CHECKOUT_PRATICA_B ?? process.env.POLAR_CHECKOUT_PRATICA;
+    },
+    get famiglia() {
+      return process.env.POLAR_CHECKOUT_FAMIGLIA_B ?? process.env.POLAR_CHECKOUT_FAMIGLIA;
+    },
   },
 };
 
@@ -45,8 +60,11 @@ export function linkCheckout(
   tipo: "singola" | "famiglia",
   verificaId: string,
   email?: string | null,
+  /* La variante del test dei prezzi. Assente = variante A, cioè il
+     listino di sempre: chi chiama non è obbligato a saperne niente. */
+  variante: Variante = "a",
 ): string | null {
-  const base = ENV_LINK[tipo];
+  const base = ENV_LINK[variante][tipo];
   if (!base) {
     console.warn(
       `[polar] checkout link "${tipo}" assente: manca POLAR_CHECKOUT_${

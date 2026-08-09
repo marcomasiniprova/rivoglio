@@ -1,7 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { COPY } from "../lib/copy";
+import { LISTINO_BASE } from "../lib/prezzi";
 import { apriModoNumero } from "./aiuti";
 import { VOLI_DEMO } from "../lib/voli/fornitori/demo";
+
+/* La CTA d'acquisto porta dentro il prezzo, e dal 9/08 il prezzo ha due
+   varianti: qui si usa il listino base, che è quello che il sito serve
+   quando il cookie del test non c'è. */
+const CTA_ACQUISTO = COPY.risultato.idoneo.cta.replace("{prezzo}", LISTINO_BASE.singolaTesto);
 
 /**
  * Il flusso del check in modalità DEMO, senza chiavi: è il percorso che
@@ -118,7 +124,7 @@ test.describe("La pagina del risultato (id demo, senza chiavi)", () => {
     await page.goto(urlDemo(idoneo250.voloIata));
     // #21: prima si firma la rinuncia al recesso, poi si può proseguire.
     await page.getByRole("checkbox").first().check();
-    await page.getByRole("link", { name: COPY.risultato.idoneo.cta }).first().click();
+    await page.getByRole("link", { name: CTA_ACQUISTO }).first().click();
     await expect(page).toHaveURL(/checkout=demo/);
     await expect(page.getByText(COPY.risultato.idoneo.checkoutDemo).first()).toBeVisible();
   });
@@ -128,7 +134,7 @@ test.describe("La pagina del risultato (id demo, senza chiavi)", () => {
   }) => {
     await page.goto(urlDemo(idoneo250.voloIata));
     await expect(page.getByText(COPY.risultato.idoneo.recesso.etichetta).first()).toBeVisible();
-    await page.getByRole("link", { name: COPY.risultato.idoneo.cta }).first().click();
+    await page.getByRole("link", { name: CTA_ACQUISTO }).first().click();
     // il richiamo compare e la pagina resta questa: nessun rimando a Polar
     await expect(page.getByText(COPY.risultato.idoneo.recesso.blocco).first()).toBeVisible();
     await expect(page).not.toHaveURL(/checkout=/);

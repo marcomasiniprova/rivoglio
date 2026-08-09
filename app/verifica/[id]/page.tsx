@@ -5,6 +5,7 @@ import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import Risultato, { type DatiVerifica } from "@/components/verifica/Risultato";
 import { COPY } from "@/lib/copy";
+import { listinoCorrente } from "@/lib/prezzi-server";
 import { scadenzaStimata, valuta } from "@/lib/regole/eu261";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { demo as fornitoreDemo } from "@/lib/voli/fornitori/demo";
@@ -269,9 +270,14 @@ export default async function PaginaVerifica({
     );
   }
 
+  /* Il listino che questa persona sta vedendo dall'inizio (test dei due
+     prezzi): la cassa userà lo stesso, il cookie lo scrive il proxy. */
+  const { listino } = await listinoCorrente();
+
   const dati: DatiVerifica = {
     idPagina: id,
     idVerifica: riga.id,
+    listino,
     esito: riga.esito,
     volo: riga.volo_iata,
     dataVolo: riga.data_locale,

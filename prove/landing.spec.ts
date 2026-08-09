@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { COPY } from "../lib/copy";
+import { COOKIE_PREZZO } from "../lib/prezzi";
 import { apriModoNumero } from "./aiuti";
 
 /**
@@ -60,6 +61,11 @@ test.describe("Landing page", () => {
   test("il confronto prezzi torna: 600 - 210 = 390, 600 - 14,90 = 585,10", async ({
     page,
   }) => {
+    /* Dal 9/08 il sito serve due listini a caso (test dei prezzi): qui si
+       fissa quello base, se no la prova passa o fallisce a testa o croce. */
+    await page.context().addCookies([
+      { name: COOKIE_PREZZO, value: "a", url: "http://localhost:3100" },
+    ]);
     await page.goto("/#prezzi");
     const prezzi = page.locator("#prezzi");
     const testo = await prezzi.innerText();
