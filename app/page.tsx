@@ -4,6 +4,8 @@ import Footer from "@/components/Footer";
 import HeroCheck from "@/components/rivoglio/HeroCheck";
 import ComeFunziona from "@/components/rivoglio/ComeFunziona";
 import DatoOggettivo from "@/components/rivoglio/DatoOggettivo";
+import Copertura from "@/components/rivoglio/Copertura";
+import ChiFaCosa from "@/components/rivoglio/ChiFaCosa";
 import Garanzia from "@/components/rivoglio/Garanzia";
 import Retroattivo from "@/components/rivoglio/Retroattivo";
 import PrezziRivoglio from "@/components/rivoglio/PrezziRivoglio";
@@ -79,6 +81,8 @@ export default function Home() {
         <HeroCheck />
         <ComeFunziona />
         <DatoOggettivo />
+        <Copertura />
+        <ChiFaCosa />
         <Garanzia />
         <Retroattivo />
         <PrezziRivoglio />

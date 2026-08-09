@@ -1,6 +1,9 @@
 # STATO — Rivoglio
 
-**Aggiornato:** 2026-08-09 (giro #32: mockup del footer con l'app VERA,
+**Aggiornato:** 2026-08-09 (giro #33: firma del footer a tutta larghezza,
+mano che entra in scena, check gratis con la sua scheda, confronto con le
+banconote, casella che si cerca da sola, barre della scadenza, sezioni
+"Cosa copre" e "Chi fa cosa" dal feedback esterno · giro #32: mockup del footer con l'app VERA,
 monumenti sulle card dell'Osservatorio, doppio opt-in con conferma e
 disdetta, tasti muti dell'anteprima app, skill copertura-prompt)
 **RIVOGLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
@@ -16,6 +19,46 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #33 (9/08)**: il giro estetico chiesto da Valerio più i due
+  limiti segnalati da un esperto esterno.
+  - **LA FIRMA "RIVOGLIO"** in fondo tocca i due bordi su qualsiasi
+    schermo. Non è tentata: nel font display quella parola è larga 4,23
+    volte la propria dimensione, quindi la misura è
+    `min(calc((100vw - margini) / 4.23), 293px)` (classe
+    `.marchio-gigante` in globals.css). Alzata di un filo: prima il
+    taglio in basso se ne mangiava un quarto.
+  - **LA MANO ENTRA IN SCENA** (`components/rivoglio/ManoRivelata.tsx`):
+    alone verde che si apre da terra, mano che sale ruotando appena, e
+    SOLO DOPO lo schermo che si accende con una lama di luce in
+    diagonale. Tutto in codice, zero peso aggiunto. La finestra dello
+    schermo dentro la foto sono le misure vere dello script del mockup,
+    girate in percentuale. Telefono spinto di 7px a destra: la mano pesa
+    a sinistra e senza quel filo si legge storta.
+  - **IL CHECK GRATUITO HA LA SUA SCHEDA**, la più grande della sezione
+    prezzi: 0€ enorme, nastro "Sempre gratis", i tre punti visibili
+    ANCHE sul telefono (sparivano sotto i 640px) e bottone grande.
+  - **IL CONFRONTO COI PORTALI SI VEDE**: sei banconote da 100€ fanno i
+    600€, due se ne volano via dal portale, da noi se ne va un pezzetto
+    di una sola, e il numero che resta sale contando. ⚠️ Il contatore
+    parte dal valore VERO, non da zero: una prova ha beccato "0€ restano
+    a te" per chi non scorreva fin lì.
+  - **LA CASELLA SI CERCA DA SOLA** (`CercaInPosta.tsx`): "conferma
+    volo" si scrive una lettera alla volta e la mail salta fuori con
+    numero e data evidenziati, dentro un riquadro marcato "Esempio".
+  - **LE FINESTRE DI SCADENZA HANNO UNA BARRA DEL TEMPO** sulla stessa
+    scala 0-6 anni, con la tacca a un anno che segna l'archivio di oggi.
+  - **DAL FEEDBACK ESTERNO, due sezioni nuove sulla landing:**
+    - `/#copertura` **"Non solo i ritardi"**: tre colonne oneste. Verde =
+      verdetto automatico (ritardo). Giallo = riconosciuto ma il verdetto
+      dipende da un dato che ha solo l'utente (cancellato, dirottato) e
+      finché è incerto NON si paga. Grigio = non ancora (negato imbarco e
+      coincidenza persa, bagagli con link alla guida, treni). Il motore
+      gestiva cancellati e dirottati da giorni: era il SITO a non dirlo.
+    - `/#chi-fa-cosa` **"Due clic tuoi. Il resto è mio."**: tre righe da
+      una parte, quattro dall'altra, e il perché l'invio parte dalla
+      email dell'utente (FR, U2, W6 lavorano solo i reclami mandati dal
+      passeggero, ed è lo stesso motivo per cui la compensazione arriva
+      intera).
 - **GIRO #32 (9/08)**: il giro delle cose che Valerio ha visto rotte
   guardando il sito dal telefono.
   - **IL TELEFONO DEL FOOTER MOSTRA L'APP VERA**: dentro la foto c'era

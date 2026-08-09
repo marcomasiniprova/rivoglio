@@ -393,6 +393,113 @@ export const COPY = {
     promemoria: "Nessun abbonamento, nessuna percentuale, nessun altro costo.",
   },
 
+  /**
+   * COSA COPRE RIVOGLIO, detto per esteso.
+   *
+   * Nasce da un feedback esterno del 9/08: leggendo la landing si capiva
+   * "solo ritardi", perché di cancellazioni e dirottamenti non si parlava
+   * da nessuna parte, pur essendo nel motore da giorni. Il silenzio su
+   * una cosa che facciamo è un danno quanto una promessa non mantenuta.
+   *
+   * Le tre colonne dicono la verità a tre livelli, e nessuna promette
+   * quello che il motore non fa: verdetto automatico / verdetto che
+   * dipende da una cosa che sai solo tu / non ancora.
+   */
+  copertura: {
+    occhiello: "Cosa copre",
+    titolo: "Non solo i ritardi.",
+    testo:
+      "Il Regolamento CE 261/2004 non parla solo di ritardo. Qui sotto c'è tutto quello che il check sa fare oggi, e quello che ancora non sa: senza mezze frasi.",
+    gruppi: [
+      {
+        stato: "pronto",
+        etichetta: "Verdetto automatico",
+        spiegazione: "Il check risponde da solo, con gli orari certificati del volo.",
+        voci: [
+          {
+            nome: "Ritardo all'arrivo",
+            testo:
+              "Da 3 ore in su. L'orario è quello delle ruote a terra, non quello che ricordi tu: fascia da 250, 400 o 600 euro secondo la distanza.",
+          },
+        ],
+      },
+      {
+        stato: "quasi",
+        etichetta: "Riconosciuto, verdetto da completare",
+        spiegazione:
+          "Il check li riconosce e prepara la lettera, ma per il verdetto serve una cosa che sai solo tu. Finché resta incerto NON paghi.",
+        voci: [
+          {
+            nome: "Volo cancellato",
+            testo:
+              "La compensazione dipende da quanti giorni prima ti hanno avvisato e da che volo alternativo ti hanno offerto: due cose che negli archivi di volo non esistono. Rimborso del biglietto e volo alternativo, invece, si chiedono comunque.",
+          },
+          {
+            nome: "Atterrato in un altro aeroporto",
+            testo:
+              "Il dirottamento conta come ritardo se ci hai messo più di 3 ore ad arrivare a destinazione. Il tempo del trasferimento a terra lo sai solo tu.",
+          },
+        ],
+      },
+      {
+        stato: "arrivo",
+        etichetta: "Non ancora",
+        spiegazione: "Lo diciamo prima che tu ci perda tempo.",
+        voci: [
+          {
+            nome: "Negato imbarco e coincidenza persa",
+            testo:
+              "Sono nel CE 261 e i dati del volo li abbiamo già: manca la parte che ti chiede cosa è successo al gate. È il prossimo pezzo che costruiamo.",
+          },
+          {
+            nome: "Bagaglio perso o in ritardo",
+            testo:
+              "Qui vale la Convenzione di Montreal, non il CE 261, e nessun archivio certifica un bagaglio: un verdetto automatico non è possibile. La guida per farlo da solo però c'è già.",
+            link: { testo: "Leggi la guida bagagli", dove: "/guida-bagagli" },
+          },
+          {
+            nome: "Treni",
+            testo:
+              "Regolamento diverso (CE 1371/2007) e nessun archivio pubblico sui ritardi di Trenitalia e Italo. Oggi non lo facciamo, e preferiamo dirlo che prometterlo.",
+          },
+        ],
+      },
+    ],
+  },
+
+  /**
+   * CHI FA COSA. Nasce dallo stesso feedback del 9/08: "il lavoro resta a
+   * carico tuo". È vero che il reclamo lo manda l'utente, e non è un
+   * ripiego: FR, U2, W6, V7 e DY dichiarano per iscritto che lavorano
+   * SOLO il reclamo inviato dal passeggero. Quello che si può togliere è
+   * la fatica, non il gesto. Qui si dice quanta ne resta: due clic.
+   */
+  divisione: {
+    occhiello: "Chi fa cosa",
+    titolo: "Due clic tuoi. Il resto è mio.",
+    tuo: {
+      titolo: "Lo fai tu",
+      tempo: "due minuti in tutto",
+      voci: [
+        "Dici qual era il volo: numero e data, o la foto della carta d'imbarco.",
+        "Premi invio sull'email di reclamo, che trovi già scritta e già indirizzata.",
+        "Mi dici se la compagnia risponde. Un tocco, dalla pratica.",
+      ],
+    },
+    nostro: {
+      titolo: "Lo faccio io",
+      tempo: "il resto",
+      voci: [
+        "Verifico l'orario certificato di atterraggio e calcolo la fascia.",
+        "Scrivo la lettera col riferimento di legge e il canale reclami giusto di quella compagnia.",
+        "Ti ricordo io le scadenze: promemoria a 14 e 30 giorni, col sollecito già pronto.",
+        "Tengo la pratica aggiornata, e se in 90 giorni non ottieni niente ti restituisco i soldi.",
+      ],
+    },
+    perche:
+      "Il reclamo parte dalla tua email per un motivo pratico: Ryanair, Wizz Air ed easyJet dichiarano per iscritto che lavorano solo i reclami inviati dal passeggero. È anche il motivo per cui la compensazione arriva a te intera, senza passare da noi.",
+  },
+
   retroattivo: {
     occhiello: "Retroattivo",
     titolo: "Vale anche per i voli dell'anno scorso.",

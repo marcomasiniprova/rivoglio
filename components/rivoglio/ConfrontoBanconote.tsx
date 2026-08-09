@@ -73,20 +73,31 @@ function Banconota({ via, nostra }: { via: boolean; nostra: boolean }) {
   );
 }
 
-/** Il numero che sale contando: un conto vero, non un'etichetta ferma. */
+/**
+ * Il numero che sale contando.
+ *
+ * ATTENZIONE, e c'è un motivo se è scritto qui: il valore di partenza è
+ * quello VERO, non zero. Prima partiva da zero e restava zero per chi non
+ * scorreva fin qui: una prova ha beccato "0€ restano a te" nella pagina,
+ * che è esattamente il tipo di numero sbagliato che questo sito non può
+ * permettersi. Il conto parte solo quando la sezione entra in vista
+ * DOPO essere stata fuori: chi ci atterra sopra vede subito la cifra
+ * giusta, senza il tuffo a zero.
+ */
 function Contatore({ a, parti }: { a: number; parti: boolean }) {
   const fermo = useReducedMotion();
-  const [n, setN] = useState(0);
-  /* Con le animazioni ridotte il numero è già quello finale: si decide
-     in render, non con un setState dentro l'effetto (quello innescava
-     un secondo giro di render per niente). */
-  const mostrato = fermo ? a : n;
+  const [n, setN] = useState(a);
+  /* Se al primo giro la sezione era già davanti agli occhi, non si
+     anima: si mostra e basta. */
+  const eraGiaLì = useRef<boolean | null>(null);
 
   useEffect(() => {
-    if (!parti || fermo) return;
+    if (eraGiaLì.current === null) eraGiaLì.current = parti;
+    if (!parti || fermo || eraGiaLì.current) return;
     let vivo = true;
     const durata = 900;
     const inizio = performance.now();
+    setN(0);
     const passo = (ora: number) => {
       if (!vivo) return;
       const t = Math.min(1, (ora - inizio) / durata);
@@ -101,7 +112,7 @@ function Contatore({ a, parti }: { a: number; parti: boolean }) {
     };
   }, [a, parti, fermo]);
 
-  return <>{euro(Math.round(mostrato * 100) / 100)}</>;
+  return <>{euro(Math.round(n * 100) / 100)}</>;
 }
 
 function Riga({
