@@ -525,7 +525,7 @@ export const COPY = {
       },
     ],
     /** Le due estremità della barra del tempo. */
-    scalaOggi: "oggi · la tacca è il nostro archivio (12 mesi)",
+    scalaOggi: "oggi",
     scalaFine: "6 anni",
     /** La finta casella email che si cerca da sola. */
     posta: {

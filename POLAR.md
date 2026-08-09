@@ -141,7 +141,7 @@ produzione.
   Descrizione: la lettera di reclamo pronta per un passeggero, i
   documenti a supporto e la sequenza di promemoria.
 - **Famiglia** · pagamento singolo · **24,90 €**
-  Stessa cosa fino a 4 passeggeri sullo stesso volo.
+  Stessa cosa fino a 5 passeggeri sullo stesso volo.
 
 Nella descrizione usa parole da prodotto digitale: "documento generato
 automaticamente", "disponibile subito dopo il pagamento". Mai "ci
@@ -155,6 +155,9 @@ indirizzi che iniziano per `https://buy.polar.sh/...`.
 **5. Crea il webhook**
 Settings → Webhooks → Add endpoint.
 - Indirizzo: `https://rivoglio.netlify.app/api/polar/webhook`
+  ⚠️ Questo è l'indirizzo di OGGI. Quando rivolio.it sarà puntato su
+  Netlify diventerà `https://rivolio.it/api/polar/webhook`: si cambia in
+  un campo dal pannello di Polar, senza rifare niente.
 - Eventi: almeno `order.paid` (e `checkout.updated` se te lo propone).
 - Formato: **Raw** (non Discord, non Slack).
 Alla fine ti mostra un **segreto** che inizia per `polar_whs_...`:

@@ -1,0 +1,17 @@
+[
+  {
+    "volo": "ZZ250",
+    "data": "2026-08-06",
+    "esito": "idoneo",
+    "ritardoMinuti": 200,
+    "importo": 250,
+    "tratta": "Scalo demo A → Scalo demo B",
+    "km": 980,
+    "vettore": "ZZ Compagnia Demo",
+    "arrivoPrevisto": "2026-08-06T20:00:00.000Z",
+    "arrivoEffettivo": "2026-08-06T23:20:00.000Z",
+    "stato": "atterrato",
+    "demo": true,
+    "motivo": "Arrivo con 3 h e 20 min di ritardo su una tratta di 980 km: fascia da 250€. Restano da verificare le circostanze straordinarie, che può invocare solo la compagnia."
+  }
+]
