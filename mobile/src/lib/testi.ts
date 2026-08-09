@@ -187,6 +187,93 @@ export const TESTI = {
   },
 
   /* ---- IL VERDETTO: tre esiti, mai una promessa ---- */
+  /* I CASI CHE GLI ARCHIVI NON VEDONO. Stesse parole del sito
+     (lib/copy.ts): volo cancellato, negato imbarco, coincidenza persa.
+     Sull'app erano un vicolo cieco: usciva "incerto" e finiva li'. */
+  domande: {
+    cancellato: {
+      occhiello: "Manca poco",
+      titolo: "Due domande e ti dico se ti spetta.",
+      testo:
+        "Per un volo cancellato la legge guarda due cose che gli archivi non sanno: quando ti hanno avvisato e come ti hanno rimandato a destinazione. Rispondi e il verdetto si chiude.",
+      preavviso: {
+        domanda: "Quando ti hanno detto che il volo era cancellato?",
+        aiuto: "Vale il primo avviso: email, SMS o messaggio della compagnia.",
+        voci: [
+          { valore: "oltre14", testo: "Più di due settimane prima" },
+          { valore: "fra7e13", testo: "Fra una e due settimane prima" },
+          { valore: "meno7", testo: "Meno di una settimana prima" },
+          { valore: "nessuno", testo: "Nessun avviso: l'ho saputo in aeroporto" },
+          { valore: "nonRicordo", testo: "Non me lo ricordo" },
+        ],
+      },
+      alternativa: {
+        domanda: "Con il volo che hai preso davvero, quanto dopo sei arrivato?",
+        aiuto: "Rispetto all'ora di arrivo che c'era sul biglietto cancellato.",
+        voci: [
+          { valore: "nessuna", testo: "Non mi hanno dato nessun volo alternativo" },
+          { valore: "entro2", testo: "Meno di 2 ore dopo" },
+          { valore: "fra2e4", testo: "Fra 2 e 4 ore dopo" },
+          { valore: "oltre4", testo: "Più di 4 ore dopo" },
+          { valore: "nonRicordo", testo: "Non me lo ricordo" },
+        ],
+      },
+    },
+    dichiara: {
+      invito: "Ti hanno lasciato a terra o hai perso una coincidenza?",
+      invitoSotto:
+        "Sono due casi che negli archivi non si vedono: il volo può risultare in orario mentre tu sei rimasto al gate. Se è successo a te, dimmelo e chiudo il verdetto.",
+      negato: {
+        scheda: "Mi hanno lasciato a terra",
+        presenza: {
+          domanda: "Eri al gate in orario, con la prenotazione valida?",
+          voci: [
+            { valore: "si", testo: "Sì, ero lì in orario" },
+            { valore: "no", testo: "No, sono arrivato tardi" },
+            { valore: "nonRicordo", testo: "Non me lo ricordo" },
+          ],
+        },
+        volonta: {
+          domanda: "Hai ceduto il posto in cambio di qualcosa?",
+          voci: [
+            { valore: "volontario", testo: "Sì, mi hanno offerto un accordo" },
+            { valore: "involontario", testo: "No, mi hanno lasciato a terra e basta" },
+            { valore: "nonRicordo", testo: "Non me lo ricordo" },
+          ],
+        },
+      },
+      coincidenza: {
+        scheda: "Ho perso una coincidenza",
+        unica: {
+          domanda: "Le tratte erano su un'unica prenotazione?",
+          aiuto: "Un solo codice di prenotazione per tutto il viaggio, anche con compagnie diverse.",
+          voci: [
+            { valore: "unica", testo: "Sì, un'unica prenotazione" },
+            { valore: "separati", testo: "No, biglietti comprati separatamente" },
+            { valore: "nonRicordo", testo: "Non me lo ricordo" },
+          ],
+        },
+        ritardo: {
+          domanda: "Alla destinazione finale, quanto dopo sei arrivato?",
+          voci: [
+            { valore: "entro3", testo: "Meno di 3 ore dopo" },
+            { valore: "oltre3", testo: "3 ore o più dopo" },
+            { valore: "nonRicordo", testo: "Non me lo ricordo" },
+          ],
+        },
+        destinazione: {
+          domanda: "Qual era la destinazione finale del viaggio?",
+          segnaposto: "Città o aeroporto",
+        },
+      },
+      bottone: "Vedi il verdetto",
+      nota: "Le risposte restano sulla tua verifica. Il check resta gratuito.",
+      notaDemo: "Esempio dimostrativo: il verdetto qui non vale per una pratica vera.",
+    },
+    chiuso: "Ecco com'è andata.",
+    attesa: "Un attimo.",
+  },
+
   verdetto: {
     idoneo: {
       occhiello: "Verifica completata",

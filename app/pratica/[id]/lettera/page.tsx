@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { compagniaPerVettore } from "@/lib/lettera/compagnie";
-import { ALLEGATI, generaReclamo, testoEnac } from "@/lib/lettera/genera";
+import { ALLEGATI, generaReclamo, istruzioniOrganismo } from "@/lib/lettera/genera";
 import { METEO_ATTIVO, fraseMeteo, meteoStorico } from "@/lib/meteo/openmeteo";
 import { aeroporto } from "@/lib/voli/distanza";
 import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
@@ -49,6 +49,10 @@ type RigaVolo = {
   data_locale: string;
   vettore_operativo: string | null;
   vettore_marketing: string | null;
+  /* Servono a scegliere l'organismo nazionale competente: la competenza è
+     dello Stato dell'aeroporto di PARTENZA (art. 16 par. 1). */
+  partenza_iata: string | null;
+  arrivo_iata: string | null;
   arrivo_previsto_utc: string | null;
   arrivo_effettivo_utc: string | null;
   stato: FattoVolo["stato"];
@@ -162,7 +166,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
     ? ((await db
         .from("voli")
         .select(
-          "volo_iata, data_locale, vettore_operativo, vettore_marketing, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, payload_grezzo",
+          "volo_iata, data_locale, vettore_operativo, vettore_marketing, partenza_iata, arrivo_iata, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, payload_grezzo",
         )
         .eq("id", pratica.volo_id)
         .maybeSingle()) as { data: RigaVolo | null })
@@ -199,6 +203,10 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
     dataLocale: volo.data_locale,
     vettoreOperativo: volo.vettore_operativo ?? "",
     vettoreMarketing: volo.vettore_marketing,
+    /* Servono a scegliere l'organismo nazionale giusto: la competenza e'
+       dello Stato dell'aeroporto di PARTENZA (art. 16 par. 1). */
+    partenzaIata: volo.partenza_iata,
+    arrivoIata: volo.arrivo_iata,
     arrivoPrevistoUtc: volo.arrivo_previsto_utc,
     arrivoEffettivoUtc: volo.arrivo_effettivo_utc,
     stato: volo.stato,
@@ -254,7 +262,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
 
   const compagnia =
     compagniaPerVettore(volo.vettore_operativo) ?? compagniaPerVettore(volo.volo_iata);
-  const enac = testoEnac();
+  const organismo = istruzioniOrganismo(volo.partenza_iata);
   const passeggeriDaCompilare = (pratica.passeggeri ?? []).length === 0;
 
   return (
@@ -372,10 +380,10 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
 
       {/* ------------------------------------------------ se tacciono */}
       <section className="no-stampa rounded-2xl border border-bordo bg-white px-6 py-5">
-        <h2 className="font-display text-lg tracking-[-0.03em]">{enac.titolo}</h2>
-        <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{enac.premessa}</p>
+        <h2 className="font-display text-lg tracking-[-0.03em]">{organismo.titolo}</h2>
+        <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{organismo.premessa}</p>
         <ol className="mt-3 flex list-none flex-col gap-2 text-[0.95rem] leading-relaxed text-fumo">
-          {enac.passi.map((passo, i) => (
+          {organismo.passi.map((passo, i) => (
             <li key={passo} className="flex gap-3">
               <span className="numeri mt-0.5 font-medium text-verde">{i + 1}.</span>
               {passo}
@@ -384,16 +392,16 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         </ol>
         <div className="mt-4 flex flex-col gap-1.5">
           <a
-            href={enac.urlPortale}
+            href={organismo.urlPortale}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 break-all text-sm font-medium text-verde hover:text-verde-scuro"
           >
             <ExternalLink className="size-4 shrink-0" aria-hidden="true" />
-            {enac.urlPortale}
+            {organismo.urlPortale}
           </a>
           <a
-            href={enac.urlModalita}
+            href={organismo.urlModalita}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 break-all text-sm text-fumo hover:text-inchiostro"
@@ -402,7 +410,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
             Le regole del reclamo, sul sito ENAC
           </a>
         </div>
-        <p className="mt-4 text-sm leading-relaxed text-fumo-2">{enac.avvertenza}</p>
+        <p className="mt-4 text-sm leading-relaxed text-fumo-2">{organismo.avvertenza}</p>
       </section>
 
       <p className="no-stampa text-sm leading-relaxed text-fumo-2">

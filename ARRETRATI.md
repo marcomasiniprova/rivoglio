@@ -420,25 +420,38 @@ non altro codice.**
   Se la risposta alla seconda è no, il retroattivo lungo è chiuso comunque:
   senza Live il motore non dà verdetti, quindi si pagherebbe un abbonamento
   per zero pratiche in più. **Non abbonarsi a niente prima della risposta.**
-- **La garanzia dei 90 giorni va ripensata, ed è il rischio più
-  sottovalutato.** Le compagnie rispondono in 8-14 settimane: il giorno 90
+- ~~**La garanzia dei 90 giorni va ripensata.**~~ **CHIUSO il 9/08 (giro
+  #38)**: legata all'esito (rifiuto senza motivo valido o silenzio oltre i
+  termini). Il testo originale resta qui sotto perché spiega il conto.
+- ~~La garanzia dei 90 giorni, il rischio più
+  sottovalutato.~~ Le compagnie rispondono in 8-14 settimane: il giorno 90
   cade DENTRO quella finestra, quindi clienti onesti chiederanno il rimborso
   senza che la compagnia abbia ancora deciso. Al 50% di escussioni il
   margine per pratica scende da 13,66 a circa 6,83 euro. Due strade, decide
   Valerio: legarla all'ESITO ("se la compagnia rifiuta senza motivo valido o
   non risponde nei termini, ti rimborsiamo") oppure allungarla a 180 giorni.
   **Non è un dettaglio di testo: è metà del guadagno.**
-- **La lettera manda tutti all'ENAC, anche chi parte da fuori Italia.**
-  L'art. 16 assegna la competenza all'organismo dello Stato dell'AEROPORTO
-  DI PARTENZA: per un Barcellona-Berlino l'ente è spagnolo, non l'ENAC.
-  Serve una tabella `NEB[paese di partenza]` (circa 31 righe, con nome e
-  link ufficiale verificati) al posto dell'ENAC scritto in chiaro in
-  `lib/lettera/genera.ts`. Va fatto anche restando solo sull'Italia, perché
-  già oggi vendiamo verdetti su partenze non italiane.
-  ⚠️ Nota: il campo `autoritaNazionale` dentro `compagnie.ts` è agganciato
-  alla COMPAGNIA ed è concettualmente sbagliato per lo stesso motivo. Oggi
-  non è usato da nessuna parte, quindi non fa danni: va sostituito, non
-  corretto.
+- **I 9 paesi che mancano nella tabella degli enti nazionali**
+  (`lib/lettera/neb.ts`): Croazia, Slovenia, Slovacchia, Romania, Cipro,
+  Estonia, Lettonia, Lituania, Liechtenstein. Non ci sono perché la pagina
+  ufficiale della Commissione e i suoi PDF sono bloccati dal proxy di questo
+  ambiente: **non ho voluto scrivere nomi non verificati**. Oggi per quei
+  paesi la lettera dice il paese e rimanda all'elenco ufficiale, che è
+  onesto ma meno comodo. Si chiude aprendo
+  https://transport.ec.europa.eu/transport-themes/passenger-rights/national-enforcement-bodies-neb_en
+  da un PC normale e copiando le righe mancanti.
+- **Il francese, lo svedese, il danese e il norvegese hanno il nome
+  dell'ente ma non l'indirizzo verificato**: la lettera li nomina
+  correttamente e rimanda all'elenco ufficiale per il link. Stessa fonte di
+  sopra, stessa mezz'ora di lavoro.
+- ~~**La lettera manda tutti all'ENAC, anche chi parte da fuori Italia.**~~
+  **CHIUSO il 9/08 (giro #38)**: `lib/lettera/neb.ts` sceglie l'ente dallo
+  Stato dell'aeroporto di partenza, 20 paesi verificati, 6 prove.
+- **Resta il campo vecchio da buttare:** `autoritaNazionale` dentro
+  `compagnie.ts` è agganciato alla COMPAGNIA, che è concettualmente
+  sbagliato (la competenza è dello Stato di partenza). Oggi non lo usa
+  nessuno, quindi non fa danni: va tolto, non corretto, così nessuno in
+  futuro lo ripesca credendolo buono.
 - **La Svizzera resta fuori dal cancello territoriale, di proposito.**
   Applica il 261 per accordo bilaterale, non come Stato membro, e non ho
   una fonte verificata sotto mano. Oggi quei casi escono incerti (vendita

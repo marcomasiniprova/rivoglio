@@ -1,6 +1,11 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #36: repo BLINDATA — rate limit e
+**Aggiornato:** 2026-08-09 (giro #38: garanzia legata all'ESITO invece
+che ai 90 giorni, enti nazionali per paese di partenza nella lettera,
+l'app ha finalmente i casi cancellato/negato imbarco/coincidenza persa ·
+giro #37: cancello territoriale, chiuso un falso positivo vero (New York
+→ Toronto usciva idoneo a 600€), banco di prova coi 30 casi reali, ricerca
+su archivi, conversione e mercato · giro #36: repo BLINDATA — rate limit e
 CORS chiusa su /api/verifica e tutte le rotte, poi= reso a prova di
 open-redirect E di XSS in auth/conferma, header di sicurezza CSP ovunque,
 strato anti-copia; banconote del confronto RIFATTE pulite (le vere hanno
@@ -29,6 +34,43 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #38 (9/08): GARANZIA SULL'ESITO, ENTI NAZIONALI PER PAESE,
+  E L'APP NON È PIÙ UN VICOLO CIECO.**
+  - **LA GARANZIA È LEGATA ALL'ESITO** (scelta di Valerio col popup). Non
+    più "90 giorni": ora scatta **se la compagnia rifiuta senza un motivo
+    valido o non risponde entro i termini di legge**. Il perché è un conto:
+    le compagnie rispondono in 8-14 settimane, quindi il giorno 90 cadeva
+    DENTRO l'attesa e un cliente onesto avrebbe chiesto il rimborso a
+    pratica ancora viva. Al 50% di escussioni il margine per pratica
+    scendeva da 13,66 a 6,83 euro: metà del guadagno, per un calendario.
+    Aggiornati landing, card prezzi, FAQ, verdetto, condizioni d'uso, email
+    T+0 e T+60, app, llms.txt, SPEC e DECISIONI. La colonna
+    `garanzia_fino_al` resta popolata (nessuna migrazione da fare) ma non la
+    vede più nessuno: vale come promemoria interno.
+  - **GLI ENTI NAZIONALI SEGUONO L'AEROPORTO DI PARTENZA** (`lib/lettera/
+    neb.ts`). L'art. 16 par. 1 dà la competenza allo Stato dello scalo di
+    PARTENZA: la lettera mandava tutti all'ENAC, quindi chi partiva da
+    Barcellona scriveva all'ufficio sbagliato. Ora la lettera e la guida
+    passo-passo nominano l'ente giusto, col suo sito. **20 paesi in tabella**
+    con fonte verificata una per una (Italia, Spagna, Germania, Francia,
+    Olanda, Grecia, Austria, Ungheria, Cechia, Bulgaria, Polonia, Irlanda,
+    Portogallo, Belgio, Lussemburgo, Finlandia, Svezia, Danimarca, Norvegia,
+    Malta). ⚠️ Per i paesi NON in tabella la lettera **non inventa un
+    ufficio**: dice il paese e rimanda all'elenco ufficiale della
+    Commissione. Mancano Croazia, Slovenia, Slovacchia, Romania, Cipro,
+    Estonia, Lettonia, Lituania, Liechtenstein: la pagina ufficiale UE è
+    bloccata dal proxy di questo ambiente, sono in ARRETRATI. **6 prove
+    nuove**, fra cui quella che vieta di nominare un ente non verificato.
+  - **L'APP HA I CASI CHE VALGONO SOLDI** (`mobile/src/components/
+    DomandeCaso.tsx`). Prima sull'app un volo cancellato diceva "incerto" e
+    finiva lì, mentre sul sito si chiudeva con due domande: era il vicolo
+    cieco più caro che avevamo, perché il cancellato è il caso in cui la
+    compensazione spetta più spesso. Ora l'app ha **le due domande dell'art.
+    5** (preavviso e volo alternativo) e **negato imbarco + coincidenza
+    persa**, con la ricerca dello scalo di destinazione. Il verdetto resta
+    del server: in quel file non c'è una riga di Regolamento.
+  - Prove: **362 verdi** sul web (restano le 2 note dell'Osservatorio),
+    mobile tipi/lint/jest tutti verdi.
 - **GIRO #37 (9/08): IL CANCELLO TERRITORIALE (un falso positivo vero) +
   BANCO DI PROVA + LA RICERCA CHE RISPONDE AL PIANO DELL'AMICO.**
   - 🔴 **TROVATO E CHIUSO UN FALSO POSITIVO VERO.** Il motore calcolava

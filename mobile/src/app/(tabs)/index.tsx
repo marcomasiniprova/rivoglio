@@ -221,6 +221,9 @@ export default function SchermataCheck() {
       params: {
         volo: voloDaControllare.trim().toUpperCase(),
         data: iso,
+        /* Serve alle domande dei casi che gli archivi non vedono: le
+           risposte vanno scritte sulla verifica giusta, non su una nuova. */
+        id: esito.id ?? "",
         esito: esito.esito,
         motivo: esito.motivo,
         importo: String(esito.importo ?? ""),

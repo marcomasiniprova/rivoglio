@@ -252,3 +252,83 @@ export async function voliDiTratta(
     return { ok: false, errore: "Sei offline? Controlla la connessione e riprova." };
   }
 }
+
+/* ───────────── I CASI CHE GLI ARCHIVI NON VEDONO ─────────────────────────
+   Volo cancellato, negato imbarco, coincidenza persa: il motore da solo
+   non può chiuderli, perché dipendono da fatti che sa solo il passeggero
+   (quando ti hanno avvisato, se sei salito, se il biglietto era unico).
+   Fino a oggi sull'app questi casi erano un vicolo cieco: usciva "incerto"
+   e finiva lì, mentre sul sito si chiudevano con due domande.
+   Il verdetto resta SEMPRE del server: qui si spediscono solo le risposte. */
+
+export type EsitoDomande =
+  | {
+      ok: true;
+      esito: "idoneo" | "incerto" | "non_idoneo";
+      motivo: string;
+      importo?: number;
+    }
+  | { ok: false; errore: string };
+
+async function mandaRisposte(rotta: string, corpo: unknown): Promise<EsitoDomande> {
+  try {
+    const r = await fetch(`${SITO}${rotta}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(corpo),
+    });
+    const dati = await r.json().catch(() => null);
+    if (!r.ok || !dati?.ok) {
+      return {
+        ok: false,
+        errore:
+          typeof dati?.errore === "string"
+            ? dati.errore
+            : "Non riesco a chiudere il verdetto. Riprova fra un attimo.",
+      };
+    }
+    return {
+      ok: true,
+      esito: dati.esito,
+      motivo: dati.motivo,
+      importo: typeof dati.importo === "number" ? dati.importo : undefined,
+    };
+  } catch {
+    return { ok: false, errore: "Sei offline? Controlla la connessione e riprova." };
+  }
+}
+
+/** Volo cancellato: preavviso e volo alternativo (art. 5). */
+export function chiudiCancellato(d: {
+  volo: string;
+  data: string;
+  verificaId: string | null;
+  preavviso: string;
+  alternativa: string;
+}): Promise<EsitoDomande> {
+  return mandaRisposte("/api/verifica/cancellato", d);
+}
+
+/** Negato imbarco (art. 4) o coincidenza persa (sentenza Folkerts). */
+export function chiudiDichiarato(
+  d:
+    | {
+        volo: string;
+        data: string;
+        verificaId: string | null;
+        caso: "negato";
+        presenza: string;
+        volonta: string;
+      }
+    | {
+        volo: string;
+        data: string;
+        verificaId: string | null;
+        caso: "coincidenza";
+        unica: string;
+        ritardoFinale: string;
+        destinazioneFinale: string;
+      },
+): Promise<EsitoDomande> {
+  return mandaRisposte("/api/verifica/dichiara", d);
+}

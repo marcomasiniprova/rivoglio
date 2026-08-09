@@ -17,6 +17,7 @@ import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import marchio from "../../assets/images/marchio.png";
 import Bottone from "@/components/Bottone";
+import DomandeCaso from "@/components/DomandeCaso";
 import Titolo from "@/components/Titolo";
 import { SITO } from "@/lib/api";
 import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
@@ -57,6 +58,7 @@ export default function SchermataVerdetto() {
   const p = useLocalSearchParams<{
     volo: string;
     data: string;
+    id: string;
     da: string;
     a: string;
     esito: string;
@@ -70,6 +72,10 @@ export default function SchermataVerdetto() {
 
   const idoneo = p.esito === "idoneo";
   const incerto = p.esito === "incerto";
+  /* Il motore segnala il volo cancellato dentro il motivo: è la stessa
+     frase che cerca il sito (lib/regole/eu261.ts), e non va cambiata alla
+     leggera né qui né là. */
+  const cancellato = (p.motivo ?? "").includes("risulta cancellato");
   const testa = idoneo ? V.idoneo : incerto ? V.incerto : V.nonIdoneo;
   const ritardo = Number(p.ritardo);
   const haOrari = Boolean(p.previsto && p.effettivo);
@@ -136,6 +142,23 @@ export default function SchermataVerdetto() {
           </Text>
           <Text style={stili.fasciaNota}>{V.idoneo.nota}</Text>
         </View>
+      )}
+
+      {/* I CASI CHE GLI ARCHIVI NON VEDONO.
+          Cancellato: le due domande dell'art. 5 compaiono da sole, perché
+          il motore ha già detto che il volo risulta cancellato.
+          Negato imbarco e coincidenza persa: l'invito compare sotto un
+          "no" o un "incerto", cioè proprio quando il verdetto automatico
+          sembra chiuso ma il caso dell'utente può essere un altro.
+          Su un idoneo non serve: ha già la sua fascia. */}
+      {!idoneo && (
+        <DomandeCaso
+          volo={p.volo}
+          data={p.data}
+          verificaId={p.id || null}
+          cancellato={cancellato}
+          demo={p.demo === "1"}
+        />
       )}
 
       <Text style={stili.nota}>{testa.nota}</Text>

@@ -1,6 +1,8 @@
 import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
 import type { Passeggero, Pratica } from "@/lib/pratiche/pratiche";
 import { type CanaleCompagnia, compagniaPerVettore } from "./compagnie";
+import { paeseDiScalo } from "@/lib/regole/territorio";
+import { ELENCO_UFFICIALE_NEB, nebPerPaese, nomeBreveNeb } from "./neb";
 
 /**
  * Il generatore di documenti (strato 5, SPEC §4). In v1 è un modello
@@ -102,6 +104,23 @@ function percheFascia(importo: number, ritardoMinuti: number, kmTratta: number |
   return `Per un ritardo all'arrivo di ${durata(ritardoMinuti)} su ${tratta}, l'articolo 7 del Regolamento fissa la compensazione in ${euro(importo)} a passeggero.`;
 }
 
+/**
+ * Come si nomina, dentro la lettera, l'ente a cui si farà reclamo se la
+ * compagnia tace. NON è sempre l'ENAC: l'art. 16 par. 1 dà la competenza
+ * all'organismo dello Stato dell'AEROPORTO DI PARTENZA, quindi per un volo
+ * partito da Barcellona è quello spagnolo.
+ *
+ * Se il paese di partenza non è nella nostra tabella, la frase resta vera
+ * ma generica ("l'organismo nazionale competente dello Stato di partenza"):
+ * meglio dirlo così che spedire una persona all'ufficio sbagliato.
+ */
+function organismoDiPartenza(fatto: FattoVolo): string {
+  const neb = nebPerPaese(paeseDiScalo(fatto.partenzaIata));
+  if (!neb) return "l'organismo nazionale competente dello Stato da cui è partito il volo";
+  const sigla = nomeBreveNeb(neb);
+  return sigla === neb.nome ? `${neb.nome}` : `${sigla} (${neb.nome})`;
+}
+
 /* ----------------------------------------------------------- reclamo */
 
 /**
@@ -161,7 +180,7 @@ Intestato a: [da compilare]
 
 Chiedo il pagamento, o una risposta scritta e motivata, entro 30 giorni dal ricevimento della presente. Se intendete invocare circostanze eccezionali, chiedo che siano indicate in modo specifico e documentate: l'onere della prova è a vostro carico.
 
-In mancanza di riscontro nel termine indicato, presenterò reclamo all'ENAC, l'organismo nazionale responsabile dell'applicazione del Regolamento (CE) 261/2004, e valuterò ogni ulteriore tutela nelle sedi competenti.
+In mancanza di riscontro nel termine indicato, presenterò reclamo a ${organismoDiPartenza(fatto)}, l'organismo nazionale responsabile dell'applicazione del Regolamento (CE) 261/2004 per lo Stato di partenza, e valuterò ogni ulteriore tutela nelle sedi competenti.
 
 In allegato: carta d'imbarco, documento d'identità e le eventuali ricevute delle spese sostenute.
 
@@ -211,7 +230,7 @@ A oggi non ho ricevuto alcun riscontro. Il silenzio non estingue il diritto: i p
 
 Vi chiedo il pagamento, o una risposta scritta e motivata, entro 14 giorni dal ricevimento del presente sollecito.
 
-Decorso inutilmente questo termine, presenterò reclamo all'ENAC, l'organismo nazionale responsabile dell'applicazione del Regolamento (CE) 261/2004, che può accertare la violazione e applicare le sanzioni previste. Valuterò inoltre ogni ulteriore tutela nelle sedi competenti.
+Decorso inutilmente questo termine, presenterò reclamo a ${organismoDiPartenza(fatto)}, l'organismo nazionale responsabile dell'applicazione del Regolamento (CE) 261/2004 per lo Stato di partenza, che può accertare la violazione e applicare le sanzioni previste. Valuterò inoltre ogni ulteriore tutela nelle sedi competenti.
 
 Distinti saluti,
 
@@ -235,6 +254,63 @@ export type IstruzioniEnac = {
   avvertenza: string;
   fonte: string;
 };
+
+/**
+ * Le istruzioni per il reclamo all'organismo nazionale, scelte in base al
+ * paese dell'AEROPORTO DI PARTENZA (art. 16 par. 1).
+ *
+ * Tre casi, in ordine di quanto sappiamo:
+ * 1. partenza dall'Italia (o scalo sconosciuto): la guida ENAC completa,
+ *    con gli URL verificati. È anche la riserva sensata, visto che il
+ *    nostro pubblico parte quasi sempre da qui;
+ * 2. partenza da un altro paese che abbiamo in tabella: guida più corta
+ *    ma col nome e il sito giusti di quell'ente;
+ * 3. paese non in tabella: si dice apertamente che l'ente va cercato
+ *    nell'elenco ufficiale della Commissione. Mai un ufficio inventato.
+ */
+export function istruzioniOrganismo(partenzaIata?: string | null): IstruzioniEnac {
+  const paese = paeseDiScalo(partenzaIata);
+  if (!paese || paese === "Italy") return testoEnac();
+
+  const neb = nebPerPaese(paese);
+  if (!neb) {
+    return {
+      titolo: "Il reclamo all'organismo nazionale, passo per passo",
+      premessa: `Il tuo volo è partito da un aeroporto in ${paese}. Il reclamo va all'organismo di quel paese, non all'ENAC: lo dice l'articolo 16 del Regolamento, che assegna la competenza allo Stato dell'aeroporto di partenza. Non abbiamo ancora verificato quale sia per ${paese}: lo trovi nell'elenco ufficiale della Commissione europea, qui sotto.`,
+      passi: [
+        "Aspetta 6 settimane dall'invio del reclamo alla compagnia, oppure la sua risposta se arriva prima.",
+        `Apri l'elenco ufficiale della Commissione e cerca ${paese}: trovi l'ente competente e come contattarlo.`,
+        "Tieni a portata di mano: numero e data del volo, il reclamo inviato alla compagnia, la sua eventuale risposta, la carta d'imbarco.",
+        "Indica i fatti come stanno nella tua lettera: orari previsto ed effettivo, ritardo all'arrivo, richiesta già inviata alla compagnia.",
+        "Invia e conserva la ricevuta della segnalazione insieme al resto della pratica.",
+      ],
+      urlModalita: ELENCO_UFFICIALE_NEB,
+      urlPortale: ELENCO_UFFICIALE_NEB,
+      avvertenza:
+        "L'organismo nazionale accerta le violazioni e può sanzionare la compagnia, ma non liquida la compensazione al posto suo. Serve a farla rispondere: per il pagamento la strada resta il reclamo diretto ed eventualmente il giudice.",
+      fonte: `Ente non ancora verificato per ${paese}. Elenco ufficiale: Commissione europea, National enforcement bodies (NEB).`,
+    };
+  }
+
+  const breve = nomeBreveNeb(neb);
+  const dove = neb.url ?? ELENCO_UFFICIALE_NEB;
+  return {
+    titolo: `Il reclamo a ${breve}, passo per passo`,
+    premessa: `Il tuo volo è partito da un aeroporto in ${paese}, quindi l'organismo competente è ${neb.nome}${neb.sigla ? ` (${neb.sigla})` : ""}, non l'ENAC: la competenza è dello Stato dell'aeroporto di partenza (art. 16 del Regolamento). Il reclamo è gratuito e lo presenti tu.`,
+    passi: [
+      "Aspetta 6 settimane dall'invio del reclamo alla compagnia, oppure la sua risposta se arriva prima.",
+      "Tieni a portata di mano: numero e data del volo, il reclamo inviato alla compagnia, la sua eventuale risposta, la carta d'imbarco.",
+      `Apri il sito di ${breve} e cerca la sezione dei reclami per i diritti del passeggero.`,
+      "Indica i fatti come stanno nella tua lettera: orari previsto ed effettivo, ritardo all'arrivo, richiesta già inviata alla compagnia.",
+      "Invia e conserva la ricevuta della segnalazione insieme al resto della pratica.",
+    ],
+    urlModalita: dove,
+    urlPortale: dove,
+    avvertenza:
+      "L'organismo nazionale accerta le violazioni e può sanzionare la compagnia, ma non liquida la compensazione al posto suo. Serve a farla rispondere: per il pagamento la strada resta il reclamo diretto ed eventualmente il giudice.",
+    fonte: `Ente competente per ${paese}: ${neb.nome}. Vedi lib/lettera/neb.ts per la fonte di ogni riga.`,
+  };
+}
 
 /**
  * La segnalazione all'ENAC, passo per passo. URL verificati con ricerca
