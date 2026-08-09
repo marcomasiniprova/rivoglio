@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { Anima, AnimaLista, Figlio } from "@/components/Anima";
+import ConfrontoBanconote from "./ConfrontoBanconote";
 import { COPY } from "@/lib/copy";
 
 /**
@@ -98,36 +99,64 @@ export default function PrezziRivoglio() {
           </p>
         </Anima>
 
-        {/* La premessa: il check è gratis, il verdetto lo vedi PRIMA di
-            pagare. Una striscia, non un terzo biglietto. */}
+        {/* IL CHECK GRATUITO HA LA SUA SCHEDA, ed è la più grande della
+            sezione (richiesta di Valerio, 9/08): è la cosa che distingue
+            Rivoglio da chi ti fa pagare per sapere se hai diritto. Prima
+            era una strisciolina sopra i biglietti e si leggeva come una
+            nota a piè di pagina. */}
         <Anima ritardo={0.05} className="mx-auto mt-12 max-w-[880px]">
-          <div className="rounded-2xl border border-bordo/70 bg-white p-5 shadow-[0_18px_44px_-32px_rgba(5,46,31,.3)] sm:p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="min-w-0">
-                <p className="text-[15px] font-semibold text-inchiostro">
-                  {CHECK.nome}{" "}
-                  <span className="numeri font-display text-[19px] font-medium tracking-[-0.02em] text-verde-scuro">
-                    {CHECK.prezzo}
-                  </span>{" "}
-                  <span className="text-[13px] font-normal text-fumo-2">{CHECK.periodo}</span>
+          <div className="relative overflow-hidden rounded-[1.75rem] border-2 border-verde bg-white shadow-[0_34px_80px_-40px_rgba(10,157,92,.55)]">
+            {/* l'alone verde dietro il numero: fa da faro alla cifra */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-menta/45 blur-[70px]"
+            />
+            <span className="absolute right-0 top-0 rounded-bl-2xl bg-verde px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-[0.16em] text-white">
+              {CHECK.nastro}
+            </span>
+
+            <div className="relative grid gap-7 p-6 sm:p-9 md:grid-cols-[auto_1fr] md:items-center md:gap-10">
+              {/* la cifra, grande come merita */}
+              <div className="text-center md:text-left">
+                <p className="numeri font-display text-[76px] font-medium leading-[0.85] tracking-[-0.05em] text-verde sm:text-[92px]">
+                  {CHECK.prezzo}
                 </p>
-                <p className="mt-1 text-[14px] leading-relaxed text-fumo">{CHECK.descrizione}</p>
+                <p className="mt-2 text-[13.5px] font-medium uppercase tracking-[0.16em] text-fumo-2">
+                  {CHECK.periodo}
+                </p>
               </div>
-              <a
-                href="#controllo"
-                className="block shrink-0 rounded-bottone bg-inchiostro px-6 py-3 text-center text-[14.5px] font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-inchiostro/85 active:scale-[0.98]"
-              >
-                {CHECK.bottone}
-              </a>
+
+              <div className="min-w-0">
+                <h3 className="font-display text-[24px] font-medium leading-tight tracking-[-0.02em] text-inchiostro sm:text-[27px]">
+                  {CHECK.nome}
+                </h3>
+                <p className="mt-2 text-[15.5px] leading-relaxed text-fumo">
+                  {CHECK.descrizione}
+                </p>
+
+                {/* i punti si vedono ANCHE sul telefono: prima sparivano
+                    sotto i 640px, cioè proprio dove passa la gente */}
+                <ul className="mt-5 grid gap-2.5 sm:grid-cols-2">
+                  {CHECK.punti.map((punto) => (
+                    <li key={punto} className="flex items-start gap-2.5">
+                      <span className="mt-0.5 grid h-[19px] w-[19px] shrink-0 place-items-center rounded-full bg-menta-tenue">
+                        <Check aria-hidden="true" strokeWidth={3} className="h-3 w-3 text-verde" />
+                      </span>
+                      <span className="text-[13.5px] leading-snug text-fumo">{punto}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <a
+                  href="#controllo"
+                  className="riflesso mt-6 inline-flex h-13 w-full items-center justify-center gap-2 rounded-bottone bg-verde px-8 text-[16px] font-semibold text-white shadow-[0_16px_34px_-14px_rgba(10,157,92,.7)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro active:scale-[0.99] sm:w-auto"
+                >
+                  {CHECK.bottone}
+                  <span aria-hidden="true">→</span>
+                </a>
+                <p className="mt-3 text-[13px] text-fumo-2">{CHECK.rassicurazione}</p>
+              </div>
             </div>
-            <ul className="mt-4 hidden flex-wrap gap-x-5 gap-y-1.5 border-t border-bordo/60 pt-4 sm:flex">
-              {CHECK.punti.map((punto) => (
-                <li key={punto} className="flex items-center gap-2">
-                  <Check aria-hidden="true" strokeWidth={2.8} className="h-3 w-3 text-verde" />
-                  <span className="text-[12.5px] text-fumo">{punto}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </Anima>
 
@@ -228,41 +257,14 @@ export default function PrezziRivoglio() {
           ))}
         </AnimaLista>
 
-        {/* Il confronto onesto coi portali a percentuale: striscia sottile
-            sotto le card. Il "come nasce" apre la matematica dichiarata. */}
+        {/* IL CONFRONTO COI PORTALI, con le banconote che se ne volano
+            via (scelta di Valerio col popup, 9/08). Era un riquadro con
+            due righe di testo: giusto nei numeri, invisibile agli occhi.
+            Il "come nasce" apre la matematica dichiarata, come sempre. */}
         <Anima ritardo={0.08} className="mx-auto mt-10 max-w-3xl">
           <div className="rounded-2xl border border-bordo/70 bg-white p-5 sm:p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <p className="shrink-0 text-[12.5px] font-medium uppercase tracking-[0.14em] text-fumo-2 sm:max-w-[150px]">
-                {SEZIONE.confronto.base}
-              </p>
-              <div className="grid flex-1 gap-3 sm:grid-cols-2">
-                {SEZIONE.confronto.voci.map((v, i) => {
-                  const nostro = i === SEZIONE.confronto.voci.length - 1;
-                  return (
-                    <div
-                      key={v.nome}
-                      className={`rounded-xl border px-4 py-3 ${
-                        nostro ? "border-verde/30 bg-menta-tenue" : "border-bordo bg-nebbia"
-                      }`}
-                    >
-                      <p className="text-[13.5px] font-medium">
-                        {v.nome}{" "}
-                        <span
-                          className={`numeri font-display font-medium tracking-[-0.02em] ${
-                            nostro ? "text-verde" : "text-inchiostro"
-                          }`}
-                        >
-                          {v.costo}
-                        </span>
-                      </p>
-                      <p className="mt-1 text-[12.5px] text-fumo">{v.resta}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            <details className="group mt-4">
+            <ConfrontoBanconote />
+            <details className="group mt-5 border-t border-bordo/60 pt-4">
               <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 text-[13px] font-medium text-fumo underline decoration-dotted underline-offset-4 transition-colors marker:hidden hover:text-verde">
                 {COPY.comune.apriIlConto}
                 <span

@@ -312,17 +312,44 @@ export const COPY = {
     /** Il confronto messo in colonna. I numeri sono quelli di notaConfronto: 600 × 35% = 210; 600 - 210 = 390; 600 - 14,90 = 585,10. */
     confronto: {
       base: "Su una compensazione da 600€",
+      /* I numeri servono ANCHE all'animazione delle banconote: il
+         componente li usa per far volare via la quota giusta, invece di
+         inventarsi una proporzione a occhio. Le stringhe restano perché
+         senza JavaScript la sezione deve leggersi lo stesso. */
+      compensazione: 600,
       voci: [
-        { nome: "Portale al 35%", costo: "trattiene 210€", resta: "a te restano 390€" },
-        { nome: "Rivoglio", costo: "costa 14,90€", resta: "a te restano 585,10€" },
+        {
+          nome: "Portale al 35%",
+          costo: "trattiene 210€",
+          resta: "a te restano 390€",
+          trattenuto: 210,
+          restano: 390,
+          etichettaVia: "via 210€",
+        },
+        {
+          nome: "Rivoglio",
+          costo: "costa 14,90€",
+          resta: "a te restano 585,10€",
+          trattenuto: 14.9,
+          restano: 585.1,
+          etichettaVia: "via 14,90€",
+        },
       ],
+      /* Le due righe sotto le banconote: dette in parole, non in cifre. */
+      didascalia: {
+        portale: "Una compensazione su tre resta al portale.",
+        nostro: "Qui resta a te, meno il prezzo di una pizza.",
+      },
     },
     piani: {
       check: {
-        nome: "Il check",
+        nome: "Il check del volo",
+        nastro: "Sempre gratis",
         prezzo: "0€",
         periodo: "per sempre",
-        descrizione: "Scopri se il tuo volo rientra in una fascia di compensazione.",
+        rassicurazione: "Niente carta, niente account. Paghi solo se decidi di aprire la pratica.",
+        descrizione:
+          "Numero di volo e data, oppure la foto della carta d'imbarco: in trenta secondi sai se il tuo volo rientra in una fascia del CE 261/2004, e vedi gli orari veri su cui l'abbiamo deciso.",
         punti: [
           "Numero di volo e data, nient'altro",
           "Verifica sui dati ufficiali del volo",

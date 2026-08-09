@@ -542,3 +542,19 @@ a[class*="rounded-pillola"]:active {
     scroll-behavior: auto;
   }
 }
+
+/* LA FIRMA IN FONDO ALLA PAGINA, larga esattamente quanto lo schermo.
+   Misurato nel font display: "RIVOGLIO" in maiuscolo con tracking -0.05em
+   è largo 4,23 volte la propria dimensione. Dividendo la larghezza
+   disponibile per 4,23 la parola tocca i due bordi su qualsiasi telefono,
+   invece di restare piccola in mezzo con due buchi ai lati.
+   I 40px e i 64px sono i margini della pagina (px-5 e sm:px-8), e il
+   tetto è la larghezza massima del contenitore: 1240 / 4,23. */
+.marchio-gigante {
+  font-size: min(calc((100vw - 40px) / 4.23), 293px);
+}
+@media (min-width: 640px) {
+  .marchio-gigante {
+    font-size: min(calc((100vw - 64px) / 4.23), 293px);
+  }
+}

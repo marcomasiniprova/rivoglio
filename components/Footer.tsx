@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Marchio } from "./Logo";
 import BadgeStore from "./BadgeStore";
+import ManoRivelata from "./rivoglio/ManoRivelata";
 import { COPY } from "@/lib/copy";
 
 /**
@@ -93,19 +93,15 @@ export default function Footer() {
                 <span aria-hidden="true">→</span>
               </Link>
             </div>
-            {/* Foto raddrizzata e ritagliata al polso l'8/08: la mano esce
-                SOLO dal bordo basso della card (il taglio lo fa il bordo,
-                non l'immagine) e il telefono è al centro ottico della tela. */}
-            <div className="relative flex items-end justify-center overflow-hidden pt-4 md:pt-8">
-              <Image
-                src="/telefono-app.webp"
-                alt={F.cartolina.altTelefono}
-                width={940}
-                height={917}
-                sizes="(min-width: 768px) 460px, 330px"
-                className="mb-[-2px] h-[320px] w-auto object-contain object-bottom sm:h-[380px] md:h-[440px]"
-              />
-            </div>
+            {/* La mano NON sta ferma: sale dal basso e lo schermo si accende
+                (ManoRivelata). Il telefono è al centro ottico della tela, con
+                un pelo di spinta a destra: la mano pesa a sinistra e senza
+                quel filo l'occhio la legge storta. */}
+            <ManoRivelata
+              src="/telefono-app.webp"
+              alt={F.cartolina.altTelefono}
+              className="translate-x-[7px]"
+            />
           </div>
         </div>
 
@@ -230,7 +226,7 @@ export default function Footer() {
             come nel lockup del marchio: occupa tutta la larghezza e viene
             tagliato dal bordo basso, come nei riferimenti. */}
         <div className="relative mt-10 select-none overflow-hidden" aria-hidden="true">
-          <p className="translate-y-[24%] whitespace-nowrap bg-[linear-gradient(180deg,rgba(127,232,174,.5)_0%,rgba(127,232,174,.05)_85%)] bg-clip-text text-center font-display text-[clamp(3.4rem,13.5vw,15rem)] font-medium uppercase leading-[0.8] tracking-[-0.05em] text-transparent">
+          <p className="marchio-gigante translate-y-[12%] whitespace-nowrap bg-[linear-gradient(180deg,rgba(127,232,174,.5)_0%,rgba(127,232,174,.05)_88%)] bg-clip-text text-center font-display font-medium uppercase leading-[0.8] tracking-[-0.05em] text-transparent">
             {COPY.comune.marchio}
           </p>
         </div>
