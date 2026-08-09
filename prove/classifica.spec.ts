@@ -19,7 +19,13 @@ test("da spenta risponde attiva:false, senza voci e senza errori", async ({ requ
   expect(corpo.voci).toBeUndefined();
 });
 
-test("risponde anche a chi chiama da un'altra origine (l'app)", async ({ request }) => {
+test("il CORS è chiuso alla nostra origine, non più aperto a chiunque", async ({ request }) => {
+  /* Prima rispondeva "*": qualunque sito poteva leggerla dal browser di un
+     suo visitatore. Il team di sicurezza l'ha segnalato (giro #36). Ora
+     l'header c'è ma è la NOSTRA origine, non "*". L'app nativa non è un
+     browser: il CORS non la riguarda e continua a leggere. */
   const r = await request.get("/api/classifica");
-  expect(r.headers()["access-control-allow-origin"]).toBe("*");
+  const acao = r.headers()["access-control-allow-origin"];
+  expect(acao).toBeTruthy();
+  expect(acao).not.toBe("*");
 });

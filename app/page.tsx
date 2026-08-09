@@ -19,9 +19,12 @@ import { COPY } from "@/lib/copy";
  * La home di Rivolio: lo scanner dei rimborsi (SPEC §1).
  *
  * L'ordine delle sezioni segue il funnel (SPEC §3): prima il check, che è
- * il prodotto; poi come funziona, cosa c'è dietro il verdetto, la garanzia,
- * il gancio retroattivo, i prezzi col confronto, i numeri del problema, le
- * domande e l'Osservatorio. I vecchi componenti viaggi restano nel
+ * il prodotto; poi come funziona e cosa c'è dietro il verdetto; cosa copre;
+ * la garanzia che azzera il rischio; SUBITO DOPO i numeri del problema (è
+ * l'argomento che convince, prima stava sepolto sotto i prezzi); chi fa
+ * cosa; il gancio retroattivo; i prezzi col confronto; le domande e
+ * l'Osservatorio. "Chi fa cosa" è sceso qui sotto per non fare due spiegoni
+ * di fila con "Cosa copre". I vecchi componenti viaggi restano nel
  * repository ma la pagina non li importa più.
  */
 
@@ -82,11 +85,11 @@ export default function Home() {
         <ComeFunziona />
         <DatoOggettivo />
         <Copertura />
-        <ChiFaCosa />
         <Garanzia />
+        <NumeriMercato />
+        <ChiFaCosa />
         <Retroattivo />
         <PrezziRivolio />
-        <NumeriMercato />
         <FaqRivolio />
         <Osservatorio />
         <InvitoBreve />

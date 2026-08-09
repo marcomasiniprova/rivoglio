@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Logo from "@/components/Logo";
 import ModuloEntra from "@/components/ModuloEntra";
+import { percorsoInterno } from "@/lib/api/percorso";
 
 export const metadata: Metadata = {
   title: "Entra | Rivolio",
@@ -22,8 +23,7 @@ export const metadata: Metadata = {
  */
 export default async function PaginaEntra({ searchParams }: PageProps<"/entra">) {
   const p = await searchParams;
-  const grezzo = typeof p.poi === "string" ? p.poi : "/app";
-  const poi = grezzo.startsWith("/") && !grezzo.startsWith("//") ? grezzo : "/app";
+  const poi = percorsoInterno(p.poi);
   const modo = p.modo === "registrati" ? "registrati" : "accedi";
   const errore = typeof p.errore === "string" ? p.errore : null;
 

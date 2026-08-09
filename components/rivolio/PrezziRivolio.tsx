@@ -171,6 +171,19 @@ export default function PrezziRivolio() {
                     </span>
                   </p>
 
+                  {/* La garanzia, proprio sotto il prezzo: è l'obiezione
+                      numero uno di chi sta per pagare, e va tolta di dosso
+                      dove si decide (scelta di Valerio col popup, 9/08). */}
+                  <p className="mt-3 flex items-start gap-2 rounded-xl bg-menta-tenue/70 px-3 py-2 text-[12.5px] font-medium leading-snug text-verde-scuro">
+                    <span
+                      aria-hidden="true"
+                      className="mt-px grid h-[15px] w-[15px] shrink-0 place-items-center rounded-full bg-verde"
+                    >
+                      <Check strokeWidth={3.2} className="h-2.5 w-2.5 text-white" />
+                    </span>
+                    {SEZIONE.garanziaCarta}
+                  </p>
+
                   <ul className="mt-5 flex-1 space-y-2.5 border-t border-bordo/60 pt-5">
                     {p.punti.map((punto) => (
                       <li key={punto} className="flex items-start gap-2.5">

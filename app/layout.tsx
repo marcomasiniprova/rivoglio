@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Instrument_Serif, Poppins } from "next/font/google";
+import AntiCopia from "@/components/AntiCopia";
 import "./globals.css";
 
 // Geist per i titoli, Poppins per il testo.
@@ -87,8 +88,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col bg-nebbia text-inchiostro">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(DATI_STRUTTURATI) }}
+          /* Il "<" si scrive escapato: un dato che contenesse "</script>"
+             non potrebbe chiudere il tag. Qui i dati sono nostri, ma è
+             l'abitudine giusta ovunque un valore finisca dentro uno script. */
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(DATI_STRUTTURATI).replace(/</g, "\\u003c"),
+          }}
         />
+        <AntiCopia />
         {children}
       </body>
     </html>

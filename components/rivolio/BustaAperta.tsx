@@ -1,20 +1,21 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 /**
- * La busta che si apre e lascia uscire la lettera.
+ * La busta email, resa come un asset 3D (stile "render matte") invece che
+ * come un disegnino piatto.
  *
- * Serve al riquadro "cercala nella tua posta": un riquadro con dentro
- * del testo resta un riquadro con dentro del testo, per quanto sia
- * scritto bene. Un oggetto che si muove lo guardi.
+ * Il riferimento di Valerio era una busta 3D lucida col bollo della
+ * chiocciola; lui l'ha voluta nei VERDI del marchio, non blu. Non è un file
+ * scaricato (i render 3D belli hanno licenze, e qui la macchina di rendering
+ * non è disponibile): è costruita in SVG dando a ogni faccia una sfumatura
+ * che finge la luce (chiaro in alto, scuro in basso), un'ombra morbida a
+ * terra e i bordi arrotondati. A schermo, piccola, legge come un oggetto 3D.
  *
- * Il rilievo è quello dei monumenti dell'Osservatorio, stessa lingua:
- * faccia in luce piena, fianco al 40%, e le pieghe scavate nel colore
- * del fondo. Niente immagini da scaricare: sono una ventina di forme.
- *
- * L'ordine conta: prima si alza l'aletta, POI esce la lettera. Al
- * contrario sembrerebbe che la carta attraversi la busta.
+ * `aperta`: quando la ricerca trova la mail, la lettera SALE e il bollo con
+ * la chiocciola compare con un piccolo rimbalzo. Prima galleggia appena, come
+ * un oggetto in scena.
  */
 
 const CURVA = [0.16, 1, 0.3, 1] as const;
@@ -26,51 +27,104 @@ export default function BustaAperta({
   aperta: boolean;
   className?: string;
 }) {
+  const fermo = useReducedMotion();
+
   return (
     <div className={`relative ${className ?? ""}`}>
-      {/* l'alone: il palcoscenico dell'oggetto */}
-      <motion.span
-        aria-hidden="true"
-        className="absolute left-1/2 top-1/2 h-[86%] w-[86%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-menta/50 blur-[26px]"
+      <motion.div
+        className="h-full w-full"
         initial={false}
-        animate={{ opacity: aperta ? 1 : 0.35, scale: aperta ? 1 : 0.75 }}
-        transition={{ duration: 0.9, ease: CURVA }}
-      />
+        animate={fermo ? {} : { y: [0, -4, 0] }}
+        transition={fermo ? undefined : { duration: 4.6, ease: "easeInOut", repeat: Infinity }}
+      >
+        <svg viewBox="0 0 160 150" className="h-full w-full" aria-hidden="true">
+          <defs>
+            {/* le facce: chiaro in alto, scuro in basso = luce dall'alto */}
+            <linearGradient id="ba-retro" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#12a862" />
+              <stop offset="1" stopColor="#067a47" />
+            </linearGradient>
+            <linearGradient id="ba-fronte" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#41c084" />
+              <stop offset="1" stopColor="#0a9d5c" />
+            </linearGradient>
+            <linearGradient id="ba-lettera" x1="0" y1="0" x2="0.15" y2="1">
+              <stop offset="0" stopColor="#ffffff" />
+              <stop offset="1" stopColor="#eaf3e4" />
+            </linearGradient>
+            <linearGradient id="ba-bollo" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#15b56e" />
+              <stop offset="1" stopColor="#0a8f52" />
+            </linearGradient>
+            <radialGradient id="ba-alone" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0" stopColor="#63e6a8" stopOpacity="0.55" />
+              <stop offset="1" stopColor="#63e6a8" stopOpacity="0" />
+            </radialGradient>
+          </defs>
 
-      <svg viewBox="0 0 96 72" className="relative h-full w-full" aria-hidden="true">
-        {/* l'ombra a terra */}
-        <ellipse cx="48" cy="66.5" rx="30" ry="3.4" className="fill-verde-scuro/15" />
+          {/* l'alone morbido dietro: il palcoscenico dell'oggetto */}
+          <motion.ellipse
+            cx="80"
+            cy="74"
+            rx="60"
+            ry="52"
+            fill="url(#ba-alone)"
+            initial={false}
+            animate={{ opacity: aperta ? 1 : 0.45 }}
+            transition={{ duration: 0.8, ease: CURVA }}
+          />
+          {/* l'ombra a terra */}
+          <ellipse cx="80" cy="138" rx="52" ry="7" fill="#052e1f" opacity="0.16" />
 
-        {/* LA LETTERA: sta dietro il corpo della busta e sale */}
-        <motion.g
-          initial={false}
-          animate={aperta ? { y: -22, opacity: 1 } : { y: 8, opacity: 0 }}
-          transition={{ duration: 0.75, ease: CURVA, delay: aperta ? 0.28 : 0 }}
-        >
-          <rect x="24" y="16" width="48" height="34" rx="3" className="fill-white" />
-          <rect x="24" y="16" width="48" height="34" rx="3" className="fill-none stroke-verde/25" strokeWidth="1.2" />
-          <rect x="30" y="23" width="24" height="3.2" rx="1.6" className="fill-verde/70" />
-          <rect x="30" y="30" width="36" height="2.6" rx="1.3" className="fill-fumo-2/45" />
-          <rect x="30" y="36" width="30" height="2.6" rx="1.3" className="fill-fumo-2/45" />
-          <rect x="30" y="42" width="18" height="2.6" rx="1.3" className="fill-fumo-2/45" />
-        </motion.g>
+          {/* l'aletta aperta dietro la lettera: dà il "è aperta" */}
+          <path d="M32 92 80 34 128 92Z" fill="url(#ba-retro)" opacity="0.65" />
 
-        {/* IL CORPO della busta: davanti alla lettera */}
-        <path d="M14 30h68a4 4 0 0 1 4 4v26a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V34a4 4 0 0 1 4-4Z" className="fill-verde" />
-        {/* la piega inferiore, la V che fa riconoscere una busta */}
-        <path d="M10 62 48 42l38 20v2a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2Z" className="fill-verde-scuro" />
-        <path d="M10 34 48 54l38-20v-1.5a2.5 2.5 0 0 0-2.5-2.5h-71A2.5 2.5 0 0 0 10 32.5Z" className="fill-verde/55" />
+          {/* LA LETTERA che sale, col bollo */}
+          <motion.g
+            initial={false}
+            animate={fermo ? { y: aperta ? -6 : 4 } : { y: aperta ? -6 : 6 }}
+            transition={{ duration: 0.75, ease: CURVA, delay: aperta ? 0.15 : 0 }}
+          >
+            <rect x="47" y="24" width="66" height="82" rx="7" fill="url(#ba-lettera)" />
+            <rect x="47" y="24" width="66" height="82" rx="7" fill="none" stroke="#0a9d5c" strokeOpacity="0.14" strokeWidth="1" />
+            {/* righe di testo accennate */}
+            <g fill="#cfe3d4">
+              <rect x="56" y="36" width="32" height="4" rx="2" />
+              <rect x="56" y="46" width="48" height="3.4" rx="1.7" />
+              <rect x="56" y="54" width="40" height="3.4" rx="1.7" />
+            </g>
+            {/* il bollo con la chiocciola */}
+            <motion.g
+              initial={false}
+              animate={{ scale: aperta ? 1 : 0, opacity: aperta ? 1 : 0 }}
+              transition={{ duration: 0.5, ease: CURVA, delay: aperta ? 0.4 : 0 }}
+              style={{ transformOrigin: "80px 78px" }}
+            >
+              <circle cx="80" cy="78" r="19" fill="#eafff3" />
+              <circle cx="80" cy="78" r="15.5" fill="url(#ba-bollo)" />
+              <text
+                x="80"
+                y="85"
+                textAnchor="middle"
+                fontFamily="Arial, Helvetica, sans-serif"
+                fontWeight="700"
+                fontSize="20"
+                fill="#eafff3"
+              >
+                @
+              </text>
+            </motion.g>
+          </motion.g>
 
-        {/* L'ALETTA: chiusa copre la bocca, aperta si ribalta all'indietro */}
-        <motion.path
-          d="M10 32.5A2.5 2.5 0 0 1 12.5 30h71a2.5 2.5 0 0 1 2.5 2.5L48 54Z"
-          className="fill-verde-scuro"
-          style={{ transformOrigin: "48px 30px" }}
-          initial={false}
-          animate={{ scaleY: aperta ? -0.72 : 1, opacity: aperta ? 0.85 : 1 }}
-          transition={{ duration: 0.5, ease: CURVA }}
-        />
-      </svg>
+          {/* la tasca davanti: la parete frontale con la piega centrale */}
+          <path d="M24 96 80 118 136 96 136 120a8 8 0 0 1-8 8H32a8 8 0 0 1-8-8Z" fill="url(#ba-fronte)" />
+          {/* i due lembi laterali, un filo più scuri per la profondità */}
+          <path d="M24 96 80 118 24 120Z" fill="#0a8f52" />
+          <path d="M136 96 80 118 136 120Z" fill="#0a8f52" />
+          {/* il taglio superiore della tasca, luce */}
+          <path d="M24 96 80 118 136 96" fill="none" stroke="#5fce97" strokeWidth="1.4" strokeLinejoin="round" opacity="0.7" />
+        </svg>
+      </motion.div>
     </div>
   );
 }

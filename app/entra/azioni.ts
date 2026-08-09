@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { benvenuto } from "@/lib/email/messaggi";
+import { percorsoInterno } from "@/lib/api/percorso";
 
 export type Esito = { errore?: string; avviso?: string };
 
@@ -20,16 +21,12 @@ async function origine() {
 }
 
 /**
- * Dove mandare l'utente dopo il login.
- *
- * Si accettano SOLO percorsi interni che iniziano con una barra singola.
- * Senza questo controllo un link tipo `/entra?poi=//sito-cattivo.it` ti
- * spedisce fuori dopo il login: è la falla chiamata "open redirect".
+ * Dove mandare l'utente dopo il login: solo un percorso interno vero.
+ * La regola sta in un punto solo (percorsoInterno), condivisa con le altre
+ * porte d'ingresso, così non si può indurire qui e dimenticare altrove.
  */
 function destinazioneSicura(poi: FormDataEntryValue | null): string {
-  const p = typeof poi === "string" ? poi : "";
-  if (p.startsWith("/") && !p.startsWith("//")) return p;
-  return "/app";
+  return percorsoInterno(poi);
 }
 
 function nonConfigurato(): Esito {

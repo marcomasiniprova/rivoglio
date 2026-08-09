@@ -87,7 +87,11 @@ export default function PaginaPrivacy() {
 
       <h2>Per quanto li conserviamo</h2>
       <ul>
-        <li>Le verifiche dei voli: senza dati che ti identificano, per le statistiche del servizio.</li>
+        <li>
+          Le verifiche dei voli: al più tardi dopo 24 mesi (il tempo utile a seguire una
+          pratica, visto che la finestra di reclamo arriva a due anni) togliamo ogni dato che
+          possa ricondurle a te; restano solo numeri anonimi per le statistiche del servizio.
+        </li>
         <li>
           L&apos;iscrizione all&apos;Osservatorio: finché non ti disiscrivi.
         </li>

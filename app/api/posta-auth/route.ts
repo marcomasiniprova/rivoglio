@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { conferma, linkMagico } from "@/lib/email/messaggi";
 import { casa } from "@/lib/email/posta";
+import { percorsoInterno } from "@/lib/api/percorso";
 
 /**
  * Il gancio "Send Email" di Supabase.
@@ -69,8 +70,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Il link deve tornare sulla NOSTRA pagina di conferma, non su Supabase.
-  const dove = corpo.email_data?.redirect_to;
-  const poi = dove?.startsWith("/") && !dove.startsWith("//") ? dove : "/app";
+  const poi = percorsoInterno(corpo.email_data?.redirect_to);
   const link = `${casa()}/auth/conferma?token_hash=${encodeURIComponent(token)}&type=${encodeURIComponent(tipo)}&poi=${encodeURIComponent(poi)}`;
 
   const esito =

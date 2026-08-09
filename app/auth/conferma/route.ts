@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { type EmailOtpType } from "@supabase/supabase-js";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
+import { percorsoInterno } from "@/lib/api/percorso";
 
 /**
  * Dove atterra chi clicca il link ricevuto per email.
@@ -29,10 +30,13 @@ import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
  * perché sono due problemi diversi con due soluzioni diverse.
  */
 
-/** Solo percorsi interni: senza questo, `poi=//sito-cattivo.it` ti spedisce fuori. */
-function destinazioneSicura(grezzo: string | null): string {
-  const p = grezzo ?? "/app";
-  return p.startsWith("/") && !p.startsWith("//") ? p : "/app";
+/* `poi` qui è doppiamente pericoloso: oltre all'open redirect, sotto
+   finisce DENTRO uno <script> (forma 3). percorsoInterno accetta solo
+   caratteri da percorso vero, quindi un `poi` con `</script>` è già
+   escluso alla radice. jsSicuro è la seconda rete: neutralizza `<` prima
+   di scriverlo nel tag, così anche un domani distratto non apre un buco. */
+function jsSicuro(valore: string): string {
+  return JSON.stringify(valore).replace(/</g, "\\u003c");
 }
 
 function fallito(request: NextRequest, motivo: string) {
@@ -43,7 +47,7 @@ function fallito(request: NextRequest, motivo: string) {
 
 export async function GET(request: NextRequest) {
   const p = request.nextUrl.searchParams;
-  const poi = destinazioneSicura(p.get("poi") ?? p.get("next"));
+  const poi = percorsoInterno(p.get("poi") ?? p.get("next"));
 
   if (!SUPABASE_CONFIGURATO) return fallito(request, "configurazione");
 
@@ -103,7 +107,7 @@ export async function GET(request: NextRequest) {
 <script>
 (function(){
   var f = new URLSearchParams(location.hash.replace(/^#/, ""));
-  var poi = ${JSON.stringify(poi)};
+  var poi = ${jsSicuro(poi)};
   if (f.get("access_token")) {
     // rigiro i dati al server come parametri normali
     var q = new URLSearchParams({

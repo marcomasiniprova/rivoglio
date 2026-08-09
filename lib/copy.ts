@@ -370,7 +370,6 @@ export const COPY = {
           "Sollecito già pronto al giorno 15",
           "Se serve, contro-risposta e reclamo ENAC",
           "Tracker della pratica, sul web e nell'app",
-          "Garanzia 90 giorni: se la compagnia non paga, non paghi neanche tu",
         ],
         bottone: "Prepara la pratica",
       },
@@ -390,6 +389,8 @@ export const COPY = {
         bottone: "Prepara la pratica famiglia",
       },
     },
+    /** La garanzia, dentro le card: è l'obiezione numero uno di chi paga. */
+    garanziaCarta: "Garanzia 90 giorni: se non ottieni nulla, ti rimborsiamo per intero.",
     promemoria: "Nessun abbonamento, nessuna percentuale, nessun altro costo.",
   },
 

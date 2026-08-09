@@ -403,3 +403,26 @@ non altro codice.**
 - **Lettera per negato/coincidenza**: oggi il verdetto c'è, la lettera
   usa il modello del ritardo; va scritta la variante con art. 4 e
   giurisprudenza Folkerts per i due casi nuovi.
+
+## Dal giro #36 (9/08) — sicurezza e stile
+- **Cancellazione automatica dopo 24 mesi**: la privacy ora PROMETTE che le
+  verifiche perdono i dati che identificano l'utente entro 24 mesi. La
+  promessa è scritta ma il lavoro NON è ancora automatico: serve un job (cron
+  Netlify, come `avvisa.mjs`) che gira ogni notte, trova le verifiche più
+  vecchie di 24 mesi e azzera i campi riconducibili (email collegata,
+  eventuali nomi passeggeri), lasciando solo i numeri anonimi per le
+  statistiche. Finché non c'è, la pulizia va fatta a mano. Priorità bassa
+  finché il volume è piccolo, ma la promessa è pubblica: non lasciarla vuota
+  a lungo.
+- **Titolare del trattamento nella privacy** (l'unico punto 🔴 dell'audit che
+  resta): serve cognome e, se c'è, ragione sociale + P.IVA + indirizzo di
+  Valerio. È un dato suo, non lo posso inventare. Vedi "Serve Valerio".
+- **Strato anti-copia**: è dentro (`AntiCopia.tsx`, scelta "entrambi" col
+  popup) ma è DEBOLE per natura e si può spegnere quando si vuole (basta
+  togliere `<AntiCopia />` dal layout). Se un domani dà fastidio agli utenti
+  veri (tasto destro bloccato), toglierlo è sano.
+- **CSP più stretta (nonce)**: oggi la CSP ammette `'unsafe-inline'` sugli
+  script perché Next inietta i suoi senza nonce. Il gradino successivo, se un
+  domani si vuole blindare anche l'inline, è una CSP con nonce per richiesta
+  (serve un middleware che genera il nonce e lo passa a Next). Non urgente:
+  non c'è nessun punto dove un dato dell'utente finisce in uno script.

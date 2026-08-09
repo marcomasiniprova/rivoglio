@@ -9,9 +9,8 @@ import { COPY } from "@/lib/copy";
  *
  * Ogni compagnia ha la sua card con un cielo: un aereo in rilievo decolla
  * da "oggi" e vola lungo la rotta tratteggiata fino a dove arriva la sua
- * finestra (2 anni, o 5-6). La scia se la lascia dietro, la bandierina
- * dice il paese della legge che comanda (Italia / Unione Europea), e la
- * tacca verticale al primo anno è il nostro archivio di oggi.
+ * finestra (2 anni, o 5-6). La scia se la lascia dietro e la bandierina
+ * dice il paese della legge che comanda (Italia / Unione Europea).
  *
  * L'aereo è NOSTRO, disegnato col rilievo dei monumenti (faccia in luce,
  * fianco in ombra): i loghi delle compagnie sono marchi registrati e un
@@ -68,8 +67,11 @@ function Bandiera({ paese }: { paese: "it" | "eu" }) {
       <rect width="24" height="16" fill="#003399" />
       {Array.from({ length: 12 }, (_, i) => {
         const a = (i / 12) * Math.PI * 2;
+        /* coordinate arrotondate: senza, il server e il browser stampano
+           l'ultima cifra decimale in modo diverso e React segnala un
+           "hydration mismatch" (il pallino 1 Issue del dev server). */
         return (
-          <circle key={i} cx={12 + Math.sin(a) * 5} cy={8 - Math.cos(a) * 5} r="0.8" fill="#FFCC00" />
+          <circle key={i} cx={+(12 + Math.sin(a) * 5).toFixed(2)} cy={+(8 - Math.cos(a) * 5).toFixed(2)} r="0.8" fill="#FFCC00" />
         );
       })}
     </svg>
@@ -109,8 +111,8 @@ function Card({
         </p>
       </div>
 
-      {/* IL CIELO: la striscia dove vola l'aereo. Sfuma verso l'alto,
-          la rotta è tratteggiata, la tacca al primo anno è l'archivio. */}
+      {/* IL CIELO: la striscia dove vola l'aereo. Sfuma verso l'alto e
+          la rotta è tratteggiata; l'aereo si ferma dove scade la finestra. */}
       <div className="relative mx-6 mb-5 mt-4 h-[64px] overflow-hidden rounded-xl bg-[linear-gradient(180deg,var(--color-menta-tenue),#ffffff_78%)] sm:mx-7">
         {/* la rotta completa, tenue */}
         <div className="absolute inset-x-4 top-1/2 border-t-2 border-dashed border-verde/20" />
@@ -121,12 +123,6 @@ function Card({
           initial={false}
           animate={{ width: vola ? `calc((100% - 32px) * ${quota})` : "0%" }}
           transition={{ duration: fermo ? 0 : 1.3, ease: CURVA, delay: fermo ? 0 : 0.25 + i * 0.15 }}
-        />
-        {/* la tacca del primo anno: fin lì arriva l'archivio, oggi */}
-        <div
-          aria-hidden="true"
-          className="absolute top-[10px] bottom-[10px] w-[2px] rounded bg-verde-scuro/30"
-          style={{ left: `calc(16px + (100% - 32px) * ${1 / SCALA_ANNI})` }}
         />
         {/* l'aereo che vola fino alla fine della finestra */}
         <motion.div

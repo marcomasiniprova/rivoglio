@@ -1,6 +1,12 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #35: Rivoglio estinto anche nei
+**Aggiornato:** 2026-08-09 (giro #36: repo BLINDATA — rate limit e
+CORS chiusa su /api/verifica e tutte le rotte, poi= reso a prova di
+open-redirect E di XSS in auth/conferma, header di sicurezza CSP ovunque,
+strato anti-copia; banconote del confronto RIFATTE pulite (le vere hanno
+"specimen" per legge, ora sono 100€ disegnate da noi), animazione più
+lunga e umana, barra grigia tolta dalle scadenze, busta email 3D verde,
+landing riordinata · giro #35: Rivoglio estinto anche nei
 lockup spezzati e nel mockup, negato imbarco e coincidenza persa con
 verdetto, banconote VERE nel confronto, aerei in volo sulle scadenze,
 Entra dritto al login, ritardo in parole · giro #34: il marchio è RIVOLIO, i voli
@@ -23,6 +29,76 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #36 (9/08): SICUREZZA A TAPPETO + IL GIRO DI STILE CHIESTO.**
+  - **LA REPO È BLINDATA (audit del team di Valerio + scan con la skill
+    Masriyan/Claude-Code-CyberSecurity-Skill).** Le difese vere, quelle che
+    contano:
+    - **/api/verifica** non era senza freno per davvero (aveva già un tetto
+      inline da 20/min), ma il **CORS era aperto a chiunque (`*`)**: ora usa
+      il tetto condiviso (`lib/api/limite`) e il CORS è chiuso alla NOSTRA
+      origine. Il check same-origin della landing non se ne accorge (il
+      browser non applica il CORS allo stesso sito), l'app nativa nemmeno
+      (non è un browser). Stessa chiusura su leggi-carta e tutte le rotte
+      che spartiscono `CORS`.
+    - **`poi=` (dove torni dopo il login)**: c'era già il filtro "inizia con
+      /" ma bucava col **backslash** (`/\evil.com` → il browser lo gira in
+      `//evil.com`). Peggio: in `auth/conferma` il `poi` finiva DENTRO uno
+      `<script>` via `JSON.stringify` → un `poi` con `</script>` eseguiva
+      codice (**XSS reale**, più grave di quanto visto dal team). Chiuso alla
+      radice con `lib/api/percorso.ts` (`percorsoInterno`: solo caratteri da
+      percorso vero) in tutti e 4 i punti + escape del `<` nello script.
+    - **Header di sicurezza** (mancavano del tutto): `next.config.ts` ora
+      mette CSP (script/style solo da noi + inline, `object-src none`,
+      `base-uri self`, `frame-ancestors self`, connect solo self+supabase),
+      X-Frame-Options SAMEORIGIN, Referrer-Policy, Permissions-Policy
+      (fotocamera/micro/posizione spenti), nosniff, HSTS. `unsafe-eval` solo
+      in sviluppo (Fast Refresh), sparisce in produzione.
+    - **Verificato NON presente**: verdetto/lettera sbloccati lato client
+      (il gating è già server-side: auth + proprietà + stato `pagata`, e il
+      webhook Polar verifica la firma); segreti nel bundle (solo le chiavi
+      pubbliche per progetto usano `NEXT_PUBLIC_`, mai la service key);
+      segreti hardcoded (zero).
+    - **Strato anti-copia** (`components/AntiCopia.tsx`, scelto da Valerio
+      col popup "entrambi"): tasto destro e scorciatoie devtools bloccati
+      fuori dai campi, messaggio in console. ⚠️ È DEBOLE PER NATURA e va
+      detto: su un sito il codice della pagina è sempre raggiungibile; alza
+      solo la soglia di fastidio. NON blocca la selezione del testo, se no
+      la lettera di reclamo non si potrebbe copiare. La difesa vera sono le
+      chiavi server-side, RLS, rate limit e header qui sopra.
+    - **Privacy**: retention delle verifiche resa concreta (24 mesi, poi si
+      tolgono i dati che identificano). ⚠️ Il **titolare del trattamento**
+      resta col placeholder: servono cognome/dati societari di Valerio
+      (in ARRETRATI e in "Serve Valerio"). Cookie: la pagina già dichiara
+      "solo tecnici, niente banner" (a posto).
+  - **IL CONFRONTO HA LE BANCONOTE PULITE, ORA DISEGNATE DA NOI**
+    (`ConfrontoBanconote.tsx`, via `public/assets/banconota-100.webp`). La
+    foto vera aveva "specimen" di traverso e la firma: OGNI immagine legale
+    di una banconota ce l'ha per legge, una foto pulita non esiste. Quindi
+    la 100€ è ricostruita in SVG (verde euro, arco, stelle UE, striscia
+    olografica): pulita per costruzione, nostra, legale. L'animazione è **1
+    secondo più lunga e più umana**: il ventaglio si APRE una carta alla
+    volta, poi le banconote prendono la **rincorsa** (un cenno in giù, poi
+    via in alto ruotando), il contatore sale in 1,4s.
+  - **VIA LA BARRA GRIGIA VERTICALE** dalle scadenze (`FinestreScadenza.tsx`):
+    la tacca del "primo anno" nel tragitto dell'aereo, tolta. Resta la rotta
+    tratteggiata e l'aereo che si ferma dove scade la finestra. (Sistemato
+    anche l'hydration mismatch delle stelle UE: coordinate arrotondate.)
+  - **LA BUSTA EMAIL È UN 3D VERDE** (`BustaAperta.tsx` rifatta): render
+    "matte" in SVG (facce sfumate = luce dall'alto, ombra a terra, bordi
+    tondi) col bollo della chiocciola, nei verdi del marchio (scelta di
+    Valerio col popup; il riferimento era blu). La lettera sale quando la
+    ricerca trova. Non è un file scaricato: Blender non era collegato e i
+    render stock hanno licenze.
+  - **LANDING RIORDINATA** (Valerio d'accordo): "I numeri del problema" sale
+    tra Garanzia e Retroattivo (argomento che convince, prima era sepolto
+    sotto i prezzi); "Chi fa cosa" scende sotto la Garanzia (non fa più due
+    spiegoni di fila con "Cosa copre"). L'Invito finale RESTA finché non
+    arrivano i testimonial. La **garanzia** ora è una riga dentro le due card
+    prezzi, sotto la cifra (era un punto sepruto solo nella pratica).
+  - **TESTIMONIAL: fermo, come chiesto.** Serve `EFFERD_REGISTRY_TOKEN`
+    (a pagamento, Efferd Pro) che Valerio non ha ancora: STOP come da sue
+    istruzioni. Niente sezione finché non arriva il token e le recensioni
+    vere.
 - **GIRO #35 (9/08): GLI ULTIMI DUE CASI CE 261 E IL GIRO DI STILE.**
   - **RIVOGLIO È DAVVERO ESTINTO.** La passata del giro #34 non poteva
     vedere i lockup SPEZZATI in due stringhe ("Rivo"+"glio"): nav del
