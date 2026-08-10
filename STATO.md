@@ -902,15 +902,17 @@ social rifatta (era rimasta al prodotto viaggi).
   (Android Studio + emulatore, oppure `expo start --web` in 2 minuti).
 
 ## Serve Valerio (in ordine)
-0-bis. **LE MIGRAZIONI DEL DATABASE, tutte insieme, 2 minuti.** Apri
-   supabase.com/dashboard → il progetto di Rivolio → **SQL Editor** →
-   **New query**, incolla tutto `supabase/DA-APPLICARE.sql` e premi Run.
-   Dentro ci sono le quattro cose che mancano (doppio opt-in, cancellati,
-   negato imbarco, paese degli scali). Si può rilanciare quante volte
-   vuoi: non cancella niente. Deve rispondere "Success. No rows returned".
-   ⚠️ Il connettore Composio che mi hai indicato non si può autorizzare da
-   qui: la sessione non ha uno schermo per il login, quindi il file lo
-   applichi tu.
+0-bis. ~~LE MIGRAZIONI DEL DATABASE~~ ✅ **FATTE da Valerio il 10/08**:
+   `supabase/DA-APPLICARE.sql` è stato eseguito sul Supabase vero. Da qui
+   in avanti sono attivi il doppio opt-in, i voli cancellati, il negato
+   imbarco e il paese degli scali in cache. Il file resta nel repo e si
+   può rilanciare: non cancella niente.
+0-ter. 🔴 **IL RAMO DEL LAVORO NON È MAI STATO UNITO A `main`.** `main` è
+   fermo al commit `1b0fb03` (il pivot del nome, prima di tutto il resto):
+   **79 commit indietro**. Conseguenza pratica scoperta il 10/08: la
+   scheda Actions di GitHub è vuota, perché GitHub legge i lavori
+   programmati SOLO dal ramo predefinito. Finché non si unisce, l'autopilot
+   degli aeroporti non parte e non si può nemmeno lanciare a mano.
 0. **DUE COSE SOLO TUE, e sbloccano le email:**
    a. **Il dominio.** Finché `rivolio.it` (o quello che scegli) non è
       verificato su Resend, le email partono SOLO verso
