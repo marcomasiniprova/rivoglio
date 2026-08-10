@@ -1,19 +1,23 @@
 /**
- * LA SCHEDA DELLA PRATICA: il tracker, dentro l'app.
+ * LA SCHEDA DELLA PRATICA: i quattro fogli (tavola 6e, giro #49).
  *
- * Richiesta di Valerio (8/08, popup): "tutto tranne pagare". Quindi qui
- * dentro c'è la timeline passo per passo, la lettera che si legge, si
- * copia e si apre direttamente nell'email, e il bottone "L'ho inviata".
- * L'unico momento in cui si apre il sito è il pagamento, che qui non
- * esiste: quando si arriva su questa schermata si è già pagato.
+ * Richiesta di Valerio (8/08, popup): "tutto tranne pagare". Qui dentro
+ * la pratica si segue e si combatte: il reclamo, la replica al loro no
+ * (o il sollecito), la segnalazione all'ente, la conciliazione. Ogni
+ * foglio si apre a schermo pieno (6g), si copia e si manda dalla email
+ * dell'utente. Il no della compagnia si dichiara qui (6d), a scelta
+ * chiusa.
  *
- * Regole di sempre: l'app non decide niente (la scheda arriva dal server,
- * lettera compresa), e non si promette mai l'esito.
+ * Regole di sempre: l'app non decide niente. I fogli arrivano dal
+ * server, calcolati dallo stesso codice del sito; i tempi (42 giorni,
+ * +14, 30 per la conciliazione) sono suoi, non nostri. E non si promette
+ * mai l'esito: "richiesta di 400€", mai "la compagnia deve".
  */
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
+  Modal,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -28,9 +32,16 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Bottone from "@/components/Bottone";
-import { confermaInvio, schedaPratica, type SchedaPratica } from "@/lib/api";
+import {
+  confermaInvio,
+  dichiaraRifiuto,
+  motiviRifiuto,
+  schedaPratica,
+  type MotivoRifiutoApp,
+  type SchedaPratica,
+} from "@/lib/api";
 import { DEMO, schedaDemo } from "@/lib/dati";
-import { dataBreve } from "@/lib/formati";
+import { dataBreve, euro } from "@/lib/formati";
 import { tokenSessione } from "@/lib/sessione";
 import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
 import { TESTI } from "@/lib/testi";
@@ -40,35 +51,21 @@ const T = TESTI.praticaScheda;
 const riempi = (testo: string, valori: Record<string, string | number>) =>
   testo.replace(/\{(\w+)\}/g, (_, chiave: string) => String(valori[chiave] ?? ""));
 
-/* La timeline: i passi nell'ordine in cui succedono davvero.
-   Lo stato della pratica dice fin dove siamo arrivati. */
-const ORDINE = ["pagata", "pronta", "inviata", "sollecito", "enac", "esito"] as const;
-type Passo = (typeof ORDINE)[number];
-
-function passoRaggiunto(stato: string): number {
-  switch (stato) {
-    case "creata":
-      return -1;
-    case "pagata":
-      return 0;
-    case "pronta":
-      return 1;
-    case "inviata":
-      return 2;
-    case "sollecito":
-      return 3;
-    case "enac":
-      return 4;
-    default:
-      // esito_pagata, esito_rifiutata, rimborsata: fine corsa.
-      return 5;
-  }
-}
-
-const dataOra = (iso: string) => {
+const dataLunga = (iso: string) => {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleDateString("it-IT", { day: "numeric", month: "long" });
+};
+
+/** Un foglio aperto a schermo pieno (6g). */
+type FoglioAperto = {
+  titolo: string;
+  oggetto: string;
+  corpo: string;
+  /** Indirizzo email a cui si manda, se un indirizzo esiste. */
+  email: string | null;
+  /** true per la segnalazione: si presenta sul portale, non per email. */
+  soloPortale?: boolean;
 };
 
 export default function SchermataPratica() {
@@ -80,9 +77,18 @@ export default function SchermataPratica() {
   const [messaggio, setMessaggio] = useState<string | null>(null);
   const [scheda, setScheda] = useState<SchedaPratica | null>(null);
   const [aggiorno, setAggiorno] = useState(false);
-  const [copiata, setCopiata] = useState(false);
   const [invioInCorso, setInvioInCorso] = useState(false);
   const [invioFatto, setInvioFatto] = useState(false);
+
+  /* Il foglio aperto a schermo pieno, e il suo "copiato". */
+  const [aperto, setAperto] = useState<FoglioAperto | null>(null);
+  const [copiato, setCopiato] = useState(false);
+
+  /* Il no della compagnia (6d): la lista si apre, si sceglie, si manda. */
+  const [rifiutoAperto, setRifiutoAperto] = useState(false);
+  const [motivi, setMotivi] = useState<MotivoRifiutoApp[]>([]);
+  const [motivoScelto, setMotivoScelto] = useState<string | null>(null);
+  const [rifiutoInCorso, setRifiutoInCorso] = useState(false);
 
   const carica = useCallback(async () => {
     if (!id) return;
@@ -125,37 +131,27 @@ export default function SchermataPratica() {
     setAggiorno(false);
   };
 
-  async function copiaLettera() {
-    if (!scheda?.lettera) return;
+  async function copia(testo: string) {
     try {
-      await Clipboard.setStringAsync(`${scheda.lettera.oggetto}\n\n${scheda.lettera.corpo}`);
-      setCopiata(true);
-      setTimeout(() => setCopiata(false), 3000);
+      await Clipboard.setStringAsync(testo);
+      setCopiato(true);
+      setTimeout(() => setCopiato(false), 2600);
     } catch (e) {
       console.warn("[pratica] copia fallita:", e);
     }
   }
 
-  async function apriEmail() {
-    if (!scheda?.lettera) return;
-    const { compagnia, oggetto, corpo } = scheda.lettera;
-    const a = compagnia?.email ?? "";
-    const url = `mailto:${a}?subject=${encodeURIComponent(oggetto)}&body=${encodeURIComponent(corpo)}`;
+  async function apriEmail(foglio: FoglioAperto) {
+    const a = foglio.email ?? "";
+    const url = `mailto:${a}?subject=${encodeURIComponent(foglio.oggetto)}&body=${encodeURIComponent(foglio.corpo)}`;
     try {
       await Linking.openURL(url);
     } catch (e) {
       // Nessuna app email sul dispositivo: si ripiega sulla condivisione.
       console.warn("[pratica] mailto non aperto:", e);
-      void condividi();
+      const avviso = await condividiApp(`${foglio.oggetto}\n\n${foglio.corpo}`);
+      if (avviso) setMessaggio(avviso);
     }
-  }
-
-  async function condividi() {
-    if (!scheda?.lettera) return;
-    /* Sul web `Share` non esiste: condividiApp ripiega su Web Share e poi
-       sugli appunti, così il tasto risponde sempre a qualcosa. */
-    const avviso = await condividiApp(`${scheda.lettera.oggetto}\n\n${scheda.lettera.corpo}`);
-    if (avviso) setMessaggio(avviso);
   }
 
   async function hoInviato() {
@@ -174,55 +170,67 @@ export default function SchermataPratica() {
     await carica();
   }
 
+  async function apriRifiuto() {
+    setRifiutoAperto(true);
+    if (motivi.length === 0) setMotivi(await motiviRifiuto());
+  }
+
+  async function mandaRifiuto() {
+    if (!scheda || !motivoScelto) return;
+    if (DEMO) {
+      setMessaggio(T.rifiuto.demoNota);
+      setRifiutoAperto(false);
+      return;
+    }
+    setRifiutoInCorso(true);
+    const token = await tokenSessione();
+    const esito = token
+      ? await dichiaraRifiuto(scheda.pratica.id, motivoScelto, token)
+      : { ok: false, errore: T.entraPrima };
+    setRifiutoInCorso(false);
+    if (!esito.ok) {
+      setMessaggio(esito.errore ?? T.errore);
+      return;
+    }
+    setRifiutoAperto(false);
+    await carica();
+  }
+
   const p = scheda?.pratica;
-  const raggiunto = p ? passoRaggiunto(p.stato) : -1;
+  const inviata = Boolean(p?.inviataIl);
+  const rifiutoDichiarato = Boolean(scheda?.rifiutoMotivo && scheda.rifiutoMotivo !== "silenzio");
+  const etichettaMotivo =
+    motivi.find((m) => m.motivo === scheda?.rifiutoMotivo)?.etichetta ?? scheda?.rifiutoMotivo;
+  const puoConfermareInvio = p && (p.stato === "pagata" || p.stato === "pronta");
   const finale =
-    p && (TESTI.praticaScheda.esitiFinali as Record<string, string>)[p.stato]
-      ? (TESTI.praticaScheda.esitiFinali as Record<string, string>)[p.stato]
+    p && (T.esitiFinali as Record<string, string>)[p.stato]
+      ? (T.esitiFinali as Record<string, string>)[p.stato]
       : null;
 
-  /* La data di un passo, dalla cronologia (il tipo dell'evento è il nome
-     dello stato). "esito" raccoglie i tre esiti finali. */
-  const dataPasso = (passo: Passo): string | null => {
-    if (!scheda) return null;
-    const tipi =
-      passo === "esito" ? ["esito_pagata", "esito_rifiutata", "rimborsata"] : [passo];
-    const evento = scheda.eventi.find((e) => tipi.includes(e.tipo));
-    return evento ? dataOra(evento.creato_il) : null;
-  };
-
-  const puoConfermareInvio = p && (p.stato === "pagata" || p.stato === "pronta");
+  /* Il badge d'etichetta di ogni motivo: il silenzio ha la sua frase. */
+  const pesoDi = (m: MotivoRifiutoApp) =>
+    m.motivo === "silenzio"
+      ? { testo: T.rifiuto.pesi.silenzio, tono: "grigio" as const }
+      : m.peso === "dipende"
+        ? { testo: T.rifiuto.pesi.dipende, tono: "giallo" as const }
+        : { testo: T.rifiuto.pesi.debole, tono: "verde" as const };
 
   return (
     <ScrollView
       style={stili.pagina}
-      contentContainerStyle={[
-        stili.contenuto,
-        { paddingTop: insets.top + SPAZIO.l, paddingBottom: insets.bottom + SPAZIO.xxl },
-      ]}
+      contentContainerStyle={[stili.contenuto, { paddingBottom: insets.bottom + SPAZIO.xxl }]}
       refreshControl={
-        <RefreshControl
-          refreshing={aggiorno}
-          onRefresh={() => void aggiorna()}
-          tintColor={COLORI.verde}
-          colors={[COLORI.verde]}
-        />
+        <RefreshControl refreshing={aggiorno} onRefresh={() => void aggiorna()} tintColor={COLORI.verde} />
       }
     >
-      {/* ------------------------------------------------ la testata */}
-      <Pressable
-        onPress={() => router.back()}
-        accessibilityRole="button"
-        style={stili.indietro}
-        hitSlop={8}
-      >
+      <Pressable onPress={() => router.back()} accessibilityRole="button" style={stili.indietro}>
         <Feather name="arrow-left" size={16} color={COLORI.fumo} />
         <Text style={stili.indietroTesto}>{T.indietro}</Text>
       </Pressable>
 
       {stato === "caricamento" && (
         <View style={stili.centro}>
-          <ActivityIndicator size="large" color={COLORI.verde} />
+          <ActivityIndicator color={COLORI.verde} />
           <Text style={stili.nota}>{T.caricamento}</Text>
         </View>
       )}
@@ -230,343 +238,664 @@ export default function SchermataPratica() {
       {stato === "errore" && (
         <View style={stili.centro}>
           <Text style={stili.errore}>{messaggio ?? T.errore}</Text>
-          <Bottone
-            testo={TESTI.comune.riprova}
-            onPress={() => {
-              setStato("caricamento");
-              void carica();
-            }}
-            variante="vetro"
-          />
+          <Bottone testo={TESTI.comune.riprova} onPress={() => void carica()} variante="fantasma" />
         </View>
       )}
 
-      {stato === "pronto" && p && (
+      {stato === "pronto" && p && scheda && (
         <>
-          {/* -------------------------------------------- il volo */}
+          {/* ------------------------------------------------ testata */}
+          <Text style={stili.occhiello}>{T.occhiello.toUpperCase()}</Text>
           <Text style={stili.tratta}>
-            {p.volo?.da && p.volo?.a ? `${p.volo.da} → ${p.volo.a}` : (p.volo?.iata ?? T.voloMancante)}
+            {p.volo?.da && p.volo?.a ? `${p.volo.da} · ${p.volo.a}` : (p.volo?.iata ?? T.voloMancante)}
           </Text>
           <Text style={stili.sotto}>
-            {p.volo ? `${p.volo.iata} · ${dataBreve(p.volo.data)}` : ""}
+            {p.volo?.data ? `${dataBreve(p.volo.data)} · ` : ""}
+            {p.importo ? riempi(T.richiestaDi, { importo: euro(p.importo) }) : ""}
           </Text>
 
-          {p.importo !== null && (
-            <View style={stili.fascia}>
-              <Text style={stili.fasciaImporto}>
-                {p.importo}€ <Text style={stili.fasciaPer}>{T.perPasseggero}</Text>
-              </Text>
-              {p.tipo === "famiglia" && p.passeggeri > 1 && (
-                <Text style={stili.fasciaNota}>{riempi(T.passeggeri, { n: p.passeggeri })}</Text>
-              )}
-              <Text style={stili.fasciaFonte}>{T.fonteImporto}</Text>
+          {finale && (
+            <View style={stili.finale}>
+              <Text style={stili.finaleTesto}>{finale}</Text>
             </View>
           )}
 
-          {/* -------------------------------------------- la timeline */}
-          <View style={stili.scheda}>
-            <Text style={stili.schedaTitolo}>{T.cronologia}</Text>
-            {ORDINE.map((passo, i) => {
-              const fatto = i <= raggiunto;
-              const corrente = i === raggiunto;
-              const etichetta =
-                passo === "esito" && finale ? finale : T.passi[passo];
-              const quando = fatto ? dataPasso(passo) : null;
-              return (
-                <View key={passo} style={stili.passo}>
-                  <View style={stili.passoTraccia}>
-                    <View
-                      style={[
-                        stili.pallino,
-                        fatto && stili.pallinoFatto,
-                        corrente && stili.pallinoCorrente,
-                      ]}
-                    >
-                      {fatto && <Feather name="check" size={11} color={COLORI.bianco} />}
-                    </View>
-                    {i < ORDINE.length - 1 && (
-                      <View style={[stili.linea, i < raggiunto && stili.lineaFatta]} />
-                    )}
+          {messaggio && stato === "pronto" && (
+            <Text style={stili.avviso} accessibilityRole="alert">
+              {messaggio}
+            </Text>
+          )}
+
+          {/* -------------------------------------- 1° · il reclamo */}
+          <View style={stili.foglio}>
+            <View style={stili.foglioTesta}>
+              <Text style={stili.foglioTitolo}>{T.fogli.titoli.reclamo}</Text>
+              <View style={[stili.bollo, inviata ? stili.bolloFatto : stili.bolloPronto]}>
+                <Text style={[stili.bolloTesto, inviata ? stili.bolloTestoFatto : stili.bolloTestoPronto]}>
+                  {inviata ? T.fogli.stati.inviato : scheda.lettera ? T.fogli.stati.pronto : T.fogli.stati.dopo}
+                </Text>
+              </View>
+            </View>
+
+            {inviata && p.inviataIl ? (
+              <Text style={stili.foglioRiga}>{riempi(T.fogli.inviatoIl, { data: dataLunga(p.inviataIl) })}</Text>
+            ) : scheda.lettera ? (
+              <Text style={stili.foglioRiga}>{T.lettera.sottotitolo}</Text>
+            ) : (
+              <Text style={stili.foglioRiga}>{T.lettera.manca}</Text>
+            )}
+
+            {scheda.lettera && (
+              <>
+                <View style={stili.oggetto}>
+                  <Text style={stili.oggettoEtichetta}>{T.lettera.oggetto.toUpperCase()}</Text>
+                  <Text style={stili.oggettoTesto}>{scheda.lettera.oggetto}</Text>
+                </View>
+                <View style={stili.foglioAzioni}>
+                  <Bottone
+                    testo={T.fogli.apri}
+                    variante="fantasma"
+                    onPress={() =>
+                      setAperto({
+                        titolo: T.fogli.titoli.reclamo,
+                        oggetto: scheda.lettera!.oggetto,
+                        corpo: scheda.lettera!.corpo,
+                        email: scheda.lettera!.compagnia?.email ?? null,
+                      })
+                    }
+                  />
+                  {puoConfermareInvio && !invioFatto && (
+                    <>
+                      <Bottone testo={T.invio.bottone} onPress={() => void hoInviato()} caricamento={invioInCorso} />
+                      <Text style={stili.invioNota}>{T.invio.nota}</Text>
+                    </>
+                  )}
+                  {invioFatto && <Text style={stili.grazie}>{T.invio.grazie}</Text>}
+                </View>
+              </>
+            )}
+          </View>
+
+          {/* --------------------- 2° · la replica al no o il sollecito */}
+          <View style={stili.foglio}>
+            <View style={stili.foglioTesta}>
+              <Text style={stili.foglioTitolo}>
+                {rifiutoDichiarato ? T.fogli.titoli.replica : T.fogli.titoli.sollecito}
+              </Text>
+              <View style={[stili.bollo, scheda.sollecito ? stili.bolloPronto : stili.bolloDopo]}>
+                <Text style={[stili.bolloTesto, scheda.sollecito ? stili.bolloTestoPronto : stili.bolloTestoDopo]}>
+                  {scheda.sollecito ? T.fogli.stati.pronto : T.fogli.stati.dopo}
+                </Text>
+              </View>
+            </View>
+
+            {scheda.sollecito ? (
+              <>
+                <Text style={stili.foglioRiga}>
+                  {rifiutoDichiarato && etichettaMotivo
+                    ? riempi(T.fogli.replicaAperta, { motivo: etichettaMotivo })
+                    : T.fogli.sollecitoChiuso}
+                </Text>
+                <View style={stili.foglioAzioni}>
+                  <Bottone
+                    testo={T.fogli.apri}
+                    variante="fantasma"
+                    onPress={() =>
+                      setAperto({
+                        titolo: rifiutoDichiarato ? T.fogli.titoli.replica : T.fogli.titoli.sollecito,
+                        oggetto: scheda.sollecito!.oggetto,
+                        corpo: scheda.sollecito!.corpo,
+                        email: scheda.lettera?.compagnia?.email ?? null,
+                      })
+                    }
+                  />
+                </View>
+              </>
+            ) : (
+              <Text style={stili.foglioRiga}>{T.fogli.sollecitoChiuso}</Text>
+            )}
+
+            {/* Il no si può dichiarare finché non è già dichiarato. */}
+            {inviata && !rifiutoDichiarato && (
+              <Pressable onPress={() => void apriRifiuto()} accessibilityRole="button" style={stili.rifiutoBottone}>
+                <Text style={stili.rifiutoBottoneTesto}>{T.rifiuto.bottone}</Text>
+              </Pressable>
+            )}
+          </View>
+
+          {/* ------------------------- 3° · la segnalazione all'ente */}
+          <View style={stili.foglio}>
+            <View style={stili.foglioTesta}>
+              <Text style={stili.foglioTitolo}>{T.fogli.titoli.segnalazione}</Text>
+              <View style={[stili.bollo, scheda.segnalazione ? stili.bolloPronto : stili.bolloDopo]}>
+                <Text
+                  style={[stili.bolloTesto, scheda.segnalazione ? stili.bolloTestoPronto : stili.bolloTestoDopo]}
+                >
+                  {scheda.segnalazione ? T.fogli.stati.pronto : T.fogli.stati.dopo}
+                </Text>
+              </View>
+            </View>
+            <Text style={stili.foglioRiga}>
+              {scheda.segnalazione ? T.fogli.segnalazioneDove : T.fogli.segnalazioneChiusa}
+            </Text>
+            <View style={stili.notaGialla}>
+              <Text style={stili.notaGiallaTesto}>{T.fogli.segnalazioneNota}</Text>
+            </View>
+            {scheda.segnalazione && (
+              <View style={stili.foglioAzioni}>
+                <Bottone
+                  testo={T.fogli.apri}
+                  variante="fantasma"
+                  onPress={() =>
+                    setAperto({
+                      titolo: T.fogli.titoli.segnalazione,
+                      oggetto: scheda.segnalazione!.oggetto,
+                      corpo: scheda.segnalazione!.corpo,
+                      email: null,
+                      soloPortale: true,
+                    })
+                  }
+                />
+              </View>
+            )}
+          </View>
+
+          {/* --------------------------------- 4° · la conciliazione */}
+          <View style={stili.foglio}>
+            <View style={stili.foglioTesta}>
+              <Text style={stili.foglioTitolo}>{T.fogli.titoli.conciliazione}</Text>
+              <View style={[stili.bollo, scheda.conciliazione ? stili.bolloPronto : stili.bolloDopo]}>
+                <Text
+                  style={[stili.bolloTesto, scheda.conciliazione ? stili.bolloTestoPronto : stili.bolloTestoDopo]}
+                >
+                  {scheda.conciliazione ? T.fogli.stati.pronto : T.fogli.stati.dopo}
+                </Text>
+              </View>
+            </View>
+
+            {scheda.conciliazione ? (
+              <>
+                <Text style={stili.foglioRiga}>{scheda.conciliazione.premessa}</Text>
+                <View style={stili.concGriglia}>
+                  <View style={stili.concCella}>
+                    <Text style={stili.concEtichetta}>{T.conciliazione.costo.toUpperCase()}</Text>
+                    <Text style={stili.concValore}>{scheda.conciliazione.costo}</Text>
                   </View>
-                  <View style={stili.passoTesti}>
-                    <Text
-                      style={[
-                        stili.passoTesto,
-                        fatto && stili.passoTestoFatto,
-                        corrente && stili.passoTestoCorrente,
-                      ]}
-                    >
-                      {etichetta}
-                    </Text>
-                    {quando ? <Text style={stili.passoData}>{quando}</Text> : null}
+                  <View style={stili.concCella}>
+                    <Text style={stili.concEtichetta}>{T.conciliazione.scadenza.toUpperCase()}</Text>
+                    <Text style={stili.concValore}>{scheda.conciliazione.scadenza}</Text>
                   </View>
                 </View>
+                {scheda.conciliazione.passi.map((passo, i) => (
+                  <View key={passo} style={stili.concPasso}>
+                    <View style={stili.concNumero}>
+                      <Text style={stili.concNumeroTesto}>{i + 1}</Text>
+                    </View>
+                    <Text style={stili.concPassoTesto}>{passo}</Text>
+                  </View>
+                ))}
+                <View style={stili.notaGialla}>
+                  <Text style={stili.notaGiallaTesto}>{scheda.conciliazione.avvertenza}</Text>
+                </View>
+                <View style={stili.foglioAzioni}>
+                  <Bottone
+                    testo={riempi(T.conciliazione.apri, {
+                      nome: scheda.conciliazione.sigla ?? scheda.conciliazione.nome,
+                    })}
+                    icona="external-link"
+                    onPress={() => {
+                      void openBrowserAsync(scheda.conciliazione!.url);
+                    }}
+                  />
+                </View>
+                <Text style={stili.concFonte}>
+                  {T.conciliazione.fonteTitolo}: {scheda.conciliazione.fonte}
+                </Text>
+              </>
+            ) : (
+              <Text style={stili.foglioRiga}>{T.fogli.conciliazioneChiusa}</Text>
+            )}
+          </View>
+
+          <Text style={stili.tuttiTuoi}>{T.fogli.tuttiTuoi}</Text>
+        </>
+      )}
+
+      {/* ------------------------------- il no della compagnia (6d) */}
+      <Modal visible={rifiutoAperto} animationType="slide" onRequestClose={() => setRifiutoAperto(false)}>
+        <ScrollView style={stili.pagina} contentContainerStyle={stili.contenutoModale}>
+          <Text style={stili.tratta}>{T.rifiuto.titolo}</Text>
+          <Text style={stili.sotto}>{T.rifiuto.sotto}</Text>
+
+          <View style={stili.motivi}>
+            {motivi.length === 0 && <ActivityIndicator color={COLORI.verde} />}
+            {motivi.map((m) => {
+              const attivo = motivoScelto === m.motivo;
+              const peso = pesoDi(m);
+              return (
+                <Pressable
+                  key={m.motivo}
+                  onPress={() => setMotivoScelto(m.motivo)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: attivo }}
+                  style={[stili.motivo, attivo && stili.motivoAttivo]}
+                >
+                  <View style={[stili.radio, attivo && stili.radioAttivo]}>
+                    {attivo && <View style={stili.radioPunto} />}
+                  </View>
+                  <View style={stili.motivoTesti}>
+                    <Text style={stili.motivoTitolo}>{m.etichetta}</Text>
+                    <Text style={stili.motivoAiuto}>{m.aiuto}</Text>
+                    <View
+                      style={[
+                        stili.peso,
+                        peso.tono === "verde" && stili.pesoVerde,
+                        peso.tono === "giallo" && stili.pesoGiallo,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          stili.pesoTesto,
+                          peso.tono === "verde" && stili.pesoTestoVerde,
+                          peso.tono === "giallo" && stili.pesoTestoGiallo,
+                        ]}
+                      >
+                        {peso.testo}
+                      </Text>
+                    </View>
+                  </View>
+                </Pressable>
               );
             })}
           </View>
 
-          {/* -------------------------------------------- la lettera */}
-          {scheda.lettera ? (
-            <View style={stili.scheda}>
-              <Text style={stili.schedaTitolo}>{T.lettera.titolo}</Text>
-              <Text style={stili.letteraSotto}>{T.lettera.sottotitolo}</Text>
+          <Text style={stili.allegaEmail}>{T.rifiuto.allegaEmail}</Text>
 
-              {scheda.lettera.compagnia && (
-                <View style={stili.canale}>
-                  <Text style={stili.canaleTitolo}>
-                    {riempi(T.lettera.canaleTitolo, { nome: scheda.lettera.compagnia.nome })}
-                  </Text>
-                  <Text style={stili.canaleTesto}>{scheda.lettera.compagnia.canale}</Text>
-                  {scheda.lettera.compagnia.indirizzoPostale && (
-                    <Text style={stili.canaleIndirizzo}>
-                      {T.lettera.indirizzo}: {scheda.lettera.compagnia.indirizzoPostale}
-                    </Text>
-                  )}
-                </View>
-              )}
+          <View style={stili.foglioAzioni}>
+            <Bottone
+              testo={T.rifiuto.conferma}
+              onPress={() => void mandaRifiuto()}
+              caricamento={rifiutoInCorso}
+              disabilitato={!motivoScelto}
+            />
+            <Pressable
+              onPress={() => setRifiutoAperto(false)}
+              accessibilityRole="button"
+              style={stili.annulla}
+            >
+              <Text style={stili.annullaTesto}>{T.rifiuto.annulla}</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </Modal>
 
-              <Text style={stili.oggettoEtichetta}>{T.lettera.oggetto}</Text>
-              <Text style={stili.oggetto}>{scheda.lettera.oggetto}</Text>
-
-              <View style={stili.corpoRiquadro}>
-                <Text style={stili.corpo}>{scheda.lettera.corpo}</Text>
+      {/* ------------------------- il foglio a schermo pieno (6g) */}
+      <Modal visible={aperto !== null} animationType="slide" onRequestClose={() => setAperto(null)}>
+        {aperto && (
+          <View style={stili.pagina}>
+            <View style={[stili.foglioPienoTesta, { paddingTop: insets.top + SPAZIO.l }]}>
+              <Pressable onPress={() => setAperto(null)} accessibilityRole="button" style={stili.chiudi}>
+                <Feather name="x" size={20} color={COLORI.inchiostro} />
+              </Pressable>
+              <View style={stili.foglioPienoTitoli}>
+                <Text style={stili.foglioPienoTitolo}>{aperto.titolo}</Text>
               </View>
-
-              <Text style={stili.allegati}>
-                {T.lettera.allegati}: {scheda.lettera.allegati.join(", ")}
-              </Text>
-
-              <View style={stili.azioni}>
-                <Bottone testo={T.lettera.apriEmail} onPress={() => void apriEmail()} icona="mail" />
-                <View style={stili.azioniRiga}>
-                  <Pressable
-                    onPress={() => void copiaLettera()}
-                    accessibilityRole="button"
-                    style={stili.azioneSecondaria}
-                  >
-                    <Feather name="copy" size={14} color={COLORI.verdeScuro} />
-                    <Text style={stili.azioneSecondariaTesto}>
-                      {copiata ? T.lettera.copiata : T.lettera.copia}
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => void condividi()}
-                    accessibilityRole="button"
-                    style={stili.azioneSecondaria}
-                  >
-                    <Feather name="share-2" size={14} color={COLORI.verdeScuro} />
-                    <Text style={stili.azioneSecondariaTesto}>{T.lettera.condividi}</Text>
-                  </Pressable>
-                </View>
-                {scheda.lettera.compagnia?.url ? (
-                  <Pressable
-                    onPress={() => void openBrowserAsync(scheda.lettera!.compagnia!.url)}
-                    accessibilityRole="button"
-                    style={stili.azioneSecondaria}
-                  >
-                    <Feather name="external-link" size={14} color={COLORI.verdeScuro} />
-                    <Text style={stili.azioneSecondariaTesto}>{T.lettera.apriCanale}</Text>
-                  </Pressable>
-                ) : null}
-              </View>
+              <Pressable
+                onPress={() => void copia(`${aperto.oggetto}\n\n${aperto.corpo}`)}
+                accessibilityRole="button"
+                style={stili.copiaPillola}
+              >
+                <Text style={stili.copiaPillolaTesto}>
+                  {copiato ? T.foglio.copiato : T.foglio.copia}
+                </Text>
+              </Pressable>
             </View>
-          ) : (
-            p.stato !== "creata" && (
-              <View style={stili.scheda}>
-                <Text style={stili.letteraSotto}>{T.lettera.manca}</Text>
-              </View>
-            )
-          )}
 
-          {/* -------------------------------------------- l'ho inviata */}
-          {puoConfermareInvio && scheda.lettera && (
-            <View style={stili.scheda}>
-              {invioFatto ? (
-                <Text style={stili.grazie}>{T.invio.grazie}</Text>
+            <ScrollView contentContainerStyle={stili.foglioPienoCorpo}>
+              <View style={stili.carta}>
+                <Text style={stili.cartaOggetto}>{aperto.oggetto}</Text>
+                <Text style={stili.cartaCorpo}>{aperto.corpo}</Text>
+              </View>
+              <Text style={stili.campiGialli}>{T.foglio.campiGialli}</Text>
+            </ScrollView>
+
+            <View style={[stili.foglioPienoPiedi, { paddingBottom: insets.bottom + SPAZIO.l }]}>
+              {aperto.soloPortale ? (
+                <Text style={stili.invioNota}>{T.fogli.segnalazioneDove}</Text>
               ) : (
-                <>
-                  <Bottone
-                    testo={T.invio.bottone}
-                    onPress={() => void hoInviato()}
-                    caricamento={invioInCorso}
-                    icona="send"
-                  />
-                  <Text style={stili.invioNota}>{T.invio.nota}</Text>
-                </>
+                <Bottone testo={T.foglio.apriEmail} icona="mail" onPress={() => void apriEmail(aperto)} />
               )}
             </View>
-          )}
-
-          {p.garanziaFinoAl && (
-            <Text style={stili.garanzia}>
-              {T.garanzia}
-            </Text>
-          )}
-        </>
-      )}
+          </View>
+        )}
+      </Modal>
     </ScrollView>
   );
 }
 
 const stili = StyleSheet.create({
   pagina: { flex: 1, backgroundColor: COLORI.nebbia },
-  contenuto: { paddingHorizontal: SPAZIO.schermata, gap: SPAZIO.l },
+  contenuto: { paddingHorizontal: SPAZIO.schermata, paddingTop: SPAZIO.xxl + SPAZIO.l },
+  contenutoModale: {
+    paddingHorizontal: SPAZIO.schermata,
+    paddingTop: SPAZIO.xxl + SPAZIO.xl,
+    paddingBottom: SPAZIO.xxl,
+  },
   indietro: {
     flexDirection: "row",
     alignItems: "center",
     gap: SPAZIO.s,
     alignSelf: "flex-start",
-    paddingVertical: SPAZIO.xs,
+    paddingVertical: SPAZIO.s,
+    marginBottom: SPAZIO.s,
   },
   indietroTesto: { fontFamily: FONT.testoMedio, fontSize: 14, color: COLORI.fumo },
-  centro: { alignItems: "center", paddingVertical: SPAZIO.xxl, gap: SPAZIO.l },
+  centro: { alignItems: "center", gap: SPAZIO.m, paddingVertical: SPAZIO.xxl },
   nota: { fontFamily: FONT.testo, fontSize: 13, color: COLORI.fumo2 },
   errore: {
-    fontFamily: FONT.testo,
-    fontSize: 14.5,
-    lineHeight: 21,
+    fontFamily: FONT.testoMedio,
+    fontSize: 14,
     color: COLORI.errore,
     textAlign: "center",
+    maxWidth: 300,
+  },
+  avviso: {
+    fontFamily: FONT.testoMedio,
+    fontSize: 13,
+    color: COLORI.errore,
+    marginTop: SPAZIO.m,
+  },
+
+  occhiello: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 11,
+    letterSpacing: 1.8,
+    color: COLORI.verdeScuro,
   },
   tratta: {
     fontFamily: FONT.display,
-    fontSize: 26,
+    fontSize: 28,
+    lineHeight: 34,
     letterSpacing: -0.9,
     color: COLORI.inchiostro,
-  },
-  sotto: { fontFamily: FONT.testo, fontSize: 13.5, color: COLORI.fumo, marginTop: -SPAZIO.s },
-  fascia: {
-    backgroundColor: COLORI.verdeNotte,
-    borderRadius: RAGGIO.scheda,
-    padding: SPAZIO.l,
-  },
-  fasciaImporto: {
-    fontFamily: FONT.display,
-    fontSize: 34,
-    letterSpacing: -1.2,
-    color: COLORI.bianco,
-  },
-  fasciaPer: { fontFamily: FONT.testo, fontSize: 13.5, color: COLORI.menta },
-  fasciaNota: { fontFamily: FONT.testoMedio, fontSize: 13, color: COLORI.menta, marginTop: 2 },
-  fasciaFonte: {
-    fontFamily: FONT.testo,
-    fontSize: 11.5,
-    color: COLORI.bianco,
-    opacity: 0.75,
     marginTop: SPAZIO.s,
   },
-  scheda: {
+  sotto: { fontFamily: FONT.testo, fontSize: 13.5, color: COLORI.fumo, marginTop: SPAZIO.xs },
+  finale: {
+    alignSelf: "flex-start",
+    backgroundColor: COLORI.mentaTenue,
+    borderRadius: RAGGIO.pillola,
+    paddingHorizontal: SPAZIO.m,
+    paddingVertical: 6,
+    marginTop: SPAZIO.m,
+  },
+  finaleTesto: { fontFamily: FONT.testoSemi, fontSize: 12.5, color: COLORI.verdeScuro },
+
+  /* Un foglio della timeline. */
+  foglio: {
     backgroundColor: COLORI.bianco,
     borderRadius: RAGGIO.scheda,
-    padding: SPAZIO.l,
-    ...OMBRA.scheda,
-  },
-  schedaTitolo: {
-    fontFamily: FONT.display,
-    fontSize: 19,
-    letterSpacing: -0.5,
-    color: COLORI.inchiostro,
-    marginBottom: SPAZIO.m,
-  },
-  passo: { flexDirection: "row", gap: SPAZIO.m },
-  passoTraccia: { alignItems: "center", width: 22 },
-  pallino: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: COLORI.nebbia2,
     borderWidth: 1,
     borderColor: COLORI.bordo,
-    alignItems: "center",
-    justifyContent: "center",
+    padding: SPAZIO.l,
+    marginTop: SPAZIO.l,
+    ...OMBRA.scheda,
   },
-  pallinoFatto: { backgroundColor: COLORI.verde, borderColor: COLORI.verde },
-  pallinoCorrente: { borderWidth: 3, borderColor: COLORI.menta },
-  linea: { width: 2, flex: 1, minHeight: 18, backgroundColor: COLORI.bordo },
-  lineaFatta: { backgroundColor: COLORI.verde },
-  passoTesti: { flex: 1, paddingBottom: SPAZIO.l },
-  passoTesto: { fontFamily: FONT.testo, fontSize: 14.5, color: COLORI.fumo2 },
-  passoTestoFatto: { color: COLORI.inchiostro },
-  passoTestoCorrente: { fontFamily: FONT.testoSemi },
-  passoData: { fontFamily: FONT.testo, fontSize: 12, color: COLORI.fumo2, marginTop: 1 },
-  letteraSotto: {
+  foglioTesta: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: SPAZIO.m,
+  },
+  foglioTitolo: {
+    flex: 1,
+    fontFamily: FONT.testoSemi,
+    fontSize: 15,
+    color: COLORI.inchiostro,
+  },
+  bollo: { borderRadius: RAGGIO.pillola, paddingHorizontal: SPAZIO.m, paddingVertical: 4 },
+  bolloFatto: { backgroundColor: COLORI.mentaTenue },
+  bolloPronto: { backgroundColor: COLORI.verde },
+  bolloDopo: { backgroundColor: COLORI.nebbia2 },
+  bolloTesto: { fontFamily: FONT.testoSemi, fontSize: 11.5 },
+  bolloTestoFatto: { color: COLORI.verdeScuro },
+  bolloTestoPronto: { color: COLORI.bianco },
+  bolloTestoDopo: { color: COLORI.fumo },
+  foglioRiga: {
     fontFamily: FONT.testo,
     fontSize: 13.5,
     lineHeight: 20,
     color: COLORI.fumo,
+    marginTop: SPAZIO.m,
   },
-  canale: {
-    backgroundColor: COLORI.mentaTenue,
-    borderWidth: 1,
-    borderColor: COLORI.menta,
+  oggetto: {
+    backgroundColor: COLORI.nebbia,
     borderRadius: RAGGIO.campo,
     padding: SPAZIO.m,
     marginTop: SPAZIO.m,
-  },
-  canaleTitolo: { fontFamily: FONT.testoSemi, fontSize: 13.5, color: COLORI.verdeNotte },
-  canaleTesto: {
-    fontFamily: FONT.testo,
-    fontSize: 13,
-    lineHeight: 19,
-    color: COLORI.verdeNotte,
-    marginTop: 2,
-  },
-  canaleIndirizzo: {
-    fontFamily: FONT.testo,
-    fontSize: 12,
-    lineHeight: 18,
-    color: COLORI.verdeScuro,
-    marginTop: SPAZIO.s,
   },
   oggettoEtichetta: {
     fontFamily: FONT.testoMedio,
-    fontSize: 11,
-    letterSpacing: 1,
-    textTransform: "uppercase",
+    fontSize: 10,
+    letterSpacing: 1.2,
     color: COLORI.fumo2,
-    marginTop: SPAZIO.l,
   },
-  oggetto: { fontFamily: FONT.testoSemi, fontSize: 14.5, color: COLORI.inchiostro, marginTop: 2 },
-  corpoRiquadro: {
-    backgroundColor: COLORI.nebbia,
-    borderWidth: 1,
-    borderColor: COLORI.bordo,
-    borderRadius: RAGGIO.campo,
-    padding: SPAZIO.m,
-    marginTop: SPAZIO.m,
-    maxHeight: 260,
-    overflow: "hidden",
+  oggettoTesto: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 13.5,
+    lineHeight: 19,
+    color: COLORI.inchiostro,
+    marginTop: 3,
   },
-  corpo: { fontFamily: FONT.testo, fontSize: 12.5, lineHeight: 19, color: COLORI.inchiostro },
-  allegati: {
-    fontFamily: FONT.testo,
-    fontSize: 12,
-    lineHeight: 18,
-    color: COLORI.fumo,
-    marginTop: SPAZIO.m,
-  },
-  azioni: { marginTop: SPAZIO.l, gap: SPAZIO.m },
-  azioniRiga: { flexDirection: "row", gap: SPAZIO.l },
-  azioneSecondaria: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPAZIO.s,
-    paddingVertical: SPAZIO.xs,
-  },
-  azioneSecondariaTesto: { fontFamily: FONT.testoMedio, fontSize: 14, color: COLORI.verdeScuro },
+  foglioAzioni: { marginTop: SPAZIO.l, gap: SPAZIO.m },
   invioNota: {
     fontFamily: FONT.testo,
     fontSize: 12.5,
     lineHeight: 18,
     color: COLORI.fumo,
+    textAlign: "center",
+  },
+  grazie: { fontFamily: FONT.testoMedio, fontSize: 13.5, color: COLORI.verdeScuro },
+
+  rifiutoBottone: {
+    marginTop: SPAZIO.l,
+    borderTopWidth: 1,
+    borderTopColor: COLORI.bordo,
+    paddingTop: SPAZIO.l,
+  },
+  rifiutoBottoneTesto: { fontFamily: FONT.testoSemi, fontSize: 14, color: COLORI.verdeScuro },
+
+  notaGialla: {
+    backgroundColor: "#FDF6E3",
+    borderRadius: RAGGIO.campo,
+    padding: SPAZIO.m,
     marginTop: SPAZIO.m,
   },
-  grazie: { fontFamily: FONT.testoMedio, fontSize: 14.5, color: COLORI.verdeScuro },
-  garanzia: {
+  notaGiallaTesto: {
+    fontFamily: FONT.testo,
+    fontSize: 12.5,
+    lineHeight: 19,
+    color: COLORI.ambra,
+  },
+  tuttiTuoi: {
+    fontFamily: FONT.testo,
+    fontSize: 13,
+    color: COLORI.fumo,
+    textAlign: "center",
+    marginTop: SPAZIO.xl,
+  },
+
+  /* La conciliazione (6f). */
+  concGriglia: { flexDirection: "row", gap: SPAZIO.s, marginTop: SPAZIO.m },
+  concCella: {
+    flex: 1,
+    backgroundColor: COLORI.nebbia,
+    borderRadius: RAGGIO.campo,
+    padding: SPAZIO.m,
+  },
+  concEtichetta: {
+    fontFamily: FONT.testoMedio,
+    fontSize: 10,
+    letterSpacing: 1,
+    color: COLORI.fumo2,
+  },
+  concValore: {
+    fontFamily: FONT.testo,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: COLORI.inchiostro,
+    marginTop: 3,
+  },
+  concPasso: { flexDirection: "row", gap: SPAZIO.m, marginTop: SPAZIO.m },
+  concNumero: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: COLORI.mentaTenue,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  concNumeroTesto: { fontFamily: FONT.testoSemi, fontSize: 12, color: COLORI.verdeScuro },
+  concPassoTesto: {
+    flex: 1,
+    fontFamily: FONT.testo,
+    fontSize: 13,
+    lineHeight: 19,
+    color: COLORI.inchiostro,
+  },
+  concFonte: {
+    fontFamily: FONT.testo,
+    fontSize: 11.5,
+    lineHeight: 17,
+    color: COLORI.fumo2,
+    marginTop: SPAZIO.m,
+  },
+
+  /* Il no della compagnia (6d). */
+  motivi: { marginTop: SPAZIO.xl, gap: SPAZIO.s },
+  motivo: {
+    flexDirection: "row",
+    gap: SPAZIO.m,
+    backgroundColor: COLORI.bianco,
+    borderWidth: 1,
+    borderColor: COLORI.bordo,
+    borderLeftWidth: 3,
+    borderLeftColor: COLORI.bordo,
+    borderRadius: RAGGIO.interno,
+    padding: SPAZIO.l,
+  },
+  motivoAttivo: {
+    backgroundColor: COLORI.mentaTenue,
+    borderColor: COLORI.menta,
+    borderLeftColor: COLORI.verde,
+  },
+  radio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: COLORI.bordo,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
+  },
+  radioAttivo: { borderColor: COLORI.verde },
+  radioPunto: { width: 10, height: 10, borderRadius: 5, backgroundColor: COLORI.verde },
+  motivoTesti: { flex: 1 },
+  motivoTitolo: { fontFamily: FONT.testoSemi, fontSize: 14.5, color: COLORI.inchiostro },
+  motivoAiuto: {
+    fontFamily: FONT.testo,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: COLORI.fumo,
+    marginTop: 2,
+  },
+  peso: {
+    alignSelf: "flex-start",
+    backgroundColor: COLORI.nebbia2,
+    borderRadius: RAGGIO.pillola,
+    paddingHorizontal: SPAZIO.s + 2,
+    paddingVertical: 3,
+    marginTop: SPAZIO.s,
+  },
+  pesoVerde: { backgroundColor: COLORI.mentaTenue },
+  pesoGiallo: { backgroundColor: "#FDF6E3" },
+  pesoTesto: { fontFamily: FONT.testoMedio, fontSize: 11, color: COLORI.fumo },
+  pesoTestoVerde: { color: COLORI.verdeScuro },
+  pesoTestoGiallo: { color: COLORI.ambra },
+  allegaEmail: {
     fontFamily: FONT.testo,
     fontSize: 12.5,
     lineHeight: 19,
     color: COLORI.fumo,
+    marginTop: SPAZIO.l,
+  },
+  annulla: { alignSelf: "center", padding: SPAZIO.s },
+  annullaTesto: { fontFamily: FONT.testoMedio, fontSize: 14, color: COLORI.fumo },
+
+  /* Il foglio a schermo pieno (6g). */
+  foglioPienoTesta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPAZIO.m,
+    paddingHorizontal: SPAZIO.schermata,
+    paddingBottom: SPAZIO.m,
+    backgroundColor: COLORI.bianco,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORI.bordo,
+  },
+  chiudi: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORI.nebbia,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  foglioPienoTitoli: { flex: 1 },
+  foglioPienoTitolo: { fontFamily: FONT.testoSemi, fontSize: 14.5, color: COLORI.inchiostro },
+  copiaPillola: {
+    borderWidth: 1,
+    borderColor: COLORI.verde,
+    borderRadius: RAGGIO.pillola,
+    paddingHorizontal: SPAZIO.l,
+    paddingVertical: 7,
+  },
+  copiaPillolaTesto: { fontFamily: FONT.testoSemi, fontSize: 13, color: COLORI.verdeScuro },
+  foglioPienoCorpo: { padding: SPAZIO.schermata, paddingBottom: SPAZIO.xxl },
+  carta: {
+    backgroundColor: COLORI.bianco,
+    borderRadius: RAGGIO.interno,
+    borderWidth: 1,
+    borderColor: COLORI.bordo,
+    padding: SPAZIO.xl,
+    ...OMBRA.scheda,
+  },
+  cartaOggetto: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 14.5,
+    lineHeight: 21,
+    color: COLORI.inchiostro,
+  },
+  cartaCorpo: {
+    fontFamily: FONT.testo,
+    fontSize: 13.5,
+    lineHeight: 21,
+    color: COLORI.inchiostro,
+    marginTop: SPAZIO.l,
+  },
+  campiGialli: {
+    fontFamily: FONT.testo,
+    fontSize: 12.5,
+    color: COLORI.fumo,
+    marginTop: SPAZIO.l,
     textAlign: "center",
+  },
+  foglioPienoPiedi: {
+    paddingHorizontal: SPAZIO.schermata,
+    paddingTop: SPAZIO.m,
+    backgroundColor: COLORI.bianco,
+    borderTopWidth: 1,
+    borderTopColor: COLORI.bordo,
   },
 });

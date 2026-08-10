@@ -119,6 +119,23 @@ export type LetteraScheda = {
   } | null;
 };
 
+/** Un foglio successivo al reclamo: sollecito/replica o segnalazione. */
+export type FoglioScheda = { oggetto: string; corpo: string } | null;
+
+/** La conciliazione (quarto colpo), calcolata dal server sul paese di partenza. */
+export type ConciliazioneScheda = {
+  nome: string;
+  sigla?: string;
+  url: string;
+  titolo: string;
+  premessa: string;
+  passi: string[];
+  costo: string;
+  scadenza: string;
+  avvertenza: string;
+  fonte: string;
+} | null;
+
 export type SchedaPratica = {
   pratica: {
     id: string;
@@ -133,7 +150,59 @@ export type SchedaPratica = {
   };
   eventi: EventoScheda[];
   lettera: LetteraScheda | null;
+  /* I colpi dopo il reclamo (giro #49): null finché non è il loro
+     momento. Li calcola il server con lo stesso codice del sito. */
+  sollecito?: FoglioScheda;
+  segnalazione?: FoglioScheda;
+  conciliazione?: ConciliazioneScheda;
+  giorniDallInvio?: number | null;
+  rifiutoMotivo?: string | null;
 };
+
+/** Un motivo di rifiuto, per la scelta chiusa (6d). */
+export type MotivoRifiutoApp = {
+  motivo: string;
+  etichetta: string;
+  aiuto: string;
+  peso: "debole" | "dipende" | "solido";
+};
+
+/** L'elenco dei motivi del no, dal server: la replica vera resta là. */
+export async function motiviRifiuto(): Promise<MotivoRifiutoApp[]> {
+  try {
+    const r = await fetch(`${SITO}/api/pratiche/rifiuto`);
+    const dati = await r.json().catch(() => null);
+    return Array.isArray(dati?.motivi) ? (dati.motivi as MotivoRifiutoApp[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Dichiara il motivo del no della compagnia. Sblocca la replica. */
+export async function dichiaraRifiuto(
+  praticaId: string,
+  motivo: string,
+  token: string,
+): Promise<{ ok: boolean; errore?: string }> {
+  try {
+    const r = await fetch(`${SITO}/api/pratiche/rifiuto`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ praticaId, motivo }),
+    });
+    const dati = await r.json().catch(() => null);
+    if (!r.ok || !dati?.ok) {
+      return {
+        ok: false,
+        errore:
+          typeof dati?.errore === "string" ? dati.errore : "Non sono riuscito a registrarlo. Riprova.",
+      };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, errore: "Sei offline? Controlla la connessione e riprova." };
+  }
+}
 
 export type EsitoScheda = { ok: true; scheda: SchedaPratica } | { ok: false; errore: string };
 

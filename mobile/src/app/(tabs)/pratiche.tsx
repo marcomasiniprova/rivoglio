@@ -97,6 +97,11 @@ export default function Pratiche() {
      nel browser (richiesta di Valerio, 8/08). */
   const vaiAlCheck = () => router.navigate("/");
 
+  /* Aperte sopra, chiuse sotto (tavola 7d). */
+  const CHIUSE = new Set(["esito_pagata", "esito_rifiutata", "rimborsata"]);
+  const aperte = pratiche.filter((p) => !CHIUSE.has(p.stato));
+  const chiuse = pratiche.filter((p) => CHIUSE.has(p.stato));
+
   return (
     <View style={stili.schermo}>
       <ScrollView
@@ -120,7 +125,22 @@ export default function Pratiche() {
       >
         <View style={stili.testata}>
           <Titolo prima={T.titolo.prima} corsivo={T.titolo.corsivo} />
-          <Text style={stili.sottotitolo}>{T.sottotitolo}</Text>
+          <Text style={stili.sottotitolo}>
+            {pratiche.length > 0
+              ? [
+                  aperte.length === 1
+                    ? T.conteggio.apertaUna
+                    : riempi(T.conteggio.aperte, { n: aperte.length }),
+                  chiuse.length > 0
+                    ? chiuse.length === 1
+                      ? T.conteggio.chiusaUna
+                      : riempi(T.conteggio.chiuse, { n: chiuse.length })
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join(", ") + "."
+              : T.sottotitolo}
+          </Text>
         </View>
 
         {stato === "caricamento" ? (
@@ -137,8 +157,9 @@ export default function Pratiche() {
           </View>
         ) : null}
 
-        {stato === "pronto" && pratiche.length > 0
-          ? pratiche.map((p) => (
+        {stato === "pronto" && aperte.length > 0 ? (
+          <>
+            {aperte.map((p) => (
               <Pressable
                 key={p.id}
                 onPress={() => router.push(`/pratica/${p.id}`)}
@@ -149,43 +170,63 @@ export default function Pratiche() {
                     <View style={stili.pillolaStato}>
                       <Text style={stili.pillolaStatoTesto}>{nomeStato(p.stato)}</Text>
                     </View>
+                    {p.importo_fascia !== null ? (
+                      <Text style={stili.fasciaImporto}>
+                        {riempi(T.fascia, { importo: euro(p.importo_fascia) })}
+                      </Text>
+                    ) : null}
                     {p.demo ? <BadgeDemo /> : null}
                   </View>
 
                   <Text style={stili.volo}>
                     {p.volo_iata && p.data_locale
-                      ? riempi(T.volo, {
-                          volo: p.volo_iata,
-                          data: dataBreve(p.data_locale),
-                        })
+                      ? riempi(T.volo, { volo: p.volo_iata, data: dataBreve(p.data_locale) })
                       : T.voloMancante}
                   </Text>
+                  <Text style={stili.aperta}>
+                    {riempi(T.aperta, { data: dataBreve(p.creata_il.slice(0, 10)) })}
+                  </Text>
 
-                  <View style={stili.fascia}>
-                    <Text style={stili.fasciaImporto}>
-                      {p.importo_fascia !== null
-                        ? riempi(T.fascia, { importo: euro(p.importo_fascia) })
-                        : T.fasciaDaConfermare}
-                    </Text>
-                    {p.importo_fascia !== null ? (
-                      // La cifra non resta mai sola: si cita da dove viene.
-                      <Text style={stili.fasciaFonte}>{T.fasciaFonte}</Text>
-                    ) : null}
-                  </View>
-
-                  <View style={stili.piede}>
-                    <Text style={stili.aperta}>
-                      {riempi(T.aperta, { data: dataBreve(p.creata_il.slice(0, 10)) })}
-                    </Text>
-                    <View style={stili.apriRiga}>
-                      <Text style={stili.apriTesto}>{T.apri}</Text>
-                      <Feather name="chevron-right" size={15} color={COLORI.verdeScuro} />
+                  {/* Il prossimo passo, guidato dallo STATO (tavola 7d). */}
+                  {(T.prossimoPasso as Record<string, string>)[p.stato] ? (
+                    <View style={stili.passoRiquadro}>
+                      <Text style={stili.passoEtichetta}>
+                        {T.prossimoPasso.etichetta.toUpperCase()}
+                      </Text>
+                      <Text style={stili.passoTesto}>
+                        {(T.prossimoPasso as Record<string, string>)[p.stato]}
+                      </Text>
                     </View>
-                  </View>
+                  ) : null}
                 </Scheda>
               </Pressable>
-            ))
-          : null}
+            ))}
+          </>
+        ) : null}
+
+        {stato === "pronto" && chiuse.length > 0 ? (
+          <>
+            <Text style={stili.sezione}>{T.sezioni.chiuse.toUpperCase()}</Text>
+            {chiuse.map((p) => (
+              <Pressable
+                key={p.id}
+                onPress={() => router.push(`/pratica/${p.id}`)}
+                accessibilityRole="button"
+                style={stili.chiusa}
+              >
+                <View style={stili.chiusaTesti}>
+                  <Text style={stili.chiusaVolo}>
+                    {p.volo_iata && p.data_locale
+                      ? riempi(T.volo, { volo: p.volo_iata, data: dataBreve(p.data_locale) })
+                      : T.voloMancante}
+                  </Text>
+                  <Text style={stili.chiusaStato}>{nomeStato(p.stato)}</Text>
+                </View>
+                <Feather name="chevron-right" size={16} color={COLORI.fumo2} />
+              </Pressable>
+            ))}
+          </>
+        ) : null}
 
         {stato === "pronto" && pratiche.length === 0 ? (
           utente ? (
@@ -299,4 +340,47 @@ const stili = StyleSheet.create({
   },
   apriRiga: { flexDirection: "row", alignItems: "center", gap: 2 },
   apriTesto: { fontFamily: FONT.testoMedio, fontSize: 13, color: COLORI.verdeScuro },
+
+  /* Il prossimo passo (tavola 7d): il riquadro che dice il gesto. */
+  passoRiquadro: {
+    backgroundColor: COLORI.nebbia,
+    borderRadius: RAGGIO.campo,
+    padding: SPAZIO.m,
+  },
+  passoEtichetta: {
+    fontFamily: FONT.testoMedio,
+    fontSize: 10,
+    letterSpacing: 1.2,
+    color: COLORI.fumo2,
+  },
+  passoTesto: {
+    fontFamily: FONT.testoMedio,
+    fontSize: 13,
+    lineHeight: 19,
+    color: COLORI.inchiostro,
+    marginTop: 3,
+  },
+
+  /* Le chiuse: righe piccole sotto la loro etichetta. */
+  sezione: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 11,
+    letterSpacing: 1.6,
+    color: COLORI.fumo2,
+    marginTop: SPAZIO.s,
+  },
+  chiusa: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPAZIO.m,
+    backgroundColor: COLORI.bianco,
+    borderWidth: 1,
+    borderColor: COLORI.bordo,
+    borderRadius: RAGGIO.interno,
+    paddingHorizontal: SPAZIO.l,
+    paddingVertical: SPAZIO.m,
+  },
+  chiusaTesti: { flex: 1 },
+  chiusaVolo: { fontFamily: FONT.testoMedio, fontSize: 14, color: COLORI.inchiostro },
+  chiusaStato: { fontFamily: FONT.testo, fontSize: 12.5, color: COLORI.fumo, marginTop: 1 },
 });

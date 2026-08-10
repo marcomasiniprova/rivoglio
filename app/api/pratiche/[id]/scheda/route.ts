@@ -2,9 +2,22 @@ import { NextResponse } from "next/server";
 import { CORS } from "@/lib/api/limite";
 import { utenteDaRichiesta } from "@/lib/api/utente";
 import { compagniaPerVettore } from "@/lib/lettera/compagnie";
-import { ALLEGATI, generaReclamo } from "@/lib/lettera/genera";
+import {
+  ALLEGATI,
+  generaReclamo,
+  generaSegnalazioneEnte,
+  generaSollecito,
+} from "@/lib/lettera/genera";
+import { conciliazionePerPartenza, prontoPerConciliazione } from "@/lib/lettera/conciliazione";
 import { METEO_ATTIVO, fraseMeteo, meteoStorico } from "@/lib/meteo/openmeteo";
 import type { Passeggero, TipoPratica } from "@/lib/pratiche/pratiche";
+import {
+  GIORNI_PRIMA_DELL_ENTE,
+  GIORNI_PRIMA_DEL_SOLLECITO,
+  prontoPerSollecito,
+  schedaRifiuto,
+  type MotivoRifiuto,
+} from "@/lib/pratiche/rifiuto";
 import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { aeroporto } from "@/lib/voli/distanza";
@@ -39,6 +52,8 @@ type RigaPratica = {
   garanzia_fino_al: string | null;
   inviata_il: string | null;
   creata_il: string;
+  /** Il motivo del no della compagnia, se il cliente l'ha dichiarato. */
+  rifiuto_motivo: string | null;
 };
 
 type RigaVolo = {
@@ -46,6 +61,7 @@ type RigaVolo = {
   data_locale: string;
   vettore_operativo: string | null;
   vettore_marketing: string | null;
+  partenza_iata: string | null;
   partenza_citta: string | null;
   arrivo_citta: string | null;
   arrivo_previsto_utc: string | null;
@@ -97,7 +113,7 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
   const { data: pratica } = (await db
     .from("pratiche")
     .select(
-      "id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, importo_fascia, garanzia_fino_al, inviata_il, creata_il",
+      "id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, importo_fascia, garanzia_fino_al, inviata_il, creata_il, rifiuto_motivo",
     )
     .eq("id", id)
     .maybeSingle()) as { data: RigaPratica | null };
@@ -114,7 +130,7 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
     ? ((await db
         .from("voli")
         .select(
-          "volo_iata, data_locale, vettore_operativo, vettore_marketing, partenza_citta, arrivo_citta, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, payload_grezzo",
+          "volo_iata, data_locale, vettore_operativo, vettore_marketing, partenza_iata, partenza_citta, arrivo_citta, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, payload_grezzo",
         )
         .eq("id", pratica.volo_id)
         .maybeSingle()) as { data: RigaVolo | null })
@@ -142,6 +158,15 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
       indirizzoPostale: string | null;
     } | null;
   } | null = null;
+
+  /* ── I fogli DOPO il reclamo (giro #49): la pratica ha quattro colpi
+     e l'app li mostra tutti, calcolati dallo stesso codice del sito.
+     Il motore è uno: se cambia una replica, cambia per tutti e due. */
+  type Foglio = { oggetto: string; corpo: string } | null;
+  let sollecito: Foglio = null;
+  let segnalazione: Foglio = null;
+  let conciliazione: ReturnType<typeof conciliazionePerPartenza> | null = null;
+  let giorniDallInvio: number | null = null;
 
   if (pratica.stato !== "creata" && volo && pratica.verifica_id) {
     const { data: verifica } = (await db
@@ -214,6 +239,42 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
             : null,
         };
       }
+
+      /* I colpi successivi esistono solo DOPO l'invio del reclamo, e coi
+         tempi della pagina del sito: il sollecito al giorno 42 (o subito
+         se il no è dichiarato), l'ente due settimane dopo, la
+         conciliazione a 30 giorni (o subito col no). */
+      if (pratica.inviata_il) {
+        giorniDallInvio = Math.floor(
+          (Date.now() - new Date(pratica.inviata_il).getTime()) / 86_400_000,
+        );
+        const motivo = schedaRifiuto(pratica.rifiuto_motivo)
+          ? (pratica.rifiuto_motivo as MotivoRifiuto)
+          : null;
+        const rifiutoDichiarato = Boolean(motivo && motivo !== "silenzio");
+        const giornoInvio = pratica.inviata_il.slice(0, 10);
+        const passeggeriPratica = {
+          passeggeri: pratica.passeggeri ?? [],
+          tipo: pratica.tipo,
+        };
+
+        if (prontoPerSollecito(giorniDallInvio, motivo)) {
+          sollecito = generaSollecito(passeggeriPratica, fatto, verdetto, giornoInvio, motivo);
+        }
+        if (sollecito && giorniDallInvio >= GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE) {
+          segnalazione = generaSegnalazioneEnte(
+            passeggeriPratica,
+            fatto,
+            verdetto,
+            giornoInvio,
+            null,
+            motivo,
+          );
+        }
+        if (prontoPerConciliazione(giorniDallInvio, rifiutoDichiarato)) {
+          conciliazione = conciliazionePerPartenza(volo.partenza_iata);
+        }
+      }
     }
   }
 
@@ -240,6 +301,12 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
       },
       eventi: (eventi ?? []) as { tipo: string; nota: string | null; creato_il: string }[],
       lettera,
+      /* I colpi dopo il reclamo: null finché non è il loro momento. */
+      sollecito,
+      segnalazione,
+      conciliazione,
+      giorniDallInvio,
+      rifiutoMotivo: pratica.rifiuto_motivo,
     },
     { headers: CORS },
   );

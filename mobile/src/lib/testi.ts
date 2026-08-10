@@ -652,6 +652,26 @@ export const TESTI = {
   pratiche: {
     titolo: { prima: "Le tue", corsivo: "pratiche." },
     sottotitolo: "Ogni reclamo che hai aperto, con il punto in cui si trova.",
+    /* Il sottotitolo della tavola (7d): "Due aperte, una chiusa." coi
+       numeri veri. Le cifre in lettere fino al dieci, poi in numero. */
+    conteggio: {
+      aperte: "{n} aperte",
+      apertaUna: "1 aperta",
+      chiuse: "{n} chiuse",
+      chiusaUna: "1 chiusa",
+    },
+    sezioni: { aperte: "Aperte", chiuse: "Chiuse" },
+    /* Il prossimo passo di ogni pratica aperta, guidato dallo STATO:
+       niente conti sui giorni (il giorno d'invio non è in questo dato). */
+    prossimoPasso: {
+      etichetta: "Prossimo passo",
+      creata: "Completa l'apertura dal sito",
+      pagata: "La lettera è in preparazione: tira giù per aggiornare",
+      pronta: "La lettera è pronta: mandala dalla tua email",
+      inviata: "In attesa di risposta: il sollecito si sblocca alla sesta settimana",
+      sollecito: "Il sollecito è pronto: aprilo e mandalo",
+      enac: "La segnalazione all'ente è pronta",
+    },
     // {volo} è il codice del volo, {data} da dataBreve().
     volo: "Volo {volo} del {data}",
     // Quando il volo agganciato non è leggibile: si dice, non si inventa.
@@ -721,11 +741,83 @@ export const TESTI = {
      cosa che apre il sito è il pagamento. Mai promettere l'esito. */
   praticaScheda: {
     indietro: "Le tue pratiche",
+    occhiello: "La tua pratica",
     voloMancante: "Pratica senza volo agganciato",
     perPasseggero: "a passeggero",
     // {n} è il numero di passeggeri della pratica famiglia.
     passeggeri: "{n} passeggeri",
     fonteImporto: "Importo del Regolamento CE 261/2004, per passeggero",
+    /* Il sottotitolo della testata: "12 marzo · richiesta di 400 euro".
+       RICHIESTA, mai "la compagnia deve": deve solo se non ha una causa
+       escludente valida, e una promessa qui costerebbe la garanzia. */
+    richiestaDi: "richiesta di {importo} a passeggero",
+
+    /* ---- I QUATTRO FOGLI (tavola 6e) ---- */
+    fogli: {
+      titoli: {
+        reclamo: "1° · il reclamo",
+        sollecito: "2° · il sollecito",
+        replica: "2° · la replica al loro no",
+        segnalazione: "3° · la segnalazione all'ente nazionale",
+        conciliazione: "4° · la conciliazione",
+      },
+      stati: {
+        inviato: "Inviato",
+        pronto: "Pronto",
+        dopo: "Dopo",
+      },
+      // {data} è il giorno dell'invio dichiarato dall'utente.
+      inviatoIl: "Mandato da te il {data}.",
+      sollecitoChiuso:
+        "Si sblocca alla sesta settimana dall'invio: prima non serve, le compagnie rispondono in 8-14 settimane. Se ti hanno già risposto no, dichiaralo qui sotto e parte subito.",
+      // {motivo} è l'etichetta del motivo dichiarato.
+      replicaAperta: "Hanno risposto: {motivo}. La replica è pronta.",
+      segnalazioneChiusa:
+        "Si sblocca due settimane dopo il sollecito, se ancora tacciono.",
+      segnalazioneNota:
+        "L'ente accerta la violazione e può sanzionare la compagnia. I soldi però non li versa lui: serve a fare pressione, non a incassare.",
+      segnalazioneDove:
+        "Si presenta sul portale dell'ente, non per email: copia il testo e incollalo nel modulo.",
+      conciliazioneChiusa:
+        "Si apre a 30 giorni dal reclamo, o subito se la compagnia ha detto no. È la strada gratuita che i soldi li muove davvero.",
+      apri: "Apri il foglio",
+      tuttiTuoi: "Tutti e quattro i fogli sono già tuoi. Li mandi tu, quando serve.",
+    },
+
+    /* ---- IL NO DELLA COMPAGNIA (tavola 6d) ---- */
+    rifiuto: {
+      bottone: "La compagnia ti ha risposto no?",
+      titolo: "Cosa ti hanno risposto?",
+      sotto: "Scegli la frase più vicina alla loro. Da quella dipende la replica che ti preparo.",
+      pesi: {
+        debole: "Di solito non regge",
+        dipende: "Qui possono avere ragione",
+        silenzio: "Il silenzio non è un no",
+      },
+      conferma: "Prepara la replica",
+      annulla: "Non ancora",
+      allegaEmail:
+        "Se hai la loro email a portata di mano, tienila: la replica cita le loro stesse parole, ed è la cosa che le fa cambiare idea più spesso.",
+      demoNota: "Questa è la scheda dimostrativa: il no si dichiara su una pratica vera.",
+    },
+
+    /* ---- LA CONCILIAZIONE (tavola 6f) ---- */
+    conciliazione: {
+      costo: "Quanto costa",
+      scadenza: "Entro quando",
+      apri: "Apri {nome} nel browser",
+      fonteTitolo: "Fonte",
+    },
+
+    /* ---- IL FOGLIO A SCHERMO PIENO (tavola 6g) ---- */
+    foglio: {
+      chiudi: "Chiudi",
+      copia: "Copia",
+      copiato: "Copiato.",
+      apriEmail: "Apri nella tua email",
+      // I campi fra parentesi quadre sono da riempire a mano.
+      campiGialli: "I punti fra parentesi quadre sono i tuoi: tutto il resto è già scritto.",
+    },
     /* La timeline: i passi nell'ordine in cui succedono. */
     passi: {
       pagata: "Pagamento ricevuto",
