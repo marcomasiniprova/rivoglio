@@ -77,14 +77,22 @@ social rifatta (era rimasta al prodotto viaggi).
     nessuno: il rischio era che un domani qualcuno lo ripescasse
     credendolo buono. Tolto da tutte e 20 le schede, con una prova che
     vieta di rimetterlo.
-  - ⚠️ **I NOVE ENTI NAZIONALI MANCANTI RESTANO MANCANTI** (Croazia,
-    Slovenia, Slovacchia, Romania, Cipro, Estonia, Lettonia, Lituania,
-    Liechtenstein). Da qui l'elenco ufficiale della Commissione, il PDF
-    dei NEB e i siti nazionali sono tutti bloccati dal proxy: **non li
-    scrivo a memoria**, perché mandare una persona all'ufficio sbagliato è
-    peggio che dirle di cercarlo. La lettera per quei paesi continua a
-    nominare il paese e a rimandare all'elenco ufficiale, che è il
-    comportamento giusto. In ARRETRATI c'è l'indirizzo da aprire.
+  - ✅ **GLI ENTI NAZIONALI SONO COMPLETI: 29 paesi.** Valerio ha aperto
+    il PDF ufficiale della Commissione (13 luglio 2026) e me ne ha passato
+    il testo. Aggiunti Croazia, Slovenia, Slovacchia, Romania, Cipro,
+    Estonia, Lettonia, Lituania **e la Svizzera**. Il Liechtenstein resta
+    fuori perché nel PDF non c'è, né fra gli Stati membri né fra i paesi
+    SEE: non si inventa.
+  - 🔴 **E IL PDF HA FATTO EMERGERE TRE ERRORI VERI nella tabella che
+    avevamo.** In **Ungheria**, **Finlandia** e **Norvegia** mandavamo il
+    passeggero all'autorità dell'aviazione civile, ma in quei tre paesi i
+    casi individuali li tratta un altro ufficio: il PDF ungherese lo
+    scrive in modo esplicito ("i reclami mandati qui non vengono
+    trattati"). Chi seguiva la nostra lettera scriveva a chi non gli
+    avrebbe risposto. Corretti tutti e tre, più la Polonia (il Difensore
+    dei passeggeri, non l'autorità). **La Svizzera nel PDF sta nella
+    sezione dei paesi che applicano norme equivalenti: è la terza conferma
+    indipendente del giro #47.**
   - **L'INDIRIZZO DEL SITO NON È PIÙ SCRITTO A MANO DA NESSUNA PARTE.**
     Il web già leggeva tutto da `NEXT_PUBLIC_SITO`; l'app invece aveva
     `rivoglio.netlify.app` scritto in quattro punti (l'invito agli amici,
