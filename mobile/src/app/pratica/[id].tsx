@@ -254,7 +254,40 @@ export default function SchermataPratica() {
             {p.importo ? riempi(T.richiestaDi, { importo: euro(p.importo) }) : ""}
           </Text>
 
-          {finale && (
+          {/* GLI ESITI FINALI IN FACCIA (3h, 4i): quando la partita è
+              chiusa, la prima schermata lo dice in grande, non con una
+              pillola. La cifra vera del bonifico la conosce solo il suo
+              conto: qui si cita la fascia, che è il dato nostro. */}
+          {p.stato === "esito_pagata" && (
+            <View style={stili.vittoria}>
+              <Text style={stili.vittoriaOcchiello}>
+                {TESTI.esitoFinale.pagata.occhiello.toUpperCase()}
+              </Text>
+              <Text style={stili.vittoriaTitolo}>{TESTI.esitoFinale.pagata.titolo}</Text>
+              <Text style={stili.vittoriaTesto}>
+                {TESTI.esitoFinale.pagata.testo.replace(
+                  "{importo}",
+                  p.importo ? euro(p.importo) : "quella del Regolamento",
+                )}
+              </Text>
+              <View style={stili.vittoriaAzione}>
+                <Bottone
+                  testo={TESTI.esitoFinale.pagata.bottone}
+                  onPress={() => router.navigate("/")}
+                />
+              </View>
+            </View>
+          )}
+          {p.stato === "rimborsata" && (
+            <View style={stili.garanziaBlocco}>
+              <Text style={stili.vittoriaOcchiello}>
+                {TESTI.esitoFinale.rimborsata.occhiello.toUpperCase()}
+              </Text>
+              <Text style={stili.garanziaTitolo}>{TESTI.esitoFinale.rimborsata.titolo}</Text>
+              <Text style={stili.garanziaTesto}>{TESTI.esitoFinale.rimborsata.testo}</Text>
+            </View>
+          )}
+          {finale && p.stato !== "esito_pagata" && p.stato !== "rimborsata" && (
             <View style={stili.finale}>
               <Text style={stili.finaleTesto}>{finale}</Text>
             </View>
@@ -630,6 +663,56 @@ const stili = StyleSheet.create({
     marginTop: SPAZIO.m,
   },
   finaleTesto: { fontFamily: FONT.testoSemi, fontSize: 12.5, color: COLORI.verdeScuro },
+  vittoria: {
+    backgroundColor: COLORI.verdeNotte,
+    borderRadius: RAGGIO.grande,
+    padding: SPAZIO.xl,
+    marginTop: SPAZIO.l,
+    ...OMBRA.sollevata,
+  },
+  vittoriaOcchiello: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 10.5,
+    letterSpacing: 1.6,
+    color: COLORI.menta,
+  },
+  vittoriaTitolo: {
+    fontFamily: FONT.display,
+    fontSize: 26,
+    letterSpacing: -0.8,
+    color: COLORI.bianco,
+    marginTop: SPAZIO.s,
+  },
+  vittoriaTesto: {
+    fontFamily: FONT.testo,
+    fontSize: 13.5,
+    lineHeight: 20,
+    color: "rgba(255,255,255,0.8)",
+    marginTop: SPAZIO.m,
+  },
+  vittoriaAzione: { marginTop: SPAZIO.l },
+  garanziaBlocco: {
+    backgroundColor: COLORI.mentaTenue,
+    borderWidth: 1,
+    borderColor: COLORI.menta,
+    borderRadius: RAGGIO.scheda,
+    padding: SPAZIO.l,
+    marginTop: SPAZIO.l,
+  },
+  garanziaTitolo: {
+    fontFamily: FONT.display,
+    fontSize: 21,
+    letterSpacing: -0.5,
+    color: COLORI.inchiostro,
+    marginTop: SPAZIO.s,
+  },
+  garanziaTesto: {
+    fontFamily: FONT.testo,
+    fontSize: 13.5,
+    lineHeight: 20,
+    color: COLORI.fumo,
+    marginTop: SPAZIO.s,
+  },
 
   /* Un foglio della timeline. */
   foglio: {

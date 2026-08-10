@@ -191,6 +191,19 @@ export async function verificaCodice(
   }
 }
 
+/** Cambia la password dell'account collegato. */
+export async function cambiaPassword(nuova: string): Promise<{ errore?: string }> {
+  if (nuova.length < 8) return { errore: "La password deve avere almeno 8 caratteri." };
+  if (DEMO) return {};
+  try {
+    const { error } = await supabase.auth.updateUser({ password: nuova });
+    if (error) return { errore: inItaliano(error.message) };
+    return {};
+  } catch (e) {
+    return { errore: inItaliano(e instanceof Error ? e.message : String(e)) };
+  }
+}
+
 export async function accedi(email: string, password: string): Promise<{ errore?: string }> {
   const pulita = email.trim().toLowerCase();
   if (!EMAIL_OK.test(pulita)) return { errore: "Controlla l'indirizzo email." };

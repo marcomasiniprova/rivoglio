@@ -167,6 +167,67 @@ export type MotivoRifiutoApp = {
   peso: "debole" | "dipende" | "solido";
 };
 
+/** Le compagnie che corrispondono al nome scritto (codeshare, 6c). */
+export type VettoreTrovato = { iata: string; nome: string; paese: string };
+
+export async function cercaVettori(q: string): Promise<VettoreTrovato[]> {
+  if (q.trim().length < 2) return [];
+  try {
+    const r = await fetch(`${SITO}/api/verifica/operativo?q=${encodeURIComponent(q.trim())}`);
+    const dati = await r.json().catch(() => null);
+    return Array.isArray(dati?.compagnie) ? (dati.compagnie as VettoreTrovato[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Dichiara chi ha operato il volo: il verdetto lo chiude il server. */
+export async function dichiaraOperativo(
+  volo: string,
+  dataIso: string,
+  vettore: string,
+  verificaId: string | null,
+): Promise<EsitoCheck> {
+  try {
+    const r = await fetch(`${SITO}/api/verifica/operativo`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ volo, data: dataIso, vettore, verificaId }),
+    });
+    const dati = await r.json().catch(() => null);
+    if (!r.ok || !dati?.ok) {
+      return {
+        ok: false,
+        errore: typeof dati?.errore === "string" ? dati.errore : "Non riesco a chiudere il verdetto. Riprova fra un attimo.",
+      };
+    }
+    return dati as EsitoCheck;
+  } catch {
+    return { ok: false, errore: "Sei offline? Controlla la connessione e riprova." };
+  }
+}
+
+/** L'eliminazione dell'account: irreversibile, la conferma è una parola. */
+export async function eliminaAccount(token: string): Promise<{ ok: boolean; errore?: string }> {
+  try {
+    const r = await fetch(`${SITO}/api/account/elimina`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ conferma: "ELIMINA" }),
+    });
+    const dati = await r.json().catch(() => null);
+    if (!r.ok || !dati?.ok) {
+      return {
+        ok: false,
+        errore: typeof dati?.errore === "string" ? dati.errore : "Non sono riuscito a completare l'eliminazione.",
+      };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: false, errore: "Sei offline? Controlla la connessione e riprova." };
+  }
+}
+
 /** L'elenco dei motivi del no, dal server: la replica vera resta là. */
 export async function motiviRifiuto(): Promise<MotivoRifiutoApp[]> {
   try {

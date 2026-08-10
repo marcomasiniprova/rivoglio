@@ -445,6 +445,91 @@ export const TESTI = {
     },
   },
 
+  /* ---- CHI HA OPERATO IL VOLO (6c), dentro il verdetto incerto ---- */
+  operato: {
+    occhiello: "Un'ultima cosa",
+    titolo: "Di che compagnia era l'aereo?",
+    testo: "Capita che il biglietto sia di una compagnia e l'aereo di un'altra: il reclamo va a chi ha fatto volare l'aereo, altrimenti torna indietro.",
+    aiuto: "Sulla carta d'imbarco c'è scritto, in piccolo, sotto il nome del volo: operato da. Quella è la compagnia che serve.",
+    campo: "Cerca la compagnia",
+    conferma: "Conferma e chiudi il verdetto",
+    dopo: "Non lo so, guardo dopo",
+  },
+
+  /* ---- GLI ERRORI DEDICATI DEL CHECK (4b, 4c) ---- */
+  erroriCheck: {
+    nonTrovato: {
+      titolo: "Questo volo non lo trovo.",
+      testo: "Prima di dire che non ti spetta niente, controlliamo tre cose.",
+      controlli: [
+        "La data è quella della PARTENZA? Se sei atterrato dopo mezzanotte, il volo è del giorno prima.",
+        "Il numero è del volo, non della prenotazione: due lettere e tre o quattro cifre (FR 8321), non sei caratteri misti.",
+        "Oltre i 12 mesi il check non arriva: il dato certo copre un anno.",
+      ],
+      cta: "Il modo più sicuro è la carta d'imbarco: da lì leggo numero e data senza sbagliare.",
+      bottone: "Prova con la carta d'imbarco",
+    },
+    offline: {
+      titolo: "Sei senza rete. Non è un problema.",
+      testo: "Il check di un volo nuovo ha bisogno degli archivi, quindi aspetta. I voli già controllati restano salvati sul telefono.",
+      bottone: "Riprova ora",
+    },
+  },
+
+  /* ---- IL PASSAGGIO AL PAGAMENTO (4d/4h) ---- */
+  cassa: {
+    titolo: "Il pagamento si fa sul sito.",
+    testo: "Dentro l'app non passa: così quello che paghi resta intero al lavoro sulla tua pratica, senza la trattenuta degli store. La pratica poi la segui qui.",
+    prezzoNota: "Prezzo fisso, scritto prima di pagare. Nessuna percentuale sul tuo rimborso.",
+    apri: "Apri il sito e continua",
+    dopo: "Non ora",
+  },
+
+  /* ---- GLI ESITI FINALI IN FACCIA (3h, 4i) ---- */
+  esitoFinale: {
+    pagata: {
+      occhiello: "Pratica chiusa",
+      titolo: "La compagnia ha pagato.",
+      /* {importo} è la fascia a passeggero: la cifra vera del bonifico
+         la conosce solo il suo conto corrente. */
+      testo: "La fascia della pratica era {importo} a passeggero, e la compensazione è arrivata a te, intera. Se un altro volo ti è andato storto, il check resta gratis.",
+      bottone: "Controlla un altro volo",
+    },
+    rimborsata: {
+      occhiello: "Garanzia",
+      titolo: "Ti abbiamo rimborsato la pratica.",
+      testo: "La compagnia non ha pagato, quindi è scattata la garanzia: il prezzo della pratica ti torna indietro. Lettera e allegati restano tuoi.",
+    },
+  },
+
+  /* ---- SICUREZZA E DATI (18) ---- */
+  sicurezza: {
+    titolo: "Sicurezza e dati",
+    voce: "Sicurezza e dati",
+    voceSotto: "Password, i tuoi dati, l'eliminazione",
+    password: {
+      titolo: "Cambia la password",
+      campo: "La nuova password",
+      segnaposto: "almeno 8 caratteri",
+      bottone: "Cambia la password",
+      fatta: "Password cambiata.",
+      corta: "Almeno 8 caratteri.",
+    },
+    dati: {
+      titolo: "I tuoi dati",
+      testo: "Per una copia di tutto quello che abbiamo su di te, scrivici: la mandiamo alla tua email.",
+      bottone: "Chiedi la copia dei dati",
+      oggetto: "Richiesta dei miei dati",
+    },
+    elimina: {
+      titolo: "Elimina l'account",
+      testo: "Sparisce tutto: pratiche, voli seguiti, profilo e accesso. Non si torna indietro. Le lettere già copiate restano tue.",
+      campo: "Scrivi ELIMINA per confermare",
+      bottone: "Elimina per sempre",
+      conferma: "ELIMINA",
+    },
+  },
+
   /* ---- IL PERMESSO NOTIFICHE (4g): la schermata cuscinetto ----
      Compare PRIMA della finestra di sistema: chi dice no qui non brucia
      il permesso di iOS, che è quasi irreversibile. E dice esattamente

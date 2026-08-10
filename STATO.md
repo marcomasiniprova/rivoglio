@@ -1,7 +1,8 @@
 # STATO — Rivolio
 
 **Aggiornato:** 2026-08-10 (giro #49: L'APP MIGRA AL DESIGN DELLA TAVOLA
-DEFINITIVA, 5 schermate su 34 · giro #48: IL QUARTO COLPO, cioè quello che i
+DEFINITIVA, terza ondata: la migrazione è COMPLETA per tutto ciò che è
+onesto costruire oggi · giro #48: IL QUARTO COLPO, cioè quello che i
 soldi li muove davvero, più la riforma del 2027 scritta e messa in
 calendario · giro #47: LA SVIZZERA VERIFICATA, non più un
 punto interrogativo · giro #46: IL GIRO DA UTENTE CRITICO, tre
@@ -98,9 +99,36 @@ social rifatta (era rimasta al prodotto viaggi).
     rimborso (4i), l'esito celebrativo (3h), il tracker in volo (3i:
     servono dati che oggi non abbiamo), sicurezza account con Face ID
     (18: libreria in più).
+  - **TERZA ONDATA (stessa giornata): la migrazione è COMPLETA.** Chiusi
+    anche: il codeshare dentro il verdetto (6c: "Di che compagnia era
+    l'aereo?", ricerca chiusa, il server richiude il verdetto), gli
+    errori dedicati del check (4b volo non trovato coi tre controlli, 4c
+    senza rete), il passaggio alla cassa (4d: il foglio che dice che si
+    paga sul sito e perché, PRIMA di aprire il browser), gli esiti in
+    faccia sulla pratica (3h "La compagnia ha pagato" con la fascia
+    citata, 4i la garanzia rimborsata), la card del volo salvato con gli
+    orari veri ("Doveva arrivare alle... Atterrato alle..."), la
+    Classifica nel linguaggio nuovo, SICUREZZA E DATI (18) con cambio
+    password, richiesta dei dati e **l'eliminazione dell'account vera**
+    (rotta `/api/account/elimina`: conferma scritta, cancella pratiche,
+    voli seguiti e profilo, anonimizza le verifiche, elimina l'accesso).
+  - **Cosa della tavola NON è stato costruito, e perché è un motivo e
+    non un ritardo:** il Face ID (libreria nativa: con gli store),
+    l'elenco dei dispositivi collegati (servirebbe una tabella sessioni
+    che non esiste: mostrarla finta è vietato dalla regola 3), la
+    POSIZIONE dell'aereo nel tracker (nessun nostro fornitore pagato la
+    dà; OpenSky è gratis ma vieta l'uso commerciale: in ARRETRATI la
+    domanda ad AeroDataBox), il modulo "le fonti non concordano" con le
+    due fonti affiancate (l'API oggi non espone le fonti separate: il
+    caso esce incerto onesto, che è la stessa sostanza).
   - ⚠️ **Il codice via SMS che voleva Valerio richiede un fornitore a
     pagamento** (Twilio o simili su Supabase): in ARRETRATI, si decide
     coi confini di spesa. Il codice via EMAIL è vivo e gratuito.
+  - **COLLAUDO FINALE: 834 verdi sul sito** (le 2 rosse sono le note
+    dell'Osservatorio in sandbox, le 4 saltate la sveglia del 2027).
+    Mobile: tipi, lint e jest verdi; giri visivi su check, scena, home,
+    pratiche, pratica coi 4 fogli, accesso col codice, permessi,
+    sicurezza e cassa: zero errori in console.
   - Prove: la suite della tratta 15 su 15 (dentro c'è quella nuova
     sull'arrivo aggiornato); l'ultima suite piena del sito resta quella
     del giro #48, 832 verdi. Mobile: tipi, lint e jest verdi, zero

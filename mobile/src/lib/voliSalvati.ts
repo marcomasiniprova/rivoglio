@@ -36,6 +36,10 @@ export type VoloSalvato = {
   motivo?: string;
   /** Fascia in euro, solo sugli idonei. */
   importo?: number;
+  /** Orari di arrivo del volo (ISO), come li ha dati il server: sono
+      la parte "tracker" della card, e sono dati, non stime. */
+  previsto?: string | null;
+  effettivo?: string | null;
   /** Minuti di ritardo all'arrivo, se il motore li ha dati. */
   ritardoMinuti?: number;
   /** Quando è stato controllato l'ultima volta (ISO). */

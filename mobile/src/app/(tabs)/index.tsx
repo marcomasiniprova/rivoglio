@@ -227,6 +227,8 @@ export default function SchermataCheck() {
       motivo: esito.motivo,
       importo: esito.importo,
       ritardoMinuti: esito.ritardoMinuti,
+      previsto: esito.dato.previsto,
+      effettivo: esito.dato.effettivo,
       controllatoIl: new Date().toISOString(),
       aggiuntoIl: new Date().toISOString(),
     });
@@ -369,6 +371,37 @@ export default function SchermataCheck() {
             <Text style={stili.sottotitolo}>{testata.sottotitolo}</Text>
 
             {/* ------------------------------------------- il contenuto */}
+            {/* GLI ERRORI DEDICATI (4b, 4c): un volo che non si trova e
+                la rete assente non sono la stessa cosa, e nessuno dei
+                due è una riga rossa qualsiasi. */}
+            {errore && (
+              <View style={stili.erroreCard}>
+                {errore.toLowerCase().includes("offline") ||
+                errore.toLowerCase().includes("connession") ? (
+                  <>
+                    <Text style={stili.erroreTitolo}>{TESTI.erroriCheck.offline.titolo}</Text>
+                    <Text style={stili.erroreTesto}>{TESTI.erroriCheck.offline.testo}</Text>
+                  </>
+                ) : errore.toLowerCase().includes("non risulta") ||
+                  errore.toLowerCase().includes("ricontrolla") ||
+                  errore.toLowerCase().includes("carta d'imbarco") ? (
+                  <>
+                    <Text style={stili.erroreTitolo}>{TESTI.erroriCheck.nonTrovato.titolo}</Text>
+                    <Text style={stili.erroreTesto}>{TESTI.erroriCheck.nonTrovato.testo}</Text>
+                    {TESTI.erroriCheck.nonTrovato.controlli.map((c, i) => (
+                      <View key={c} style={stili.erroreRiga}>
+                        <Text style={stili.erroreNumero}>{i + 1}</Text>
+                        <Text style={stili.erroreRigaTesto}>{c}</Text>
+                      </View>
+                    ))}
+                    <Text style={stili.erroreCta}>{TESTI.erroriCheck.nonTrovato.cta}</Text>
+                  </>
+                ) : (
+                  <Text style={stili.erroreTesto}>{errore}</Text>
+                )}
+              </View>
+            )}
+
             {modo === "tratta" && (
               <View style={stili.blocco}>
                 <RicercaTratta occupato={inCorso} onSeleziona={setScelta} />
@@ -621,6 +654,49 @@ const stili = StyleSheet.create({
     maxWidth: 340,
   },
   blocco: { marginTop: SPAZIO.xl },
+  erroreCard: {
+    backgroundColor: COLORI.bianco,
+    borderWidth: 1,
+    borderColor: "rgba(194,65,12,0.35)",
+    borderRadius: RAGGIO.scheda,
+    padding: SPAZIO.l,
+    marginTop: SPAZIO.l,
+  },
+  erroreTitolo: { fontFamily: FONT.testoSemi, fontSize: 16, color: COLORI.inchiostro },
+  erroreTesto: {
+    fontFamily: FONT.testo,
+    fontSize: 13.5,
+    lineHeight: 20,
+    color: COLORI.fumo,
+    marginTop: SPAZIO.s,
+  },
+  erroreRiga: { flexDirection: "row", gap: SPAZIO.m, marginTop: SPAZIO.m },
+  erroreNumero: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 12,
+    color: COLORI.verdeScuro,
+    backgroundColor: COLORI.mentaTenue,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    textAlign: "center",
+    lineHeight: 22,
+    overflow: "hidden",
+  },
+  erroreRigaTesto: {
+    flex: 1,
+    fontFamily: FONT.testo,
+    fontSize: 13,
+    lineHeight: 19,
+    color: COLORI.inchiostro,
+  },
+  erroreCta: {
+    fontFamily: FONT.testoMedio,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: COLORI.verdeScuro,
+    marginTop: SPAZIO.m,
+  },
   /* La scena scavalca il padding della pagina: schermo intero, come
      nella tavola. Il velo verde resta sotto e non si vede. */
   scenaPiena: {

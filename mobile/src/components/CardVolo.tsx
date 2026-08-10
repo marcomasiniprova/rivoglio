@@ -21,6 +21,15 @@ import type { VoloSalvato } from "@/lib/voliSalvati";
 
 const T = TESTI.mieiVoli;
 
+/** "2026-08-06T18:35Z" → "18:35", vuoto se il dato non c'è. */
+function ora(iso?: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+}
+
 const dataIt = (iso: string) => {
   const d = new Date(`${iso}T12:00:00Z`);
   return Number.isNaN(d.getTime())
@@ -113,6 +122,11 @@ export default function CardVolo({
             <Text style={stili.importo}>
               {volo.importo}€ <Text style={stili.perPasseggero}>{T.perPasseggero}</Text>
             </Text>
+            {volo.previsto && volo.effettivo ? (
+              <Text style={stili.dettaglio}>
+                {`Doveva arrivare alle ${ora(volo.previsto)}. Atterrato alle ${ora(volo.effettivo)}.`}
+              </Text>
+            ) : null}
             {typeof volo.ritardoMinuti === "number" && (
               <Text style={stili.dettaglio}>
                 {T.ritardo}: {durata(volo.ritardoMinuti)}
@@ -131,6 +145,11 @@ export default function CardVolo({
         {nonIdoneo && (
           <View style={[stili.esito, stili.esitoNeutro]}>
             <Text style={stili.esitoTitolo}>{T.esiti.nonIdoneo}</Text>
+            {volo.previsto && volo.effettivo ? (
+              <Text style={stili.dettaglio}>
+                {`Doveva arrivare alle ${ora(volo.previsto)}. Atterrato alle ${ora(volo.effettivo)}.`}
+              </Text>
+            ) : null}
             {typeof volo.ritardoMinuti === "number" && (
               <Text style={stili.dettaglio}>
                 {T.ritardo}: {durata(volo.ritardoMinuti)}

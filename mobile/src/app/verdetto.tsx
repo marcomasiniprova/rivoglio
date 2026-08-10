@@ -13,7 +13,10 @@ import {
   Text,
   View,
 } from "react-native";
+import { useState } from "react";
+import { Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import ChiHaOperato from "@/components/ChiHaOperato";
 import marchio from "../../assets/images/marchio.png";
 import Bottone from "@/components/Bottone";
 import DomandeCaso from "@/components/DomandeCaso";
@@ -50,6 +53,9 @@ const oraDa = (iso: string) => {
 
 export default function SchermataVerdetto() {
   const router = useRouter();
+  /* Il passaggio alla cassa (4d): un fermo che dice DOVE si paga e
+     perché, prima di aprire il browser. */
+  const [cassaAperta, setCassaAperta] = useState(false);
   const p = useLocalSearchParams<{
     volo: string;
     data: string;
@@ -184,6 +190,17 @@ export default function SchermataVerdetto() {
 
       <Text style={stili.motivo}>{p.motivo}</Text>
 
+      {/* IL CODESHARE SI CHIUDE QUI (6c): quando il motore si è fermato
+          perché non sa chi ha fatto volare l'aereo, la risposta ce l'ha
+          l'utente sulla carta d'imbarco. La parola codeshare non compare. */}
+      {incerto && (p.motivo ?? "").toLowerCase().includes("codeshare") && (
+        <ChiHaOperato
+          volo={p.volo}
+          dataIso={p.data}
+          verificaId={p.id || null}
+        />
+      )}
+
       {/* Su un caso incerto la cosa più importante non è il motivo: è che
           non pagherai. Va detta in un blocco che si vede, non in una nota
           grigia in fondo dove nessuno arriva. */}
@@ -217,10 +234,8 @@ export default function SchermataVerdetto() {
           <>
             <Bottone
               testo={SC.preparaPratica}
-              onPress={() => {
-                void WebBrowser.openBrowserAsync(`${SITO}/#controllo`);
-              }}
-              icona="external-link"
+              onPress={() => setCassaAperta(true)}
+              icona="arrow-right"
             />
             {/* ⚠️ Il prezzo NON si scrive nel bottone: è acceso il test
                 dei due prezzi e la variante la decide il sito con un
@@ -236,6 +251,37 @@ export default function SchermataVerdetto() {
           variante={idoneo ? "fantasma" : "pieno"}
         />
       </View>
+
+      {/* ------------------------------- il passaggio alla cassa (4d) */}
+      <Modal
+        visible={cassaAperta}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setCassaAperta(false)}
+      >
+        <View style={stili.cassaSfondo}>
+          <View style={stili.cassaFoglio}>
+            <Text style={stili.cassaTitolo}>{TESTI.cassa.titolo}</Text>
+            <Text style={stili.cassaTesto}>{TESTI.cassa.testo}</Text>
+            <Text style={stili.cassaPrezzo}>{TESTI.cassa.prezzoNota}</Text>
+            <View style={stili.cassaAzioni}>
+              <Bottone
+                testo={TESTI.cassa.apri}
+                icona="external-link"
+                onPress={() => {
+                  setCassaAperta(false);
+                  void WebBrowser.openBrowserAsync(`${SITO}/#controllo`);
+                }}
+              />
+              <Bottone
+                testo={TESTI.cassa.dopo}
+                variante="fantasma"
+                onPress={() => setCassaAperta(false)}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -349,6 +395,38 @@ const stili = StyleSheet.create({
     marginTop: SPAZIO.l,
   },
   azioni: { marginTop: SPAZIO.xl, gap: SPAZIO.m },
+  cassaSfondo: {
+    flex: 1,
+    backgroundColor: "rgba(5,46,31,0.55)",
+    justifyContent: "flex-end",
+  },
+  cassaFoglio: {
+    backgroundColor: COLORI.bianco,
+    borderTopLeftRadius: RAGGIO.massimo,
+    borderTopRightRadius: RAGGIO.massimo,
+    padding: SPAZIO.xl,
+    paddingBottom: SPAZIO.xxl,
+  },
+  cassaTitolo: {
+    fontFamily: FONT.display,
+    fontSize: 23,
+    letterSpacing: -0.6,
+    color: COLORI.inchiostro,
+  },
+  cassaTesto: {
+    fontFamily: FONT.testo,
+    fontSize: 14,
+    lineHeight: 21,
+    color: COLORI.fumo,
+    marginTop: SPAZIO.m,
+  },
+  cassaPrezzo: {
+    fontFamily: FONT.testoMedio,
+    fontSize: 12.5,
+    color: COLORI.verdeScuro,
+    marginTop: SPAZIO.m,
+  },
+  cassaAzioni: { marginTop: SPAZIO.l, gap: SPAZIO.m },
   prezzoNota: {
     fontFamily: FONT.testo,
     fontSize: 12.5,

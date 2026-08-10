@@ -16,6 +16,7 @@ import { Feather } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Titolo from "@/components/Titolo";
+import { VeloVerde } from "@/components/ScenaVerdetto";
 import Vuoto from "@/components/Vuoto";
 import { classifica, type VoceClassifica } from "@/lib/api";
 import { leggiProfilo } from "@/lib/profilo";
@@ -91,6 +92,8 @@ export default function SchermataClassifica() {
         />
       }
     >
+      <VeloVerde />
+      <Text style={stili.occhielloNuovo}>LA CLASSIFICA</Text>
       <Titolo prima={T.titolo.prima} corsivo={T.titolo.corsivo} />
       <Text style={stili.sottotitolo}>{T.sottotitolo}</Text>
 
@@ -201,6 +204,13 @@ export default function SchermataClassifica() {
 const stili = StyleSheet.create({
   schermo: { flex: 1, backgroundColor: COLORI.nebbia },
   contenuto: { paddingHorizontal: SPAZIO.schermata, gap: SPAZIO.l },
+  occhielloNuovo: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 11,
+    letterSpacing: 1.8,
+    color: COLORI.verdeScuro,
+    marginBottom: SPAZIO.s,
+  },
   sottotitolo: {
     fontFamily: FONT.testo,
     fontSize: 13.5,

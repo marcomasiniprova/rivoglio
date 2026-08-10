@@ -95,6 +95,13 @@ export default function SchermataProfilo() {
 
   const voci: Voce[] = [
     {
+      chiave: "sicurezza",
+      icona: "lock",
+      titolo: TESTI.sicurezza.voce,
+      sotto: TESTI.sicurezza.voceSotto,
+      fai: () => router.push("/sicurezza"),
+    },
+    {
       chiave: "dati",
       icona: "user",
       titolo: P.voci.dati,
