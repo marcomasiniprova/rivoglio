@@ -1,4 +1,9 @@
 import { Linking, Platform, Share } from "react-native";
+import { SITO } from "./api";
+
+/** "https://rivolio.it" → "rivolio.it": in un messaggio da leggere il
+ *  protocollo è rumore. */
+const senzaProtocollo = (u: string) => u.replace(/^https?:\/\//, "");
 
 /**
  * Le cose che il telefono sa fare e il browser no.
@@ -46,7 +51,7 @@ export async function condividi(messaggio: string): Promise<Esito> {
     await nav?.clipboard?.writeText(messaggio);
     return "Invito copiato: incollalo dove vuoi.";
   } catch {
-    return "Copia questo link e mandalo a chi vuoi: rivoglio.netlify.app";
+    return `Copia questo link e mandalo a chi vuoi: ${senzaProtocollo(SITO)}`;
   }
 }
 

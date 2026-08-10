@@ -64,7 +64,7 @@ export default function SchermataProfilo() {
   );
 
   async function invita() {
-    setAvviso(await condividi(P.invita.messaggio));
+    setAvviso(await condividi(P.invita.messaggio.replace("{sito}", SITO)));
   }
 
   const voci: Voce[] = [
@@ -109,7 +109,7 @@ export default function SchermataProfilo() {
       chiave: "sito",
       icona: "globe",
       titolo: P.voci.sito,
-      sotto: P.voci.sitoSotto,
+      sotto: P.voci.sitoSotto.replace("{sitoBreve}", SITO.replace(/^https?:\/\//, "")),
       fai: () => void openBrowserAsync(SITO),
     },
   ];

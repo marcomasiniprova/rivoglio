@@ -85,7 +85,20 @@ social rifatta (era rimasta al prodotto viaggi).
     peggio che dirle di cercarlo. La lettera per quei paesi continua a
     nominare il paese e a rimandare all'elenco ufficiale, che è il
     comportamento giusto. In ARRETRATI c'è l'indirizzo da aprire.
-  - Prove: **776 verdi** (restano le 2 note dell'Osservatorio).
+  - **L'INDIRIZZO DEL SITO NON È PIÙ SCRITTO A MANO DA NESSUNA PARTE.**
+    Il web già leggeva tutto da `NEXT_PUBLIC_SITO`; l'app invece aveva
+    `rivoglio.netlify.app` scritto in quattro punti (l'invito agli amici,
+    la voce del profilo, il messaggio di riserva, l'esempio della
+    lettera). Adesso leggono tutti `SITO`: il giorno del dominio si
+    cambia una variabile e si muove tutto, invece di lasciare in giro
+    inviti che portano a un sito morto.
+  - **`DOMINIO-E-EMAIL.md` e `POLAR-PASSO-PASSO.md`**: le due cose che
+    deve fare Valerio, scritte un passo alla volta, coi riquadri da
+    copiare. Più `SENTENZE-DA-CONTROLLARE.md`, i quattro indirizzi delle
+    sentenze citate nelle repliche, con scritto accanto cosa ognuna deve
+    dire.
+  - Prove: **776 verdi** (restano le 2 note dell'Osservatorio), app
+    tipi/lint/jest tutti verdi.
 - **GIRO #46 (10/08): IL GIRO DA UTENTE CRITICO. Sito, blog, pagine
   evento e web app provati come dieci persone normali, a 1440 e a 390.**
   - 🔴 **CHI SCRIVEVA "ROMA" VEDEVA L'AEROPORTO SBAGLIATO SCRITTO GIUSTO.**

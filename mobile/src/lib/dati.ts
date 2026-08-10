@@ -13,7 +13,7 @@
  * riconosciamo diventa un messaggio generico e finisce su console.error.
  */
 import { supabase } from "./supabase";
-import type { SchedaPratica } from "./api";
+import { SITO, type SchedaPratica } from "./api";
 
 export const DEMO: boolean = process.env.EXPO_PUBLIC_DEMO === "1";
 
@@ -117,7 +117,7 @@ export function schedaDemo(id: string): SchedaPratica | null {
       compagnia: {
         nome: "ZZ Compagnia Demo",
         canale: "Modulo reclami sul sito della compagnia (esempio).",
-        url: "https://rivoglio.netlify.app",
+        url: SITO,
         email: null,
         indirizzoPostale: null,
       },

@@ -406,8 +406,12 @@ export const TESTI = {
       titolo: "Fai controllare un volo a chi ami",
       testo: "Il check è gratis: passa Rivolio a chi ha preso un volo in ritardo.",
       // Il messaggio che parte con la condivisione. Niente promesse.
+      /* {sito} lo riempie chi mostra il testo, leggendo SITO da api.ts.
+         Prima l'indirizzo era scritto a mano qui dentro: il giorno che
+         cambia il dominio, un invito che porta a un sito morto è peggio
+         di nessun invito. */
       messaggio:
-        "Ho controllato il mio volo con Rivolio: se è atterrato in ritardo ti dice subito se rientra in una fascia di compensazione fino a 600€. Gratis: https://rivoglio.netlify.app",
+        "Ho controllato il mio volo con Rivolio: se è atterrato in ritardo ti dice subito se rientra in una fascia di compensazione fino a 600€. Gratis: {sito}",
     },
     voci: {
       dati: "Dati personali",
@@ -421,7 +425,7 @@ export const TESTI = {
       supporto: "Scrivici",
       supportoSotto: "Rispondiamo per email",
       sito: "Rivolio sul web",
-      sitoSotto: "rivoglio.netlify.app",
+      sitoSotto: "{sitoBreve}",
     },
     piede:
       "Rivolio non è un intermediario: prepara i documenti, il reclamo lo invii tu e la compensazione arriva a te.",
