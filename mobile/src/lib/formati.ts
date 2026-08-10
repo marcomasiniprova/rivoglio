@@ -13,6 +13,22 @@ export function euro(n: number, decimali = 0): string {
   return (dec ? `${conPunti},${dec}` : conPunti) + "€";
 }
 
+/**
+ * 232 -> "3 h e 52 min" · 45 -> "45 min" · 120 -> "3 h"
+ *
+ * Mai "3h52": è un formato da tabellone di stazione, e la regola del
+ * giro #35 lo vieta in tutto il prodotto. Sul sito lo fa `formattaMinuti`
+ * in lib/regole/eu261.ts: se cambia lì, cambia anche qui.
+ */
+export function durataLunga(minuti: number): string {
+  if (!Number.isFinite(minuti) || minuti <= 0) return "";
+  const h = Math.floor(minuti / 60);
+  const m = Math.round(minuti % 60);
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h} h`;
+  return `${h} h e ${m} min`;
+}
+
 /** "2026-08-14" -> "ven 14 ago" */
 export function dataBreve(iso: string): string {
   const d = new Date(iso + "T12:00:00");

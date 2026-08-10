@@ -232,6 +232,10 @@ export default function SchermataCheck() {
         a: esito.dato.a ?? "",
         previsto: esito.dato.previsto ?? "",
         effettivo: esito.dato.effettivo ?? "",
+        /* Serve al chip della tratta sul verdetto: la distanza è il dato
+           che spiega PERCHÉ sei in quella fascia, e senza il chip resta
+           un numero calato dall'alto. */
+        km: String(esito.dato.km ?? ""),
         demo: esito.demo ? "1" : "",
       },
     });

@@ -298,6 +298,61 @@ export const TESTI = {
     demo: "Esempio dimostrativo",
     altroVolo: "Controlla un altro volo",
     apriPratica: "Apri la pratica dal sito",
+
+    /* ------------------------------------------------------------------
+       IL VERDETTO RIFATTO (giro #49), sul riferimento della board.
+       Quello che cambia rispetto a prima: l'importo diventa il
+       protagonista, e accanto compare la DIMOSTRAZIONE. Non basta dire
+       "250€": si mostra da dove esce, cioè le tre fasce con la tua
+       accesa e la soglia delle tre ore con quanto la superi.
+       ------------------------------------------------------------------ */
+    scena: {
+      /** I tre stati del motore, come li legge una persona. */
+      bolloIdoneo: "Verificato sul tracciamento",
+      bolloIncerto: "Caso incerto",
+      bolloNonIdoneo: "Verifica completata",
+
+      /** Il titolo: la frase cambia col fatto, non con lo stato. */
+      atterrato: "Atterrato con",
+      diRitardo: "di ritardo.",
+      senzaOrari: "Ecco cosa risulta dagli archivi.",
+
+      laTuaFascia: "La tua fascia",
+      perPasseggero: "per passeggero",
+
+      /* Le tre fasce dell'art. 7, con la ragione di ognuna. Sono
+         didascalie, non promesse: dicono perché sei in quella. */
+      fasce: [
+        { importo: 250, quando: "fino a 1.500 km" },
+        { importo: 400, quando: "fino a 3.500 km" },
+        { importo: 600, quando: "oltre i 3.500" },
+      ],
+
+      soglia: "soglia 3 h",
+      oltreSoglia: "{minuti} oltre",
+      sottoSoglia: "mancano {minuti}",
+
+      /* I chip: SOLO dati che il motore ha davvero. Il meteo non c'è di
+         proposito, l'archivio storico a uso commerciale costa e resta
+         spento (vedi STATO): un chip "meteo sereno" sarebbe un dato
+         inventato, e la regola numero due lo vieta. */
+      chipTratta: "Tratta",
+      chipScioperi: "Scioperi",
+      chipFonte: "Fonte",
+      chipFonteValore: "tracciamento",
+      chipFonteDemo: "esempio",
+      chipScioperiNessuno: "nessuno",
+
+      preparaPratica: "Prepara la pratica",
+      /* ⚠️ Il prezzo NON si scrive qui. È acceso il test dei due prezzi e
+         la variante la decide il sito con un cookie: se l'app scrivesse
+         14,90 metà delle persone troverebbe 24,90 alla cassa. */
+      prezzoNota: "Prezzo fisso, scritto prima di pagare. Nessuna percentuale sul tuo rimborso.",
+      nonPromessa:
+        "Non è una promessa di pagamento: la compagnia può ancora invocare una circostanza eccezionale, e deve provarla.",
+      incertoRassicura:
+        "Non hai pagato niente e non pagherai. Quando il fatto non è certo, il caso non si vende.",
+    },
   },
 
   comune: {
