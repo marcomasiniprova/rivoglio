@@ -1,6 +1,7 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-10 (giro #48: IL QUARTO COLPO, cioè quello che i
+**Aggiornato:** 2026-08-10 (giro #49: L'APP MIGRA AL DESIGN DELLA TAVOLA
+DEFINITIVA, 5 schermate su 34 · giro #48: IL QUARTO COLPO, cioè quello che i
 soldi li muove davvero, più la riforma del 2027 scritta e messa in
 calendario · giro #47: LA SVIZZERA VERIFICATA, non più un
 punto interrogativo · giro #46: IL GIRO DA UTENTE CRITICO, tre
@@ -48,6 +49,45 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #49 (10/08): L'APP MIGRA AL DESIGN DELLA TAVOLA DEFINITIVA.**
+  Valerio ha consegnato la tavola finale di Claude Design (34 schermate,
+  con le 9 correzioni di sostanza chieste col prompt: via il "Termine
+  2031", via il meteo, via i prezzi dai bottoni, la lettera a 30 giorni,
+  "non costituisce parere legale" sui fogli, l'onere della prova nella
+  replica). Decisioni prese col popup: 4 tab (Home · Check · Pratiche ·
+  Account), la Home compare con la prima pratica, NESSUNA cifra di
+  prezzo nell'app finché dura il test A/B (la variante la decide un
+  cookie del browser: l'app non può saperla), cinematica sulle 3 scene
+  chiave. **Migrate finora 5 schermate su 34**, ognuna col giro visivo
+  sull'app vera a 390px:
+  1. **il verdetto** (giro precedente, commit "verdetto rifatto");
+  2. **il check coi tre modi** (6a, 7a, 7b): tratta predefinita che
+     cerca da sola, elenco che racconta i voli ("Doveva arrivare alle
+     09:55. Atterrato alle 13:47" è un dato VERO: il fornitore manda
+     l'orario aggiornato e la filiera lo buttava, ora è in
+     `lib/voli/tratta.ts` con la sua prova), riquadro anti-prenotazione,
+     conferma dei campi letti dalla carta;
+  3. **la scena dell'analisi** (7c): schermo verde notte, biglietto di
+     vetro coi dati veri, sei passi con la loro riga, "5 archivi su 6",
+     contarello dei secondi;
+  4. **la home premium** (3d): card "Richiesti alle compagnie" con la
+     somma delle fasce dichiarata "a passeggero", contatori veri, "Da
+     fare oggi" guidata dallo STATO (niente "giorno 42/42": il giorno
+     d'invio non è nel dato dell'elenco e non si stima);
+  5. **le 4 tab** coi nomi della tavola, Home e Classifica con lo stesso
+     interruttore.
+  - I valori esatti del design (colori, corpi, raggi, ombre) sono in
+    `mobile/RIFERIMENTO-DESIGN.md`, estratti dal CSS della tavola: la
+    palette combaciava con la nostra esadecimale per esadecimale. Il
+    file da 1,8 MB resta fuori dal repo.
+  - **Restano 29 schermate.** Le prossime: pratiche (7d, 7e), la pratica
+    coi quattro fogli (6e), la conciliazione (6f), la lettera a schermo
+    pieno (6g), il rifiuto (6d), poi accesso, permessi, portafoglio,
+    errori e il resto del percorso premium.
+  - Prove: la suite della tratta 15 su 15 (dentro c'è quella nuova
+    sull'arrivo aggiornato); l'ultima suite piena del sito resta quella
+    del giro #48, 832 verdi. Mobile: tipi, lint e jest verdi, zero
+    errori console nei giri visivi.
 - **GIRO #48 (10/08): IL QUARTO COLPO. Perché la pratica finiva con un
   documento che, per sua natura, i soldi non li muove.**
   - 🔴 **LA SEGNALAZIONE ALL'ENTE NON PAGA, E LO SAPEVAMO.** Lo scriviamo
