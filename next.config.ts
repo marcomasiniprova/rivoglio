@@ -66,9 +66,18 @@ const nextConfig: NextConfig = {
   /* L'anteprima dell'app (build web di Expo in /public/app-anteprima) va
      servita su un indirizzo PULITO, senza /index.html in coda: il router
      dell'app legge l'indirizzo del browser e con /index.html appeso non
-     riconosce la rotta ("Unmatched Route"). */
+     riconosce la rotta ("Unmatched Route").
+
+     La seconda riga serve alla lavagna: l'export di Expo è una pagina
+     sola, quindi /app-anteprima/verdetto come FILE non esiste e darebbe
+     404. Questa regola gira dopo il controllo dei file veri, quindi i
+     font e i bundle sotto /app-anteprima/assets continuano a essere
+     serviti da sé: qui cadono solo le rotte dell'app. */
   async rewrites() {
-    return [{ source: "/app-anteprima", destination: "/app-anteprima/index.html" }];
+    return [
+      { source: "/app-anteprima", destination: "/app-anteprima/index.html" },
+      { source: "/app-anteprima/:rotta*", destination: "/app-anteprima/index.html" },
+    ];
   },
 };
 
