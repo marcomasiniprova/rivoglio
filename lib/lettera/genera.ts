@@ -3,6 +3,7 @@ import type { Passeggero, Pratica } from "@/lib/pratiche/pratiche";
 import { type CanaleCompagnia, compagniaPerVettore } from "./compagnie";
 import { paeseDiScalo } from "@/lib/regole/territorio";
 import { ELENCO_UFFICIALE_NEB, nebPerPaese, nomeBreveNeb } from "./neb";
+import { type MotivoRifiuto, schedaRifiuto } from "@/lib/pratiche/rifiuto";
 
 /**
  * Il generatore di documenti (strato 5, SPEC §4). In v1 è un modello
@@ -206,6 +207,14 @@ export function generaSollecito(
   fatto: FattoVolo,
   verdetto: Verdetto,
   dataPrimoInvio: string | null,
+  /**
+   * Il motivo per cui la compagnia ha detto no, dichiarato dall'utente a
+   * scelta chiusa. Da qui esce il PARAGRAFO CENTRALE del sollecito: a un
+   * guasto tecnico si risponde in un modo, a uno sciopero del personale
+   * in un altro. Senza, la replica resterebbe generica e varrebbe la
+   * metà. `null` o "silenzio" = nessuna risposta ricevuta.
+   */
+  motivoRifiuto: MotivoRifiuto | null = null,
 ): Lettera | null {
   if (verdetto.esito !== "idoneo") return null;
 
@@ -215,8 +224,12 @@ export function generaSollecito(
   const giornoVolo = dataLunga(fatto.dataLocale);
   const giornoInvio = dataPrimoInvio ? dataLunga(dataPrimoInvio) : "[data di invio del primo reclamo]";
   const compagnia = compagniaPerVettore(fatto.vettoreOperativo) ?? compagniaPerVettore(fatto.voloIata);
+  const scheda = schedaRifiuto(motivoRifiuto) ?? schedaRifiuto("silenzio")!;
+  const haRisposto = scheda.motivo !== "silenzio";
 
-  const oggetto = `Sollecito: richiesta di compensazione volo ${fatto.voloIata} del ${giornoVolo}`;
+  const oggetto = haRisposto
+    ? `Riscontro al vostro diniego: compensazione volo ${fatto.voloIata} del ${giornoVolo}`
+    : `Sollecito: richiesta di compensazione volo ${fatto.voloIata} del ${giornoVolo}`;
 
   const corpo = `${intestazione(fatto, compagnia)},
 
@@ -226,9 +239,9 @@ in data ${giornoInvio} vi ho inviato una richiesta di compensazione pecuniaria a
       : `un totale di ${euro(totale)} (${euro(verdetto.importo)} per ${n} passeggeri)`
   }.
 
-A oggi non ho ricevuto alcun riscontro. Il silenzio non estingue il diritto: i presupposti della richiesta restano quelli documentati nella prima lettera, che si intende qui integralmente richiamata.
+${scheda.replica}
 
-Vi chiedo il pagamento, o una risposta scritta e motivata, entro 14 giorni dal ricevimento del presente sollecito.
+Vi chiedo il pagamento, o una risposta scritta e motivata, entro 14 giorni dal ricevimento della presente.
 
 Decorso inutilmente questo termine, presenterò reclamo a ${organismoDiPartenza(fatto)}, l'organismo nazionale responsabile dell'applicazione del Regolamento (CE) 261/2004 per lo Stato di partenza, che può accertare la violazione e applicare le sanzioni previste. Valuterò inoltre ogni ulteriore tutela nelle sedi competenti.
 

@@ -17,6 +17,8 @@ import { scadenzaStimata } from "../regole/eu261";
  *   esplode salta il giro di tutti per colpa di una pratica sola.
  */
 
+import type { MotivoRifiuto } from "./rifiuto";
+
 export type StatoPratica =
   | "creata"
   | "pagata"
@@ -48,6 +50,14 @@ export type Pratica = {
   scadenza_stimata: string | null;
   garanzia_fino_al: string | null;
   inviata_il: string | null;
+  /**
+   * Il motivo per cui la compagnia ha detto no, dichiarato dal cliente a
+   * scelta chiusa. Decide la replica nel sollecito. NULL = non ha ancora
+   * risposto, o il cliente non ce l'ha detto.
+   * (Colonne della migrazione 2026-08-15.)
+   */
+  rifiuto_motivo?: MotivoRifiuto | null;
+  rifiuto_il?: string | null;
   creata_il: string;
   aggiornata_il: string;
 };

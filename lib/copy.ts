@@ -1110,6 +1110,12 @@ export const COPY = {
         rinuncia_recesso_mancante: "Rinuncia al recesso da verificare",
         email_t0: "Email di conferma inviata",
         email_t2: "Promemoria d'invio inviato",
+        email_sollecito: "Email col sollecito inviata",
+        email_ente: "Email con la segnalazione all'ente inviata",
+        email_esito: "Email di controllo esito inviata",
+        rifiuto: "La compagnia ha risposto no",
+        // I nomi vecchi delle stesse tappe: le pratiche di prima li hanno
+        // ancora scritti in cronologia e devono restare leggibili.
         email_t15: "Email col sollecito inviata",
         email_t30: "Email col reclamo ENAC inviata",
         email_t60: "Email di controllo esito inviata",

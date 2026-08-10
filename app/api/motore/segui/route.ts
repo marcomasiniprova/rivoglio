@@ -10,17 +10,30 @@ import {
 } from "@/lib/pratiche/pratiche";
 import { comeVa, promemoriaInvio, reclamoEnac, sollecitoPronto } from "@/lib/email/pratiche";
 import { casa } from "@/lib/email/posta";
+import { GIORNI_PRIMA_DELL_ENTE, GIORNI_PRIMA_DEL_SOLLECITO } from "@/lib/pratiche/rifiuto";
 
 /**
  * Il cron dei follow-up (SPEC §6): una volta al giorno scorre le pratiche
  * aperte e manda l'email giusta per il punto in cui sono.
  *
  *   T+2  dal pagamento, se mai segnata come inviata → promemoria
- *   T+15 dall'invio → sollecito pronto (+ stato `sollecito`)
- *   T+30 dall'invio → escalation ENAC (+ stato `enac`)
- *   T+60 dall'invio → com'è andata + garanzia
+ *   T+42 dall'invio → sollecito pronto (+ stato `sollecito`)
+ *   T+56 dall'invio → segnalazione all'ente nazionale (+ stato `enac`)
+ *   T+90 dall'invio → com'è andata + garanzia
  *
- * OGNI invio lascia un evento (`email_t2`, `email_t15`...): prima di
+ * ⚠️ PERCHÉ 42 E NON 15, come era prima. Le compagnie rispondono in
+ * 8-14 settimane: un sollecito mandato al giorno 15 arriva quando
+ * nessuno ha ancora aperto la pratica, e serve solo a farci sembrare
+ * automatici. Sei settimane è anche il termine che l'ENAC stesso indica
+ * prima di poter presentare reclamo all'ente. I due numeri vivono in
+ * `lib/pratiche/rifiuto.ts` e sono uno solo, non due copie.
+ *
+ * ⚠️ IL RIFIUTO SCAVALCA IL CALENDARIO. Se il cliente dichiara che la
+ * compagnia ha risposto no, il sollecito è disponibile subito: la
+ * risposta c'è già, aspettare altre cinque settimane sarebbe assurdo.
+ * Quel salto lo fa `/api/pratiche/rifiuto`, non questo cron.
+ *
+ * OGNI invio lascia un evento (`email_t2`, `email_sollecito`...): prima di
  * mandare si controlla che l'evento non esista già, così nessuna email
  * parte due volte. Se l'invio fallisce l'evento NON si scrive, e il giro
  * successivo riprova da solo.
@@ -35,13 +48,23 @@ export const dynamic = "force-dynamic";
 
 const GIORNO_MS = 86_400_000;
 
-type Passo = "email_t2" | "email_t15" | "email_t30" | "email_t60";
+type Passo = "email_t2" | "email_sollecito" | "email_ente" | "email_esito";
 
 const NOTE: Record<Passo, string> = {
   email_t2: "Promemoria d'invio (T+2) mandato.",
-  email_t15: "Sollecito pronto (T+15) mandato.",
-  email_t30: "Escalation ENAC (T+30) mandata.",
-  email_t60: "Richiesta d'esito e promemoria garanzia (T+60) mandati.",
+  email_sollecito: "Sollecito pronto (T+42) mandato.",
+  email_ente: "Segnalazione all'ente nazionale (T+56) mandata.",
+  email_esito: "Richiesta d'esito e promemoria garanzia (T+90) mandati.",
+};
+
+/* I nomi vecchi delle stesse tappe. Servono a non rimandare un'email a
+   chi l'ha già ricevuta col nome di prima: una pratica non deve
+   accorgersi che abbiamo cambiato i tempi. */
+const NOMI_VECCHI: Record<Passo, string | null> = {
+  email_t2: null,
+  email_sollecito: "email_t15",
+  email_ente: "email_t30",
+  email_esito: "email_t60",
 };
 
 function giorniDa(iso: string | null): number {
@@ -52,7 +75,11 @@ function giorniDa(iso: string | null): number {
 
 /** Il passo dovuto adesso per questa pratica, o niente. */
 function passoDovuto(pr: PraticaConVolo, fatti: Set<string>): Passo | null {
-  const fatto = (t: Passo) => fatti.has(`${pr.id}:${t}`);
+  const fatto = (t: Passo) => {
+    if (fatti.has(`${pr.id}:${t}`)) return true;
+    const vecchio = NOMI_VECCHI[t];
+    return vecchio ? fatti.has(`${pr.id}:${vecchio}`) : false;
+  };
 
   // Mai inviata: esiste solo il promemoria del giorno 2.
   if (!pr.inviata_il) {
@@ -69,9 +96,13 @@ function passoDovuto(pr: PraticaConVolo, fatti: Set<string>): Passo | null {
   // Inviata: si guarda dal traguardo più lontano. Se una tappa più avanti
   // è già stata mandata, quelle prima sono superate e non si mandano più.
   const g = giorniDa(pr.inviata_il);
-  if (g >= 60) return fatto("email_t60") ? null : "email_t60";
-  if (g >= 30) return fatto("email_t30") ? null : "email_t30";
-  if (g >= 15) return fatto("email_t15") ? null : "email_t15";
+  if (g >= 90) return fatto("email_esito") ? null : "email_esito";
+  if (g >= GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE) {
+    return fatto("email_ente") ? null : "email_ente";
+  }
+  if (g >= GIORNI_PRIMA_DEL_SOLLECITO) {
+    return fatto("email_sollecito") ? null : "email_sollecito";
+  }
   return null;
 }
 
@@ -84,7 +115,7 @@ async function mandaPasso(pr: PraticaConVolo, passo: Passo): Promise<boolean> {
   let esito: { ok: boolean };
   if (passo === "email_t2") {
     esito = await promemoriaInvio(pr.email, { importo: pr.importo_fascia, link });
-  } else if (passo === "email_t15") {
+  } else if (passo === "email_sollecito") {
     esito = await sollecitoPronto(pr.email, {
       volo,
       dataVolo,
@@ -93,7 +124,7 @@ async function mandaPasso(pr: PraticaConVolo, passo: Passo): Promise<boolean> {
       importo: pr.importo_fascia,
       link,
     });
-  } else if (passo === "email_t30") {
+  } else if (passo === "email_ente") {
     esito = await reclamoEnac(pr.email, { volo, dataVolo, link });
   } else {
     esito = await comeVa(pr.email, { garanziaFinoAl: pr.garanzia_fino_al, link });
@@ -104,11 +135,11 @@ async function mandaPasso(pr: PraticaConVolo, passo: Passo): Promise<boolean> {
   await registraEvento(pr.id, passo, NOTE[passo]);
 
   // Le tappe che spostano anche lo stato della macchina.
-  if (passo === "email_t15" && pr.stato === "inviata") {
-    await transizionePratica(pr.id, "sollecito", "Sollecito del giorno 15 in mano all'utente.");
+  if (passo === "email_sollecito" && pr.stato === "inviata") {
+    await transizionePratica(pr.id, "sollecito", "Sollecito in mano all'utente (sei settimane di silenzio).");
   }
-  if (passo === "email_t30" && (pr.stato === "inviata" || pr.stato === "sollecito")) {
-    await transizionePratica(pr.id, "enac", "Escalation ENAC del giorno 30 in mano all'utente.");
+  if (passo === "email_ente" && (pr.stato === "inviata" || pr.stato === "sollecito")) {
+    await transizionePratica(pr.id, "enac", "Segnalazione all'ente nazionale in mano all'utente.");
   }
   return true;
 }
