@@ -64,7 +64,10 @@ export default function Paginazione({
       aria-label="Pagine del Tabellone"
       className="mt-14 border-t border-verde-notte/12 pt-5"
     >
-      <div className="flex items-center justify-between gap-4">
+      {/* A 320 punti "Precedente · Pagina 1 di 2 · Successivo" non sta
+          su una riga e spingeva la pagina fuori schermo: lì il conteggio
+          va a capo, centrato sotto le due frecce. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         {haPrima ? (
           <Link href={indirizzo(corrente - 1)} className={acceso} rel="prev">
             <Freccia verso="sinistra" />
@@ -77,7 +80,7 @@ export default function Paginazione({
           </span>
         )}
 
-        <p className="text-[14.5px] font-medium text-verde-notte/60 sm:hidden">
+        <p className="text-[14.5px] font-medium text-verde-notte/60 max-[359px]:order-3 max-[359px]:w-full max-[359px]:text-center sm:hidden">
           Pagina {corrente} di {totale}
         </p>
 

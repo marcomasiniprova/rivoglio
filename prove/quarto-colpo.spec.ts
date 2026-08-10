@@ -248,3 +248,27 @@ test.describe("Calendario: la riforma entra in vigore nell'estate 2027", () => {
     expect(SVEGLIA < "2027-06-21").toBe(true);
   });
 });
+
+/* ── I TESTI DEL SITO NON DEVONO PROMETTERE TEMPI CHE NON USIAMO ──────
+   Fino al 10/08 la landing, le card prezzi e le FAQ dicevano "al giorno
+   15 trovi il sollecito pronto". I tempi erano stati portati a sei
+   settimane il 9/08 (le compagnie rispondono in 8-14 settimane: un
+   sollecito al giorno 15 arriva prima che qualcuno abbia aperto la
+   pratica). Chi comprava leggeva una promessa che non manteniamo, e la
+   fiducia è esattamente la cosa che vendiamo. */
+test.describe("I tempi promessi combaciano con quelli veri", () => {
+  const testi = JSON.stringify(COPY);
+
+  test("nessun testo parla del giorno 15", () => {
+    expect(testi).not.toContain("giorno 15");
+    expect(testi).not.toContain("14 e 30 giorni");
+  });
+
+  test("il sollecito vero sta nella sesta settimana", () => {
+    expect(Math.round(GIORNI_PRIMA_DEL_SOLLECITO / 7)).toBe(6);
+  });
+
+  test("il sito nomina la conciliazione, che è il canale che paga", () => {
+    expect(testi.toLowerCase()).toContain("conciliazione");
+  });
+});

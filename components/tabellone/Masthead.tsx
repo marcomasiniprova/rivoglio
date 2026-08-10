@@ -106,7 +106,10 @@ export default function Masthead() {
             href="/#controllo"
             className="riflesso inline-flex items-center whitespace-nowrap rounded-[9px] bg-verde-notte px-4 py-2.5 text-[14px] font-semibold text-carta shadow-[0_10px_24px_-12px_rgba(5,46,31,.8)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro sm:px-5"
           >
-            Controlla il tuo volo
+            {/* Sotto i 360 punti il testo pieno spinge la testata fuori
+                dallo schermo e il blog scorre di lato. */}
+            <span className="max-[359px]:hidden">Controlla il tuo volo</span>
+            <span className="hidden max-[359px]:inline">Controlla</span>
           </Link>
         </div>
       </div>

@@ -49,6 +49,8 @@ export const COPY = {
       { testo: "Il Tabellone", ancora: "/tabellone" },
     ],
     cta: "Controlla il tuo volo",
+    /** Sotto i 360 punti di larghezza: il testo pieno non ci sta. */
+    ctaCorta: "Controlla",
     entra: "Entra",
   },
 
@@ -212,7 +214,7 @@ export const COPY = {
       {
         nome: "Invii tu, incassi tu",
         testo:
-          "Lo mandi dalla tua email in 2 minuti. La compensazione arriva a te, per intero. E al giorno 15 senza risposta trovi il sollecito già pronto.",
+          "Lo mandi dalla tua email in 2 minuti. La compensazione arriva a te, per intero. E se restano in silenzio, dopo sei settimane trovi il sollecito già pronto.",
       },
     ],
     /** I 3 passi mostrati durante il check: avanzamento REALE, mai finto. */
@@ -370,8 +372,9 @@ export const COPY = {
         punti: [
           "Lettera formale con i dati verificati del volo",
           "Indirizzo e canale corretti della compagnia operativa",
-          "Sollecito già pronto al giorno 15",
-          "Se serve, contro-risposta e reclamo ENAC",
+          "Sollecito già pronto dopo sei settimane",
+          "Se dicono no, la replica che smonta il loro motivo",
+          "Segnalazione all'ente e conciliazione gratuita, già scritte",
           "Tracker della pratica, sul web e nell'app",
         ],
         bottone: "Prepara la pratica",
@@ -501,7 +504,8 @@ export const COPY = {
       voci: [
         "Verifico l'orario certificato di atterraggio e calcolo la fascia.",
         "Scrivo la lettera col riferimento di legge e il canale reclami giusto di quella compagnia.",
-        "Ti ricordo io le scadenze: promemoria a 14 e 30 giorni, col sollecito già pronto.",
+        "Ti ricordo io le scadenze, col sollecito e la replica al loro no già scritti.",
+        "Se non pagano, ti preparo la segnalazione all'ente e la conciliazione: è gratuita e si fa da casa.",
         "Tengo la pratica aggiornata, e se la compagnia non paga ti restituisco i soldi.",
       ],
     },
@@ -595,7 +599,7 @@ export const COPY = {
       {
         domanda: "E allora cosa pago, esattamente?",
         risposta:
-          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, letto dal tracciamento del volo e archiviato come prova. Il secondo colpo: il sollecito già pronto al giorno 15, il punto esatto in cui la maggior parte delle persone lascia perdere. La garanzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, ti rimborsiamo per intero.",
+          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, letto dal tracciamento del volo e archiviato come prova. I colpi dopo il primo: il sollecito, la replica se dicono no, la segnalazione all'ente e la conciliazione gratuita, che è il canale dove i soldi si muovono davvero. La garanzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, ti rimborsiamo per intero.",
       },
       {
         domanda: "Quanto ricevo, se va a buon fine?",
@@ -1062,12 +1066,12 @@ export const COPY = {
         nome: "Inviata",
         descrizione: "Hai inviato il reclamo alla compagnia. Ora la palla è a loro.",
         prossimoPasso:
-          "Niente da fare per ora. Se al giorno 15 non è arrivata risposta, ti mandiamo il sollecito già pronto.",
+          "Niente da fare per ora: le compagnie rispondono in 8-14 settimane. Se restano in silenzio, alla sesta ti mandiamo il sollecito già pronto. Se invece rispondono no, dillo dalla pratica e la replica parte subito.",
       },
       sollecito: {
         nome: "Sollecito",
         descrizione:
-          "Giorno 15, nessuna risposta: il sollecito è pronto. È il passaggio che la maggior parte delle persone salta. Tu no.",
+          "Sei settimane, nessuna risposta: il sollecito è pronto. È il passaggio che la maggior parte delle persone salta. Tu no.",
         prossimoPasso:
           "Invia il sollecito che ti abbiamo mandato via email, sempre dalla tua casella.",
       },
@@ -1191,6 +1195,8 @@ export const COPY = {
     corsivo: "Scoprilo adesso.",
     testo: "Trenta secondi, niente email, nessun conto da creare. Il check è gratis, sempre.",
     cta: "Controlla il tuo volo",
+    /** Sotto i 360 punti di larghezza: il testo pieno non ci sta. */
+    ctaCorta: "Controlla",
   },
 
   footer: {

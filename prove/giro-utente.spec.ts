@@ -106,3 +106,23 @@ test.describe("Chi sbaglia a scrivere il numero non viene mandato ad aspettare",
 function ieri(): string {
   return new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
 }
+
+/* ── GLI SCHERMI MINUSCOLI ────────────────────────────────────────────
+   320 punti sono l'iPhone SE di prima generazione e, soprattutto, la
+   modalità zoom di iOS, che moltissime persone tengono accesa. Lì la
+   barra in alto spingeva la pagina fuori schermo di 26px: il sito
+   scorreva di lato, che è sempre un difetto e su un sito che vende
+   fiducia sembra roba fatta male. */
+test.describe("A 320 punti niente scorre di lato", () => {
+  test.use({ viewport: { width: 320, height: 600 } });
+
+  for (const rotta of ["/", "/tabellone", "/sciopero-aerei", "/aeroporto/fco"]) {
+    test(`${rotta} sta dentro lo schermo`, async ({ page }) => {
+      await page.goto(rotta);
+      const fuori = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(fuori).toBeLessThanOrEqual(2);
+    });
+  }
+});

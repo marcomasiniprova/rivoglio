@@ -18,7 +18,13 @@ export default function StrisciaArgomenti({ escluso }: { escluso?: string }) {
   if (argomenti.length === 0) return null;
 
   return (
-    <nav aria-label="Argomenti del Tabellone" className="px-5 pt-10 sm:px-8 sm:pt-14">
+    <nav
+      aria-label="Argomenti del Tabellone"
+      /* `overflow-x-clip`: la striscia scorre da sé, ma su schermi molto
+         stretti sporgeva oltre il bordo e faceva scorrere di lato tutta
+         la pagina (a 320 punti, visto il 10/08). */
+      className="overflow-x-clip px-5 pt-10 sm:px-8 sm:pt-14"
+    >
       <div className="mx-auto max-w-[1216px]">
         <div className="-mx-5 flex gap-2.5 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {argomenti.map((t) => (
