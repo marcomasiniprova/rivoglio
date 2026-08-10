@@ -80,10 +80,27 @@ social rifatta (era rimasta al prodotto viaggi).
     `mobile/RIFERIMENTO-DESIGN.md`, estratti dal CSS della tavola: la
     palette combaciava con la nostra esadecimale per esadecimale. Il
     file da 1,8 MB resta fuori dal repo.
-  - **Restano 29 schermate.** Le prossime: pratiche (7d, 7e), la pratica
-    coi quattro fogli (6e), la conciliazione (6f), la lettera a schermo
-    pieno (6g), il rifiuto (6d), poi accesso, permessi, portafoglio,
-    errori e il resto del percorso premium.
+  - **SECONDA ONDATA (stessa giornata): migrate altre 11, siamo a 16 su
+    34.** La pratica coi QUATTRO FOGLI (6e) con la scheda API estesa (i
+    fogli li calcola il server, stesso codice del sito), il no della
+    compagnia a scelta chiusa (6d) coi badge onesti, la conciliazione
+    (6f) coi passi e ConciliaWeb, il foglio a schermo pieno (6g) con
+    Copia e mailto, le pratiche aperte/chiuse col prossimo passo (7d) e
+    lo stato vuoto (7e), il permesso notifiche cuscinetto (4g, prima
+    della finestra di sistema), il codice a sei cifre via email (3c,
+    accanto alla password: scelta "entrambi"), il portafoglio coi soli
+    numeri veri (3f: niente cifre di acquisto finché non c'è un
+    venditore).
+  - **Restano 18 schermate**, quasi tutte di contorno: l'apertura
+    cinematica (3a), il restyle di 6b/6c (cancellato e codeshare, che
+    FUNZIONANO già con lo stile vecchio), gli stati d'errore dedicati
+    (4a/4b/4c), il passaggio al pagamento (4d/4h, fermo con Polar), il
+    rimborso (4i), l'esito celebrativo (3h), il tracker in volo (3i:
+    servono dati che oggi non abbiamo), sicurezza account con Face ID
+    (18: libreria in più).
+  - ⚠️ **Il codice via SMS che voleva Valerio richiede un fornitore a
+    pagamento** (Twilio o simili su Supabase): in ARRETRATI, si decide
+    coi confini di spesa. Il codice via EMAIL è vivo e gratuito.
   - Prove: la suite della tratta 15 su 15 (dentro c'è quella nuova
     sull'arrivo aggiornato); l'ultima suite piena del sito resta quella
     del giro #48, 832 verdi. Mobile: tipi, lint e jest verdi, zero
