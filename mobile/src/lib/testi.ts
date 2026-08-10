@@ -113,34 +113,43 @@ export const TESTI = {
      dell'analisi del server. Nessuno è decorativo, la sequenza non si
      taglia mai (scelta di Valerio, 8/08). */
   analisi: {
-    titolo: "Analisi in corso",
+    /* La scena scura della tavola (7c): occhiello, biglietto di vetro,
+       sei passi con la loro riga di dato VERO, barra degli archivi.
+       I titoli dei passi sono cose che il server fa davvero. */
+    occhiello: "Sto interrogando gli archivi",
     passi: [
-      "Cerco il volo negli archivi di volo",
-      "Leggo l'orario di atterraggio certificato",
-      "Calcolo la distanza reale della tratta",
-      "Controllo scioperi e circostanze note del giorno",
-      "Confronto orario previsto e orario effettivo",
-      "Applico il Regolamento CE 261/2004",
+      "Volo trovato negli orari ufficiali",
+      "Orario reale di atterraggio",
+      "Ritardo all'arrivo calcolato",
+      "Distanza fra i due aeroporti",
+      "Scioperi e circostanze del giorno",
+      "Fascia del Regolamento",
     ],
+    /* Le righe sotto i passi quando il dato vero non è ancora arrivato:
+       appena c'è, la riga diventa il dato (ruote a terra alle 13:47). */
     dettagli: [
-      "Interrogo il tracciamento del volo",
-      "Verifico che l'orario sia confermato, non stimato",
-      "Distanza ortodromica fra i due aeroporti",
-      "Incrocio la tabella scioperi del trasporto aereo",
-      "Ritardo all'arrivo, al minuto",
-      "Articoli 5, 6 e 7 del Regolamento",
+      "numero e giorno negli archivi di volo",
+      "dal tracciamento, non da una stima",
+      "previsto contro effettivo, al minuto",
+      "in ortodromica, decide la fascia",
+      "la tabella del trasporto aereo",
+      "articoli 5, 6 e 7",
     ],
-    nota: "Ogni passo è reale: interroghiamo davvero i dati del volo. Se non li troviamo, te lo diciamo.",
-    carta: {
-      intestazione: "Carta d'imbarco",
-      intestazioneEn: "Boarding pass",
+    inCorso: "in corso",
+    ruoteATerra: "ruote a terra alle {ora}",
+    kmFra: "{km} km fra i due scali",
+    /* La barra in fondo: quanti archivi sono stati interrogati e da
+       quanti secondi la scena sta girando. Numeri veri: {n} è il passo. */
+    contatore: "{n} archivi su 6",
+    secondi: "{s} s",
+    nessunaStima:
+      "Nessuna stima: se un dato non risulta verificato, il caso resta incerto e non paghi.",
+    biglietto: {
       volo: "Volo",
       data: "Data",
-      tratta: "Tratta",
-      previsto: "Arrivo previsto",
-      effettivo: "Arrivo effettivo",
-      verifica: "Verifica",
-      timbro: "Reg. CE 261/2004",
+      previsto: "Previsto",
+      effettivo: "Effettivo",
+      distanza: "Distanza",
     },
   },
 

@@ -37,6 +37,7 @@ import ScenaScan from "@/components/ScenaScan";
 import { VeloVerde } from "@/components/ScenaVerdetto";
 import { verificaVolo } from "@/lib/api";
 import { conBarre, dataIso, inItaliano, perEsteso } from "@/lib/data";
+import { dataBreve, durataLunga } from "@/lib/formati";
 import { chiediPermesso, registraToken, statoPermesso } from "@/lib/notifiche";
 import { useSessione } from "@/lib/sessione";
 import { leggiVoli, salvaVolo, togliVolo, type VoloSalvato } from "@/lib/voliSalvati";
@@ -92,7 +93,9 @@ export default function SchermataCheck() {
     tratta: string | null;
     previsto: string | null;
     effettivo: string | null;
-  }>({ tratta: null, previsto: null, effettivo: null });
+    ritardo: string | null;
+    km: number | null;
+  }>({ tratta: null, previsto: null, effettivo: null, ritardo: null, km: null });
   /* Vera finché sequenza e richiesta non sono chiuse: tiene il sipario
      giù anche se il focus va e torna (cambio tab a metà analisi). */
   const analisiViva = useRef(false);
@@ -164,7 +167,7 @@ export default function SchermataCheck() {
        sequenza dei passi corre col suo tempo e non si taglia mai; la
        richiesta vera corre in parallelo. */
     setInAnalisi({ volo: voloDaControllare.trim().toUpperCase(), data: iso });
-    setLetto({ tratta: null, previsto: null, effettivo: null });
+    setLetto({ tratta: null, previsto: null, effettivo: null, ritardo: null, km: null });
     setPasso(0);
     setFase("teatro");
 
@@ -192,6 +195,11 @@ export default function SchermataCheck() {
       tratta: esito.dato.da && esito.dato.a ? `${esito.dato.da} → ${esito.dato.a}` : null,
       previsto: oraDa(esito.dato.previsto),
       effettivo: oraDa(esito.dato.effettivo),
+      ritardo:
+        typeof esito.ritardoMinuti === "number" && esito.ritardoMinuti > 0
+          ? durataLunga(esito.ritardoMinuti)
+          : null,
+      km: esito.dato.km ?? null,
     });
 
     /* Il volo si salva da solo, con l'esito che ha dato il motore: è
@@ -325,16 +333,19 @@ export default function SchermataCheck() {
         <VeloVerde />
 
         {fase === "teatro" ? (
-          /* La scena di scansione prende il posto di tutto: il biglietto
-             si compila coi dati veri mentre i sei passi avanzano. */
-          <View style={stili.scenaScheda}>
+          /* La scena prende TUTTO lo schermo, verde notte come nella
+             tavola: i margini negativi scavalcano il padding della
+             pagina, il biglietto si compila coi dati veri. */
+          <View style={stili.scenaPiena}>
             <ScenaScan
               volo={inAnalisi.volo}
-              dataTesto={inItaliano(inAnalisi.data)}
+              dataTesto={dataBreve(inAnalisi.data)}
               passo={passo}
               tratta={letto.tratta}
               arrivoPrevisto={letto.previsto}
               arrivoEffettivo={letto.effettivo}
+              ritardo={letto.ritardo}
+              km={letto.km}
             />
           </View>
         ) : (
@@ -597,12 +608,12 @@ const stili = StyleSheet.create({
     maxWidth: 340,
   },
   blocco: { marginTop: SPAZIO.xl },
-  scenaScheda: {
-    backgroundColor: COLORI.bianco,
-    borderRadius: RAGGIO.massimo,
-    padding: SPAZIO.xl,
-    marginTop: SPAZIO.xl,
-    ...OMBRA.scheda,
+  /* La scena scavalca il padding della pagina: schermo intero, come
+     nella tavola. Il velo verde resta sotto e non si vede. */
+  scenaPiena: {
+    marginHorizontal: -SPAZIO.schermata,
+    marginTop: -(SPAZIO.xxl + SPAZIO.l),
+    marginBottom: -116,
   },
   scheda: {
     backgroundColor: COLORI.bianco,
