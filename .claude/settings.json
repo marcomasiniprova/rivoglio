@@ -3,5 +3,6 @@
   "env": {
     "USE_BUILTIN_RIPGREP": "0",
     "ENABLE_TOOL_SEARCH": "auto:5"
-  }
+  },
+  "askUserQuestionTimeout": "never"
 }
