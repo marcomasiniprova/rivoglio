@@ -137,15 +137,21 @@ export default function Home() {
 
         <View style={stili.statRiga}>
           <View style={stili.stat}>
-            <Text style={stili.statEtichetta}>{T.statRecuperati}</Text>
+            <Text style={stili.statEtichetta} numberOfLines={1}>
+              {T.statRecuperati}
+            </Text>
             <Text style={stili.statValore}>{euro(recuperato)}</Text>
           </View>
           <View style={stili.stat}>
-            <Text style={stili.statEtichetta}>{T.statCheck}</Text>
+            <Text style={stili.statEtichetta} numberOfLines={1}>
+              {T.statCheck}
+            </Text>
             <Text style={stili.statValore}>{checkFatti}</Text>
           </View>
           <View style={stili.stat}>
-            <Text style={stili.statEtichetta}>{T.statAttesa}</Text>
+            <Text style={stili.statEtichetta} numberOfLines={1}>
+              {T.statAttesa}
+            </Text>
             <Text style={stili.statValore}>{aperte.length}</Text>
           </View>
         </View>
@@ -298,10 +304,13 @@ const stili = StyleSheet.create({
     paddingHorizontal: SPAZIO.m,
     paddingVertical: SPAZIO.m,
   },
+  /* Su un iPhone SE le tre colonne sono strette e "RECUPERATI" si
+     spezzava a metà parola ("RECUPERA / TI"). Meno spaziatura, un filo
+     più piccolo, e una riga sola: la parola resta intera. */
   statEtichetta: {
     fontFamily: FONT.testo,
-    fontSize: 10.5,
-    letterSpacing: 0.6,
+    fontSize: 9.5,
+    letterSpacing: 0.2,
     textTransform: "uppercase",
     color: "rgba(255,255,255,0.55)",
   },

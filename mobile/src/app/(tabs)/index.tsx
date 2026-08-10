@@ -54,6 +54,11 @@ type Modo = (typeof MODI)[number];
 
 const attesa = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/* L'aria sotto il contenuto, perché la barra delle tab è una pillola che
+   galleggia sopra la pagina: senza, su uno schermo corto copre il
+   bottone che fa partire il check. Lo stesso numero delle altre tab. */
+const ARIA_BARRA = 116;
+
 /* L'analisi profonda, identica al sito (scelta di Valerio, 8/08): un passo
    ogni 2,4 secondi e la sequenza non si taglia MAI, nemmeno se il server
    risponde subito. */
@@ -665,7 +670,7 @@ const stili = StyleSheet.create({
   contenuto: {
     paddingHorizontal: SPAZIO.schermata,
     paddingTop: SPAZIO.xxl + SPAZIO.l,
-    paddingBottom: 116,
+    paddingBottom: ARIA_BARRA,
   },
   /* La testata sta a SINISTRA, come nella tavola: l'occhiello in
      maiuscolo largo, la domanda grande, la riga di aiuto. */

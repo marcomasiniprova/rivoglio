@@ -393,7 +393,7 @@ export const TESTI = {
       fasce: [
         { importo: 250, quando: "fino a 1.500 km" },
         { importo: 400, quando: "fino a 3.500 km" },
-        { importo: 600, quando: "oltre i 3.500" },
+        { importo: 600, quando: "oltre 3.500 km" },
       ],
 
       soglia: "soglia 3 h",

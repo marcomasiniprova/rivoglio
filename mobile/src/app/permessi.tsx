@@ -7,7 +7,7 @@
  * preferisce l'email lo dice qui senza bruciare niente: la finestra di
  * sistema parte solo dopo il "Va bene, avvisami".
  */
-import { StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -38,10 +38,23 @@ export default function SchermataPermessi() {
     router.back();
   }
 
+  /* I DUE BOTTONI RESTANO SEMPRE IN FONDO ALLO SCHERMO, e il testo
+     scorre sotto di loro. Su un iPhone SE (667 punti) il contenuto è
+     alto 797: con la pagina rigida le due azioni finivano FUORI dallo
+     schermo e la schermata sembrava un vicolo cieco, proprio quella in
+     cui si chiede un permesso. Visto sulla lavagna il 10/08. */
   return (
-    <View style={[stili.pagina, { paddingTop: insets.top + SPAZIO.xxl }]}>
+    <View style={stili.pagina}>
       <VeloVerde />
 
+      <ScrollView
+        style={stili.scorre}
+        contentContainerStyle={[
+          stili.contenuto,
+          { paddingTop: insets.top + SPAZIO.xxl },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
       <View style={stili.campana}>
         <Feather name="bell" size={26} color={COLORI.bianco} />
       </View>
@@ -68,6 +81,7 @@ export default function SchermataPermessi() {
       </View>
 
       <Text style={stili.niente}>{T.niente}</Text>
+      </ScrollView>
 
       <View style={[stili.azioni, { paddingBottom: insets.bottom + SPAZIO.xl }]}>
         <Bottone testo={T.si} onPress={() => void accetta()} />
@@ -78,10 +92,11 @@ export default function SchermataPermessi() {
 }
 
 const stili = StyleSheet.create({
-  pagina: {
-    flex: 1,
-    backgroundColor: COLORI.nebbia,
+  pagina: { flex: 1, backgroundColor: COLORI.nebbia },
+  scorre: { flex: 1 },
+  contenuto: {
     paddingHorizontal: SPAZIO.schermata + SPAZIO.xs,
+    paddingBottom: SPAZIO.xl,
   },
   campana: {
     width: 64,
@@ -153,5 +168,12 @@ const stili = StyleSheet.create({
     padding: SPAZIO.m,
     marginTop: SPAZIO.l,
   },
-  azioni: { marginTop: "auto", gap: SPAZIO.m },
+  azioni: {
+    gap: SPAZIO.m,
+    paddingHorizontal: SPAZIO.schermata + SPAZIO.xs,
+    paddingTop: SPAZIO.m,
+    backgroundColor: COLORI.nebbia,
+    borderTopWidth: 1,
+    borderTopColor: COLORI.bordo,
+  },
 });
