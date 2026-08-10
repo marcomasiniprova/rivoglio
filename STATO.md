@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-10 (giro #50: LA LAVAGNA DELL'APP, tutte le
+**Aggiornato:** 2026-08-10 (giro #51: TUTTE E 34 LE SCHERMATE SULLA
+LAVAGNA col 404 chiuso alla radice, l'autopilot che ha girato per la
+prima volta (+2.943 scali) e la rifinitura in tre pezzi · giro #50: LA LAVAGNA DELL'APP, tutte le
 schermate su un tavolo che si trascina, più la pratica messa al riparo
 dalla quinta migrazione non ancora applicata · giro #49: L'APP MIGRA AL DESIGN DELLA TAVOLA
 DEFINITIVA, terza ondata: la migrazione è COMPLETA per tutto ciò che è
@@ -52,6 +54,75 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #51 (10/08): TUTTE E 34 LE SCHERMATE SULLA LAVAGNA, il 404
+  chiuso, e il giro di rifinitura in tre pezzi.**
+  - 🔴 **I RIQUADRI ERANO TUTTI NERI CON 404**, e il motivo stava alla
+    radice: l'export web di Expo è **una pagina sola**, quindi
+    `/app-anteprima/verdetto` come file non esiste. La riscrittura che
+    funzionava sul computer non regge su Netlify. Ora la rotta viaggia
+    come parametro sull'unico indirizzo che esiste
+    (`/app-anteprima?r=/verdetto`) e uno script montato nell'index la
+    sistema **prima** che il programma parta. ⚠️ Farlo dopo, con una
+    navigazione, manda React in aggiornamento infinito (errore 185):
+    provato e scartato.
+  - **CI SONO TUTTE E 34**, non solo le pagine: due terzi della tavola
+    sono MOMENTI dentro una pagina, e l'app adesso si sa aprire su
+    ognuno col parametro `scena` (`mobile/src/lib/anteprima.ts`).
+    Nell'app vera quel parametro non compare in nessuna navigazione.
+  - **La pratica dimostrativa** (`mobile/src/lib/esempio.ts`): id
+    `esempio`, volo ZZ250 che non è di nessuna compagnia, bollo giallo
+    "ESEMPIO DIMOSTRATIVO" in testata. È l'unico modo per guardare i
+    quattro fogli, il no della compagnia, la conciliazione e i due esiti
+    finali senza un account e una pratica pagata. Scelta di Valerio col
+    popup.
+  - **Cinque difetti della lavagna, trovati guardandola:** Home e
+    portafoglio restavano vuoti senza account; con trentatré telefoni
+    fitti il puntatore cade sempre su un riquadro e il tavolo non si
+    spostava (ora la rotellina scorre, Ctrl ingrandisce, le etichette
+    sono maniglie, e c'è "Vai a" per saltare ai gruppi); il tavolo si
+    perdeva nel nero (ora ha i confini); trentatré app che partivano
+    insieme affogavano il browser (coda da otto, e il programma si
+    scarica **una volta sola**, non trentatré).
+  - ✅ **L'AUTOPILOT DEGLI AEROPORTI HA GIRATO** (l'ha premuto Valerio):
+    **6.073 → 9.016 scali**, +2.943, commit e push da solo. Il
+    triangolino giallo era solo Node 20 in via di spegnimento: le due
+    azioni passano alla versione 5.
+  - 🔴 **MA HA ROTTO LA RICERCA, ed è il primo effetto collaterale
+    dell'automatico.** OurAirports scrive il **comune**, non la città:
+    Malpensa è diventata *"Ferno"* e Charles de Gaulle *"Paris
+    (Roissy-en-France, Val-d'Oise)"*. Chi scriveva "milano" si vedeva
+    rispondere "Ferno" e pensava di aver sbagliato. Ora **la città di
+    uno scalo già conosciuto non cambia più** (stessa prudenza già usata
+    per paese e fuso orario) e ai nuovi si toglie la specifica fra
+    parentesi. Tre prove nuove.
+  - **RIFINITURA 1 di 3 — l'app sugli schermi corti (375x667).**
+    🔴 I permessi erano un vicolo cieco: contenuto alto 797 su 667, i due
+    bottoni fuori schermo e la pagina che non scorreva. Una schermata che
+    chiede un permesso senza mostrare come rispondere. Ora le azioni sono
+    ancorate in fondo. Più: la pillola delle tab copriva il bottone del
+    check; la terza fascia si leggeva "oltre i 3.500" senza unità;
+    "RECUPERATI" si spezzava a metà parola.
+  - **RIFINITURA 2 di 3 — il sito da utente critico.**
+    🔴 **Il sito prometteva tempi che non usiamo più**: in sei punti
+    c'era "al giorno 15 trovi il sollecito pronto", ma dal 9/08 il
+    sollecito parte alla **sesta settimana** (le compagnie rispondono in
+    8-14 settimane). Chi comprava leggeva una promessa che non
+    manteniamo. Ora i testi lo dicono giusto e **una prova li lega alla
+    costante vera**: se cambia il numero, la suite si ferma.
+    🔴 **E il sito non nominava la conciliazione**, cioè il canale dove i
+    soldi si muovono davvero, costruito il 10/08. Aggiunta alle card
+    prezzi, a "Chi fa cosa" e alle FAQ.
+    🔴 **A 320 punti il sito scorreva di lato** (iPhone SE di prima
+    generazione e modalità zoom di iOS): il bottone della barra, quello
+    della testata del blog e la paginazione del Tabellone. Quattro prove
+    nuove a quella larghezza. Controllati anche 38 link interni (zero
+    rotti) e 13 pagine a 1440 e 390 (zero errori in console).
+  - **RIFINITURA 3 di 3 — i testi.** Tolto il gergo che arrivava
+    all'utente: "ortodromica" (è la distanza **in linea d'aria**),
+    "vettore" (è la **compagnia**), "riprotezione" (è **un altro volo**).
+    Una prova vieta di rimetterle.
+  - Prove: **856 verdi**, le stesse 2 rosse dell'Osservatorio in sandbox
+    e le 4 saltate della sveglia del 2027.
 - **GIRO #50 (10/08): LA LAVAGNA DELL'APP, e un guasto chiuso prima che
   arrivasse in faccia a un cliente.**
   - 🔴 **LA PRATICA SI SAREBBE SPENTA SUL DATABASE VERO.** La scheda che
@@ -1298,17 +1369,11 @@ social rifatta (era rimasta al prodotto viaggi).
 1. **Deploy dell'ultimo giro** (design + Osservatorio dati veri): il ramo è
    pronto e collaudato, pubblichi tu (tua scelta col popup). Il motore
    online funziona già.
-1-bis. 🟡 **UN CLIC: L'AUTOPILOT DEGLI AEROPORTI, primo giro a mano.** È
-   armato su `main` ma non ha mai girato, e io non posso premerlo: il
-   token di GitHub di queste sessioni non ha il permesso di far partire i
-   lavori (`403 Resource not accessible by integration`). Apri
-   `https://github.com/marcomasiniprova/rivoglio/actions/workflows/aeroporti.yml`,
-   in alto a destra premi **Run workflow**, lascia il ramo `main` e premi
-   ancora **Run workflow**. Ci mette un minuto. Se trova scali nuovi
-   committa il file da solo e Netlify ricostruisce; se non trova niente
-   scrive "Nessuna novità" e finisce lì. Se la fonte è cambiata il lavoro
-   **fallisce e non pubblica niente**, e GitHub ti manda l'email: è quello
-   che deve fare.
+1-bis. ~~L'autopilot degli aeroporti, primo giro a mano~~ ✅ **FATTO da
+   Valerio il 10/08**: 6.073 → 9.016 scali, commit e push da solo. Da qui
+   in avanti gira ogni lunedì. ⚠️ Se un lunedì l'archivio arriva monco il
+   lavoro **fallisce e non pubblica niente**, e GitHub ti manda l'email:
+   è quello che deve fare, non è un guasto.
 2. 🔴 **POLAR HA DETTO NO (10/08).** Il controllo automatico
    dell'iscrizione ha risposto "Use case not supported": prodotto legato
    ai reclami di viaggio, categoria a restrizione, e la garanzia più il

@@ -131,7 +131,7 @@ export const TESTI = {
       "numero e giorno negli archivi di volo",
       "dal tracciamento, non da una stima",
       "previsto contro effettivo, al minuto",
-      "in ortodromica, decide la fascia",
+      "in linea d'aria, decide la fascia",
       "la tabella del trasporto aereo",
       "articoli 5, 6 e 7",
     ],

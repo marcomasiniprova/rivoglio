@@ -164,7 +164,7 @@ export const COPY = {
       "600€ è l'importo massimo del Regolamento CE 261/2004: ritardi di 4 ore o più sulle tratte oltre i 3.500 km. Le altre fasce: 250€ fino a 1.500 km, 400€ fino a 3.500 km.",
     /** Apre l'"ultimo anno". */
     notaFinestra:
-      "Oggi verifichiamo voli fino a 12 mesi indietro: è la profondità degli archivi di volo che interroghiamo. Il diritto in sé dura di più (2 anni per ITA e Aeroitalia, stimati 5 o 6 per i vettori esteri) e stiamo lavorando per allargare la finestra.",
+      "Oggi verifichiamo voli fino a 12 mesi indietro: è la profondità degli archivi di volo che interroghiamo. Il diritto in sé dura di più (2 anni per ITA e Aeroitalia, stimati 5 o 6 per le compagnie estere) e stiamo lavorando per allargare la finestra.",
     /** Etichette dei bottoni che aprono le due note qui sopra. */
     apriImporto: "Come nasce il 600€",
     apriFinestra: "Perché 12 mesi",
@@ -238,7 +238,7 @@ export const COPY = {
       dettagli: [
         "Interrogo il tracciamento del volo",
         "Verifico che l'orario sia confermato, non stimato",
-        "Distanza ortodromica fra i due aeroporti",
+        "Distanza in linea d'aria fra i due aeroporti",
         "Incrocio la tabella scioperi del trasporto aereo",
         "Ritardo all'arrivo, al minuto",
         "Articoli 5, 6 e 7 del Regolamento",
@@ -266,7 +266,7 @@ export const COPY = {
       {
         titolo: "La compagnia giusta",
         testo:
-          "Il reclamo va al vettore che ha operato il volo, non a chi ti ha venduto il biglietto. È l'errore numero uno dei reclami respinti.",
+          "Il reclamo va alla compagnia che ha fatto volare l'aereo, non a chi ti ha venduto il biglietto. È l'errore numero uno dei reclami respinti.",
       },
     ],
     nota: "Le regole che applichiamo sono pubbliche: articoli 5, 6 e 7 del Regolamento CE 261/2004.",
@@ -529,7 +529,7 @@ export const COPY = {
         paese: "it" as const,
       },
       {
-        compagnie: "Ryanair, Wizz Air e altri vettori esteri",
+        compagnie: "Ryanair, Wizz Air e altre compagnie estere",
         finestra: "5-6 anni",
         nota: "stima: dipende dal paese della compagnia",
         anniStimati: 5.5,
@@ -594,7 +594,7 @@ export const COPY = {
       {
         domanda: "Posso fare tutto da solo, gratis?",
         risposta:
-          "Sì, e te lo diciamo volentieri. Il reclamo alla compagnia è gratuito e non serve un avvocato: ogni vettore ha un modulo nella sezione assistenza del suo sito (cerca \"nome della compagnia + reclamo CE 261\"). Se la risposta non arriva o non ti convince, puoi presentare reclamo gratuito all'ENAC, su enac.gov.it. Noi vendiamo il tempo che risparmi, non quello che non sai.",
+          "Sì, e te lo diciamo volentieri. Il reclamo alla compagnia è gratuito e non serve un avvocato: ogni compagnia ha un modulo nella sezione assistenza del suo sito (cerca \"nome della compagnia + reclamo CE 261\"). Se la risposta non arriva o non ti convince, puoi presentare reclamo gratuito all'ENAC, su enac.gov.it. Noi vendiamo il tempo che risparmi, non quello che non sai.",
       },
       {
         domanda: "E allora cosa pago, esattamente?",
@@ -619,7 +619,7 @@ export const COPY = {
       {
         domanda: "Fino a quando posso fare richiesta?",
         risposta:
-          "Il diritto dura a lungo: 2 anni per ITA e Aeroitalia, stimati 5 o 6 per vettori esteri come Ryanair e Wizz Air (caso per caso, nella tua verifica trovi la data indicativa). Il check online oggi verifica voli fino a 12 mesi indietro.",
+          "Il diritto dura a lungo: 2 anni per ITA e Aeroitalia, stimati 5 o 6 per compagnie estere come Ryanair e Wizz Air (caso per caso, nella tua verifica trovi la data indicativa). Il check online oggi verifica voli fino a 12 mesi indietro.",
       },
       {
         domanda: "Quali voli posso controllare?",
@@ -732,7 +732,7 @@ export const COPY = {
             },
             {
               valore: "volontario",
-              testo: "Ho ceduto io il posto in cambio di benefici (voucher, riprotezione)",
+              testo: "Ho ceduto io il posto in cambio di qualcosa (un buono, un altro volo)",
             },
           ],
         },

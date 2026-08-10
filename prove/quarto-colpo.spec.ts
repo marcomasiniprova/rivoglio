@@ -271,4 +271,19 @@ test.describe("I tempi promessi combaciano con quelli veri", () => {
   test("il sito nomina la conciliazione, che è il canale che paga", () => {
     expect(testi.toLowerCase()).toContain("conciliazione");
   });
+
+  /* IL GERGO NON ARRIVA ALL'UTENTE. "Ortodromica" è la distanza in
+     linea d'aria, "vettore" è la compagnia, "riprotezione" è un altro
+     volo: tre parole che nessuno usa al bar e che facevano sembrare il
+     sito scritto da un ufficio legale. Valerio: zero gergo senza
+     traduzione, si capisce in tre secondi o si cambia. */
+  test("le parole da ufficio legale non arrivano all'utente", () => {
+    const minuscolo = testi.toLowerCase();
+    for (const parola of ["ortodromic", "riprotezion"]) {
+      expect(minuscolo, `"${parola}" è gergo`).not.toContain(parola);
+    }
+    /* "vettore" solo come parola intera: dentro altre parole non è il
+       termine giuridico. */
+    expect(minuscolo).not.toMatch(/\bvettor[ei]\b/);
+  });
 });
