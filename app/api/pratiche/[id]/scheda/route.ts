@@ -19,6 +19,7 @@ import {
   type MotivoRifiuto,
 } from "@/lib/pratiche/rifiuto";
 import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
+import { colonnaMancante } from "@/lib/supabase/colonne";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { aeroporto } from "@/lib/voli/distanza";
 
@@ -53,8 +54,11 @@ type RigaPratica = {
   inviata_il: string | null;
   creata_il: string;
   /** Il motivo del no della compagnia, se il cliente l'ha dichiarato. */
-  rifiuto_motivo: string | null;
+  rifiuto_motivo?: string | null;
 };
+
+const COLONNE_PRATICA =
+  "id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, importo_fascia, garanzia_fino_al, inviata_il, creata_il";
 
 type RigaVolo = {
   volo_iata: string;
@@ -110,13 +114,18 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
   }
 
   const db = supabaseServizio();
-  const { data: pratica } = (await db
-    .from("pratiche")
-    .select(
-      "id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, importo_fascia, garanzia_fino_al, inviata_il, creata_il, rifiuto_motivo",
-    )
-    .eq("id", id)
-    .maybeSingle()) as { data: RigaPratica | null };
+  /* `rifiuto_motivo` è della migrazione del 15/08: finché non è applicata
+     sul database vero, chiederla farebbe fallire tutta la lettura e la
+     pratica sparirebbe dall'app per un campo accessorio. Si riprova
+     senza: il no della compagnia non si sa, il resto sì. */
+  const leggiPratica = (colonne: string) =>
+    db.from("pratiche").select(colonne).eq("id", id).maybeSingle();
+  const primoGiro = await leggiPratica(`${COLONNE_PRATICA}, rifiuto_motivo`);
+  const pratica = (
+    primoGiro.error && colonnaMancante(primoGiro.error.message)
+      ? (await leggiPratica(COLONNE_PRATICA)).data
+      : primoGiro.data
+  ) as RigaPratica | null;
 
   // Non tua = inesistente: non si conferma nemmeno che l'id esista.
   if (!pratica || !pratica.utente_id || pratica.utente_id !== utente.id) {
@@ -248,9 +257,8 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
         giorniDallInvio = Math.floor(
           (Date.now() - new Date(pratica.inviata_il).getTime()) / 86_400_000,
         );
-        const motivo = schedaRifiuto(pratica.rifiuto_motivo)
-          ? (pratica.rifiuto_motivo as MotivoRifiuto)
-          : null;
+        const motivoGrezzo = pratica.rifiuto_motivo ?? null;
+        const motivo = schedaRifiuto(motivoGrezzo) ? (motivoGrezzo as MotivoRifiuto) : null;
         const rifiutoDichiarato = Boolean(motivo && motivo !== "silenzio");
         const giornoInvio = pratica.inviata_il.slice(0, 10);
         const passeggeriPratica = {
@@ -306,7 +314,7 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
       segnalazione,
       conciliazione,
       giorniDallInvio,
-      rifiutoMotivo: pratica.rifiuto_motivo,
+      rifiutoMotivo: pratica.rifiuto_motivo ?? null,
     },
     { headers: CORS },
   );

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Copy, ExternalLink, Paperclip, Printer, ShieldCheck } from "lucide-react";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { colonnaMancante } from "@/lib/supabase/colonne";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { compagniaPerVettore } from "@/lib/lettera/compagnie";
@@ -57,8 +58,11 @@ type RigaPratica = {
   passeggeri: Passeggero[] | null;
   inviata_il: string | null;
   /** Il motivo del no della compagnia, se il cliente l'ha dichiarato. */
-  rifiuto_motivo: string | null;
+  rifiuto_motivo?: string | null;
 };
+
+const COLONNE_PRATICA =
+  "id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, inviata_il";
 
 type RigaVolo = {
   volo_iata: string;
@@ -166,11 +170,17 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   }
 
   const db = supabaseServizio();
-  const { data: pratica } = (await db
-    .from("pratiche")
-    .select("id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, inviata_il, rifiuto_motivo")
-    .eq("id", id)
-    .maybeSingle()) as { data: RigaPratica | null };
+  /* Come nella scheda dell'app: `rifiuto_motivo` arriva con la migrazione
+     del 15/08, e finché non è applicata chiederla farebbe fallire tutta
+     la lettura. Senza quel campo la lettera esce lo stesso. */
+  const leggiPratica = (colonne: string) =>
+    db.from("pratiche").select(colonne).eq("id", id).maybeSingle();
+  const primoGiro = await leggiPratica(`${COLONNE_PRATICA}, rifiuto_motivo`);
+  const pratica = (
+    primoGiro.error && colonnaMancante(primoGiro.error.message)
+      ? (await leggiPratica(COLONNE_PRATICA)).data
+      : primoGiro.data
+  ) as RigaPratica | null;
 
   // Il controllo del proprietario. Esplicito, prima di qualunque render:
   // chi non è il titolare non deve nemmeno sapere che la pratica esiste.

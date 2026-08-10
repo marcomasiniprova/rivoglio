@@ -19,6 +19,7 @@
  */
 
 import { valuta, type FattoVolo, type Verdetto } from "@/lib/regole/eu261";
+import { colonnaMancante } from "@/lib/supabase/colonne";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { aerodatabox } from "./fornitori/aerodatabox";
 import { aviationstack } from "./fornitori/aviationstack";
@@ -126,17 +127,6 @@ export function rigaUsabile(riga: RigaVolo): boolean {
 const COLONNE_CACHE_BASE =
   "id, volo_iata, data_locale, vettore_operativo, vettore_marketing, partenza_iata, partenza_citta, arrivo_iata, arrivo_citta, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, orario_verificato, vettore_da_determinare";
 const COLONNE_CACHE = `${COLONNE_CACHE_BASE}, partenza_paese, arrivo_paese, partenza_icao, arrivo_icao`;
-
-/**
- * Postgres dice "column x does not exist" (42703) quando la migrazione non
- * è ancora passata. Riconoscerlo serve a NON spegnere la cache in quella
- * finestra: senza cache ogni passeggero dello stesso volo costa una
- * chiamata al fornitore.
- */
-function colonnaMancante(messaggio: string | undefined): boolean {
-  const m = (messaggio ?? "").toLowerCase();
-  return m.includes("does not exist") || m.includes("could not find") || m.includes("schema cache");
-}
 
 /**
  * AeroDataBox se c'è la chiave, altrimenti la demo marcata.
