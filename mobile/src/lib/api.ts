@@ -80,6 +80,9 @@ export type VoloDiTratta = {
   compagnia: string | null;
   partenzaOra: string;
   arrivoOra: string;
+  /** Arrivo aggiornato dal fornitore, "" se non lo dà: serve alla frase
+      "Doveva arrivare alle 09:55. Atterrato alle 13:47." dell'elenco. */
+  arrivoEffettivoOra: string;
   cancellato: boolean;
 };
 

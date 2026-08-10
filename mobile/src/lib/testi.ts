@@ -11,21 +11,52 @@
 export const TESTI = {
   /* ---- IL CHECK: la prima schermata dell'app, senza account ---- */
   check: {
-    occhiello: "Lo scanner dei rimborsi",
-    titolo: { prima: "Hai preso un volo", corsivo: "nell'ultimo anno?" },
-    sottotitolo: "Forse ti devono fino a 600€. Controllalo gratis in 30 secondi.",
+    /* La testata cambia col MODO, come nella tavola di riferimento
+       (6a, 7a, 7b): ogni strada ha la sua domanda, non un titolo
+       generico che vale per tutte. */
+    testate: {
+      tratta: {
+        occhiello: "Il check gratuito",
+        titolo: "Che viaggio era?",
+        sottotitolo: "Le città bastano. Il numero del volo, se non ce l'hai, lo trovo io.",
+      },
+      numero: {
+        occhiello: "Il check gratuito",
+        titolo: "Hai il numero del volo?",
+        sottotitolo: "È la via più corta. Due campi e ho finito.",
+      },
+      carta: {
+        occhiello: "Il check gratuito",
+        titolo: "Inquadra la carta d'imbarco",
+        sottotitolo: "Fotografala o prendila dalla galleria: leggo io volo e data.",
+      },
+    },
     volo: {
-      etichetta: "Numero del volo",
+      etichetta: "Numero di volo",
       segnaposto: "FR 8321",
-      aiuto: "Lo trovi sulla carta d'imbarco o nell'email di conferma.",
     },
     data: {
-      etichetta: "Data del volo",
+      etichetta: "Giorno della partenza",
       segnaposto: "GG/MM/AAAA",
-      aiuto: "Il giorno della partenza.",
     },
-    bottone: "Controlla gratis",
-    rassicurazione: "Niente email, niente account. Il risultato lo vedi subito.",
+    /* Il riquadro che separa il numero del volo dal codice di
+       prenotazione (7b): è l'errore più comune di chi ha il numero. */
+    prenotazione: {
+      titolo: "Non confonderlo con il codice di prenotazione",
+      serve: {
+        tag: "Serve questo",
+        codice: "FR 8321",
+        testo: "Due lettere e tre o quattro cifre. È sulla carta d'imbarco, in alto.",
+      },
+      non: {
+        tag: "Non questo",
+        codice: "Q8T2LM",
+        testo: "Sei caratteri misti: è la prenotazione, e vale per tutti i tuoi voli.",
+      },
+    },
+    bottoneTratta: "Controlla questo volo",
+    bottoneNumero: "Cerca il volo",
+    rassicurazione: "Il check resta gratuito.",
     punti: [
       "Il check è gratis, sempre",
       "Nessuna percentuale sulla compensazione",
@@ -35,13 +66,16 @@ export const TESTI = {
       voloMancante: "Scrivi il numero del volo.",
       dataMancante: "Scegli la data del volo.",
       dataStrana: "Scrivi la data come GG/MM/AAAA.",
+      voloDaScegliere: "Tocca il volo che hai preso, poi controlla.",
     },
     entra: "Ho già un account",
-    /* I due modi di dire qual è il volo. Il primo è quello per tutti: il
-       numero di volo lo sa a memoria una persona su dieci. */
+    /* I tre modi di dire qual è il volo, nell'ordine della tavola:
+       la tratta per tutti, la carta per chi ce l'ha in mano, il numero
+       per chi lo sa. */
     modo: {
-      tratta: "Non so il numero",
-      numero: "So il numero",
+      tratta: "Per tratta",
+      carta: "Carta d'imbarco",
+      numero: "Numero volo",
     },
   },
 
@@ -57,6 +91,21 @@ export const TESTI = {
     letto: "Letto dalla carta d'imbarco: volo {volo} del {data}. Controlla che sia giusto.",
     lettoSoloVolo: "Dalla carta d'imbarco ho letto il volo {volo}. La data scrivila tu.",
     lettoSoloData: "Dalla carta d'imbarco ho letto il giorno {data}. Il volo scrivilo tu.",
+    /* La conferma dei campi letti (7a): la persona DEVE vedere cosa è
+       stato letto prima che parta il check. Un verdetto su un volo letto
+       male è peggio di nessun verdetto.
+       ⚠️ La tavola mostra anche la riga della tratta: qui non c'è perché
+       l'OCR estrae volo e data, e una riga in più sarebbe inventata. */
+    conferma: {
+      bollo: "Carta riconosciuta",
+      domanda: "Ho letto questi campi. Sono giusti?",
+      volo: "Numero di volo",
+      data: "Data",
+      privacy:
+        "La foto non viene salvata: la leggo, prendo questi campi e la scarto. Non esce dal telefono.",
+      si: "Sì, sono giusti",
+      correggo: "Correggo a mano",
+    },
   },
 
   /* ---- L'ANALISI IN CORSO: il teatro onesto, identico al sito ----
@@ -100,9 +149,9 @@ export const TESTI = {
     da: { etichetta: "Da dove sei partito", segnaposto: "Città o aeroporto" },
     a: { etichetta: "Dove sei arrivato", segnaposto: "Città o aeroporto" },
     data: {
-      etichetta: "Che giorno",
+      etichetta: "Giorno della partenza",
       segnaposto: "GG/MM/AAAA",
-      aiuto: "Il giorno della partenza.",
+      aiuto: "Se sei atterrato dopo mezzanotte, conta il giorno del decollo.",
     },
     bottone: "Cerca il volo",
     errori: {
@@ -113,10 +162,20 @@ export const TESTI = {
       dataStrana: "Scrivi la data come GG/MM/AAAA.",
     },
     elenco: {
-      titolo: "Qual era il tuo?",
-      sottotitolo: "Gli orari sono quelli di partenza previsti. Tocca il tuo volo.",
-      arrivo: "arrivo",
-      cancellato: "cancellato",
+      titolo: "Quale di questi hai preso?",
+      /* {n} è il numero di voli trovati quel giorno. */
+      conteggio: "{n} voli quel giorno",
+      conteggioUno: "1 volo quel giorno",
+      /* Le frasi delle righe, come nella tavola (6a): raccontano il volo
+         invece di elencare orari. {prev} ed {eff} sono orari "HH:MM".
+         La frase con l'atterraggio esce SOLO se il fornitore ha dato
+         l'orario aggiornato: senza, resta il previsto e basta. */
+      doveva: "Doveva arrivare alle {prev}. Atterrato alle {eff}.",
+      inOrario: "Arrivato alle {eff}, in orario.",
+      soloPrevisto: "Arrivo previsto alle {prev}.",
+      cancellato: "Cancellato.",
+      // {durata} è "3 h e 52 min", nel formato unico del prodotto.
+      ritardoBadge: "{durata} di ritardo",
       demo: "Elenco dimostrativo: manca la chiave del fornitore dati.",
     },
     nessuno: {

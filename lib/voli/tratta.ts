@@ -39,6 +39,14 @@ export type VoloDiTratta = {
   partenzaOra: string;
   /** Orario locale di arrivo previsto, "09:45". */
   arrivoOra: string;
+  /**
+   * Orario locale di arrivo AGGIORNATO dal fornitore ("13:47"), vuoto se
+   * non lo dà. Serve all'elenco per dire "doveva arrivare alle 09:55,
+   * atterrato alle 13:47": è il momento in cui l'utente riconosce il SUO
+   * volo. Non è un verdetto: il ritardo che conta lo misura il motore
+   * dopo, sull'orario certificato.
+   */
+  arrivoEffettivoOra: string;
   /** true solo se il fornitore dice esplicitamente che era cancellato. */
   cancellato: boolean;
 };
@@ -150,11 +158,13 @@ export function voliDaRisposta(voci: VoceAdb[], iataArrivoChiesto: string): Volo
     if (!volo || visti.has(volo)) continue;
     visti.add(volo);
 
+    const arrivo_ = voce.arrival ?? voce.movement;
     voli.push({
       volo,
       compagnia: voce.airline?.name ?? null,
       partenzaOra: oraLocale(voce.departure?.scheduledTime),
-      arrivoOra: oraLocale((voce.arrival ?? voce.movement)?.scheduledTime),
+      arrivoOra: oraLocale(arrivo_?.scheduledTime),
+      arrivoEffettivoOra: oraLocale(arrivo_?.revisedTime),
       cancellato: voce.status === "Canceled",
     });
   }
@@ -171,11 +181,15 @@ export function voliDaRisposta(voci: VoceAdb[], iataArrivoChiesto: string): Volo
 function elencoDemo(): EsitoTratta {
   return {
     demo: true,
+    /* Gli orari effettivi qui sotto COMBACIANO col ritardo che il motore
+       demo dichiara per ciascun volo (fornitori/demo.ts): ZZ250 +3h20,
+       ZZ180 +2h59, ZZ400 +3h30. Se là cambia un ritardo, va cambiato
+       anche qui, o l'elenco promette una cosa e il verdetto un'altra. */
     voli: [
-      { volo: "ZZ250", compagnia: "ZZ Compagnia Demo", partenzaOra: "06:20", arrivoOra: "08:40", cancellato: false },
-      { volo: "ZZ180", compagnia: "ZZ Compagnia Demo", partenzaOra: "11:05", arrivoOra: "13:25", cancellato: false },
-      { volo: "ZZ777", compagnia: "ZZ Compagnia Demo", partenzaOra: "17:30", arrivoOra: "19:50", cancellato: true },
-      { volo: "ZZ400", compagnia: "ZZ Compagnia Demo", partenzaOra: "21:15", arrivoOra: "23:35", cancellato: false },
+      { volo: "ZZ250", compagnia: "ZZ Compagnia Demo", partenzaOra: "06:20", arrivoOra: "08:40", arrivoEffettivoOra: "12:00", cancellato: false },
+      { volo: "ZZ180", compagnia: "ZZ Compagnia Demo", partenzaOra: "11:05", arrivoOra: "13:25", arrivoEffettivoOra: "16:24", cancellato: false },
+      { volo: "ZZ777", compagnia: "ZZ Compagnia Demo", partenzaOra: "17:30", arrivoOra: "19:50", arrivoEffettivoOra: "", cancellato: true },
+      { volo: "ZZ400", compagnia: "ZZ Compagnia Demo", partenzaOra: "21:15", arrivoOra: "23:35", arrivoEffettivoOra: "03:05", cancellato: false },
     ],
   };
 }

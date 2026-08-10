@@ -1,15 +1,21 @@
 /**
  * La prima schermata dell'app: IL CHECK DEL VOLO.
  *
- * Rifatta l'8/08 per Rivolio (prima era l'onboarding del vecchio prodotto
- * viaggi). Regole del prodotto, identiche al sito:
- * - il check è gratis e NON richiede account: si scrive volo e data e basta;
+ * Ridisegnata il 10/08 sulla tavola di riferimento (6a, 7a, 7b):
+ * - TRE modi di dire qual è il volo, nel selettore in fondo: la tratta
+ *   (predefinito: il numero di volo lo sa a memoria una persona su
+ *   dieci), la carta d'imbarco fotografata, il numero per chi ce l'ha;
+ * - la testata cambia col modo: ogni strada ha la sua domanda;
+ * - nella tratta si SCEGLIE il volo dall'elenco e si conferma col
+ *   bottone in fondo, come nella tavola.
+ *
+ * Regole del prodotto, identiche al sito:
+ * - il check è gratis e NON richiede account;
  * - il verdetto lo dà il motore sul server, mai l'app (lib/api.ts);
  * - niente promesse: "forse ti devono", mai "hai diritto a".
  */
 import { useCallback, useRef, useState } from "react";
 import {
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -21,7 +27,6 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import marchio from "../../../assets/images/marchio.png";
 import Bottone from "@/components/Bottone";
 import Campo from "@/components/Campo";
 import CardAvvisi, { type StatoAvvisi } from "@/components/CardAvvisi";
@@ -29,7 +34,7 @@ import CardVolo from "@/components/CardVolo";
 import RicercaTratta from "@/components/RicercaTratta";
 import ScattaCarta from "@/components/ScattaCarta";
 import ScenaScan from "@/components/ScenaScan";
-import Titolo from "@/components/Titolo";
+import { VeloVerde } from "@/components/ScenaVerdetto";
 import { verificaVolo } from "@/lib/api";
 import { conBarre, dataIso, inItaliano, perEsteso } from "@/lib/data";
 import { chiediPermesso, registraToken, statoPermesso } from "@/lib/notifiche";
@@ -40,6 +45,8 @@ import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
 import { TESTI } from "@/lib/testi";
 
 const T = TESTI.check;
+const MODI = ["tratta", "carta", "numero"] as const;
+type Modo = (typeof MODI)[number];
 
 const attesa = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -65,11 +72,14 @@ export default function SchermataCheck() {
   const [errore, setErrore] = useState<string | null>(null);
   const [inCorso, setInCorso] = useState(false);
   const [salvati, setSalvati] = useState<VoloSalvato[]>([]);
-  /* Il modo predefinito è la tratta, non il numero: il numero di volo lo
-     sa a memoria una persona su dieci, e chi non ce l'ha se ne va. */
-  const [modo, setModo] = useState<"tratta" | "numero">("tratta");
-  /* Quello che è stato letto dalla carta d'imbarco, per dirlo in chiaro:
-     un campo che si riempie da solo senza spiegazioni mette a disagio. */
+  const [modo, setModo] = useState<Modo>("tratta");
+  /* Il volo scelto dall'elenco della tratta: il bottone in fondo lo
+     conferma, come nella tavola. */
+  const [scelta, setScelta] = useState<{ volo: string; iso: string } | null>(null);
+  /* Quello che è stato letto dalla carta d'imbarco. Se la lettura è
+     completa compare la carta di conferma (7a); se è a metà si passa al
+     modo numero coi campi già scritti e la riga che dice cosa manca. */
+  const [lettura, setLettura] = useState<{ volo: string; iso: string } | null>(null);
   const [daCarta, setDaCarta] = useState<string | null>(null);
 
   /* IL TEATRO: durante l'analisi la scheda diventa la scena di scansione,
@@ -103,10 +113,6 @@ export default function SchermataCheck() {
      Valerio): chiederlo all'avvio, a freddo, se lo prende un "no". */
   const giaChiesto = useRef(false);
 
-  /* I voli tornano a ogni ritorno sulla schermata: se ne è stato appena
-     controllato uno, la lista lo mostra aggiornato senza riavviare.
-     È anche il momento in cui i voli salvati salgono sul server, se
-     l'utente è entrato: così chi entra dopo ritrova tutto seguito. */
   useFocusEffect(
     useCallback(() => {
       /* Se si torna qui dal verdetto, il sipario della scena è ancora
@@ -146,7 +152,7 @@ export default function SchermataCheck() {
     await seguiVoli(salvati);
   }
 
-  /** Il check vero e proprio: lo usa il form e lo usa "ricontrolla". */
+  /** Il check vero e proprio: lo usano i tre modi e "ricontrolla". */
   async function chiedi(voloDaControllare: string, iso: string) {
     if (analisiViva.current) return;
     analisiViva.current = true;
@@ -242,28 +248,43 @@ export default function SchermataCheck() {
   }
 
   /**
-   * Quello che è stato letto dalla carta d'imbarco finisce nei campi,
-   * NON in un check automatico: la persona deve vedere il dato e poterlo
-   * correggere. Un verdetto su un volo letto male è peggio di nessun
-   * verdetto.
+   * Quello che è stato letto dalla carta d'imbarco. Lettura completa =
+   * carta di conferma (7a): la persona DEVE vedere i campi prima che
+   * parta il check. Lettura a metà = modo numero coi campi già scritti.
+   * Un verdetto su un volo letto male è peggio di nessun verdetto.
    */
   function dallaCarta(voloLetto: string | null, dataLetta: string | null) {
     setErrore(null);
+    if (voloLetto && dataLetta) {
+      setLettura({ volo: voloLetto, iso: dataLetta });
+      return;
+    }
     setModo("numero");
     if (voloLetto) setVolo(voloLetto);
     if (dataLetta) setData(inItaliano(dataLetta));
-
     const giorno = dataLetta ? perEsteso(dataLetta) : "";
-    if (voloLetto && dataLetta) {
-      setDaCarta(TESTI.carta.letto.replace("{volo}", voloLetto).replace("{data}", giorno));
-    } else if (voloLetto) {
-      setDaCarta(TESTI.carta.lettoSoloVolo.replace("{volo}", voloLetto));
-    } else {
-      setDaCarta(TESTI.carta.lettoSoloData.replace("{data}", giorno));
-    }
+    setDaCarta(
+      voloLetto
+        ? TESTI.carta.lettoSoloVolo.replace("{volo}", voloLetto)
+        : TESTI.carta.lettoSoloData.replace("{data}", giorno),
+    );
   }
 
-  /** Il bottone del form: valida quello che è stato scritto, poi chiede. */
+  /** "Correggo a mano": i campi letti passano al modo numero, editabili. */
+  function correggiAMano() {
+    if (!lettura) return;
+    setVolo(lettura.volo);
+    setData(inItaliano(lettura.iso));
+    setDaCarta(
+      TESTI.carta.letto
+        .replace("{volo}", lettura.volo)
+        .replace("{data}", perEsteso(lettura.iso)),
+    );
+    setLettura(null);
+    setModo("numero");
+  }
+
+  /** Il bottone del modo numero: valida quello che è stato scritto. */
   async function controlla() {
     if (!volo.trim()) {
       setErrore(T.errori.voloMancante);
@@ -281,6 +302,17 @@ export default function SchermataCheck() {
     await chiedi(volo, iso);
   }
 
+  /** Il bottone del modo tratta: conferma il volo scelto dall'elenco. */
+  async function controllaScelto() {
+    if (!scelta) {
+      setErrore(T.errori.voloDaScegliere);
+      return;
+    }
+    await chiedi(scelta.volo, scelta.iso);
+  }
+
+  const testata = T.testate[modo];
+
   return (
     <KeyboardAvoidingView
       style={stili.pagina}
@@ -290,27 +322,12 @@ export default function SchermataCheck() {
         contentContainerStyle={stili.contenuto}
         keyboardShouldPersistTaps="handled"
       >
-        {/* ------------------------------------------------ il marchio */}
-        <View style={stili.marchio}>
-          <Image source={marchio} style={stili.segno} accessibilityLabel="Rivolio" />
-          <Text style={stili.nomeMarchio}>
-            Rivo<Text style={stili.nomeVerde}>lio</Text>
-          </Text>
-        </View>
+        <VeloVerde />
 
-        <View style={stili.occhiello}>
-          <View style={stili.pallino} />
-          <Text style={stili.occhielloTesto}>{T.occhiello}</Text>
-        </View>
-
-        <Titolo prima={T.titolo.prima} corsivo={T.titolo.corsivo} centro />
-        <Text style={stili.sottotitolo}>{T.sottotitolo}</Text>
-
-        {/* ------------------------------------------------ il form */}
-        <View style={stili.scheda}>
-          {fase === "teatro" ? (
-            /* La scena di scansione prende il posto del form: il biglietto
-               si compila coi dati veri mentre i sei passi avanzano. */
+        {fase === "teatro" ? (
+          /* La scena di scansione prende il posto di tutto: il biglietto
+             si compila coi dati veri mentre i sei passi avanzano. */
+          <View style={stili.scenaScheda}>
             <ScenaScan
               volo={inAnalisi.volo}
               dataTesto={inItaliano(inAnalisi.data)}
@@ -319,122 +336,211 @@ export default function SchermataCheck() {
               arrivoPrevisto={letto.previsto}
               arrivoEffettivo={letto.effettivo}
             />
-          ) : (
-            <>
-          {/* La strada più corta di tutte, quando la carta d'imbarco c'è. */}
-          <ScattaCarta onLetto={dallaCarta} />
-
-          {/* I due modi di dire qual è il volo: la tratta per tutti,
-              il numero per chi ce l'ha davanti. */}
-          <View style={stili.modi}>
-            {(["tratta", "numero"] as const).map((m) => (
-              <Pressable
-                key={m}
-                onPress={() => {
-                  setModo(m);
-                  setErrore(null);
-                }}
-                accessibilityRole="button"
-                accessibilityState={{ selected: modo === m }}
-                style={[stili.modo, modo === m && stili.modoAttivo]}
-              >
-                <Text style={[stili.modoTesto, modo === m && stili.modoTestoAttivo]}>
-                  {T.modo[m]}
-                </Text>
-              </Pressable>
-            ))}
           </View>
+        ) : (
+          <>
+            {/* -------------------------------------------- la testata */}
+            <Text style={stili.occhiello}>{testata.occhiello}</Text>
+            <Text style={stili.titolo}>{testata.titolo}</Text>
+            <Text style={stili.sottotitolo}>{testata.sottotitolo}</Text>
 
-          {modo === "tratta" ? (
-            <>
-              <RicercaTratta
-                occupato={inCorso}
-                onScegli={(v, iso) => void chiedi(v, iso)}
-              />
-              {errore && (
-                <Text style={stili.errore} accessibilityRole="alert">
-                  {errore}
-                </Text>
-              )}
-            </>
-          ) : (
-            <>
-          {daCarta && (
-            <View style={stili.daCarta}>
-              <Feather name="check-circle" size={15} color={COLORI.verdeScuro} />
-              <Text style={stili.daCartaTesto}>{daCarta}</Text>
-            </View>
-          )}
+            {/* ------------------------------------------- il contenuto */}
+            {modo === "tratta" && (
+              <View style={stili.blocco}>
+                <RicercaTratta occupato={inCorso} onSeleziona={setScelta} />
+              </View>
+            )}
 
-          <Campo
-            etichetta={T.volo.etichetta}
-            valore={volo}
-            onChange={(t) => setVolo(t.toUpperCase())}
-            segnaposto={T.volo.segnaposto}
-          />
-          <Text style={stili.aiuto}>{T.volo.aiuto}</Text>
+            {modo === "carta" && (
+              <View style={stili.blocco}>
+                {lettura ? (
+                  /* --------------------------- la conferma dei campi (7a) */
+                  <View style={stili.conferma}>
+                    <View style={stili.confermaBollo}>
+                      <View style={stili.confermaPunto} />
+                      <Text style={stili.confermaBolloTesto}>{TESTI.carta.conferma.bollo}</Text>
+                    </View>
+                    <Text style={stili.confermaDomanda}>{TESTI.carta.conferma.domanda}</Text>
 
-          <View style={stili.spazio} />
+                    <View style={stili.confermaRighe}>
+                      <View style={stili.confermaRiga}>
+                        <Text style={stili.confermaEtichetta}>{TESTI.carta.conferma.volo}</Text>
+                        <Text style={stili.confermaValore}>{lettura.volo}</Text>
+                      </View>
+                      <View style={[stili.confermaRiga, stili.confermaRigaUltima]}>
+                        <Text style={stili.confermaEtichetta}>{TESTI.carta.conferma.data}</Text>
+                        <Text style={stili.confermaValore}>{perEsteso(lettura.iso)}</Text>
+                      </View>
+                    </View>
 
-          <Campo
-            etichetta={T.data.etichetta}
-            valore={data}
-            onChange={(t) => setData(conBarre(t))}
-            segnaposto={T.data.segnaposto}
-            tipo="numero"
-          />
-          <Text style={stili.aiuto}>{T.data.aiuto}</Text>
+                    <Text style={stili.confermaPrivacy}>{TESTI.carta.conferma.privacy}</Text>
 
-          {errore && (
-            <Text style={stili.errore} accessibilityRole="alert">
-              {errore}
-            </Text>
-          )}
+                    <View style={stili.confermaAzioni}>
+                      <Bottone
+                        testo={TESTI.carta.conferma.si}
+                        onPress={() => void chiedi(lettura.volo, lettura.iso)}
+                        caricamento={inCorso}
+                      />
+                      <Pressable
+                        onPress={correggiAMano}
+                        accessibilityRole="button"
+                        style={stili.confermaCorreggo}
+                      >
+                        <Text style={stili.confermaCorreggoTesto}>
+                          {TESTI.carta.conferma.correggo}
+                        </Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                ) : (
+                  <ScattaCarta onLetto={dallaCarta} />
+                )}
+                {errore && (
+                  <Text style={stili.errore} accessibilityRole="alert">
+                    {errore}
+                  </Text>
+                )}
+              </View>
+            )}
 
-          <View style={stili.spazio} />
-          <Bottone
-            testo={T.bottone}
-            onPress={controlla}
-            caricamento={inCorso}
-            icona="arrow-right"
-          />
-            </>
-          )}
-          <Text style={stili.rassicurazione}>{T.rassicurazione}</Text>
-            </>
-          )}
-        </View>
+            {modo === "numero" && (
+              <View style={stili.blocco}>
+                <View style={stili.scheda}>
+                  {daCarta && (
+                    <View style={stili.daCarta}>
+                      <Feather name="check-circle" size={15} color={COLORI.verdeScuro} />
+                      <Text style={stili.daCartaTesto}>{daCarta}</Text>
+                    </View>
+                  )}
 
-        {/* ------------------------------------------------ i tuoi voli */}
-        {fase === "campo" && salvati.length > 0 && (
-          <View style={stili.voli}>
-            <Text style={stili.voliTitolo}>{TESTI.mieiVoli.titolo}</Text>
-            <Text style={stili.voliSotto}>{TESTI.mieiVoli.sottotitolo}</Text>
-            <View style={stili.voliElenco}>
-              {salvati.map((v) => (
-                <CardVolo
-                  key={`${v.volo}-${v.data}`}
-                  volo={v}
-                  onApri={() => void chiedi(v.volo, v.data)}
-                  onTogli={() => {
-                    void togliVolo(v.volo, v.data).then(setSalvati);
-                    void smettiDiSeguire(v.volo, v.data);
+                  <Campo
+                    etichetta={T.volo.etichetta}
+                    valore={volo}
+                    onChange={(t) => setVolo(t.toUpperCase())}
+                    segnaposto={T.volo.segnaposto}
+                  />
+
+                  <View style={stili.spazio} />
+
+                  <Campo
+                    etichetta={T.data.etichetta}
+                    valore={data}
+                    onChange={(t) => setData(conBarre(t))}
+                    segnaposto={T.data.segnaposto}
+                    tipo="numero"
+                  />
+
+                  {errore && (
+                    <Text style={stili.errore} accessibilityRole="alert">
+                      {errore}
+                    </Text>
+                  )}
+                </View>
+
+                {/* Il riquadro che evita l'errore più comune (7b): il
+                    codice di prenotazione non è il numero del volo. */}
+                <View style={stili.prenota}>
+                  <Text style={stili.prenotaTitolo}>{T.prenotazione.titolo}</Text>
+                  <View style={stili.prenotaRiga}>
+                    <View style={[stili.prenotaChip, stili.prenotaChipSi]}>
+                      <Text style={[stili.prenotaCodice, stili.prenotaCodiceSi]}>
+                        {T.prenotazione.serve.codice}
+                      </Text>
+                    </View>
+                    <View style={stili.prenotaTesti}>
+                      <Text style={stili.prenotaTag}>{T.prenotazione.serve.tag}</Text>
+                      <Text style={stili.prenotaTesto}>{T.prenotazione.serve.testo}</Text>
+                    </View>
+                  </View>
+                  <View style={stili.prenotaRiga}>
+                    <View style={stili.prenotaChip}>
+                      <Text style={stili.prenotaCodice}>{T.prenotazione.non.codice}</Text>
+                    </View>
+                    <View style={stili.prenotaTesti}>
+                      <Text style={[stili.prenotaTag, stili.prenotaTagNo]}>
+                        {T.prenotazione.non.tag}
+                      </Text>
+                      <Text style={stili.prenotaTesto}>{T.prenotazione.non.testo}</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            )}
+
+            {/* ------------------------- il selettore dei modi e il via */}
+            <View style={stili.modi}>
+              {MODI.map((m) => (
+                <Pressable
+                  key={m}
+                  onPress={() => {
+                    setModo(m);
+                    setErrore(null);
                   }}
-                />
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: modo === m }}
+                  style={[stili.modoVoce, modo === m && stili.modoAttivo]}
+                >
+                  <Text
+                    numberOfLines={1}
+                    style={[stili.modoTesto, modo === m && stili.modoTestoAttivo]}
+                  >
+                    {T.modo[m]}
+                  </Text>
+                </Pressable>
               ))}
             </View>
 
-            <CardAvvisi
-              stato={avvisi}
-              onEntra={() => router.push("/accesso")}
-              onAttiva={() => void attivaAvvisi()}
-            />
-          </View>
-        )}
+            {modo === "tratta" && (
+              <View style={stili.via}>
+                <Bottone
+                  testo={T.bottoneTratta}
+                  onPress={() => void controllaScelto()}
+                  caricamento={inCorso}
+                  disabilitato={!scelta}
+                />
+              </View>
+            )}
+            {modo === "numero" && (
+              <View style={stili.via}>
+                <Bottone
+                  testo={T.bottoneNumero}
+                  onPress={() => void controlla()}
+                  caricamento={inCorso}
+                  icona="arrow-right"
+                />
+              </View>
+            )}
 
-        {/* ------------------------------------------------ la fiducia */}
-        {fase === "campo" && (
-          <>
+            <Text style={stili.rassicurazione}>{T.rassicurazione}</Text>
+
+            {/* ---------------------------------------------- i tuoi voli */}
+            {salvati.length > 0 && (
+              <View style={stili.voli}>
+                <Text style={stili.voliTitolo}>{TESTI.mieiVoli.titolo}</Text>
+                <Text style={stili.voliSotto}>{TESTI.mieiVoli.sottotitolo}</Text>
+                <View style={stili.voliElenco}>
+                  {salvati.map((v) => (
+                    <CardVolo
+                      key={`${v.volo}-${v.data}`}
+                      volo={v}
+                      onApri={() => void chiedi(v.volo, v.data)}
+                      onTogli={() => {
+                        void togliVolo(v.volo, v.data).then(setSalvati);
+                        void smettiDiSeguire(v.volo, v.data);
+                      }}
+                    />
+                  ))}
+                </View>
+
+                <CardAvvisi
+                  stato={avvisi}
+                  onEntra={() => router.push("/accesso")}
+                  onAttiva={() => void attivaAvvisi()}
+                />
+              </View>
+            )}
+
+            {/* ---------------------------------------------- la fiducia */}
             <View style={stili.punti}>
               {T.punti.map((p) => (
                 <View key={p} style={stili.punto}>
@@ -465,74 +571,156 @@ const stili = StyleSheet.create({
     paddingTop: SPAZIO.xxl + SPAZIO.l,
     paddingBottom: 116,
   },
-  /* La testata sta AL CENTRO (richiesta di Valerio, 8/08): marchio,
-     occhiello, titolo e sottotitolo sono un blocco simmetrico, non
-     appoggiato a sinistra. */
-  marchio: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: SPAZIO.s,
-  },
-  segno: { width: 30, height: 30 },
-  nomeMarchio: {
-    fontFamily: FONT.display,
-    fontSize: 19,
-    letterSpacing: -0.6,
-    color: COLORI.inchiostro,
-  },
-  nomeVerde: { color: COLORI.verde },
+  /* La testata sta a SINISTRA, come nella tavola: l'occhiello in
+     maiuscolo largo, la domanda grande, la riga di aiuto. */
   occhiello: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: SPAZIO.s,
-    alignSelf: "center",
-    backgroundColor: COLORI.bianco,
-    borderRadius: RAGGIO.pillola,
-    paddingHorizontal: SPAZIO.m,
-    paddingVertical: 7,
-    marginTop: SPAZIO.xl,
-    borderWidth: 1,
-    borderColor: COLORI.bordo,
+    fontFamily: FONT.testoSemi,
+    fontSize: 11.5,
+    letterSpacing: 1.8,
+    textTransform: "uppercase",
+    color: COLORI.verdeScuro,
   },
-  pallino: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORI.verde },
-  occhielloTesto: { fontFamily: FONT.testoMedio, fontSize: 12.5, color: COLORI.inchiostro },
+  titolo: {
+    fontFamily: FONT.display,
+    fontSize: 30,
+    lineHeight: 36,
+    letterSpacing: -1,
+    color: COLORI.inchiostro,
+    marginTop: SPAZIO.s,
+  },
   sottotitolo: {
     fontFamily: FONT.testo,
     fontSize: 15,
     lineHeight: 22,
     color: COLORI.fumo,
-    marginTop: SPAZIO.m,
-    textAlign: "center",
-    alignSelf: "center",
-    maxWidth: 320,
+    marginTop: SPAZIO.s,
+    maxWidth: 340,
   },
-  scheda: {
+  blocco: { marginTop: SPAZIO.xl },
+  scenaScheda: {
     backgroundColor: COLORI.bianco,
-    borderRadius: RAGGIO.grande,
+    borderRadius: RAGGIO.massimo,
     padding: SPAZIO.xl,
     marginTop: SPAZIO.xl,
     ...OMBRA.scheda,
   },
-  modi: {
-    flexDirection: "row",
-    gap: SPAZIO.xs,
+  scheda: {
+    backgroundColor: COLORI.bianco,
+    borderRadius: RAGGIO.scheda,
+    padding: SPAZIO.xl,
+    ...OMBRA.scheda,
+  },
+  spazio: { height: SPAZIO.l },
+  errore: {
+    fontFamily: FONT.testoMedio,
+    fontSize: 13,
+    color: COLORI.errore,
+    marginTop: SPAZIO.m,
+  },
+
+  /* Il riquadro della prenotazione (7b). */
+  prenota: {
+    backgroundColor: COLORI.bianco,
+    borderWidth: 1,
+    borderColor: COLORI.bordo,
+    borderRadius: RAGGIO.interno,
+    padding: SPAZIO.l,
+    marginTop: SPAZIO.m,
+    gap: SPAZIO.m,
+  },
+  prenotaTitolo: { fontFamily: FONT.testoSemi, fontSize: 13.5, color: COLORI.inchiostro },
+  prenotaRiga: { flexDirection: "row", gap: SPAZIO.m, alignItems: "flex-start" },
+  prenotaChip: {
+    borderWidth: 1,
+    borderColor: COLORI.bordo,
     backgroundColor: COLORI.nebbia,
-    borderRadius: RAGGIO.campo,
-    padding: SPAZIO.xs,
-    marginBottom: SPAZIO.l,
-  },
-  modo: {
-    flex: 1,
+    borderRadius: RAGGIO.minimo,
+    paddingHorizontal: SPAZIO.m,
+    paddingVertical: 7,
+    minWidth: 92,
     alignItems: "center",
-    justifyContent: "center",
-    borderRadius: RAGGIO.campo - 3,
-    paddingVertical: SPAZIO.s + 2,
-    minHeight: 40,
   },
-  modoAttivo: { backgroundColor: COLORI.bianco, ...OMBRA.scheda },
-  modoTesto: { fontFamily: FONT.testoMedio, fontSize: 13.5, color: COLORI.fumo },
-  modoTestoAttivo: { color: COLORI.inchiostro },
+  prenotaChipSi: { borderColor: COLORI.verde, backgroundColor: COLORI.mentaTenue },
+  prenotaCodice: {
+    fontFamily: FONT.display,
+    fontSize: 14,
+    letterSpacing: 0.6,
+    color: COLORI.fumo,
+  },
+  prenotaCodiceSi: { color: COLORI.verdeScuro },
+  prenotaTesti: { flex: 1 },
+  prenotaTag: { fontFamily: FONT.testoSemi, fontSize: 12, color: COLORI.verdeScuro },
+  prenotaTagNo: { color: COLORI.fumo2 },
+  prenotaTesto: {
+    fontFamily: FONT.testo,
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: COLORI.fumo,
+    marginTop: 1,
+  },
+
+  /* La carta di conferma della lettura (7a). */
+  conferma: {
+    backgroundColor: COLORI.bianco,
+    borderRadius: RAGGIO.scheda,
+    padding: SPAZIO.xl,
+    ...OMBRA.scheda,
+  },
+  confermaBollo: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPAZIO.s,
+    backgroundColor: COLORI.mentaTenue,
+    borderRadius: RAGGIO.pillola,
+    paddingHorizontal: SPAZIO.m,
+    paddingVertical: 6,
+  },
+  confermaPunto: { width: 6, height: 6, borderRadius: 3, backgroundColor: COLORI.verde },
+  confermaBolloTesto: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 11.5,
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    color: COLORI.verdeScuro,
+  },
+  confermaDomanda: {
+    fontFamily: FONT.display,
+    fontSize: 21,
+    letterSpacing: -0.5,
+    color: COLORI.inchiostro,
+    marginTop: SPAZIO.l,
+  },
+  confermaRighe: {
+    borderWidth: 1,
+    borderColor: COLORI.bordo,
+    borderRadius: RAGGIO.interno,
+    marginTop: SPAZIO.l,
+  },
+  confermaRiga: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: SPAZIO.m,
+    paddingHorizontal: SPAZIO.l,
+    paddingVertical: SPAZIO.m + 2,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORI.bordo,
+  },
+  confermaRigaUltima: { borderBottomWidth: 0 },
+  confermaEtichetta: { fontFamily: FONT.testo, fontSize: 13, color: COLORI.fumo },
+  confermaValore: { fontFamily: FONT.testoSemi, fontSize: 15, color: COLORI.inchiostro },
+  confermaPrivacy: {
+    fontFamily: FONT.testo,
+    fontSize: 12.5,
+    lineHeight: 19,
+    color: COLORI.fumo,
+    marginTop: SPAZIO.l,
+  },
+  confermaAzioni: { marginTop: SPAZIO.l, gap: SPAZIO.m },
+  confermaCorreggo: { alignSelf: "center", padding: SPAZIO.s },
+  confermaCorreggoTesto: { fontFamily: FONT.testoMedio, fontSize: 14, color: COLORI.fumo },
+
   daCarta: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -551,19 +739,29 @@ const stili = StyleSheet.create({
     lineHeight: 18,
     color: COLORI.verdeNotte,
   },
-  aiuto: {
-    fontFamily: FONT.testo,
-    fontSize: 12,
-    color: COLORI.fumo2,
-    marginTop: SPAZIO.xs + 2,
+
+  /* Il selettore dei tre modi, in fondo come nella tavola. */
+  modi: {
+    flexDirection: "row",
+    gap: SPAZIO.xs,
+    backgroundColor: COLORI.nebbia2,
+    borderRadius: RAGGIO.pillola,
+    padding: SPAZIO.xs,
+    marginTop: SPAZIO.xl,
   },
-  spazio: { height: SPAZIO.l },
-  errore: {
-    fontFamily: FONT.testoMedio,
-    fontSize: 13,
-    color: COLORI.errore,
-    marginTop: SPAZIO.m,
+  modoVoce: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: RAGGIO.pillola,
+    paddingVertical: SPAZIO.s + 2,
+    paddingHorizontal: SPAZIO.xs,
+    minHeight: 40,
   },
+  modoAttivo: { backgroundColor: COLORI.bianco, ...OMBRA.scheda },
+  modoTesto: { fontFamily: FONT.testoMedio, fontSize: 12, color: COLORI.fumo },
+  modoTestoAttivo: { color: COLORI.inchiostro },
+  via: { marginTop: SPAZIO.m },
   rassicurazione: {
     fontFamily: FONT.testo,
     fontSize: 12.5,
@@ -571,6 +769,7 @@ const stili = StyleSheet.create({
     textAlign: "center",
     marginTop: SPAZIO.m,
   },
+
   voli: { marginTop: SPAZIO.xxl },
   voliTitolo: {
     fontFamily: FONT.display,

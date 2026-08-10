@@ -70,6 +70,7 @@ const RISPOSTA: VoceAdb[] = [
     arrival: {
       airport: { iata: "ACE", municipalityName: "Arrecife" },
       scheduledTime: { utc: "2026-08-06 09:35Z", local: "2026-08-06 10:35+01:00" },
+      revisedTime: { utc: "2026-08-06 13:27Z", local: "2026-08-06 14:27+01:00" },
     },
   },
   {
@@ -122,6 +123,14 @@ test.describe("Lettura della risposta del fornitore", () => {
   test("gli orari sono quelli LOCALI, che sono gli unici che uno ricorda", () => {
     expect(voli[0].partenzaOra).toBe("06:20");
     expect(voli[0].arrivoOra).toBe("10:35");
+  });
+
+  test("l'arrivo aggiornato passa, e dove il fornitore tace resta vuoto", () => {
+    /* Serve all'elenco per dire "doveva arrivare alle 10:35, atterrato
+       alle 14:27": è così che l'utente riconosce il SUO volo. Non è un
+       verdetto: il ritardo che conta lo misura il motore dopo. */
+    expect(voli[0].arrivoEffettivoOra).toBe("14:27");
+    expect(voli[1].arrivoEffettivoOra).toBe("");
   });
 
   test("l'ordine è quello di partenza", () => {

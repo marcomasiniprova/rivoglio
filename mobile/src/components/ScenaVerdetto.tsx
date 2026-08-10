@@ -37,13 +37,13 @@ const SOGLIA_MINUTI = 180;
 export function VeloVerde({ tinta = COLORI.menta }: { tinta?: string }) {
   return (
     <View style={stili.velo} pointerEvents="none">
-      {Array.from({ length: 8 }, (_, i) => (
+      {Array.from({ length: 9 }, (_, i) => (
         <View
           key={i}
           style={{
-            height: 22,
+            height: 26,
             backgroundColor: tinta,
-            opacity: 0.22 * (1 - i / 8) ** 1.6,
+            opacity: 0.3 * (1 - i / 9) ** 1.4,
           }}
         />
       ))}
