@@ -22,6 +22,7 @@ import {
   schedaRifiuto,
   type MotivoRifiuto,
 } from "@/lib/pratiche/rifiuto";
+import { conciliazionePerPartenza, prontoPerConciliazione } from "@/lib/lettera/conciliazione";
 import { METEO_ATTIVO, fraseMeteo, meteoStorico } from "@/lib/meteo/openmeteo";
 import { aeroporto } from "@/lib/voli/distanza";
 import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
@@ -319,6 +320,17 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         )
       : null;
 
+  /* IL QUARTO COLPO: la conciliazione. Non segue il nostro calendario ma
+     quello dell'organismo: serve il reclamo già mandato e poi 30 giorni
+     di silenzio, oppure una risposta che non soddisfa. Un no dichiarato
+     è una risposta che non soddisfa, quindi apre subito. */
+  const conciliazione =
+    verdetto.esito === "idoneo" &&
+    pratica.inviata_il &&
+    prontoPerConciliazione(giorniDallInvio, Boolean(motivoRifiuto && motivoRifiuto !== "silenzio"))
+      ? conciliazionePerPartenza(volo.partenza_iata)
+      : null;
+
   const compagnia =
     compagniaPerVettore(volo.vettore_operativo) ?? compagniaPerVettore(volo.volo_iata);
   const organismo = istruzioniOrganismo(volo.partenza_iata);
@@ -591,6 +603,66 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           <textarea id="t-oggetto-3" hidden readOnly defaultValue={segnalazione.oggetto} />
           <textarea id="t-corpo-3" hidden readOnly defaultValue={segnalazione.corpo} />
         </>
+      )}
+
+      {/* ------------------------------------------- il quarto colpo */}
+      {conciliazione && (
+        <section className="no-stampa rounded-2xl border border-verde/25 bg-verde/[0.06] px-6 py-7 sm:px-8">
+          <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde-scuro">
+            Il quarto colpo
+          </p>
+          <h2 className="mt-2 font-display text-xl tracking-[-0.03em]">{conciliazione.titolo}</h2>
+          <p className="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-inchiostro/80">
+            {conciliazione.premessa}
+          </p>
+
+          <ol className="mt-5 space-y-3 text-[0.95rem] leading-relaxed">
+            {conciliazione.passi.map((passo, i) => (
+              <li key={passo} className="flex gap-3">
+                <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-verde/15 text-[0.75rem] font-semibold text-verde-scuro">
+                  {i + 1}
+                </span>
+                <span>{passo}</span>
+              </li>
+            ))}
+          </ol>
+
+          <dl className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div>
+              <dt className="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-fumo-2">
+                Quanto costa
+              </dt>
+              <dd className="mt-1 text-[0.95rem] leading-relaxed">{conciliazione.costo}</dd>
+            </div>
+            <div>
+              <dt className="text-[0.7rem] font-medium uppercase tracking-[0.14em] text-fumo-2">
+                Entro quando
+              </dt>
+              <dd className="mt-1 text-[0.95rem] leading-relaxed">{conciliazione.scadenza}</dd>
+            </div>
+          </dl>
+
+          <p className="mt-6 flex gap-2.5 rounded-xl border border-bordo bg-white px-4 py-3 text-sm leading-relaxed text-fumo">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-sole" aria-hidden="true" />
+            <span>{conciliazione.avvertenza}</span>
+          </p>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <Button asChild>
+              <a href={conciliazione.url} target="_blank" rel="noopener noreferrer">
+                Apri {conciliazione.sigla ?? conciliazione.nome}
+                <ExternalLink className="size-4" aria-hidden="true" />
+              </a>
+            </Button>
+            <Button asChild variant="contorno">
+              <Link href="/giudice-di-pace">E se non basta nemmeno questo</Link>
+            </Button>
+          </div>
+
+          <p className="mt-5 text-xs leading-relaxed text-fumo-2">
+            Fonte: {conciliazione.fonte}
+          </p>
+        </section>
       )}
 
       <p className="no-stampa text-sm leading-relaxed text-fumo-2">

@@ -64,6 +64,10 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | `/admin` shadow mode (conferma umana dei verdetti) | ✅ 07/08, SHADOW_MODE=1 |
 | Guida bagagli `/guida-bagagli` (Montreal: solo guida, niente vendita) | ✅ 8/08 notte, footer + sitemap |
 | Prove Playwright del flusso in modalità demo | ✅ 208/210 (2 = rete sandbox verso Supabase) + eval 35/35 |
+| **Il dopo-lettera: replica al no, segnalazione all'ente, guida al giudice** | ✅ 10/08 giro #45, 8 motivi a scelta chiusa |
+| **Il quarto colpo: la conciliazione (ART/ConciliaWeb, ECC-Net)** | ✅ 10/08 giro #48. È l'unico passo dopo il reclamo che i soldi li muove davvero: l'ente accerta e sanziona, non paga |
+| **L'onere della prova nelle repliche: le due gambe dell'art. 5 par. 3** | ✅ 10/08 giro #48, in tutte e cinque le repliche dove invocano una circostanza |
+| **"Non costituisce parere legale" in fondo a tutti e tre i fogli** | ✅ 10/08 giro #48 |
 
 ## 1.3 Deploy e conti
 
@@ -144,7 +148,13 @@ Il motore è chiuso: da qui il collo di bottiglia non è più il prodotto,
 **è il traffico** (dalla ricerca del giro #37: la conversione di lavoro è
 1% al lancio, 2-3% a regime, e il traffico è quello che manca).
 Quindi: deploy, le due cose che sbloccano le email (dominio su Resend e
-migrazioni), poi FASE 2, distribuzione. Il dopo-lettera (sollecito e
-segnalazione all'ente già pronti) è il pezzo di prodotto con più valore
-rimasto: il 52% dei reclami validi viene respinto al primo colpo.
+migrazioni), poi FASE 2, distribuzione.
+
+**Il dopo-lettera è finito, e adesso ha quattro colpi**: reclamo, replica
+al loro no, segnalazione all'ente, conciliazione. È il pezzo che dalla
+riforma del 2027 esce come il più importante del prodotto: da allora sarà
+la compagnia stessa a dire al passeggero che può chiedere, e quello che
+resterà da vendere non è più "ti diciamo se ti spetta", è **quando ti
+dicono di no, ecco cosa fai**.
+
 Le cose chieste e non fatte: `ARRETRATI.md`.

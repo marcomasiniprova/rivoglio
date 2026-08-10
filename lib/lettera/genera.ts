@@ -31,6 +31,23 @@ import { type MotivoRifiuto, schedaRifiuto } from "@/lib/pratiche/rifiuto";
 
 export type Lettera = { oggetto: string; corpo: string };
 
+/**
+ * LA RIGA CHE DICE COS'È QUESTA LETTERA, in fondo a ogni foglio.
+ *
+ * Serve a due cose insieme, e sono tutte e due nostre.
+ * 1. Ci tiene lontani dall'esercizio abusivo della professione: noi
+ *    generiamo un documento da norme e sentenze pubbliche, non diamo un
+ *    parere su un caso. È una distinzione vera, e va scritta.
+ * 2. NON toglie forza alla lettera, perché la forza non sta nel
+ *    presentarsi come avvocati: sta negli orari certificati e nelle
+ *    sentenze citate, che sono pubbliche e verificabili da chiunque.
+ *
+ * Sta in fondo di proposito: chi legge alla compagnia arriva prima ai
+ * fatti.
+ */
+export const NOTA_TRASPARENZA =
+  "Questa comunicazione è stata redatta a partire dalla normativa e dalla giurisprudenza pubbliche applicabili e dai dati di volo verificati. Non costituisce parere legale.";
+
 /** Ciò che la lettera legge dalla pratica. Il resto non le serve. */
 export type PraticaPerLettera = Pick<Pratica, "passeggeri" | "tipo">;
 
@@ -179,7 +196,7 @@ Il pagamento può essere effettuato con bonifico su queste coordinate:
 IBAN: [da compilare]
 Intestato a: [da compilare]
 
-Chiedo il pagamento, o una risposta scritta e motivata, entro 30 giorni dal ricevimento della presente. Se intendete invocare circostanze eccezionali, chiedo che siano indicate in modo specifico e documentate: l'onere della prova è a vostro carico.
+Chiedo il pagamento, o una risposta scritta e motivata, entro 30 giorni dal ricevimento della presente. Se intendete invocare circostanze eccezionali, chiedo che siano indicate in modo specifico e documentate: l'onere della prova è a vostro carico, e l'esonero richiede anche la dimostrazione di aver adottato tutte le misure ragionevoli, ivi compresa la riprotezione su voli alternativi, anche operati da altri vettori.
 
 In mancanza di riscontro nel termine indicato, presenterò reclamo a ${organismoDiPartenza(fatto)}, l'organismo nazionale responsabile dell'applicazione del Regolamento (CE) 261/2004 per lo Stato di partenza, e valuterò ogni ulteriore tutela nelle sedi competenti.
 
@@ -189,7 +206,10 @@ Distinti saluti,
 
 ${passeggeri[0]}
 [indirizzo email con cui è stata fatta la prenotazione]
-[data di invio]`;
+[data di invio]
+
+---
+${NOTA_TRASPARENZA}`;
 
   return { oggetto, corpo };
 }
@@ -249,7 +269,10 @@ Distinti saluti,
 
 ${passeggeri[0]}
 [indirizzo email con cui è stato inviato il primo reclamo]
-[data di invio]`;
+[data di invio]
+
+---
+${NOTA_TRASPARENZA}`;
 
   return { oggetto, corpo };
 }
@@ -431,7 +454,10 @@ Distinti saluti,
 ${passeggeri.join("\n")}
 [indirizzo di residenza]
 [recapito email e telefono]
-[data]`;
+[data]
+
+---
+${NOTA_TRASPARENZA}`;
 
   return { oggetto, corpo };
 }

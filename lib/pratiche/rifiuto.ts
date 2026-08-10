@@ -54,13 +54,35 @@ export type SchedaRifiuto = {
   riferimenti: string[];
 };
 
+/**
+ * LE DUE GAMBE DELL'ARTICOLO 5 PARAGRAFO 3, E CHI LE DEVE REGGERE.
+ *
+ * È il paragrafo che entra in OGNI replica dove la compagnia tira fuori
+ * una circostanza eccezionale, e dice le due cose su cui contano che tu
+ * non sappia niente.
+ * 1. L'onere della prova è LORO. Il passeggero non deve dimostrare che
+ *    la circostanza non c'era: è il vettore che deve dimostrare che
+ *    c'era. Chi non lo sa si mette a cercare prove che non gli servono,
+ *    non le trova e molla.
+ * 2. Anche quando la circostanza è davvero eccezionale, l'esonero non
+ *    scatta da solo: serve ANCHE la prova di aver preso tutte le misure
+ *    ragionevoli, riprotezione su altri vettori compresa. Sono due
+ *    gambe, non una, e la seconda è quella che spesso non hanno.
+ *
+ * Sta scritto una volta sola e si ripete uguale: se un domani cambia,
+ * cambia in tutte le repliche insieme.
+ */
+export const ONERE_DELLA_PROVA = `Ricordo che l'articolo 5, paragrafo 3, del Regolamento pone l'onere della prova a carico del vettore e non del passeggero, e che l'esonero richiede la dimostrazione di due elementi distinti e concorrenti: che la circostanza sia stata effettivamente eccezionale e abbia inciso su questo specifico volo, e che il vettore abbia adottato tutte le misure ragionevoli per evitare il ritardo, ivi compresa la riprotezione dei passeggeri su voli alternativi, anche operati da altri vettori. La prova del primo elemento non esonera dalla prova del secondo.`;
+
 export const RIFIUTI: SchedaRifiuto[] = [
   {
     motivo: "eccezionale_generico",
     etichetta: "Hanno scritto \"circostanza eccezionale\" senza dire quale",
     aiuto: "La risposta parla di circostanze eccezionali ma non spiega cos'è successo.",
     peso: "debole",
-    replica: `La vostra risposta invoca una circostanza eccezionale senza indicarne la natura né allegarne la prova. L'articolo 5, paragrafo 3, del Regolamento pone a carico del vettore l'onere di dimostrare sia il verificarsi della circostanza, sia il nesso con il ritardo del volo in questione, sia l'adozione di tutte le misure ragionevoli per evitarne le conseguenze. Un'affermazione generica non assolve nessuno di questi tre oneri e non costituisce una risposta motivata.
+    replica: `La vostra risposta invoca una circostanza eccezionale senza indicarne la natura né allegarne la prova. Un'affermazione generica non costituisce una risposta motivata.
+
+${ONERE_DELLA_PROVA}
 
 Vi invito pertanto a indicare per iscritto quale evento specifico avrebbe interessato questo volo, con la relativa documentazione.`,
     spiegazione:
@@ -73,6 +95,8 @@ Vi invito pertanto a indicare per iscritto quale evento specifico avrebbe intere
     aiuto: "La risposta parla di manutenzione, avaria, problema tecnico o guasto.",
     peso: "debole",
     replica: `La vostra risposta riconduce il ritardo a un problema tecnico. Un problema tecnico emerso nel corso della manutenzione o derivante da una carenza di manutenzione è inerente al normale esercizio dell'attività di trasporto aereo e non integra, di per sé, una circostanza eccezionale ai sensi dell'articolo 5, paragrafo 3, del Regolamento. Lo stesso vale per un guasto improvviso non causato da eventi esterni all'attività del vettore.
+
+${ONERE_DELLA_PROVA}
 
 Se ritenete che il guasto sia stato causato da un evento estraneo al normale esercizio dell'attività, vi invito a indicarlo specificamente e a documentarlo.`,
     spiegazione:
@@ -90,6 +114,8 @@ Se ritenete che il guasto sia stato causato da un evento estraneo al normale ese
     peso: "debole",
     replica: `La vostra risposta riconduce il ritardo a uno sciopero del vostro personale. Uno sciopero indetto dalle organizzazioni sindacali dei dipendenti del vettore, nell'ambito della normale gestione dei rapporti di lavoro, rientra nel normale esercizio dell'attività del vettore e non costituisce, in linea di principio, una circostanza eccezionale ai sensi dell'articolo 5, paragrafo 3, del Regolamento.
 
+${ONERE_DELLA_PROVA}
+
 Vi chiedo pertanto di indicare quali circostanze rendessero questo sciopero estraneo alla vostra sfera di controllo, e quali misure ragionevoli abbiate adottato per limitarne le conseguenze sui passeggeri.`,
     spiegazione:
       "Questa è la distinzione che vale i soldi, e i portali di solito non te la dicono. Se scioperava il PERSONALE DELLA COMPAGNIA, in linea di principio la compensazione spetta lo stesso: i rapporti coi propri dipendenti sono affari loro. È diverso dallo sciopero dei controllori di volo, che viene da fuori.",
@@ -103,9 +129,11 @@ Vi chiedo pertanto di indicare quali circostanze rendessero questo sciopero estr
     etichetta: "Uno sciopero dei controllori di volo o dell'aeroporto",
     aiuto: "La risposta parla di sciopero del controllo del traffico aereo, degli handler o del personale aeroportuale.",
     peso: "dipende",
-    replica: `La vostra risposta riconduce il ritardo a uno sciopero esterno alla vostra organizzazione. Anche quando la circostanza è estranea al vettore, l'esonero previsto dall'articolo 5, paragrafo 3, opera soltanto se il vettore dimostra di aver adottato tutte le misure ragionevoli per evitare il ritardo, e che il ritardo non poteva comunque essere evitato.
+    replica: `La vostra risposta riconduce il ritardo a uno sciopero esterno alla vostra organizzazione.
 
-Vi chiedo pertanto di documentare l'incidenza dello sciopero su questo specifico volo e le misure adottate, ivi compresa la riprotezione su voli alternativi, anche di altri vettori.`,
+${ONERE_DELLA_PROVA}
+
+Vi chiedo pertanto di documentare l'incidenza dello sciopero su questo specifico volo, il momento in cui è stato proclamato e le misure che avete concretamente adottato per limitarne le conseguenze sui passeggeri.`,
     spiegazione:
       "Qui è più dura, ed è giusto dirtelo: uno sciopero dei controllori viene da fuori e di solito conta come circostanza eccezionale. Resta però un punto: devono dimostrare che riguardava proprio il tuo volo e che hanno fatto il possibile, per esempio metterti su un altro aereo. Non sempre ce l'hanno, quella prova.",
     riferimenti: ["Reg. CE 261/2004, art. 5 par. 3"],
@@ -115,7 +143,9 @@ Vi chiedo pertanto di documentare l'incidenza dello sciopero su questo specifico
     etichetta: "Il maltempo",
     aiuto: "La risposta parla di condizioni meteo, neve, nebbia, temporali o vento.",
     peso: "dipende",
-    replica: `La vostra risposta riconduce il ritardo alle condizioni meteorologiche. Perché operi l'esonero previsto dall'articolo 5, paragrafo 3, non è sufficiente che quel giorno vi fossero condizioni avverse: occorre che esse abbiano inciso su questo specifico volo e che il vettore dimostri di aver adottato tutte le misure ragionevoli.
+    replica: `La vostra risposta riconduce il ritardo alle condizioni meteorologiche. Non è sufficiente che quel giorno vi fossero condizioni avverse nello scalo: occorre che esse abbiano inciso su questo specifico volo.
+
+${ONERE_DELLA_PROVA}
 
 Vi chiedo di indicare l'orario e la natura del fenomeno, la sua incidenza sulla rotazione dell'aeromobile assegnato a questo volo e le misure adottate. Rilevo inoltre che gli altri voli operati nello stesso scalo e nella stessa fascia oraria costituiscono elemento di riscontro.`,
     spiegazione:
@@ -129,7 +159,7 @@ Vi chiedo di indicare l'orario e la natura del fenomeno, la sua incidenza sulla 
     peso: "debole",
     replica: `La vostra risposta contesta l'entità del ritardo. Il ritardo rilevante ai fini degli articoli 5 e 7 del Regolamento, come interpretati dalla Corte di giustizia, è quello all'ARRIVO, e si misura sul momento in cui almeno una porta dell'aeromobile è aperta e ai passeggeri è consentito lasciarlo, non sul momento dell'atterraggio né sull'orario di partenza.
 
-L'orario di arrivo effettivo su cui si fonda la mia richiesta è tratto dal tracciamento del volo. Vi chiedo di indicare per iscritto l'orario di arrivo effettivo che ritenete corretto e la fonte da cui lo traete.`,
+L'orario di arrivo effettivo su cui si fonda la mia richiesta è tratto dal tracciamento del volo. Vi chiedo di indicare per iscritto l'orario di arrivo effettivo che ritenete corretto e la fonte da cui lo traete: i dati di rotazione dell'aeromobile e gli orari registrati sono nella vostra disponibilità e non nella mia.`,
     spiegazione:
       "Capita spesso, e quasi sempre stanno misurando un'altra cosa: il ritardo alla partenza invece che all'arrivo, o il momento in cui le ruote toccano terra invece di quando aprono la porta. Il dato che ti abbiamo dato viene dal tracciamento del volo, non da una stima.",
     riferimenti: [
@@ -154,7 +184,9 @@ Il buono può sostituire il pagamento in denaro soltanto in presenza del mio acc
     etichetta: "Non hanno risposto proprio",
     aiuto: "Sono passate settimane e non è arrivato niente.",
     peso: "debole",
-    replica: `A oggi non ho ricevuto alcun riscontro alla mia richiesta. Il silenzio non estingue il diritto alla compensazione: i presupposti restano quelli documentati nella prima lettera, che si intende qui integralmente richiamata.`,
+    replica: `A oggi non ho ricevuto alcun riscontro alla mia richiesta. Il silenzio non estingue la compensazione: i presupposti restano quelli documentati nella prima lettera, che si intende qui integralmente richiamata.
+
+Rilevo inoltre che, non avendo voi invocato alcuna circostanza eccezionale, non risulta allegato alcun fatto idoneo a fondare l'esonero previsto dall'articolo 5, paragrafo 3, del Regolamento, il cui onere probatorio resta comunque a vostro carico.`,
     spiegazione:
       "Il silenzio non è un no e non cancella niente. Serve però a una cosa: mettere agli atti che sono passate settimane senza risposta, perché è quello che guarda l'ente nazionale quando gli scrivi.",
     riferimenti: ["Reg. CE 261/2004, art. 5 par. 3"],

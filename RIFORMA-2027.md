@@ -77,9 +77,17 @@ extra.
    Oggi 42 ha senso perché le compagnie ci mettono 8-14 settimane; da
    allora ne avranno 30 per legge, e il giorno 31 diventa il momento
    giusto per battere.
-3. **Adesso**: un articolo sul Tabellone dedicato alla riforma. È la
-   parola chiave che tutti cercheranno da qui al 2027, e oggi in italiano
-   quasi nessuno l'ha scritta bene.
+3. ~~**Adesso**: un articolo sul Tabellone dedicato alla riforma.~~
+   ✅ **FATTO il 10/08**: `/tabellone/riforma-261-2027-cosa-cambia`, in
+   evidenza sulla home del blog. Dice in chiaro quali numeri vengono dai
+   comunicati e non dall'articolato.
+
+⚠️ **I primi due punti non sono più solo una nota qui dentro.**
+`prove/quarto-colpo.spec.ts` porta una sveglia: dal **1° maggio 2027** la
+suite comincia a fallire se il testo del retroattivo dice ancora "l'anno
+scorso" e se il sollecito è ancora a 42 giorni. Smette da sola appena le
+due modifiche sono fatte. Un ARRETRATI si può non leggere, una suite
+rossa no.
 
 ## Fonti
 

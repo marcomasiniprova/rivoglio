@@ -226,7 +226,10 @@ test.describe("La guida al giudice di pace", () => {
   test("si apre e dice subito che non serve un avvocato", async ({ page }) => {
     await page.goto("/giudice-di-pace");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("non paga");
-    await expect(page.getByText("non ti serve per forza un avvocato")).toBeVisible();
+    /* `.first()` perché la frase compare due volte, ed è voluto: nel
+       titolo della sezione e in grassetto dentro il testo. Chi scorre la
+       pagina di corsa deve incontrarla comunque. */
+    await expect(page.getByText("non ti serve per forza un avvocato").first()).toBeVisible();
   });
 
   test("dichiara cosa NON facciamo: niente atti, niente consulenza", async ({ page }) => {

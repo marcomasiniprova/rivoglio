@@ -154,16 +154,16 @@ export const ARTICOLO: Articolo = {
         "Attenzione alla terza riga: i due anni per il reclamo all'ENAC sono spesso scambiati per il tempo che hai per chiedere i soldi. Non lo sono. Sono il tempo per rivolgerti all'organismo nazionale, che peraltro non è sempre l'ENAC: la competenza è del paese da cui sei partito, quindi se il volo è decollato da Barcellona l'ufficio da cui passare è quello spagnolo. [Come funziona quando la compagnia dice no](/tabellone/compagnia-dice-no-cosa-puoi-fare).",
     },
 
-    { tipo: "h2", testo: "La riforma europea in arrivo" },
+    { tipo: "h2", testo: "La riforma europea: il termine diventa uno solo" },
     {
       tipo: "p",
       testo:
-        "Nel luglio 2026 il Parlamento europeo ha adottato la propria posizione respingendo l'innalzamento della soglia a 4 ore; il testo non è ancora applicabile e fino ad allora valgono le regole attuali. Fra le novità discusse c'è anche un termine unico europeo per presentare la domanda, che oggi manca: sarebbe la fine del pasticcio italiano delle due tesi.",
+        "Nel luglio 2026 la revisione del Regolamento è stata approvata: il Parlamento europeo il 7 luglio, il Consiglio il 13. La soglia delle tre ore è rimasta e gli importi non cambiano, ma arriva **un termine unico europeo di nove mesi** dalla data del disservizio per presentare la domanda. È la fine del pasticcio italiano delle due tesi.",
     },
     {
       tipo: "p",
       testo:
-        "La durata esatta di quel termine, però, non è confermata, e finché non lo è non la scriviamo. Quello che si può dire fin d'ora è la direzione: un termine unico e scritto significa una finestra che si chiude in modo prevedibile, non una che si allunga.",
+        "Le nuove regole si applicheranno dall'estate del 2027, quindi al tuo volo di oggi non si applicano. Ma la direzione va letta bene: la finestra diventa prevedibile e più corta, non più lunga. [Cosa cambia con la riforma, punto per punto](/tabellone/riforma-261-2027-cosa-cambia).",
     },
 
     { tipo: "h2", testo: "Perché il nostro check si ferma a 12 mesi" },
@@ -236,7 +236,7 @@ export const ARTICOLO: Articolo = {
         {
           domanda: "La riforma europea allungherà i tempi?",
           risposta:
-            "Non è detto. Fra le novità discusse c'è un termine unico europeo per presentare la domanda, ma la durata esatta non è confermata e il testo non è ancora applicabile. Fino ad allora valgono le regole attuali, cioè quelle di ogni singolo Stato.",
+            "No, li rende uguali per tutti: la revisione approvata a luglio 2026 introduce un termine unico di nove mesi dalla data del disservizio. Si applica dall'estate 2027, quindi fino ad allora valgono le regole attuali di ogni singolo Stato.",
         },
         {
           domanda: "Se sono fuori termine, mi spetta almeno qualcos'altro?",

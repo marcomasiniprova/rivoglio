@@ -43,11 +43,44 @@ export default function PaginaGiudiceDiPace() {
         Questa pagina ti dice com&apos;è fatta, senza girarci intorno.
       </p>
 
+      <h2>Prima del giudice c&apos;è un passaggio gratuito, e non è facoltativo</h2>
       <p>
-        <strong>Prima cosa, la più importante:</strong> non ti serve per forza un avvocato. Per le
-        cause di valore contenuto il giudice di pace ammette di stare in giudizio di persona, ed è
-        esattamente il caso di una compensazione da 250, 400 o 600 euro. La maggior parte delle
-        persone che arriva qui non lo sa, e per questo si ferma.
+        Nel trasporto è previsto un <strong>tentativo di conciliazione</strong> prima di andare in
+        causa. In Italia lo gestisce l&apos;Autorità di regolazione dei trasporti sulla piattaforma
+        ConciliaWeb: si accede con SPID, non costa niente e i casi del Regolamento CE 261/2004 ci
+        rientrano. Le compagnie lo conoscono bene: Ryanair, per dire, lo spiega sul proprio centro
+        assistenza.
+      </p>
+      <p>
+        Due motivi per farlo comunque, anche se pensi già alla causa. Il primo è che spesso finisce
+        lì: è un tavolo dove si tratta di soldi, e per la compagnia chiudere costa meno che
+        difendersi. Il secondo è pratico:{" "}
+        <strong>
+          chi va dal giudice senza aver nemmeno provato la conciliazione rischia di vedersi
+          rimandare indietro
+        </strong>{" "}
+        e di aver buttato il contributo unificato.
+      </p>
+      <p>
+        Serve che tu abbia già scritto alla compagnia e che siano passati 30 giorni senza risposta,
+        oppure che la risposta sia arrivata e non ti soddisfi. La domanda va presentata entro un
+        anno da quel reclamo:{" "}
+        <a href="https://www.autorita-trasporti.it/conciliaweb/" target="_blank" rel="noopener noreferrer">
+          ConciliaWeb, il servizio conciliazioni dell&apos;Autorità di regolazione dei trasporti
+        </a>
+        . Se il volo partiva da un altro paese dell&apos;Unione, l&apos;equivalente gratuito è il{" "}
+        <a href="https://ecc-netitalia.it/" target="_blank" rel="noopener noreferrer">
+          Centro Europeo Consumatori
+        </a>
+        .
+      </p>
+
+      <h2>Al giudice di pace non ti serve per forza un avvocato</h2>
+      <p>
+        È la cosa che quasi nessuno sa, ed è il motivo per cui tanti si fermano:{" "}
+        <strong>non ti serve per forza un avvocato</strong>. Per le cause di valore contenuto il
+        giudice di pace ammette di stare in giudizio di persona, ed è esattamente il caso di una
+        compensazione da 250, 400 o 600 euro.
       </p>
 
       <h2>Quanto costa</h2>
@@ -93,6 +126,7 @@ export default function PaginaGiudiceDiPace() {
         <li>il sollecito, con la data;</li>
         <li>la risposta della compagnia, se è arrivata;</li>
         <li>la segnalazione all&apos;ente nazionale e la sua eventuale risposta;</li>
+        <li>l&apos;esito del tentativo di conciliazione, se lo hai già fatto;</li>
         <li>la prova del ritardo: gli orari previsto ed effettivo del volo.</li>
       </ul>
       <p>
@@ -143,6 +177,12 @@ export default function PaginaGiudiceDiPace() {
           Testo unico delle spese di giustizia, d.P.R. 30 maggio 2002 n. 115. Foro competente per
           il trasporto aereo: giurisprudenza della Corte di giustizia dell&apos;Unione europea sulla
           scelta fra luogo di partenza e luogo di arrivo.
+        </p>
+        <p>
+          Conciliazione: Autorità di regolazione dei trasporti, servizio conciliazioni e piattaforma
+          ConciliaWeb, con le relative FAQ sui tempi e il vademecum. Che le compagnie la usino è
+          verificabile sul centro assistenza Ryanair, che le dedica una sezione. Assistenza
+          transfrontaliera gratuita: rete ECC-Net, Centro Europeo Consumatori Italia.
         </p>
         <p>
           <strong>Gli importi non sono scritti in questa pagina di proposito</strong>: cambiano nel

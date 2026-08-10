@@ -68,20 +68,21 @@ test.describe("Il Tabellone: la redazione", () => {
     expect(sparse, `immagini sparse in public/: ${sparse.join(", ")}`).toEqual([]);
   });
 
-  test("ci sono dieci articoli, con slug e titoli unici", () => {
-    expect(ARTICOLI.length).toBe(10);
+  test("ci sono undici articoli, con slug e titoli unici", () => {
+    /* Undici dal 10/08: il pezzo sulla riforma del 2027 (giro #48). */
+    expect(ARTICOLI.length).toBe(11);
     expect(SLUG.size).toBe(ARTICOLI.length);
     expect(new Set(ARTICOLI.map((a) => a.titolo)).size).toBe(ARTICOLI.length);
   });
 
-  test("il mix è quello deciso: 2 pilastri, 2 di emergenza, 2 sui dati, 4 verticali", () => {
+  test("il mix è quello deciso: 2 pilastri, 2 di emergenza, 2 sui dati, 5 verticali", () => {
     const conto = (t: string) => ARTICOLI.filter((a) => a.tipo === t).length;
     expect(conto("pilastro")).toBe(2);
     expect(conto("emergenza")).toBe(2);
     expect(conto("dati")).toBe(2);
     /* I verticali sono i pezzi che intercettano una ricerca sola: tre per
-       compagnia e uno per situazione. */
-    expect(conto("compagnia") + conto("situazione")).toBe(4);
+       compagnia e due per situazione (prescrizione e riforma). */
+    expect(conto("compagnia") + conto("situazione")).toBe(5);
   });
 
   for (const a of ARTICOLI) {
@@ -166,6 +167,7 @@ test.describe("Il Tabellone: la redazione", () => {
                 "/cookie",
                 "/sciopero-aerei",
                 "/aeroporto",
+                "/giudice-di-pace",
               ].some(
                 (p) => dove === p || dove.startsWith(`${p}#`) || dove.startsWith("/#"),
               ),

@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-10 (giro #47: LA SVIZZERA VERIFICATA, non più un
+**Aggiornato:** 2026-08-10 (giro #48: IL QUARTO COLPO, cioè quello che i
+soldi li muove davvero, più la riforma del 2027 scritta e messa in
+calendario · giro #47: LA SVIZZERA VERIFICATA, non più un
 punto interrogativo · giro #46: IL GIRO DA UTENTE CRITICO, tre
 difetti veri trovati e chiusi · il titolo della hero ha il font del
 Tabellone · giro #45: IL DOPO-LETTERA, cioè il secondo e
@@ -46,6 +48,81 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #48 (10/08): IL QUARTO COLPO. Perché la pratica finiva con un
+  documento che, per sua natura, i soldi non li muove.**
+  - 🔴 **LA SEGNALAZIONE ALL'ENTE NON PAGA, E LO SAPEVAMO.** Lo scriviamo
+    da giorni al passeggero, correttamente: l'ente accerta la violazione e
+    può sanzionare la compagnia, ma non liquida la compensazione. Lo dice
+    la Commissione stessa nel PDF che Valerio ha aperto. Il problema è che
+    quello era **l'ultimo foglio della pratica**: il cliente arrivava in
+    fondo a tutto quello che aveva comprato e il bonifico non l'aveva
+    ancora visto.
+  - **ADESSO C'È IL BINARIO CHE PAGA: LA CONCILIAZIONE**
+    (`lib/lettera/conciliazione.ts`). In Italia la gestisce l'**Autorità
+    di regolazione dei trasporti** sulla piattaforma **ConciliaWeb**: è
+    gratis, si fa da casa con SPID, e i casi del Regolamento CE 261/2004
+    ci rientrano per espressa previsione. Le compagnie ci si siedono
+    perché è un passaggio previsto prima della causa: **Ryanair gli dedica
+    una sezione del proprio centro assistenza**, che è la prova migliore
+    che il canale funziona. Partenza da un altro paese: la strada gratuita
+    è la rete dei centri europei consumatori (ECC-Net), e non nominiamo un
+    organismo che per quel paese non abbiamo verificato.
+  - 🔴 **E APRE PRIMA DEL NOSTRO SOLLECITO, non dopo.** Servono il reclamo
+    già mandato e poi 30 giorni di silenzio, oppure una risposta che non
+    soddisfa. **Un no dichiarato apre subito.** Il nostro sollecito parte
+    al giorno 42: allineare i due numeri "per coerenza" costerebbe al
+    cliente due settimane di strada gratuita, e una prova lo vieta.
+    ⚠️ La domanda va presentata **entro un anno dal reclamo**: è più corto
+    dei due anni per fare causa, e chi non lo sa perde il canale migliore
+    senza accorgersene.
+  - 🔴 **/giudice-di-pace MANDAVA LA GENTE A SBATTERE.** Diceva "resta una
+    strada sola: il giudice", ma nel trasporto il tentativo di
+    conciliazione viene prima, ed è previsto come passaggio: chi deposita
+    senza averlo nemmeno provato rischia di vedersi rimandare indietro e
+    di aver buttato il contributo unificato. Adesso la pagina lo dice in
+    cima, col link, e la sezione sull'avvocato resta dov'era.
+  - **LE REPLICHE HANNO LE DUE GAMBE DELL'ART. 5 PAR. 3**
+    (`ONERE_DELLA_PROVA`). Prima le repliche dicevano che il no non regge;
+    adesso dicono anche **perché non tocca a te dimostrarlo**, e la cosa
+    che le compagnie contano che tu non sappia: anche quando la
+    circostanza è davvero eccezionale, l'esonero non scatta da solo, serve
+    **anche** la prova di aver preso tutte le misure ragionevoli,
+    riprotezione su altri vettori compresa. Sono due gambe, e la seconda è
+    quella che spesso non hanno. Il paragrafo è scritto una volta sola ed
+    entra nelle cinque repliche dove la compagnia invoca una circostanza:
+    sulle altre tre (ritardo contestato, voucher, silenzio) sarebbe fuori
+    luogo, e una prova lo tiene fermo.
+  - **"NON COSTITUISCE PARERE LEGALE" IN FONDO A TUTTI E TRE I FOGLI.**
+    Non è una formula di cortesia: ci tiene fuori dall'esercizio abusivo
+    della professione, e non toglie forza alla lettera perché la forza sta
+    negli orari certificati e nelle sentenze pubbliche, non nel farsi
+    passare per avvocati. Una prova controlla che nessuno la tolga da
+    nessuno dei tre.
+  - **L'ARTICOLO SULLA RIFORMA DEL 2027 È ONLINE**
+    (`/tabellone/riforma-261-2027-cosa-cambia`, in evidenza). È la parola
+    chiave che tutti cercheranno da qui al 2027 e in italiano non l'ha
+    scritta bene quasi nessuno: in giro si trovano ancora titoli tipo
+    "addio ai rimborsi", che è falso, e articoli che raccontano il modulo
+    precompilato e il pagamento automatico come se fossero legge, quando
+    dal testo finale sono stati tolti. Il pezzo dice **quali numeri
+    vengono dai comunicati e non dall'articolato in Gazzetta**: è la
+    stessa trasparenza che vendiamo, applicata a noi.
+    ⚠️ Corretto anche il pezzo sulla prescrizione, che diceva ancora "il
+    testo non è ancora applicabile": era vero il 9/08, non più il 10.
+  - **LE DUE SCADENZE DEL 2027 NON SONO PIÙ UNA NOTA IN UN FILE.**
+    `prove/quarto-colpo.spec.ts` porta una **sveglia**: dal 1° maggio 2027
+    la suite comincia a fallire se il retroattivo promette ancora "l'anno
+    scorso" (il termine diventa 9 mesi) e se il sollecito è ancora a 42
+    giorni (le compagnie ne avranno 30 per legge, quindi il giorno giusto
+    per battere diventa il 31). Si spegne da sola appena le due modifiche
+    sono fatte. Un ARRETRATI si può non leggere, una suite rossa no.
+  - ⚠️ **Le fonti della conciliazione vanno rilette dal PC di Valerio**:
+    da qui `autorita-trasporti.it` è bloccato dal proxy, quindi i numeri
+    (gratis, un anno, 30 giorni) vengono dagli estratti dei motori di
+    ricerca. In ARRETRATI, voce Q.
+  - Prove: **832 verdi** (restano le 2 note dell'Osservatorio). Le 4
+    saltate sono la sveglia del 2027, che dorme fino al 1° maggio e non
+    è un buco: è il suo mestiere.
 - **GIRO #47 (10/08): LA SVIZZERA NON È PIÙ UN PUNTO INTERROGATIVO.**
   - Dal giro #37 i voli svizzeri uscivano incerti perché non avevamo una
     fonte sotto mano. Adesso ce l'abbiamo, e sono **due indipendenti**: il
