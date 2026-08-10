@@ -18,7 +18,7 @@
 
 import { ambitoCE261, vettoreConLicenzaUE, zonaDiScalo } from "./territorio";
 
-export const VERSIONE_REGOLE = "2026.08.7";
+export const VERSIONE_REGOLE = "2026.08.8";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
 const SOGLIA_MINUTI = 180;

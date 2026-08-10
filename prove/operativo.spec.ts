@@ -119,10 +119,14 @@ test.describe("Licenza del vettore — i grandi extra UE si riconoscono", () => 
     expect(vettoreConLicenzaUE("AZ")).toBe(true);
   });
 
-  test("la Svizzera resta un punto interrogativo, non un no", () => {
-    /* Applica il Regolamento per accordo bilaterale, non come Stato
-       membro: senza fonte verificata non ci sbilanciamo. */
-    expect(vettoreConLicenzaUE("LX")).toBeNull();
+  test("la licenza svizzera vale come comunitaria", () => {
+    /* Verificato il 10/08: l'allegato dell'Accordo sul trasporto aereo
+       dice che "vettore comunitario" comprende chi ha la sede principale
+       in Svizzera, e l'ENAC elenca la Svizzera insieme a Norvegia e
+       Islanda. Serve al ramo b): New York → Roma con Swiss è coperto.
+       ⚠️ Quello che RESTA incerto sono le tratte fra Svizzera e paesi
+       terzi, e lo decide il cancello territoriale, non questa funzione. */
+    expect(vettoreConLicenzaUE("LX")).toBe(true);
   });
 
   test("una compagnia che non conosciamo non si indovina", () => {

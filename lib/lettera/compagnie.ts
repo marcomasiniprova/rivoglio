@@ -51,8 +51,6 @@ export type CanaleCompagnia = {
    * inviati direttamente dal passeggero. null = nessuna policy trovata.
    */
   accettaIntermediari: boolean | null;
-  /** L'autorità nazionale (NEB) per l'escalation, col riferimento italiano. */
-  autoritaNazionale: string | null;
   /** true solo se l'URL del canale è sul dominio ufficiale (vedi sopra). */
   verificato: boolean;
   /** Giorno della verifica, formato ISO. */
@@ -80,7 +78,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: null,
     indirizzoPostale: "Ryanair DAC, Airside Business Park, Swords, Co. Dublin, Irlanda",
     accettaIntermediari: false,
-    autoritaNazionale: "IAA, Irish Aviation Authority (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -103,8 +100,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "easyJet Airline Company Limited, Hangar 89, London Luton Airport, Luton, Bedfordshire LU2 9PF, Regno Unito",
     accettaIntermediari: false,
-    autoritaNazionale:
-      "UK CAA; i voli UE sono di easyJet Europe (Vienna), NEB austriaco apf (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -124,8 +119,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: null,
     indirizzoPostale: "Wizz Air Hungary Zrt., Kőér utca 2/A, 1103 Budapest, Ungheria",
     accettaIntermediari: false,
-    autoritaNazionale:
-      "NKFH, autorità ungherese di tutela dei consumatori (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -144,7 +137,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: "italiatrasportoaereo@legalmail.it",
     indirizzoPostale: null,
     accettaIntermediari: null,
-    autoritaNazionale: "ENAC",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -164,7 +156,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: "aeroitalia@pec.it",
     indirizzoPostale: "Aeroitalia S.p.A., Via Andrea Mantegna 8, 00054 Fiumicino (RM)",
     accettaIntermediari: null,
-    autoritaNazionale: "ENAC",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -185,7 +176,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "Vueling Airlines, S.A. (Departamento Legal), Parque Empresarial Mas Blau II, Plaza Pla de l'Estany 5, 08820 El Prat de Llobregat (Barcellona), Spagna",
     accettaIntermediari: null,
-    autoritaNazionale: "AESA, Agencia Estatal de Seguridad Aérea (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -206,7 +196,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "Volotea, S.L., Aeropuerto de Asturias, Santiago del Monte, 33459 Castrillón (Asturias), Spagna",
     accettaIntermediari: false,
-    autoritaNazionale: "AESA, Agencia Estatal de Seguridad Aérea (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -228,7 +217,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: null,
     indirizzoPostale: "Deutsche Lufthansa AG, Venloer Str. 151-153, 50672 Colonia, Germania",
     accettaIntermediari: null,
-    autoritaNazionale: "LBA, Luftfahrt-Bundesamt (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -249,8 +237,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "Société Air France, 45 rue de Paris, 93290 Tremblay-en-France, Francia (sede legale)",
     accettaIntermediari: null,
-    autoritaNazionale:
-      "DGAC, Direction Générale de l'Aviation Civile (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -271,8 +257,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "Koninklijke Luchtvaart Maatschappij N.V., Amsterdamseweg 55, 1182 GP Amstelveen, Paesi Bassi (sede legale)",
     accettaIntermediari: null,
-    autoritaNazionale:
-      "ILT, Inspectie Leefomgeving en Transport (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -293,7 +277,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "British Airways Customer Relations, EU Compensation Claims, PO Box 1126, Uxbridge UB8 9XS, Regno Unito",
     accettaIntermediari: null,
-    autoritaNazionale: "UK CAA (post Brexit vige la UK261; per voli dall'Italia il NEB è ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -314,7 +297,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "Iberia L.A.E., S.A. Operadora, Calle Martínez Villergas 49, 28027 Madrid, Spagna (sede legale)",
     accettaIntermediari: null,
-    autoritaNazionale: "AESA, Agencia Estatal de Seguridad Aérea (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -336,8 +318,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: null,
     indirizzoPostale: "Norwegian Air Shuttle ASA, PO Box 115, NO-1330 Fornebu, Norvegia",
     accettaIntermediari: false,
-    autoritaNazionale:
-      "Luftfartstilsynet (CAA Norway); reclami individuali via Transportklagenemnda (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -359,8 +339,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: null,
     indirizzoPostale: "SWISS Customer Service, P.O. Box, CH-4002 Basilea, Svizzera",
     accettaIntermediari: null,
-    autoritaNazionale:
-      "UFAC/FOCA, Ufficio federale dell'aviazione civile (Reg. 261/2004 applicato via accordo CH-UE; per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -381,8 +359,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "Austrian Airlines Feedback Management, P.O. Box 33, A-1300 Vienna Airport, Austria",
     accettaIntermediari: null,
-    autoritaNazionale:
-      "apf, Agentur für Passagier- und Fahrgastrechte (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -405,8 +381,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "Turkish Airlines General Management Building, Istanbul Airport, Yeşilköy 34149, Bakırköy, Istanbul, Turchia",
     accettaIntermediari: null,
-    autoritaNazionale:
-      "SHGM (aviazione civile turca); per i voli in partenza dalla UE il NEB dello stato di partenza (Italia: ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -426,8 +400,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: null,
     indirizzoPostale: "Customer Affairs Department, Emirates, P.O. Box 686, Dubai, Emirati Arabi Uniti",
     accettaIntermediari: null,
-    autoritaNazionale:
-      "GCAA (Emirati Arabi Uniti); per i voli in partenza dalla UE il NEB dello stato di partenza (Italia: ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -447,8 +419,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: null,
     indirizzoPostale: "Qatar Airways Tower, P.O. Box 22550, Doha, Qatar",
     accettaIntermediari: null,
-    autoritaNazionale:
-      "QCAA (Qatar); per i voli in partenza dalla UE il NEB dello stato di partenza (Italia: ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -469,7 +439,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     indirizzoPostale:
       "Air Europa Líneas Aéreas, S.A.U., Ctra. Arenal-Llucmajor Km 21,5, 07620 Llucmajor, Baleari, Spagna (sede legale)",
     accettaIntermediari: null,
-    autoritaNazionale: "AESA, Agencia Estatal de Seguridad Aérea (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
@@ -489,8 +458,6 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     pec: null,
     indirizzoPostale: "Transavia Airlines C.V., Postbus 7777, 1118 ZM Schiphol Airport, Paesi Bassi",
     accettaIntermediari: null,
-    autoritaNazionale:
-      "ILT, Inspectie Leefomgeving en Transport (per voli dall'Italia anche ENAC)",
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:

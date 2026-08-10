@@ -8,6 +8,8 @@ import {
 } from "../lib/pratiche/rifiuto";
 import { generaSegnalazioneEnte, generaSollecito } from "../lib/lettera/genera";
 import type { FattoVolo, Verdetto } from "../lib/regole/eu261";
+import { ambitoCE261, zonaDiScalo } from "../lib/regole/territorio";
+import { COMPAGNIE } from "../lib/lettera/compagnie";
 
 /**
  * IL DOPO-LETTERA.
@@ -246,5 +248,54 @@ test.describe("La guida al giudice di pace", () => {
     const testo = await page.locator("main").innerText();
     expect(testo).not.toContain("—");
     expect(testo.toLowerCase()).not.toContain("hai diritto a");
+  });
+});
+
+test.describe("La Svizzera, verificata il 10/08", () => {
+  test("da uno scalo svizzero verso l'Unione è coperto", () => {
+    /* L'Accordo bilaterale sul trasporto aereo inserisce il Regolamento
+       nel suo allegato (Decisione 1/2006), e le disposizioni introduttive
+       dicono che i riferimenti agli Stati membri valgono anche per la
+       Svizzera. Zurigo → Roma è come Vienna → Roma. */
+    expect(ambitoCE261({ iata: "ZRH", paese: "CH" }, { iata: "FCO", paese: "IT" }, true).dentro)
+      .toBe(true);
+  });
+
+  test("verso un paese terzo resta incerto, e non è nostra prudenza", () => {
+    /* Su queste tratte le compagnie svizzere, i tribunali svizzeri e
+       l'UFAC non applicano le regole sulla compensazione. */
+    const e = ambitoCE261({ iata: "ZRH", paese: "CH" }, { iata: "JFK", paese: "US" }, true);
+    expect(e.dentro).toBe(false);
+    if (!e.dentro) expect(e.certo).toBe(false);
+  });
+
+  test("da un paese terzo verso la Svizzera, stesso limite al contrario", () => {
+    const e = ambitoCE261({ iata: "JFK", paese: "US" }, { iata: "ZRH", paese: "CH" }, true);
+    expect(e.dentro).toBe(false);
+    if (!e.dentro) expect(e.certo).toBe(false);
+  });
+
+  test("dall'Unione verso la Svizzera è coperto dalla lettera a), come sempre", () => {
+    expect(ambitoCE261({ iata: "FCO", paese: "IT" }, { iata: "ZRH", paese: "CH" }, null).dentro)
+      .toBe(true);
+  });
+
+  test("la licenza svizzera vale come comunitaria: New York → Roma con Swiss è coperto", () => {
+    expect(ambitoCE261({ iata: "JFK", paese: "US" }, { iata: "FCO", paese: "IT" }, true).dentro)
+      .toBe(true);
+  });
+
+  test("l'archivio riconosce Zurigo come Svizzera anche senza il paese dal fornitore", () => {
+    expect(zonaDiScalo("ZRH")).toBe("svizzera");
+  });
+});
+
+test.describe("Il campo morto è sparito", () => {
+  test("nessuna compagnia dichiara più un'autorità nazionale sua", () => {
+    /* Era agganciato alla COMPAGNIA, ma la competenza è dello Stato
+       dell'aeroporto di PARTENZA (art. 16 par. 1). Non lo usava nessuno:
+       il rischio era che un domani qualcuno lo ripescasse credendolo
+       buono e mandasse le lettere all'ufficio sbagliato. */
+    expect(JSON.stringify(COMPAGNIE)).not.toContain("autoritaNazionale");
   });
 });

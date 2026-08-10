@@ -41,11 +41,11 @@ const SCALI = aeroporti as Record<string, RigaArchivio | undefined>;
  * di esercizio vale come "vettore comunitario" ai sensi dell'art. 2, lett. c.
  * Serve SOLO al ramo b) (si parte da fuori e si arriva in Europa).
  *
- * ⚠️ La Svizzera NON è qui, ed è una scelta prudente: applica il regolamento
- * per accordo bilaterale, non come Stato membro, e non ho una fonte
- * verificata sotto mano. Il risultato è che un volo svizzero in arrivo da un
- * paese terzo resta "incerto" invece che idoneo: sbagliamo dalla parte di
- * chi non paga, come sempre. È segnato in ARRETRATI.
+ * ⚠️ La Svizzera non è in questa lista ma vale lo stesso, e la aggiunge
+ * `vettoreConLicenzaUE` qui sotto: l'allegato dell'Accordo dice che
+ * "vettore comunitario" comprende chi ha la sede principale in Svizzera.
+ * Sta fuori dall'elenco perché la Svizzera ha anche un limite suo, che
+ * riguarda gli SCALI e non le licenze (vedi più giù).
  */
 const LICENZA_UE = new Set<string>([
   "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR",
@@ -67,11 +67,12 @@ export function vettoreConLicenzaUE(
   const paese = c?.paese ?? paeseVettore(vettoreONumero);
   /* Compagnia che non conosciamo: non si indovina, il caso resta incerto. */
   if (!paese) return null;
-  /* La Svizzera resta un punto interrogativo dichiarato: applica il
-     Regolamento per accordo bilaterale e non come Stato membro. Dire di
-     no sarebbe una risposta sbagliata data con sicurezza. */
   if (PAESI_INCERTI_ISO.has(paese)) return null;
-  return LICENZA_UE.has(paese);
+  /* La licenza svizzera vale come comunitaria: l'allegato dell'Accordo
+     dice che "vettore comunitario" comprende chi ha la sede principale in
+     Svizzera, e l'ENAC elenca la Svizzera insieme a Norvegia e Islanda.
+     Serve al ramo b): paese terzo → Unione con Swiss è coperto. */
+  return LICENZA_UE.has(paese) || SVIZZERA_ISO.has(paese);
 }
 
 /**
@@ -121,18 +122,42 @@ const SPAZIO_UE_ISO = new Set<string>([
 ]);
 
 /**
- * I casi su cui NON ci sbilanciamo, in nessuna delle due direzioni.
+ * LA SVIZZERA, verificata il 10/08 e non più un punto interrogativo.
  *
- * La Svizzera applica il Regolamento per accordo bilaterale e non come
- * Stato membro: chiamarla "paese terzo" produrrebbe un no secco su casi
- * che probabilmente valgono, chiamarla Unione sarebbe una nostra
- * invenzione. Finché non c'è una fonte verificata sotto mano, quei voli
- * escono INCERTI, che è la nostra direzione di errore di sempre.
- * Saint-Martin sta qui per lo stesso motivo: è un caso di confine fra
- * regione ultraperiferica e territorio d'oltremare.
+ * Il Regolamento si applica in Svizzera per l'Accordo bilaterale sul
+ * trasporto aereo fra Unione e Confederazione: la Decisione 1/2006 del
+ * Comitato misto lo ha inserito nell'allegato, e le disposizioni
+ * introduttive dell'allegato dicono che i riferimenti agli Stati membri
+ * valgono anche per la Svizzera e che "vettore comunitario" comprende i
+ * vettori con sede principale in Svizzera.
+ *
+ * ⚠️ MA NON OVUNQUE, e questa è la parte che conta per noi. Sulle tratte
+ * fra la Svizzera e un paese TERZO (in un verso o nell'altro) le
+ * compagnie svizzere, i tribunali svizzeri e l'UFAC non applicano le
+ * regole sulla compensazione. Lì il caso resta incerto: dire di sì
+ * sarebbe un falso positivo, dire di no toglierebbe casi che valgono.
+ *
+ * Quindi, in pratica:
+ *   Svizzera → Unione (o Svizzera)  = coperto
+ *   Unione   → Svizzera             = coperto già dalla lettera a)
+ *   Svizzera ↔ paese terzo          = INCERTO
+ *
+ * Fonti (lette il 10/08): ENAC, FAQ diritti del passeggero, che elenca
+ * Svizzera insieme a Norvegia e Islanda sia come destinazione coperta sia
+ * come licenza che vale come comunitaria; Lexology, "Air passenger rights
+ * in Switzerland", per l'Accordo, la Decisione 1/2006 e per il limite
+ * sulle tratte da e per i paesi terzi.
  */
-const PAESI_INCERTI_ISO = new Set<string>(["CH", "MF"]);
-const PAESI_INCERTI_NOME = new Set<string>(["Switzerland"]);
+const SVIZZERA_ISO = new Set<string>(["CH"]);
+const SVIZZERA_NOME = new Set<string>(["Switzerland"]);
+
+/**
+ * I casi su cui NON ci sbilanciamo, in nessuna delle due direzioni.
+ * Saint-Martin è un caso di confine fra regione ultraperiferica e
+ * territorio d'oltremare: senza una fonte verificata resta incerto.
+ */
+const PAESI_INCERTI_ISO = new Set<string>(["MF"]);
+const PAESI_INCERTI_NOME = new Set<string>([]);
 
 /**
  * I prefissi ICAO che valgono come "siamo in Europa".
@@ -178,7 +203,7 @@ const ICAO_UE = new Set<string>([
   "BI", // Islanda
 ]);
 
-export type ZonaScalo = "ue" | "terzo" | "sconosciuto";
+export type ZonaScalo = "ue" | "svizzera" | "terzo" | "sconosciuto";
 
 /** Quello che sappiamo di uno scalo. Più campi arrivano, meglio si decide. */
 export type Scalo = {
@@ -212,6 +237,7 @@ export function zonaDiScalo(
   const iso = (scalo.paese ?? "").trim().toUpperCase();
   if (/^[A-Z]{2}$/.test(iso)) {
     if (PAESI_INCERTI_ISO.has(iso)) return "sconosciuto";
+    if (SVIZZERA_ISO.has(iso)) return "svizzera";
     return SPAZIO_UE_ISO.has(iso) ? "ue" : "terzo";
   }
 
@@ -226,10 +252,12 @@ export function zonaDiScalo(
   const isoArchivio = (riga?.iso ?? "").trim().toUpperCase();
   if (/^[A-Z]{2}$/.test(isoArchivio)) {
     if (PAESI_INCERTI_ISO.has(isoArchivio)) return "sconosciuto";
+    if (SVIZZERA_ISO.has(isoArchivio)) return "svizzera";
     return SPAZIO_UE_ISO.has(isoArchivio) ? "ue" : "terzo";
   }
   if (riga?.paese) {
     if (PAESI_INCERTI_NOME.has(riga.paese)) return "sconosciuto";
+    if (SVIZZERA_NOME.has(riga.paese)) return "svizzera";
     return SPAZIO_UE.has(riga.paese) ? "ue" : "terzo";
   }
 
@@ -272,6 +300,35 @@ export function ambitoCE261(
 
   // a) si parte dall'Europa: coperto sempre, con qualsiasi compagnia.
   if (partenza === "ue") return { dentro: true };
+
+  /* LA SVIZZERA, che non è Unione ma nemmeno un paese terzo qualsiasi.
+     Si parte da uno scalo svizzero: coperto se si resta dentro lo spazio
+     dove l'Accordo vale (Unione, SEE, Svizzera stessa). Verso un paese
+     terzo invece no: lì le autorità svizzere non applicano le regole
+     sulla compensazione, e un sì sarebbe un falso positivo. */
+  if (partenza === "svizzera") {
+    if (arrivo === "ue" || arrivo === "svizzera") return { dentro: true };
+    if (arrivo === "terzo") {
+      return {
+        dentro: false,
+        certo: false,
+        motivo:
+          "Questo volo parte dalla Svizzera e arriva fuori dall'Unione Europea. La Svizzera applica il Regolamento per un accordo con l'Unione, ma su questa tratta le autorità svizzere non riconoscono la compensazione: il caso resta incerto e non paghi niente.",
+      };
+    }
+  }
+
+  /* Si ARRIVA in Svizzera da un paese terzo: stesso limite, al contrario.
+     Se invece si parte dall'Unione il caso è già chiuso qui sopra dalla
+     lettera a), e questa riga non ci arriva nemmeno. */
+  if (arrivo === "svizzera" && partenza === "terzo") {
+    return {
+      dentro: false,
+      certo: false,
+      motivo:
+        "Questo volo parte da fuori dall'Unione Europea e arriva in Svizzera. La Svizzera applica il Regolamento per un accordo con l'Unione, ma su questa tratta le autorità svizzere non riconoscono la compensazione: il caso resta incerto e non paghi niente.",
+    };
+  }
 
   /* LA SCORCIATOIA CHE VALE VENDITE (trovata il 9/08).
      Se si ATTERRA in Europa e chi ha operato il volo ha licenza europea,

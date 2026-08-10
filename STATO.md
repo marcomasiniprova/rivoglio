@@ -1,6 +1,7 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-10 (giro #46: IL GIRO DA UTENTE CRITICO, tre
+**Aggiornato:** 2026-08-10 (giro #47: LA SVIZZERA VERIFICATA, non più un
+punto interrogativo · giro #46: IL GIRO DA UTENTE CRITICO, tre
 difetti veri trovati e chiusi · il titolo della hero ha il font del
 Tabellone · giro #45: IL DOPO-LETTERA, cioè il secondo e
 il terzo colpo quando la compagnia dice no · ramo unito a main · giro #44: IL MOTORE CHE NON LASCIA PIÙ NESSUNO
@@ -45,6 +46,46 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #47 (10/08): LA SVIZZERA NON È PIÙ UN PUNTO INTERROGATIVO.**
+  - Dal giro #37 i voli svizzeri uscivano incerti perché non avevamo una
+    fonte sotto mano. Adesso ce l'abbiamo, e sono **due indipendenti**: il
+    Regolamento si applica in Svizzera per l'**Accordo bilaterale sul
+    trasporto aereo** (Decisione 1/2006 del Comitato misto, che lo
+    inserisce nell'allegato; le disposizioni introduttive dicono che i
+    riferimenti agli Stati membri valgono anche per la Svizzera e che
+    "vettore comunitario" comprende chi ha sede principale lì). L'**ENAC**,
+    cioè l'ente a cui scriverebbe un passeggero italiano, elenca la
+    Svizzera insieme a Norvegia e Islanda.
+  - 🔴 **MA NON OVUNQUE, e questa è la parte che conta.** Sulle tratte fra
+    Svizzera e paesi TERZI (in un verso o nell'altro) le compagnie
+    svizzere, i tribunali svizzeri e l'UFAC **non applicano** le regole
+    sulla compensazione. Quindi:
+    - Zurigo → Roma = **coperto** (prima era incerto: vendita recuperata)
+    - Roma → Zurigo = coperto, già dalla lettera a)
+    - New York → Roma con Swiss = **coperto** (la licenza svizzera vale)
+    - Zurigo → New York e New York → Zurigo = **incerti**, e non per
+      prudenza nostra: è il limite vero dell'Accordo.
+  - **ETICHETTA DEL GOLDEN SET CAMBIATA, la terza volta in assoluto, e la
+    PRIMA nella direzione difficile** (da "non lo so" a "sì"). Va detto:
+    finora si era sempre andati verso il no. Qui la fonte c'è, è doppia, e
+    una delle due è l'ente competente per i nostri utenti. Regole alla
+    versione **2026.08.8**, golden set da 55 a **58 casi**, **58 su 58,
+    falsi positivi 0**.
+  - **IL CAMPO MORTO È SPARITO**: `autoritaNazionale` dentro
+    `compagnie.ts` era agganciato alla COMPAGNIA, ma la competenza è dello
+    Stato dell'aeroporto di PARTENZA (art. 16 par. 1). Non lo usava
+    nessuno: il rischio era che un domani qualcuno lo ripescasse
+    credendolo buono. Tolto da tutte e 20 le schede, con una prova che
+    vieta di rimetterlo.
+  - ⚠️ **I NOVE ENTI NAZIONALI MANCANTI RESTANO MANCANTI** (Croazia,
+    Slovenia, Slovacchia, Romania, Cipro, Estonia, Lettonia, Lituania,
+    Liechtenstein). Da qui l'elenco ufficiale della Commissione, il PDF
+    dei NEB e i siti nazionali sono tutti bloccati dal proxy: **non li
+    scrivo a memoria**, perché mandare una persona all'ufficio sbagliato è
+    peggio che dirle di cercarlo. La lettera per quei paesi continua a
+    nominare il paese e a rimandare all'elenco ufficiale, che è il
+    comportamento giusto. In ARRETRATI c'è l'indirizzo da aprire.
+  - Prove: **776 verdi** (restano le 2 note dell'Osservatorio).
 - **GIRO #46 (10/08): IL GIRO DA UTENTE CRITICO. Sito, blog, pagine
   evento e web app provati come dieci persone normali, a 1440 e a 390.**
   - 🔴 **CHI SCRIVEVA "ROMA" VEDEVA L'AEROPORTO SBAGLIATO SCRITTO GIUSTO.**

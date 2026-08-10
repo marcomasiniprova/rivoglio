@@ -238,20 +238,6 @@ export const CASI_ORO: Caso[] = [
     atteso: { esito: "incerto" },
   },
   {
-    /* La Svizzera resta un punto interrogativo DICHIARATO anche dal lato
-       della compagnia: Swiss in arrivo da un paese terzo non produce né
-       un sì né un no. Serve una fonte verificata, ed è in ARRETRATI. */
-    nome: "AMBITO: Swiss da New York a Zurigo: la Svizzera resta incerta",
-    fatto: conRitardo(250, {
-      voloIata: "LX15",
-      vettoreOperativo: "LX",
-      partenzaIata: "JFK",
-      arrivoIata: "ZRH",
-      kmOrtodromica: 6327,
-    }),
-    atteso: { esito: "incerto" },
-  },
-  {
     /* Qui invece il vettore extra UE lo conosciamo (Emirates è in tabella
        col paese AE): il no si può dare, ed è un no pulito. */
     nome: "AMBITO: Emirates da Dubai a Roma: vettore non europeo, fuori ambito",
@@ -367,7 +353,24 @@ export const CASI_ORO: Caso[] = [
     atteso: { esito: "incerto" },
   },
   {
-    nome: "PRUDENZA: la Svizzera resta incerta, non un no secco",
+    /* ⚠️ ETICHETTA CAMBIATA IL 10/08, ed è la TERZA volta in assoluto.
+       È anche la prima volta che si va nella direzione difficile, cioè da
+       "non lo so" a "sì": va detto e va motivato.
+
+       Prima questo caso era incerto perché non avevamo una fonte sotto
+       mano. Adesso ce l'abbiamo, e sono due indipendenti. Il Regolamento
+       si applica in Svizzera per l'Accordo bilaterale sul trasporto aereo
+       (Decisione 1/2006 del Comitato misto, che lo inserisce
+       nell'allegato); le disposizioni introduttive dell'allegato dicono
+       che i riferimenti agli Stati membri valgono anche per la Svizzera.
+       L'ENAC, cioè l'ente a cui scriverebbe un passeggero italiano,
+       elenca la Svizzera insieme a Norvegia e Islanda.
+
+       Zurigo → Roma è quindi come un Vienna → Roma: si parte da uno scalo
+       dove l'Accordo vale e si arriva nell'Unione. I casi che RESTANO
+       incerti sono quelli fra Svizzera e paesi terzi, e stanno qui sotto:
+       lì le autorità svizzere non applicano la compensazione. */
+    nome: "AMBITO: Zurigo → Roma con Swiss: la Svizzera è dentro l'Accordo",
     fatto: conRitardo(300, {
       voloIata: "LX1234",
       vettoreOperativo: "LX",
@@ -377,7 +380,54 @@ export const CASI_ORO: Caso[] = [
       arrivoPaese: "IT",
       kmOrtodromica: 690,
     }),
+    atteso: { esito: "idoneo", importo: 250 },
+  },
+  {
+    /* Il limite vero dell'Accordo, e non è una nostra prudenza: sulle
+       tratte fra Svizzera e paesi terzi le compagnie svizzere, i
+       tribunali svizzeri e l'UFAC non applicano le regole sulla
+       compensazione. Dire di sì qui sarebbe un falso positivo. */
+    nome: "AMBITO: Zurigo → New York: la Svizzera verso un paese terzo resta incerta",
+    fatto: conRitardo(300, {
+      voloIata: "LX14",
+      vettoreOperativo: "LX",
+      partenzaIata: "ZRH",
+      partenzaPaese: "CH",
+      arrivoIata: "JFK",
+      arrivoPaese: "US",
+      kmOrtodromica: 6330,
+    }),
     atteso: { esito: "incerto" },
+  },
+  {
+    /* Lo stesso limite al contrario. */
+    nome: "AMBITO: New York → Zurigo: verso la Svizzera da un paese terzo, incerto",
+    fatto: conRitardo(300, {
+      voloIata: "LX15",
+      vettoreOperativo: "LX",
+      partenzaIata: "JFK",
+      partenzaPaese: "US",
+      arrivoIata: "ZRH",
+      arrivoPaese: "CH",
+      kmOrtodromica: 6330,
+    }),
+    atteso: { esito: "incerto" },
+  },
+  {
+    /* Qui invece si arriva nell'UNIONE, e la competenza è dell'ENAC, che
+       elenca la licenza svizzera fra quelle che valgono come comunitarie
+       (art. 2 lett. c, letto attraverso l'allegato dell'Accordo). */
+    nome: "AMBITO: New York → Roma con Swiss: la licenza svizzera vale come comunitaria",
+    fatto: conRitardo(300, {
+      voloIata: "LX40",
+      vettoreOperativo: "LX",
+      partenzaIata: "JFK",
+      partenzaPaese: "US",
+      arrivoIata: "FCO",
+      arrivoPaese: "IT",
+      kmOrtodromica: 6888,
+    }),
+    atteso: { esito: "idoneo", importo: 600 },
   },
   {
     nome: "AMBITO: Canarie sono Unione Europea (Lanzarote → Bergamo): coperto",
