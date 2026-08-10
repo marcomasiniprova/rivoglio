@@ -6,7 +6,7 @@ import {
   prontoPerSollecito,
   schedaRifiuto,
 } from "../lib/pratiche/rifiuto";
-import { generaSollecito } from "../lib/lettera/genera";
+import { generaSegnalazioneEnte, generaSollecito } from "../lib/lettera/genera";
 import type { FattoVolo, Verdetto } from "../lib/regole/eu261";
 
 /**
@@ -164,5 +164,87 @@ test.describe("Quando parte il sollecito", () => {
     expect(GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE).toBeGreaterThan(
       GIORNI_PRIMA_DEL_SOLLECITO,
     );
+  });
+});
+
+test.describe("La segnalazione all'ente nazionale", () => {
+  test("la lettera cita il volo, i due invii e cosa si chiede", () => {
+    const l = generaSegnalazioneEnte(PRATICA, FATTO, IDONEO, "2026-06-10", "2026-07-25", null)!;
+    expect(l.oggetto).toContain("art. 16");
+    expect(l.corpo).toContain("FR8321");
+    expect(l.corpo).toContain("10 giugno 2026");
+    expect(l.corpo).toContain("25 luglio 2026");
+    expect(l.corpo).toContain("accerti la violazione");
+  });
+
+  test("se la compagnia ha risposto no, la segnalazione lo dice", () => {
+    const l = generaSegnalazioneEnte(PRATICA, FATTO, IDONEO, "2026-06-10", "2026-07-25", "meteo")!;
+    expect(l.corpo).toContain("ha respinto la richiesta");
+    expect(l.corpo).not.toContain("non ha dato alcun riscontro");
+  });
+
+  test("se la compagnia ha taciuto, la segnalazione dice il silenzio", () => {
+    const l = generaSegnalazioneEnte(PRATICA, FATTO, IDONEO, "2026-06-10", "2026-07-25", "silenzio")!;
+    expect(l.corpo).toContain("non ha dato alcun riscontro");
+  });
+
+  test("senza le date restano campi da compilare, non date inventate", () => {
+    const l = generaSegnalazioneEnte(PRATICA, FATTO, IDONEO, null, null, null)!;
+    expect(l.corpo).toContain("[data del primo reclamo]");
+    expect(l.corpo).toContain("[data del sollecito]");
+  });
+
+  test("non promette che l'ente paga: quella promessa non la possiamo mantenere", () => {
+    const l = generaSegnalazioneEnte(PRATICA, FATTO, IDONEO, "2026-06-10", "2026-07-25", null)!;
+    /* L'ente accerta e sanziona, ma non liquida la compensazione al posto
+       della compagnia. Se la lettera lo lasciasse credere, la garanzia si
+       riempirebbe di rimborsi e ce li saremmo cercati. */
+    expect(l.corpo.toLowerCase()).not.toContain("mi paghi");
+    expect(l.corpo.toLowerCase()).not.toContain("liquidi la compensazione");
+  });
+
+  test("su un verdetto non idoneo non si scrive nessuna segnalazione", () => {
+    const no: Verdetto = {
+      esito: "non_idoneo",
+      ritardoMinuti: 40,
+      motivo: "sotto soglia",
+      versioneRegole: "2026.08.7",
+    };
+    expect(generaSegnalazioneEnte(PRATICA, FATTO, no, "2026-06-10", null, null)).toBeNull();
+  });
+
+  test("niente trattino lungo, come ovunque", () => {
+    const l = generaSegnalazioneEnte(PRATICA, FATTO, IDONEO, "2026-06-10", "2026-07-25", "meteo")!;
+    expect(l.corpo).not.toContain("—");
+    expect(l.oggetto).not.toContain("—");
+  });
+});
+
+test.describe("La guida al giudice di pace", () => {
+  test("si apre e dice subito che non serve un avvocato", async ({ page }) => {
+    await page.goto("/giudice-di-pace");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("non paga");
+    await expect(page.getByText("non ti serve per forza un avvocato")).toBeVisible();
+  });
+
+  test("dichiara cosa NON facciamo: niente atti, niente consulenza", async ({ page }) => {
+    await page.goto("/giudice-di-pace");
+    await expect(page.getByText("Non siamo avvocati", { exact: false })).toBeVisible();
+  });
+
+  test("non scrive cifre precise che invecchiano", async ({ page }) => {
+    /* Una cifra sbagliata in una pagina che parla di soldi è peggio di
+       nessuna cifra: il contributo unificato cambia nel tempo. */
+    await page.goto("/giudice-di-pace");
+    const testo = (await page.locator("main").innerText()).toLowerCase();
+    expect(testo).toContain("poche decine di euro");
+    expect(testo).not.toMatch(/contributo unificato (è|e) di \d+/);
+  });
+
+  test("niente trattino lungo e niente 'hai diritto a'", async ({ page }) => {
+    await page.goto("/giudice-di-pace");
+    const testo = await page.locator("main").innerText();
+    expect(testo).not.toContain("—");
+    expect(testo.toLowerCase()).not.toContain("hai diritto a");
   });
 });

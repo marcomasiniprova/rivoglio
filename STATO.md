@@ -1,6 +1,7 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-09 (giro #44: IL MOTORE CHE NON LASCIA PIÙ NESSUNO
+**Aggiornato:** 2026-08-10 (giro #45: IL DOPO-LETTERA, cioè il secondo e
+il terzo colpo quando la compagnia dice no · ramo unito a main · giro #44: IL MOTORE CHE NON LASCIA PIÙ NESSUNO
 SENZA RISPOSTA (la cache che congelava gli incerti, gli aeroporti che si
 aggiornano da soli, i vettori extra UE, il codeshare che si chiede) ·
 giro #43: IL CANCELLO TERRITORIALE LASCIAVA SOLDI
@@ -42,6 +43,71 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #45 (10/08): IL DOPO-LETTERA. Fino a ieri il cliente si prendeva
+  un no e restava lì.**
+  - 🔴 **PRIMA COSA, IL RAMO È STATO UNITO A `main`.** `main` era fermo 79
+    commit indietro, al pivot del nome: motore, blog, pagine evento e
+    sicurezza vivevano solo sul ramo laterale. Il sintomo che lo ha fatto
+    scoprire: la scheda Actions di GitHub era vuota, perché **i lavori
+    programmati si leggono SOLO dal ramo predefinito**, quindi l'autopilot
+    degli aeroporti non poteva nemmeno comparire. Da qui in avanti si
+    lavora su `main` e basta (decisione di Valerio, 10/08).
+  - **IL SECONDO COLPO: LA REPLICA CAMBIA COL NO CHE HAI RICEVUTO**
+    (`lib/pratiche/rifiuto.ts`). Otto motivi a scelta chiusa, ognuno con la
+    sua replica scritta una volta. Il motivo non è un dato da collezione:
+    decide il paragrafo centrale del sollecito. A un guasto tecnico si
+    risponde che gli aerei si rompono e fa parte del mestiere; a uno
+    sciopero del PERSONALE DELLA COMPAGNIA si risponde che i rapporti coi
+    propri dipendenti non sono una circostanza eccezionale; al silenzio che
+    il silenzio non estingue niente. Un testo libero non avrebbe permesso
+    di decidere nessuna di queste cose.
+    ⚠️ **Due motivi su otto dicono in faccia che la compagnia può avere
+    ragione** (maltempo e sciopero dei controllori). Una prova impedisce di
+    venderli come vittorie sicure a chi ha appena pagato.
+  - 🔴 **I TEMPI ERANO SBAGLIATI, e di molto.** Il sollecito partiva al
+    giorno 15 e la segnalazione all'ente al 30: ma le compagnie rispondono
+    in 8-14 settimane, quindi quel sollecito arrivava prima che qualcuno
+    avesse aperto la pratica. Ora **42 giorni** (che è anche il termine che
+    l'ENAC indica prima di poterlo interpellare) e **56**. I nomi vecchi
+    delle tappe restano riconosciuti: nessuna pratica riceve due volte la
+    stessa email. **Il rifiuto dichiarato scavalca il calendario**: se la
+    risposta è già arrivata, aspettare altre cinque settimane sarebbe
+    assurdo.
+  - **SULLA PRATICA C'È IL BOTTONE** "La compagnia ti ha risposto no?", con
+    gli otto motivi. Non è un'email che arriva un giorno a caso: il no
+    arriva quando arriva, e chi se lo becca dopo dieci giorni non deve
+    restare fermo a guardare per un mese e mezzo.
+  - **SULLA PAGINA DELLA LETTERA CI SONO TRE FOGLI**, che compaiono uno
+    alla volta quando servono: il reclamo, il sollecito (o la replica al
+    loro no), la **segnalazione all'ente nazionale già scritta**
+    (`generaSegnalazioneEnte`), con dentro il volo, il ritardo verificato e
+    le date dei due invii. L'ente lo sceglie il paese di PARTENZA, come da
+    art. 16 par. 1: la tabella dei 20 paesi c'era già dal giro #38.
+    ⚠️ La segnalazione **non promette che l'ente paga**, perché non paga:
+    accerta e sanziona. Una prova vieta di lasciarlo credere.
+  - **`/giudice-di-pace`: la guida onesta** (scelta di Valerio col popup).
+    Dice la cosa che quasi nessuno sa, cioè che per una causa da 250-600
+    euro **non serve per forza un avvocato**, e dice anche quando NON
+    conviene. Nessun atto preparato da noi e nessuna consulenza: non siamo
+    avvocati, e Polar vieta i servizi umani.
+    ⚠️ **Nessuna cifra precisa nella pagina, di proposito**: il contributo
+    unificato cambia nel tempo, e una cifra sbagliata in una pagina che
+    parla di soldi è peggio di nessuna cifra. Una prova lo tiene fermo.
+  - **IL POPUP DELLE DOMANDE NON SCADE PIÙ.** Valerio rispondeva e il
+    riquadro si chiudeva da solo: non era distrazione sua, dalla versione
+    2.1.198 di Claude Code il riquadro si auto-risponde dopo 60 secondi.
+    `askUserQuestionTimeout: "never"` in `.claude/settings.json`, che è
+    tracciato e vale su ogni macchina. Il limite di **4 domande e 4 opzioni
+    è invece un limite vero** e non si alza: sta nella documentazione
+    ufficiale.
+  - **Sistemata una prova che falliva a caso**: l'immagine social si
+    disegna a ogni richiesta e col carico della suite intera il server
+    locale chiudeva la connessione. Ora riprova due volte prima di dire che
+    è rotta: una prova che fallisce a caso è peggio di una prova che non
+    c'è.
+  - Prove: **738 verdi** (restano le 2 note dell'Osservatorio). Le 28 nuove
+    sono sul dopo-lettera. ⚠️ Migrazione `2026-08-15-dopo-lettera.sql` da
+    applicare: è dentro `supabase/DA-APPLICARE.sql`, punto 5.
 - **GIRO #44 (9/08 notte): PERCHÉ FR4001 NON FUNZIONAVA, E LE ALTRE TRE
   COSE CHE LASCIAVANO GENTE SENZA RISPOSTA.**
   - 🔴 **LA CACHE POTEVA CONGELARE UN "INCERTO" PER SEMPRE.** È questo il
@@ -907,12 +973,12 @@ social rifatta (era rimasta al prodotto viaggi).
    in avanti sono attivi il doppio opt-in, i voli cancellati, il negato
    imbarco e il paese degli scali in cache. Il file resta nel repo e si
    può rilanciare: non cancella niente.
-0-ter. 🔴 **IL RAMO DEL LAVORO NON È MAI STATO UNITO A `main`.** `main` è
-   fermo al commit `1b0fb03` (il pivot del nome, prima di tutto il resto):
-   **79 commit indietro**. Conseguenza pratica scoperta il 10/08: la
-   scheda Actions di GitHub è vuota, perché GitHub legge i lavori
-   programmati SOLO dal ramo predefinito. Finché non si unisce, l'autopilot
-   degli aeroporti non parte e non si può nemmeno lanciare a mano.
+0-ter. ~~IL RAMO NON È MAI STATO UNITO A `main`~~ ✅ **FATTO il 10/08**:
+   79 commit uniti, zero conflitti. Da qui in avanti si lavora su `main`
+   e basta. L'autopilot degli aeroporti adesso compare in Actions.
+0-quater. 🟡 **LA QUINTA MIGRAZIONE.** `supabase/DA-APPLICARE.sql` ha un
+   punto 5 nuovo (il no della compagnia, per il dopo-lettera). Le prime
+   quattro le hai già eseguite: rilanciare tutto il file non fa danni.
 0. **DUE COSE SOLO TUE, e sbloccano le email:**
    a. **Il dominio.** Finché `rivolio.it` (o quello che scegli) non è
       verificato su Resend, le email partono SOLO verso

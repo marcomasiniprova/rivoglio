@@ -352,3 +352,86 @@ export function testoEnac(): IstruzioniEnac {
       "Ricerca web 2026-08-07: pagina 'Modalità di reclamo per negato imbarco, cancellazione e ritardo prolungato del volo' e portale carta-diritti.enac.gov.it, entrambi sul dominio ufficiale ENAC. Regola delle 6 settimane confermata dalla FAQ ENAC 'Cosa devo fare se la compagnia aerea non risponde al reclamo presentato'.",
   };
 }
+
+/* ------------------------------------- la segnalazione all'ente */
+
+/**
+ * LA SEGNALAZIONE ALL'ORGANISMO NAZIONALE, GIÀ SCRITTA.
+ *
+ * Terzo e ultimo documento della pratica. Le istruzioni per arrivarci
+ * esistevano già (`istruzioniOrganismo`), ma davanti a un modulo
+ * ufficiale la gente si ferma: quello che serve è il testo pronto, con
+ * dentro i suoi dati, il ritardo verificato e le date dei due invii.
+ *
+ * ⚠️ Cosa NON promette. L'ente accerta la violazione e può sanzionare la
+ * compagnia, ma non liquida la compensazione al posto suo. La lettera lo
+ * dice chiaramente al passeggero (nel testo che gli mostriamo, non in
+ * quella che manda), perché una promessa non mantenuta qui costa la
+ * garanzia e una recensione a una stella.
+ *
+ * `dataSollecito` è il giorno in cui l'utente ha mandato il secondo
+ * colpo; se non c'è, resta un campo da compilare. Mai una data inventata.
+ */
+export function generaSegnalazioneEnte(
+  pratica: PraticaPerLettera,
+  fatto: FattoVolo,
+  verdetto: Verdetto,
+  dataPrimoInvio: string | null,
+  dataSollecito: string | null,
+  motivoRifiuto: MotivoRifiuto | null = null,
+): Lettera | null {
+  if (verdetto.esito !== "idoneo") return null;
+  if (!fatto.arrivoPrevistoUtc || !fatto.arrivoEffettivoUtc) return null;
+
+  const passeggeri = elencoPasseggeri(pratica.passeggeri, pratica.tipo);
+  const n = passeggeri.length;
+  const totale = verdetto.importo * n;
+  const giornoVolo = dataLunga(fatto.dataLocale);
+  const compagnia = compagniaPerVettore(fatto.vettoreOperativo) ?? compagniaPerVettore(fatto.voloIata);
+  const nomeCompagnia = compagnia?.nomeLegale ?? fatto.vettoreOperativo ?? "[compagnia aerea operativa]";
+  const scheda = schedaRifiuto(motivoRifiuto);
+
+  const primo = dataPrimoInvio ? dataLunga(dataPrimoInvio) : "[data del primo reclamo]";
+  const secondo = dataSollecito ? dataLunga(dataSollecito) : "[data del sollecito]";
+
+  /* Cosa è successo dopo il reclamo: o hanno taciuto, o hanno detto no
+     per un motivo che qui si dichiara. Sono le due sole strade. */
+  const cosaHannoFatto = scheda && scheda.motivo !== "silenzio"
+    ? `Il vettore ha respinto la richiesta invocando: ${scheda.etichetta.toLowerCase()}. Ritengo il diniego infondato per le ragioni esposte nel sollecito, che allego.`
+    : `Il vettore non ha dato alcun riscontro, né al reclamo né al successivo sollecito.`;
+
+  const oggetto = `Reclamo ex art. 16 Reg. (CE) 261/2004 nei confronti di ${nomeCompagnia}, volo ${fatto.voloIata} del ${giornoVolo}`;
+
+  const corpo = `Spett.le ${organismoDiPartenza(fatto)},
+
+il sottoscritto ${passeggeri[0]} presenta reclamo ai sensi dell'articolo 16 del Regolamento (CE) n. 261/2004 nei confronti di ${nomeCompagnia}.
+
+IL VOLO
+- volo ${fatto.voloIata} del ${giornoVolo}${fatto.partenzaIata && fatto.arrivoIata ? `, da ${fatto.partenzaIata} a ${fatto.arrivoIata}` : ""};
+- arrivo previsto: ${oraUtc(fatto.arrivoPrevistoUtc)};
+- arrivo effettivo: ${oraUtc(fatto.arrivoEffettivoUtc)};
+- ritardo all'arrivo: ${durata(verdetto.ritardoMinuti)}${fatto.kmOrtodromica ? `;\n- distanza della tratta: ${km(fatto.kmOrtodromica)}` : ""}.
+
+LA RICHIESTA GIÀ AVANZATA AL VETTORE
+In data ${primo} ho chiesto al vettore la compensazione pecuniaria di ${
+    n === 1 ? euro(totale) : `${euro(totale)} complessivi (${euro(verdetto.importo)} per ${n} passeggeri)`
+  }, ai sensi degli articoli 5 e 7 del Regolamento. In data ${secondo} ho inviato sollecito.
+
+${cosaHannoFatto}
+
+COSA CHIEDO
+Chiedo che codesto organismo accerti la violazione del Regolamento e adotti i provvedimenti di competenza nei confronti del vettore.
+
+Allego: copia del reclamo inviato al vettore, copia del sollecito, la carta d'imbarco o la conferma di prenotazione${scheda && scheda.motivo !== "silenzio" ? ", copia della risposta del vettore" : ""}.
+
+Resto a disposizione per ogni chiarimento.
+
+Distinti saluti,
+
+${passeggeri.join("\n")}
+[indirizzo di residenza]
+[recapito email e telefono]
+[data]`;
+
+  return { oggetto, corpo };
+}

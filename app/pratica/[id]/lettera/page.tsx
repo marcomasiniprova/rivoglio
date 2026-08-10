@@ -8,8 +8,15 @@ import { Button } from "@/components/ui/button";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { compagniaPerVettore } from "@/lib/lettera/compagnie";
-import { ALLEGATI, generaReclamo, generaSollecito, istruzioniOrganismo } from "@/lib/lettera/genera";
 import {
+  ALLEGATI,
+  generaReclamo,
+  generaSegnalazioneEnte,
+  generaSollecito,
+  istruzioniOrganismo,
+} from "@/lib/lettera/genera";
+import {
+  GIORNI_PRIMA_DELL_ENTE,
   GIORNI_PRIMA_DEL_SOLLECITO,
   prontoPerSollecito,
   schedaRifiuto,
@@ -296,6 +303,22 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         )
       : null;
 
+  /* IL TERZO COLPO. Compare solo quando il secondo è stato dato e ha
+     avuto il suo tempo: due settimane, che è il termine che il sollecito
+     stesso concede. Mandare all'ente prima significa farsi rispondere
+     "il vettore ha ancora tempo". */
+  const segnalazione =
+    sollecito && giorniDallInvio >= GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE
+      ? generaSegnalazioneEnte(
+          { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo },
+          fatto,
+          verdetto,
+          pratica.inviata_il ? pratica.inviata_il.slice(0, 10) : null,
+          null,
+          motivoRifiuto,
+        )
+      : null;
+
   const compagnia =
     compagniaPerVettore(volo.vettore_operativo) ?? compagniaPerVettore(volo.volo_iata);
   const organismo = istruzioniOrganismo(volo.partenza_iata);
@@ -511,6 +534,62 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
 
           <textarea id="t-oggetto-2" hidden readOnly defaultValue={sollecito.oggetto} />
           <textarea id="t-corpo-2" hidden readOnly defaultValue={sollecito.corpo} />
+        </>
+      )}
+
+      {/* -------------------------------------------- il terzo colpo */}
+      {segnalazione && (
+        <>
+          <section className="no-stampa rounded-2xl border border-sole/40 bg-sole/10 px-6 py-6">
+            <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-inchiostro/60">
+              Il terzo colpo
+            </p>
+            <h2 className="mt-2 font-display text-xl tracking-[-0.03em]">
+              La segnalazione all&apos;ente nazionale è pronta.
+            </h2>
+            <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-inchiostro/80">
+              È il passo che le compagnie non ignorano: l&apos;ente accerta la violazione e può
+              sanzionarle. Dirti come funziona davvero: <span className="font-medium">non ti
+              paga lui</span>, la compensazione resta una cosa fra te e la compagnia. Serve a
+              farla muovere, e di solito funziona.
+            </p>
+          </section>
+
+          <section
+            id="foglio-3"
+            className="rounded-2xl border border-bordo bg-white px-6 py-7 sm:px-9 sm:py-9"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <p className="text-[0.95rem] leading-relaxed">
+                <span className="font-medium">Oggetto:</span> {segnalazione.oggetto}
+              </p>
+              <button
+                type="button"
+                data-copia="#t-oggetto-3"
+                className="no-stampa inline-flex shrink-0 items-center gap-1.5 rounded-pillola border border-bordo bg-nebbia px-3 py-1.5 text-xs font-medium text-fumo transition-colors hover:border-verde/40 hover:text-inchiostro"
+              >
+                <Copy className="size-3.5" aria-hidden="true" />
+                <span data-etichetta>Copia l&apos;oggetto</span>
+              </button>
+            </div>
+            <hr className="my-5 border-bordo" />
+            <div className="whitespace-pre-wrap text-[0.95rem] leading-[1.75]">
+              {segnalazione.corpo}
+            </div>
+          </section>
+
+          <div className="no-stampa flex flex-wrap items-center gap-3">
+            <Button type="button" data-copia="#t-corpo-3">
+              <Copy className="size-4" aria-hidden="true" />
+              <span data-etichetta>Copia la segnalazione</span>
+            </Button>
+            <Button asChild variant="contorno">
+              <Link href="/giudice-di-pace">Se anche l&apos;ente non basta</Link>
+            </Button>
+          </div>
+
+          <textarea id="t-oggetto-3" hidden readOnly defaultValue={segnalazione.oggetto} />
+          <textarea id="t-corpo-3" hidden readOnly defaultValue={segnalazione.corpo} />
         </>
       )}
 

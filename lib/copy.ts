@@ -1226,6 +1226,7 @@ export const COPY = {
           { testo: "Posso fare da solo, gratis?", ancora: "#domande" },
           { testo: "Cosa pago, esattamente?", ancora: "#domande" },
           { testo: "Bagaglio perso o in ritardo?", ancora: "/guida-bagagli" },
+          { testo: "La compagnia non paga?", ancora: "/giudice-di-pace" },
           { testo: "Tutte le risposte", ancora: "#domande" },
         ],
       },
