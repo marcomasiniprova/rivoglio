@@ -443,6 +443,16 @@ export const COPY = {
             testo:
               "Il dirottamento conta come ritardo se ci hai messo più di 3 ore ad arrivare a destinazione. Il tempo del trasferimento a terra lo sai solo tu.",
           },
+          {
+            nome: "Ti hanno lasciato a terra",
+            testo:
+              "Il negato imbarco non si vede da nessun archivio: l'aereo può risultare partito in orario mentre tu sei rimasto al gate. Dopo il check ti chiedo se avevi la prenotazione e se eri al gate in tempo, e il motore applica l'articolo 4.",
+          },
+          {
+            nome: "Coincidenza persa",
+            testo:
+              "Se il primo volo era in ritardo e hai perso il secondo, quello che conta è di quanto sei arrivato tardi alla destinazione finale, a patto che i voli fossero sulla stessa prenotazione. Ti chiedo dove dovevi arrivare e il motore calcola il resto.",
+          },
         ],
       },
       {
@@ -450,11 +460,6 @@ export const COPY = {
         etichetta: "Non ancora",
         spiegazione: "Lo diciamo prima che tu ci perda tempo.",
         voci: [
-          {
-            nome: "Negato imbarco e coincidenza persa",
-            testo:
-              "Sono nel CE 261 e i dati del volo li abbiamo già: manca la parte che ti chiede cosa è successo al gate. È il prossimo pezzo che costruiamo.",
-          },
           {
             nome: "Bagaglio perso o in ritardo",
             testo:
@@ -615,7 +620,7 @@ export const COPY = {
       {
         domanda: "Quali voli posso controllare?",
         risposta:
-          "Oggi verifichiamo i ritardi di 3 ore o più all'arrivo, sui voli coperti dal Regolamento CE 261/2004: in partenza da un aeroporto UE, o in arrivo nell'UE con una compagnia europea. Cancellazioni e negato imbarco arrivano a breve. Poi bagagli e treni.",
+          "Verifichiamo i voli coperti dal Regolamento CE 261/2004: in partenza da un aeroporto UE, o in arrivo nell'UE con una compagnia europea. Copriamo il ritardo di 3 ore o più all'arrivo, il volo cancellato, il dirottamento, il negato imbarco e la coincidenza persa. Bagagli e treni no, e lo diciamo prima: nella sezione Cosa copre c'è l'elenco per intero.",
       },
       {
         domanda: "Che fine fanno i miei dati?",

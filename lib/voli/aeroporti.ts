@@ -297,11 +297,18 @@ export function cercaAeroporti(query: string, limite = MASSIMO): AeroportoTrovat
     return x.riga.citta.localeCompare(y.riga.citta) || x.riga.iata.localeCompare(y.riga.iata);
   });
 
+  /* LA CITTÀ SI MOSTRA IN ITALIANO, e non è un vezzo.
+     Prima chi scriveva "Roma" vedeva questo elenco: Rome (Fiumicino),
+     Rome (Ciampino), e "Roma", che è una cittadina in AUSTRALIA. L'unica
+     voce scritta come l'aveva scritta lui era quella sbagliata, ed è
+     esattamente il modo di far scegliere l'aeroporto sbagliato a una
+     persona che ha fretta. `inItaliano` gira i nomi che conosciamo; gli
+     altri restano come sono, mai inventati. */
   return trovati.slice(0, limite).map(({ riga }) => ({
     iata: riga.iata,
-    citta: riga.a.citta,
+    citta: inItaliano(riga.a.citta) ?? riga.a.citta,
     nome: riga.a.nome,
-    paese: riga.a.paese,
+    paese: paeseInItaliano(riga.a.iso, riga.a.paese),
   }));
 }
 
@@ -330,10 +337,37 @@ export function inItaliano(nome: string | null | undefined): string | null {
     .join(" ");
 }
 
+/**
+ * Il PAESE in italiano, dal codice ISO che ogni scalo si porta dietro.
+ *
+ * Non serve una tabella scritta a mano: i nomi dei paesi li sa già Node.
+ * Serve invece per un motivo pratico: nell'elenco degli aeroporti
+ * l'utente legge "Italy", "United States", "Australia", e su un sito
+ * italiano sembra un sito tradotto male. Se il codice manca o non si
+ * riconosce, resta il nome inglese: mai inventato.
+ */
+const NOMI_PAESE = new Intl.DisplayNames(["it"], { type: "region" });
+
+export function paeseInItaliano(iso: string | null | undefined, riserva: string): string {
+  const c = (iso ?? "").trim().toUpperCase();
+  if (!/^[A-Z]{2}$/.test(c)) return riserva;
+  try {
+    const nome = NOMI_PAESE.of(c);
+    return !nome || nome === c ? riserva : nome;
+  } catch {
+    return riserva;
+  }
+}
+
 /** Un aeroporto preciso dal suo codice, per mostrarlo in chiaro. */
 export function aeroportoPerIata(iata: string): AeroportoTrovato | null {
   const codice = (iata ?? "").trim().toUpperCase();
   const a = ELENCO[codice];
   if (!a) return null;
-  return { iata: codice, citta: a.citta, nome: a.nome, paese: a.paese };
+  return {
+    iata: codice,
+    citta: inItaliano(a.citta) ?? a.citta,
+    nome: a.nome,
+    paese: paeseInItaliano(a.iso, a.paese),
+  };
 }

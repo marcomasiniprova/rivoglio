@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-10 (giro #45: IL DOPO-LETTERA, cioè il secondo e
+**Aggiornato:** 2026-08-10 (giro #46: IL GIRO DA UTENTE CRITICO, tre
+difetti veri trovati e chiusi · il titolo della hero ha il font del
+Tabellone · giro #45: IL DOPO-LETTERA, cioè il secondo e
 il terzo colpo quando la compagnia dice no · ramo unito a main · giro #44: IL MOTORE CHE NON LASCIA PIÙ NESSUNO
 SENZA RISPOSTA (la cache che congelava gli incerti, gli aeroporti che si
 aggiornano da soli, i vettori extra UE, il codeshare che si chiede) ·
@@ -43,6 +45,43 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #46 (10/08): IL GIRO DA UTENTE CRITICO. Sito, blog, pagine
+  evento e web app provati come dieci persone normali, a 1440 e a 390.**
+  - 🔴 **CHI SCRIVEVA "ROMA" VEDEVA L'AEROPORTO SBAGLIATO SCRITTO GIUSTO.**
+    L'elenco rispondeva: *Rome* (Fiumicino), *Rome* (Ciampino), e poi
+    *"Roma"*, che è una cittadina in **Australia**. L'unica voce scritta
+    come l'aveva scritta lui era quella sbagliata. Ora la città esce in
+    italiano (`inItaliano`, che c'era già ma non veniva applicato alla
+    ricerca) e anche il **paese**: "Italia", "Stati Uniti", "Regno Unito",
+    presi dal codice ISO che ogni scalo si porta dietro dal giro #44,
+    senza nessuna tabella scritta a mano.
+  - 🔴 **LA LANDING DICHIARAVA DI NON COPRIRE UNA COSA CHE COPRE.** Nella
+    colonna "Non ancora" c'era ancora *"Negato imbarco e coincidenza
+    persa: è il prossimo pezzo che costruiamo"*, ma quel pezzo esiste dal
+    giro #35. Una vendita persa scritta nero su bianco sulla pagina
+    principale. Spostati nella colonna gialla con la loro spiegazione, e
+    la FAQ non dice più "cancellazioni e negato imbarco arrivano a breve".
+  - 🔴 **CHI SBAGLIAVA A SCRIVERE IL NUMERO VENIVA MANDATO AD ASPETTARE.**
+    Il messaggio diceva solo "il volo è recente, ricontrolla domani". Ma
+    un refuso è comune quanto un volo fresco, e domani quel numero non
+    esisterà lo stesso: la persona torna, riprova e se ne va. Ora il
+    messaggio dice tutte e due le possibilità e manda a controllare il
+    numero sulla carta d'imbarco.
+  - **IL TITOLO DELLA HERO HA LA TIPOGRAFIA DEL TABELLONE** (richiesta di
+    Valerio). Il carattere era già lo stesso: a cambiare erano il peso
+    (500 contro 700) e la spaziatura, e a quella dimensione bastano a far
+    sembrare due font diversi.
+  - **Cosa NON era rotto, anche se sembrava:** il cerchio nero in basso a
+    sinistra è l'indicatore di Next in sviluppo e online non c'è; le
+    sezioni "bianche" nelle catture a pagina intera sono un artefatto di
+    Playwright con le animazioni (scorrendo davvero ci sono tutte); il
+    verdetto idoneo il bottone d'acquisto ce l'ha. **Le catture a pagina
+    intera su questo sito non fanno testo: vanno fatte scorrendo.**
+  - Controllati anche: **40 link interni, zero rotti**; nessun errore in
+    console su 13 pagine; nessuno scorrimento orizzontale su telefono;
+    nessuna immagine rotta.
+  - Prove: **758 verdi** (restano le 2 note dell'Osservatorio). Le 20
+    nuove sono `prove/giro-utente.spec.ts`, una per ogni difetto trovato.
 - **GIRO #45 (10/08): IL DOPO-LETTERA. Fino a ieri il cliente si prendeva
   un no e restava lì.**
   - 🔴 **PRIMA COSA, IL RAMO È STATO UNITO A `main`.** `main` era fermo 79

@@ -344,8 +344,13 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
   ) {
     verdetto = {
       ...verdetto,
+      /* Due possibilità, e vanno dette tutte e due. Quella gentile (il
+         dato non è ancora arrivato) era l'unica scritta, e mandava a
+         "riprova domani" anche chi aveva semplicemente sbagliato a
+         scrivere il numero: domani quel volo non esisterà lo stesso.
+         Un refuso è comune quanto un volo fresco. */
       motivo:
-        "Questo volo è recente e l'orario di arrivo certificato non è ancora negli archivi: di solito arriva entro un giorno. Ricontrolla domani: il check resta gratuito, e se ci lasci l'email ti avvisiamo noi.",
+        "Di questo volo non abbiamo ancora l'orario di arrivo certificato. Può essere per due motivi: il volo è di ieri o dell'altro ieri e il dato arriva di solito entro un giorno, oppure il numero non è quello giusto. Controlla il numero sulla carta d'imbarco; se è corretto, ricontrolla domani. Il check resta gratuito, e se ci lasci l'email ti avvisiamo noi.",
     };
   }
 

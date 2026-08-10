@@ -74,12 +74,19 @@ export default function HeroCheck() {
         </Anima>
 
         <Anima ritardo={0.12}>
-          <h1 className="luce-testo mt-6 text-[clamp(2.45rem,7.8vw,4.8rem)] leading-[0.98]">
+          {/* Stessa tipografia del titolo del Tabellone (richiesta di
+              Valerio, 10/08): il carattere era già lo stesso, a cambiare
+              erano il peso e la spaziatura, e a questa dimensione bastano
+              a far sembrare due font diversi. Bold, tracking -0.04em, e la
+              parte in corsivo torna al peso normale come là. */}
+          <h1 className="luce-testo mt-6 text-[clamp(2.45rem,7.8vw,4.8rem)] font-bold leading-[0.98] tracking-[-0.04em]">
             {titoloPrima}
             {titoloCorsivo && (
               <>
                 <br />
-                <span className="corsivo luce-corsivo text-verde-scuro">{titoloCorsivo}</span>
+                <span className="corsivo luce-corsivo font-normal text-verde-scuro">
+                  {titoloCorsivo}
+                </span>
               </>
             )}
           </h1>
