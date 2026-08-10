@@ -1085,9 +1085,19 @@ social rifatta (era rimasta al prodotto viaggi).
 1. **Deploy dell'ultimo giro** (design + Osservatorio dati veri): il ramo è
    pronto e collaudato, pubblichi tu (tua scelta col popup). Il motore
    online funziona già.
-2. **Polar**: creare i 2 prodotti (pratica 14,90 · famiglia 24,90), darmi i
-   checkout link e il segreto webhook; chiedere SUBITO l'approvazione
-   dell'organizzazione (~2 settimane).
+2. 🔴 **POLAR HA DETTO NO (10/08).** Il controllo automatico
+   dell'iscrizione ha risposto "Use case not supported": prodotto legato
+   ai reclami di viaggio, categoria a restrizione, e la garanzia più il
+   percorso automatico da idoneità a reclamo alzano il rischio di
+   contestazioni sulla carta. **Non è il testo scritto male, è la
+   categoria**, e riscriverlo più vago sarebbe peggio: alla verifica
+   guardano il sito vero e bloccano i bonifici coi soldi dei clienti
+   dentro. Le tre strade vere sono in `PAGAMENTI.md`: revisione umana
+   (email pronta), un altro venditore ufficiale (gli elenchi si
+   somigliano tutti), oppure partita IVA e Stripe diretto, che è l'unica
+   che non dipende dall'umore di qualcun altro. **Serve una decisione di
+   Valerio.** Intanto niente si ferma: il check è gratuito e il traffico
+   si costruisce lo stesso.
 3. **Email**: l'iscrizione all'Osservatorio dal sito vero è stata provata
    con valerio@artecai.it: controlla la casella, l'email di benvenuto deve
    esserci. Resend spedisce SOLO lì finché il dominio non è verificato.

@@ -1,5 +1,23 @@
 # Polar, dall'inizio alla fine
 
+> # 🔴 FERMO: POLAR HA DETTO NO (10/08)
+>
+> Il controllo automatico dell'iscrizione ha risposto **"Use case not
+> supported"**, con questa motivazione: *prodotto legato ai reclami di
+> viaggio, che rientra nei servizi di viaggio soggetti a restrizione e
+> nell'attività di assistenza ai reclami; il rimborso garantito e il
+> percorso automatico da idoneità a reclamo aumentano il rischio di
+> contestazioni sulla carta e il rischio normativo.*
+>
+> **Non è il testo scritto male: è la categoria.** Il testo era accurato,
+> e riscriverlo più vago per farlo passare sarebbe peggio, non meglio:
+> Polar è il venditore ufficiale, e quando alla verifica dei documenti
+> guardano il sito vero e trovano un'altra cosa, bloccano i bonifici coi
+> soldi dei clienti già dentro.
+>
+> Le strade vere sono in `PAGAMENTI.md`. Questo documento resta valido
+> **solo se Polar cambia idea** dopo una revisione umana.
+
 *Scritto per Valerio il 10/08. Un passo alla volta. Dove c'è un riquadro,
 si copia e si incolla.*
 
