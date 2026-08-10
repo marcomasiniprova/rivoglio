@@ -17,6 +17,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Bottone from "@/components/Bottone";
 import Titolo from "@/components/Titolo";
 import { SITO } from "@/lib/api";
+import { caricaPratiche } from "@/lib/dati";
+import { euro } from "@/lib/formati";
 import { leggiProfilo } from "@/lib/profilo";
 import { esci, useSessione } from "@/lib/sessione";
 import { apriImpostazioni, condividi, scriviA } from "@/lib/sistema";
@@ -46,6 +48,17 @@ export default function SchermataProfilo() {
   const insets = useSafeAreaInsets();
   const { utente } = useSessione();
   const [nickname, setNickname] = useState<string | null>(null);
+  /* Il portafoglio (tavola 3f), SENZA le cifre di acquisto: quelle
+     vivono nel venditore e oggi un venditore attivo non c'è. Qui stanno
+     solo i numeri che abbiamo davvero: le fasce richieste e recuperate,
+     e quante pratiche la garanzia ha rimborsato. */
+  const [portafoglio, setPortafoglio] = useState<{
+    richiesto: number;
+    recuperato: number;
+    aperteN: number;
+    chiuseN: number;
+    rimborsate: number;
+  } | null>(null);
   /* Quando un'azione non può andare fino in fondo (il browser non ha le
      impostazioni di sistema, la condivisione non c'è) si dice perché,
      invece di lasciare il tasto muto. */
@@ -60,6 +73,19 @@ export default function SchermataProfilo() {
         return;
       }
       void leggiProfilo().then((p) => setNickname(p?.nickname ?? null));
+      void caricaPratiche().then((lette) => {
+        if (lette === null) return;
+        const APERTE = new Set(["creata", "pagata", "pronta", "inviata", "sollecito", "enac"]);
+        const aperte = lette.filter((x) => APERTE.has(x.stato));
+        const pagate = lette.filter((x) => x.stato === "esito_pagata");
+        setPortafoglio({
+          richiesto: aperte.reduce((s, x) => s + (x.importo_fascia ?? 0), 0),
+          recuperato: pagate.reduce((s, x) => s + (x.importo_fascia ?? 0), 0),
+          aperteN: aperte.length,
+          chiuseN: lette.length - aperte.length,
+          rimborsate: lette.filter((x) => x.stato === "rimborsata").length,
+        });
+      });
     }, [utente]),
   );
 
@@ -156,6 +182,30 @@ export default function SchermataProfilo() {
         )}
       </View>
 
+      {/* -------------------------------------------- portafoglio */}
+      {utente && portafoglio && (portafoglio.aperteN > 0 || portafoglio.chiuseN > 0) && (
+        <View style={stili.borsa}>
+          <Text style={stili.borsaTitolo}>{P.portafoglio.titolo.toUpperCase()}</Text>
+          <View style={stili.borsaRighe}>
+            <View style={stili.borsaRiga}>
+              <Text style={stili.borsaEtichetta}>{P.portafoglio.recuperati}</Text>
+              <Text style={stili.borsaValore}>{euro(portafoglio.recuperato)}</Text>
+            </View>
+            <View style={stili.borsaRiga}>
+              <Text style={stili.borsaEtichetta}>{P.portafoglio.richiesti}</Text>
+              <Text style={stili.borsaValore}>{euro(portafoglio.richiesto)}</Text>
+            </View>
+            {portafoglio.rimborsate > 0 && (
+              <View style={stili.borsaRiga}>
+                <Text style={stili.borsaEtichetta}>{P.portafoglio.garanzia}</Text>
+                <Text style={stili.borsaValore}>{portafoglio.rimborsate}</Text>
+              </View>
+            )}
+          </View>
+          <Text style={stili.borsaNota}>{P.portafoglio.nota}</Text>
+        </View>
+      )}
+
       {/* ------------------------------------------------ invita */}
       <Pressable onPress={() => void invita()} accessibilityRole="button" style={stili.invita}>
         <View style={stili.invitaIcona}>
@@ -211,6 +261,45 @@ export default function SchermataProfilo() {
 const stili = StyleSheet.create({
   schermo: { flex: 1, backgroundColor: COLORI.nebbia },
   contenuto: { paddingHorizontal: SPAZIO.schermata, gap: SPAZIO.l },
+  /* Il portafoglio (tavola 3f), coi soli numeri veri. */
+  borsa: {
+    backgroundColor: COLORI.verdeNotte,
+    borderRadius: RAGGIO.scheda,
+    padding: SPAZIO.l,
+    ...OMBRA.sollevata,
+  },
+  borsaTitolo: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 10.5,
+    letterSpacing: 1.6,
+    color: COLORI.menta,
+  },
+  borsaRighe: { marginTop: SPAZIO.m, gap: SPAZIO.s },
+  borsaRiga: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: SPAZIO.m,
+  },
+  borsaEtichetta: {
+    flex: 1,
+    fontFamily: FONT.testo,
+    fontSize: 12.5,
+    color: "rgba(255,255,255,0.7)",
+  },
+  borsaValore: {
+    fontFamily: FONT.display,
+    fontSize: 18,
+    letterSpacing: -0.4,
+    color: COLORI.bianco,
+  },
+  borsaNota: {
+    fontFamily: FONT.testo,
+    fontSize: 11.5,
+    lineHeight: 17,
+    color: "rgba(255,255,255,0.55)",
+    marginTop: SPAZIO.m,
+  },
   carta: {
     backgroundColor: COLORI.bianco,
     borderRadius: RAGGIO.grande,

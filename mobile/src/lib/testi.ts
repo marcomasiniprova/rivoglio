@@ -445,6 +445,55 @@ export const TESTI = {
     },
   },
 
+  /* ---- IL PERMESSO NOTIFICHE (4g): la schermata cuscinetto ----
+     Compare PRIMA della finestra di sistema: chi dice no qui non brucia
+     il permesso di iOS, che è quasi irreversibile. E dice esattamente
+     quando scriveremo, che è il motivo per cui la gente dice sì. */
+  permessi: {
+    titolo: "Ti scrivo due volte. Poi basta.",
+    testo:
+      "Le notifiche servono a una cosa sola: dirti quando è il momento di premere invio. È lì che le pratiche si vincono o si perdono.",
+    righe: [
+      {
+        badge: "42",
+        titolo: "Sei settimane · il sollecito",
+        testo: "È il termine che indica l'ENAC: prima non serve, le compagnie rispondono in 8-14 settimane.",
+      },
+      {
+        badge: "no",
+        titolo: "Se arriva un rifiuto · la replica",
+        testo: "Qui non si aspetta niente: la risposta c'è, la contro-risposta parte subito.",
+      },
+      {
+        badge: "aereo",
+        titolo: "Un volo che segui va in ritardo",
+        testo: "Solo se hai chiesto tu di seguirlo.",
+      },
+    ],
+    niente:
+      "Mai promozioni, mai novità di prodotto. Se dici di no, uso l'email: funziona uguale, arriva più tardi.",
+    si: "Va bene, avvisami",
+    no: "Preferisco l'email",
+  },
+
+  /* ---- L'ACCESSO COL CODICE VIA EMAIL (3c) ---- */
+  codice: {
+    invito: "Entra col codice via email",
+    titolo: "Ti mando un codice.",
+    testo: "Sei cifre alla tua email. Serve solo a essere sicuri che la casella sia tua: da lì partiranno i reclami.",
+    manda: "Mandami il codice",
+    // {email} è l'indirizzo a cui è partito il codice.
+    mandato: "Sei cifre a {email}. Controlla anche la posta indesiderata.",
+    campo: "Il codice, sei cifre",
+    conferma: "Conferma il codice",
+    rimanda: "Non è arrivato? Rimandalo",
+    passaPassword: "Preferisco la password",
+    errori: {
+      emailVuota: "Scrivi la tua email.",
+      codiceCorto: "Il codice ha sei cifre.",
+    },
+  },
+
   /* ---- LA HOME PREMIUM (3d): compare con la prima pratica ----
      ⚠️ Ogni numero qui sotto è CALCOLATO dalle pratiche vere: la somma
      delle fasce richieste, quante sono state pagate, quanti check sono
@@ -554,6 +603,17 @@ export const TESTI = {
      avatar al centro, invito agli amici, voci in elenco) ---- */
   profiloApp: {
     titolo: { prima: "Il tuo", corsivo: "profilo." },
+    /* Il portafoglio (tavola 3f), coi soli numeri che abbiamo davvero.
+       ⚠️ Le cifre di acquisto (i −14,90 della tavola) NON ci sono:
+       vivono nel venditore, e oggi un venditore attivo non c'è. Quando
+       il pagamento sarà collegato compariranno da sole. */
+    portafoglio: {
+      titolo: "Portafoglio",
+      recuperati: "Recuperato (somma delle fasce)",
+      richiesti: "Richiesto, in attesa",
+      garanzia: "Pratiche rimborsate con la garanzia",
+      nota: "I movimenti del pagamento compariranno qui quando il venditore sarà collegato. Le fasce valgono a passeggero.",
+    },
     modifica: "Modifica il profilo",
     esci: "Esci dall'account",
     email: "valerio@artecai.it",

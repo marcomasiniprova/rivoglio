@@ -136,6 +136,61 @@ export async function registrati(email: string, password: string): Promise<{ err
   }
 }
 
+/**
+ * IL CODICE VIA EMAIL (tavola 3c): sei cifre alla casella, niente
+ * password. Supabase lo chiama OTP; all'utente la parola non compare.
+ * `shouldCreateUser: true` fa doppio servizio: chi non ha l'account se
+ * lo ritrova creato al primo codice, che è esattamente il flusso della
+ * tavola (registrazione = email + codice).
+ *
+ * ⚠️ Il codice via SMS (SIM) qui NON c'è: richiede un fornitore SMS a
+ * pagamento collegato a Supabase, e i soldi si chiedono prima. È in
+ * ARRETRATI con i costi.
+ */
+export async function mandaCodice(email: string): Promise<{ errore?: string }> {
+  const pulita = email.trim().toLowerCase();
+  if (!EMAIL_OK.test(pulita)) return { errore: "Controlla l'indirizzo email." };
+  if (DEMO) return {};
+  try {
+    const { error } = await supabase.auth.signInWithOtp({
+      email: pulita,
+      options: { shouldCreateUser: true },
+    });
+    if (error) return { errore: inItaliano(error.message) };
+    return {};
+  } catch (e) {
+    return { errore: inItaliano(e instanceof Error ? e.message : String(e)) };
+  }
+}
+
+export async function verificaCodice(
+  email: string,
+  codice: string,
+): Promise<{ errore?: string }> {
+  const pulita = email.trim().toLowerCase();
+  const cifre = codice.replace(/\D/g, "");
+  if (cifre.length !== 6) return { errore: "Il codice ha sei cifre." };
+  if (DEMO) {
+    entraDemo();
+    return {};
+  }
+  try {
+    const { error } = await supabase.auth.verifyOtp({
+      email: pulita,
+      token: cifre,
+      type: "email",
+    });
+    if (error) {
+      const m = error.message.toLowerCase();
+      if (m.includes("expired")) return { errore: "Il codice è scaduto: fattene mandare un altro." };
+      return { errore: "Il codice non corrisponde. Ricontrolla le sei cifre." };
+    }
+    return {};
+  } catch (e) {
+    return { errore: inItaliano(e instanceof Error ? e.message : String(e)) };
+  }
+}
+
 export async function accedi(email: string, password: string): Promise<{ errore?: string }> {
   const pulita = email.trim().toLowerCase();
   if (!EMAIL_OK.test(pulita)) return { errore: "Controlla l'indirizzo email." };

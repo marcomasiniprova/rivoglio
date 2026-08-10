@@ -26,7 +26,9 @@ import {
   View,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { CHIAVE_PERMESSI_RIMANDATO } from "@/app/permessi";
 import Bottone from "@/components/Bottone";
 import Campo from "@/components/Campo";
 import CardAvvisi, { type StatoAvvisi } from "@/components/CardAvvisi";
@@ -143,15 +145,18 @@ export default function SchermataCheck() {
         const stato = await statoPermesso();
         if (stato === "da_chiedere" && !giaChiesto.current) {
           giaChiesto.current = true;
-          const ok = await chiediPermesso();
-          setPermesso(ok ? "concesso" : "negato");
-          if (ok) await registraToken();
+          /* La finestra di sistema NON parte più a freddo: prima la
+             schermata cuscinetto (tavola 4g), che spiega quando e
+             perché scriveremo. Chi ha già scelto l'email non viene
+             riportato lì a ogni giro. */
+          const rimandato = await AsyncStorage.getItem(CHIAVE_PERMESSI_RIMANDATO);
+          if (!rimandato) router.push("/permessi");
           return;
         }
         setPermesso(stato);
         if (stato === "concesso") await registraToken();
       });
-    }, [utente, parametri.modo]),
+    }, [utente, parametri.modo, router]),
   );
 
   /** Il bottone della card: riapre il permesso o porta all'accesso. */
