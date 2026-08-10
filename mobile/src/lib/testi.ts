@@ -434,12 +434,50 @@ export const TESTI = {
     caricamento: "Un attimo",
     // Etichetta di accessibilità dell'avanzamento: {passo} e {totale} sono numeri.
     passoDi: "Passo {passo} di {totale}",
+    /* I nomi delle tavola definitiva (3d): Home · Check · Pratiche ·
+       Account. La Home compare solo quando esiste almeno una pratica. */
     tab: {
-      controlla: "Controlla",
+      home: "Home",
+      controlla: "Check",
       pratiche: "Pratiche",
       classifica: "Classifica",
-      profilo: "Profilo",
+      profilo: "Account",
     },
+  },
+
+  /* ---- LA HOME PREMIUM (3d): compare con la prima pratica ----
+     ⚠️ Ogni numero qui sotto è CALCOLATO dalle pratiche vere: la somma
+     delle fasce richieste, quante sono state pagate, quanti check sono
+     stati fatti. Niente contatori inventati e niente percentuali di
+     successo: quella della tavola originale era una statistica che non
+     abbiamo, ed è stata tolta apposta. */
+  home: {
+    saluto: "Buon rientro",
+    // {nome} è il nickname del profilo, quando c'è.
+    ciao: "Ciao {nome}",
+    richiesti: "Richiesti alle compagnie",
+    /* La somma è delle FASCE, che valgono a passeggero: la cifra intera
+       dipende da quanti passeggeri ha ogni pratica, e qui non la
+       inventiamo. */
+    richiestiSotto: "su {n} pratiche, ancora da decidere",
+    richiestiSottoUna: "su 1 pratica, ancora da decidere",
+    perPasseggero: "somma delle fasce, a passeggero",
+    statRecuperati: "Recuperati",
+    statCheck: "Check",
+    statAttesa: "In attesa",
+    nuovoCheck: "Nuovo check",
+    nuovoCheckSotto: "30 secondi, gratis",
+    scansiona: "Scansiona",
+    scansionaSotto: "la carta d'imbarco",
+    daFare: "Da fare oggi",
+    /* La card gialla è guidata dallo STATO della pratica, non da un
+       conto dei giorni: il giorno esatto dell'invio qui non c'è, e un
+       "giorno 42/42" stimato sarebbe un numero inventato. */
+    daFarePronta: "La lettera di {volo} è pronta. Mandala dalla tua email: due tocchi.",
+    daFareSollecito: "Il sollecito di {volo} è pronto. Aprilo e mandalo: due tocchi.",
+    apriPratica: "Apri la pratica →",
+    praticheAperte: "Pratiche aperte",
+    vaiATutte: "Tutte le pratiche",
   },
 
   onboarding: {

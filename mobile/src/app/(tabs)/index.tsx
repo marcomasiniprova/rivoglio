@@ -26,7 +26,7 @@ import {
   View,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import Bottone from "@/components/Bottone";
 import Campo from "@/components/Campo";
 import CardAvvisi, { type StatoAvvisi } from "@/components/CardAvvisi";
@@ -68,6 +68,10 @@ function oraDa(iso: string | null | undefined): string | null {
 
 export default function SchermataCheck() {
   const router = useRouter();
+  /* La Home può aprire il Check già sul modo giusto ("Scansiona la
+     carta d'imbarco" deve atterrare sulla fotocamera, non su un'altra
+     schermata da cui ricliccare). */
+  const parametri = useLocalSearchParams<{ modo?: string }>();
   const [volo, setVolo] = useState("");
   const [data, setData] = useState("");
   const [errore, setErrore] = useState<string | null>(null);
@@ -127,6 +131,10 @@ export default function SchermataCheck() {
         setInCorso(false);
         setPasso(0);
       }
+      const chiesto = parametri.modo;
+      if (chiesto === "tratta" || chiesto === "carta" || chiesto === "numero") {
+        setModo(chiesto);
+      }
       void leggiVoli().then(async (voli) => {
         setSalvati(voli);
         if (!utente || voli.length === 0) return;
@@ -143,7 +151,7 @@ export default function SchermataCheck() {
         setPermesso(stato);
         if (stato === "concesso") await registraToken();
       });
-    }, [utente]),
+    }, [utente, parametri.modo]),
   );
 
   /** Il bottone della card: riapre il permesso o porta all'accesso. */

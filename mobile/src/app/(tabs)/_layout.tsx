@@ -5,26 +5,43 @@ import { Tabs } from "expo-router/js-tabs";
 import type { BottomTabBarProps } from "expo-router/js-tabs";
 import BarraTab from "@/components/BarraTab";
 import { classifica } from "@/lib/api";
+import { caricaPratiche } from "@/lib/dati";
 import { CHIAVE_BENVENUTO } from "@/app/benvenuto";
 import { useSessione } from "@/lib/sessione";
 import { TESTI } from "@/lib/testi";
 
 /**
- * Le tab di Rivolio: Controlla, Pratiche, Classifica, Profilo.
+ * Le tab di Rivolio, coi nomi della tavola definitiva: Home, Check,
+ * Pratiche, Account (più la Classifica, che la accende il server).
  *
  * Nessuna è protetta: chi non ha l'account controlla lo stesso i voli, e
  * le tab che hanno bisogno dell'accesso lo chiedono da sole con un invito,
  * non con un muro all'avvio. È la regola del sito, portata nell'app.
  *
- * La CLASSIFICA la accende il server (CLASSIFICA_ATTIVA): al lancio sta
- * spenta finché non ci sono vincite vere da mostrare, e questa tab non
- * esiste proprio. Quando Valerio la accende, compare da sola al primo
- * avvio, senza aggiornare l'app.
+ * LA HOME COMPARE CON LA PRIMA PRATICA (scelta di Valerio, 10/08): senza
+ * pratiche ogni suo numero vale zero e l'app si apre sul Check. La tab
+ * spunta da sola quando c'è qualcosa di vero da mostrare, come la
+ * Classifica quando il server la accende.
  */
 export default function LayoutTab() {
   const router = useRouter();
   const { utente, pronto } = useSessione();
   const [conClassifica, setConClassifica] = useState(false);
+  const [conHome, setConHome] = useState(false);
+
+  useEffect(() => {
+    let montato = true;
+    /* Il setState vive SOLO nel callback asincrono (regola dei hooks):
+       senza utente si azzera lì dentro, non nel corpo dell'effetto. */
+    void (async () => {
+      if (!utente) return montato && setConHome(false);
+      const lette = await caricaPratiche();
+      if (montato && lette !== null) setConHome(lette.length > 0);
+    })();
+    return () => {
+      montato = false;
+    };
+  }, [utente]);
 
   /* LA WELCOME, una volta sola: al primo avvio (nessun account, mai
      vista) si va alla scena d'ingresso. Da lì si torna qui con "Salta"
@@ -57,7 +74,18 @@ export default function LayoutTab() {
     <Tabs
       tabBar={(p: BottomTabBarProps) => <BarraTab {...p} />}
       screenOptions={{ headerShown: false }}
+      /* L'app si apre sul Check anche quando la Home esiste: il gesto
+         più frequente resta controllare un volo. */
+      initialRouteName="index"
     >
+      <Tabs.Screen
+        name="home"
+        options={
+          conHome
+            ? { title: TESTI.comune.tab.home }
+            : { title: TESTI.comune.tab.home, href: null }
+        }
+      />
       <Tabs.Screen name="index" options={{ title: TESTI.comune.tab.controlla }} />
       <Tabs.Screen name="pratiche" options={{ title: TESTI.comune.tab.pratiche }} />
       <Tabs.Screen
