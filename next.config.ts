@@ -60,7 +60,22 @@ const HEADER_SICUREZZA = [
 
 const nextConfig: NextConfig = {
   async headers() {
-    return [{ source: "/:path*", headers: HEADER_SICUREZZA }];
+    return [
+      { source: "/:path*", headers: HEADER_SICUREZZA },
+      /* Il programma dell'app e i suoi caratteri hanno l'impronta del
+         contenuto nel nome del file: se cambia il contenuto cambia il
+         nome. Quindi si possono tenere in memoria per sempre, e la
+         lavagna smette di riscaricare 2,3 MB per ognuno dei trentatré
+         riquadri (in prova erano 75 MB per aprire una pagina). */
+      {
+        source: "/app-anteprima/_expo/:percorso*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/app-anteprima/assets/:percorso*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+    ];
   },
 
   /* L'anteprima dell'app (build web di Expo in /public/app-anteprima) va
@@ -68,16 +83,12 @@ const nextConfig: NextConfig = {
      dell'app legge l'indirizzo del browser e con /index.html appeso non
      riconosce la rotta ("Unmatched Route").
 
-     La seconda riga serve alla lavagna: l'export di Expo è una pagina
-     sola, quindi /app-anteprima/verdetto come FILE non esiste e darebbe
-     404. Questa regola gira dopo il controllo dei file veri, quindi i
-     font e i bundle sotto /app-anteprima/assets continuano a essere
-     serviti da sé: qui cadono solo le rotte dell'app. */
+     La lavagna NON usa indirizzi tipo /app-anteprima/verdetto: l'export
+     di Expo è una pagina sola, quel file non esiste e su Netlify
+     rispondeva 404 (tutti i riquadri neri, 10/08). La rotta viaggia come
+     parametro su questo stesso indirizzo: /app-anteprima?r=/verdetto. */
   async rewrites() {
-    return [
-      { source: "/app-anteprima", destination: "/app-anteprima/index.html" },
-      { source: "/app-anteprima/:rotta*", destination: "/app-anteprima/index.html" },
-    ];
+    return [{ source: "/app-anteprima", destination: "/app-anteprima/index.html" }];
   },
 };
 

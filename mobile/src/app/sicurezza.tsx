@@ -10,11 +10,12 @@
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Bottone from "@/components/Bottone";
 import Campo from "@/components/Campo";
 import { eliminaAccount } from "@/lib/api";
+import { scenaDa } from "@/lib/anteprima";
 import { cambiaPassword, esci, tokenSessione, useSessione } from "@/lib/sessione";
 import { scriviA } from "@/lib/sistema";
 import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
@@ -23,6 +24,9 @@ import { TESTI } from "@/lib/testi";
 const T = TESTI.sicurezza;
 
 export default function SchermataSicurezza() {
+  /* Solo la lavagna del sito: apre la sezione con la conferma già
+     scritta, per far vedere il bottone acceso. */
+  const { scena } = useLocalSearchParams<{ scena?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { utente } = useSessione();
@@ -31,7 +35,9 @@ export default function SchermataSicurezza() {
   const [passwordEsito, setPasswordEsito] = useState<string | null>(null);
   const [passwordInCorso, setPasswordInCorso] = useState(false);
 
-  const [conferma, setConferma] = useState("");
+  const [conferma, setConferma] = useState(() =>
+    scenaDa(scena) === "elimina" ? T.elimina.conferma : "",
+  );
   const [eliminaErrore, setEliminaErrore] = useState<string | null>(null);
   const [eliminaInCorso, setEliminaInCorso] = useState(false);
 

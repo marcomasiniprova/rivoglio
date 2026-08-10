@@ -41,6 +41,8 @@ import {
   type SchedaPratica,
 } from "@/lib/api";
 import { DEMO, schedaDemo } from "@/lib/dati";
+import { ID_ESEMPIO, schedaEsempio } from "@/lib/esempio";
+import { scenaDa } from "@/lib/anteprima";
 import { dataBreve, euro } from "@/lib/formati";
 import { tokenSessione } from "@/lib/sessione";
 import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
@@ -71,7 +73,11 @@ type FoglioAperto = {
 export default function SchermataPratica() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, scena } = useLocalSearchParams<{ id: string; scena?: string }>();
+  /* La lavagna del sito apre la pratica dimostrativa già sul momento
+     che vuole mostrare: il foglio a schermo pieno, il no della
+     compagnia, l'esito. Nell'app vera questo parametro non c'è mai. */
+  const momento = scenaDa(scena);
 
   const [stato, setStato] = useState<"caricamento" | "errore" | "pronto">("caricamento");
   const [messaggio, setMessaggio] = useState<string | null>(null);
@@ -92,6 +98,25 @@ export default function SchermataPratica() {
 
   const carica = useCallback(async () => {
     if (!id) return;
+
+    /* LA PRATICA DIMOSTRATIVA (solo dalla lavagna del sito): id fisso,
+       volo ZZ che non appartiene a nessuna compagnia, e un bollo in
+       testata che dice cos'è. Non si raggiunge per sbaglio. */
+    if (id === ID_ESEMPIO) {
+      const finta = schedaEsempio(momento);
+      setScheda(finta);
+      setStato("pronto");
+      if (momento === "rifiuto") setRifiutoAperto(true);
+      if (momento === "foglio" && finta.lettera) {
+        setAperto({
+          titolo: T.fogli.titoli.reclamo,
+          oggetto: finta.lettera.oggetto,
+          corpo: finta.lettera.corpo,
+          email: finta.lettera.compagnia?.email ?? null,
+        });
+      }
+      return;
+    }
 
     // In demo la scheda è finta e dichiarata: serve a provare la schermata.
     if (DEMO) {
@@ -117,7 +142,7 @@ export default function SchermataPratica() {
     }
     setScheda(esito.scheda);
     setStato("pronto");
-  }, [id]);
+  }, [id, momento]);
 
   useFocusEffect(
     useCallback(() => {
@@ -245,6 +270,11 @@ export default function SchermataPratica() {
       {stato === "pronto" && p && scheda && (
         <>
           {/* ------------------------------------------------ testata */}
+          {id === ID_ESEMPIO && (
+            <View style={stili.esempio}>
+              <Text style={stili.esempioTesto}>ESEMPIO DIMOSTRATIVO</Text>
+            </View>
+          )}
           <Text style={stili.occhiello}>{T.occhiello.toUpperCase()}</Text>
           <Text style={stili.tratta}>
             {p.volo?.da && p.volo?.a ? `${p.volo.da} · ${p.volo.a}` : (p.volo?.iata ?? T.voloMancante)}
@@ -644,6 +674,22 @@ const stili = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.8,
     color: COLORI.verdeScuro,
+  },
+  /* Il bollo della pratica dimostrativa: non si toglie e non si confonde
+     con una pratica vera. Vale la regola 3 del progetto. */
+  esempio: {
+    alignSelf: "flex-start",
+    backgroundColor: COLORI.sole,
+    borderRadius: RAGGIO.minimo,
+    paddingHorizontal: SPAZIO.m,
+    paddingVertical: 5,
+    marginBottom: SPAZIO.m,
+  },
+  esempioTesto: {
+    fontFamily: FONT.testoSemi,
+    fontSize: 10.5,
+    letterSpacing: 1.4,
+    color: COLORI.inchiostro,
   },
   tratta: {
     fontFamily: FONT.display,

@@ -93,6 +93,32 @@ for (const percorso of file(ASSETS).filter((f) => f.endsWith(".ttf"))) {
   }
 }
 
+/* 5. L'INGRESSO DELLA LAVAGNA.
+   L'export web di Expo è UNA pagina sola: /app-anteprima/verdetto come
+   file non esiste e su Netlify risponde 404 (successo il 10/08, tutti i
+   riquadri della lavagna neri). Quindi la lavagna chiama sempre
+   /app-anteprima?r=/verdetto&... e questo script, che gira PRIMA del
+   programma dell'app, riscrive l'indirizzo del browser su quello vero.
+   Nessuna richiesta parte: `replaceState` cambia solo la barra degli
+   indirizzi, e il router dell'app la legge già giusta al primo respiro.
+
+   Perché qui e non dentro l'app: farlo con una navigazione, a programma
+   avviato, manda React in aggiornamento infinito (errore 185, visto il
+   10/08). Prima che il programma parta invece non c'è niente da
+   aggiornare: c'è solo un indirizzo. */
+const APERTURA = `<script>(function(){try{
+var q=new URLSearchParams(location.search);var r=q.get("r");
+if(!r||r.charAt(0)!=="/"||r.slice(0,2)==="//")return;
+q.delete("r");var c=q.toString();
+history.replaceState({},"", "/app-anteprima"+(r==="/"?"":r)+(c?"?"+c:""));
+}catch(e){}})();</script>`;
+
+const INDICE = join(RADICE, "index.html");
+const html = readFileSync(INDICE, "utf8");
+if (!html.includes('q.get("r")')) {
+  writeFileSync(INDICE, html.replace("<head>", `<head>\n    ${APERTURA}`));
+}
+
 console.log(
-  `Appiattiti ${mappa.length} asset, riscritti ${sostituzioni} riferimenti, tolti ${tolti} font inutili.`,
+  `Appiattiti ${mappa.length} asset, riscritti ${sostituzioni} riferimenti, tolti ${tolti} font inutili, ingresso della lavagna montato.`,
 );

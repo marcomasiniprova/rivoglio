@@ -83,6 +83,23 @@ export function leggiCsv(testo) {
  */
 const TIPI_BUONI = new Set(["large_airport", "medium_airport", "small_airport"]);
 
+/** Quanto conta uno scalo: 2 grande, 1 medio, 0 piccolo. Decide chi esce
+ *  per primo quando si cerca una città con più aeroporti. Senza, chi
+ *  scrive "Parigi" può ritrovarsi Le Bourget prima di Charles de Gaulle
+ *  (successo il 10/08, dopo il primo giro dell'autopilot). */
+const PESO = { large_airport: 2, medium_airport: 1, small_airport: 0 };
+
+/**
+ * La città, ripulita dalla specifica amministrativa fra parentesi.
+ * OurAirports scrive "Paris (Roissy-en-France, Val-d'Oise)": all'utente
+ * si mostra una città, non un indirizzo catastale, e il confronto con i
+ * nomi italiani deve continuare a funzionare.
+ */
+function cittaPulita(grezza) {
+  const senzaParentesi = grezza.replace(/\s*\([^)]*\)\s*$/, "").trim();
+  return senzaParentesi || grezza.trim();
+}
+
 /**
  * Da OurAirports al nostro formato.
  * `vecchio` è l'archivio attuale: serve a ereditare nome del paese e
@@ -109,15 +126,28 @@ export function daOurAirports(righe, vecchio = {}) {
        prudenza 1 in cima), altrimenti quello standard del codice. */
     const paese = precedente?.paese ?? nomeDaIso(iso) ?? iso ?? "";
 
+    /* LA CITTÀ DI PRIMA VINCE, ed è la prudenza che vale più di tutte.
+       OurAirports scrive il COMUNE amministrativo, che spesso non è la
+       città che una persona cerca: Malpensa sta a "Ferno", Charles de
+       Gaulle a "Roissy-en-France". Chi scrive "milano" si vedrebbe
+       rispondere "Ferno" e penserebbe di aver sbagliato (successo il
+       10/08, al primo giro dell'autopilot). Per gli scali che avevamo
+       già la città resta quella verificata; per i nuovi si prende
+       quella della fonte, ripulita. */
+    const citta =
+      precedente?.citta ||
+      cittaPulita((r.municipality ?? "").trim() || (r.name ?? "").trim());
+
     archivio[iata] = {
       icao: (r.icao_code ?? r.gps_code ?? "").trim().toUpperCase() || null,
       nome: (r.name ?? "").trim(),
-      citta: (r.municipality ?? "").trim() || (r.name ?? "").trim(),
+      citta,
       paese,
       iso: /^[A-Z]{2}$/.test(iso) ? iso : (isoDaNome(paese) ?? null),
       lat: Number(lat.toFixed(4)),
       lon: Number(lon.toFixed(4)),
       tz: precedente?.tz ?? null,
+      peso: PESO[(r.type ?? "").trim()] ?? 0,
     };
 
     if (!precedente) nuovi.push(iata);
@@ -130,7 +160,11 @@ export function daOurAirports(righe, vecchio = {}) {
   const spariti = [];
   for (const [iata, riga] of Object.entries(vecchio)) {
     if (archivio[iata]) continue;
-    archivio[iata] = { ...riga, iso: riga.iso ?? isoDaNome(riga.paese) ?? null };
+    archivio[iata] = {
+      ...riga,
+      iso: riga.iso ?? isoDaNome(riga.paese) ?? null,
+      peso: riga.peso ?? 0,
+    };
     spariti.push(iata);
   }
 

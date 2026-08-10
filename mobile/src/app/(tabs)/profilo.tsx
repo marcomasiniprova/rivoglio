@@ -11,12 +11,14 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Bottone from "@/components/Bottone";
 import Titolo from "@/components/Titolo";
 import { SITO } from "@/lib/api";
+import { praticheEsempio } from "@/lib/esempio";
+import { scenaDa } from "@/lib/anteprima";
 import { caricaPratiche } from "@/lib/dati";
 import { euro } from "@/lib/formati";
 import { leggiProfilo } from "@/lib/profilo";
@@ -46,6 +48,8 @@ function iniziali(nickname: string | null, email: string | null | undefined): st
 export default function SchermataProfilo() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { scena } = useLocalSearchParams<{ scena?: string }>();
+  const momento = scenaDa(scena);
   const { utente } = useSessione();
   const [nickname, setNickname] = useState<string | null>(null);
   /* Il portafoglio (tavola 3f), SENZA le cifre di acquisto: quelle
@@ -68,6 +72,22 @@ export default function SchermataProfilo() {
      cambiato in Dati personali, qui deve vedersi subito. */
   useFocusEffect(
     useCallback(() => {
+      /* Il portafoglio dimostrativo, solo dalla lavagna del sito: senza
+         pratiche vere questo blocco non comparirebbe mai. I numeri sono
+         le fasce del Regolamento sulle due pratiche di esempio. */
+      if (momento === "portafoglio") {
+        const finte = praticheEsempio();
+        const aperte = finte.filter((x) => x.stato === "inviata");
+        const pagate = finte.filter((x) => x.stato === "esito_pagata");
+        setPortafoglio({
+          richiesto: aperte.reduce((s, x) => s + (x.importo_fascia ?? 0), 0),
+          recuperato: pagate.reduce((s, x) => s + (x.importo_fascia ?? 0), 0),
+          aperteN: aperte.length,
+          chiuseN: finte.length - aperte.length,
+          rimborsate: 0,
+        });
+        return;
+      }
       if (!utente) {
         setNickname(null);
         return;
@@ -86,7 +106,7 @@ export default function SchermataProfilo() {
           rimborsate: lette.filter((x) => x.stato === "rimborsata").length,
         });
       });
-    }, [utente]),
+    }, [utente, momento]),
   );
 
   async function invita() {
@@ -190,7 +210,7 @@ export default function SchermataProfilo() {
       </View>
 
       {/* -------------------------------------------- portafoglio */}
-      {utente && portafoglio && (portafoglio.aperteN > 0 || portafoglio.chiuseN > 0) && (
+      {portafoglio && (portafoglio.aperteN > 0 || portafoglio.chiuseN > 0) && (
         <View style={stili.borsa}>
           <Text style={stili.borsaTitolo}>{P.portafoglio.titolo.toUpperCase()}</Text>
           <View style={stili.borsaRighe}>

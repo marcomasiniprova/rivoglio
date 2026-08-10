@@ -15,10 +15,12 @@
 import { useCallback, useRef, useState } from "react";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { VeloVerde } from "@/components/ScenaVerdetto";
 import BadgeDemo from "@/components/BadgeDemo";
 import { caricaPratiche, type Pratica } from "@/lib/dati";
+import { praticheEsempio } from "@/lib/esempio";
+import { scenaDa } from "@/lib/anteprima";
 import { euro, dataBreve } from "@/lib/formati";
 import { leggiProfilo } from "@/lib/profilo";
 import { useSessione } from "@/lib/sessione";
@@ -38,6 +40,8 @@ const nomeStato = (stato: string): string =>
 
 export default function Home() {
   const router = useRouter();
+  const { scena } = useLocalSearchParams<{ scena?: string }>();
+  const momento = scenaDa(scena);
   const { utente } = useSessione();
   const [pratiche, setPratiche] = useState<Pratica[]>([]);
   const [checkFatti, setCheckFatti] = useState(0);
@@ -46,6 +50,14 @@ export default function Home() {
   const caricato = useRef(false);
 
   const carica = useCallback(async () => {
+    /* La Home dimostrativa, solo dalla lavagna del sito: senza pratiche
+       vere questa schermata non compare affatto (compare con la prima
+       pratica, scelta di Valerio) e non si potrebbe guardare. */
+    if (momento === "elenco") {
+      setPratiche(praticheEsempio() as unknown as Pratica[]);
+      setCheckFatti(2);
+      return;
+    }
     if (!utente) return;
     const [lette, voli, profilo] = await Promise.all([
       caricaPratiche(),
@@ -58,7 +70,7 @@ export default function Home() {
     }
     setCheckFatti(voli.length);
     setNome(profilo?.nickname ?? null);
-  }, [utente]);
+  }, [utente, momento]);
 
   useFocusEffect(
     useCallback(() => {

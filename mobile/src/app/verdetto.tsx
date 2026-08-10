@@ -17,6 +17,7 @@ import { useState } from "react";
 import { Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import ChiHaOperato from "@/components/ChiHaOperato";
+import { scenaDa } from "@/lib/anteprima";
 import marchio from "../../assets/images/marchio.png";
 import Bottone from "@/components/Bottone";
 import DomandeCaso from "@/components/DomandeCaso";
@@ -55,7 +56,6 @@ export default function SchermataVerdetto() {
   const router = useRouter();
   /* Il passaggio alla cassa (4d): un fermo che dice DOVE si paga e
      perché, prima di aprire il browser. */
-  const [cassaAperta, setCassaAperta] = useState(false);
   const p = useLocalSearchParams<{
     volo: string;
     data: string;
@@ -70,7 +70,11 @@ export default function SchermataVerdetto() {
     effettivo: string;
     km: string;
     demo: string;
+    /* Solo la lavagna del sito: apre il verdetto già sul fermo della
+       cassa (4d), per farlo vedere senza doverci cliccare sopra. */
+    scena: string;
   }>();
+  const [cassaAperta, setCassaAperta] = useState(() => scenaDa(p.scena) === "cassa");
 
   const idoneo = p.esito === "idoneo";
   const incerto = p.esito === "incerto";

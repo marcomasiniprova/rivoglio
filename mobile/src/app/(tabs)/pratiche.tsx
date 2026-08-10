@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BadgeDemo from "@/components/BadgeDemo";
 import Bottone from "@/components/Bottone";
@@ -24,6 +24,8 @@ import Scheda from "@/components/Scheda";
 import Titolo from "@/components/Titolo";
 import Vuoto from "@/components/Vuoto";
 import { caricaPratiche, type Pratica, type StatoPratica } from "@/lib/dati";
+import { praticheEsempio } from "@/lib/esempio";
+import { scenaDa } from "@/lib/anteprima";
 import { useSessione } from "@/lib/sessione";
 import { dataBreve, euro } from "@/lib/formati";
 import { COLORI, FONT, RAGGIO, SPAZIO } from "@/lib/tema";
@@ -47,6 +49,8 @@ export default function Pratiche() {
   const T = TESTI.pratiche;
 
   const router = useRouter();
+  const { scena } = useLocalSearchParams<{ scena?: string }>();
+  const momento = scenaDa(scena);
   const { utente } = useSessione();
   const [stato, setStato] = useState<"caricamento" | "errore" | "pronto">("caricamento");
   const [aggiorno, setAggiorno] = useState(false);
@@ -57,6 +61,15 @@ export default function Pratiche() {
   const caricato = useRef(false);
 
   const carica = useCallback(async () => {
+    /* L'ELENCO DIMOSTRATIVO, solo dalla lavagna del sito: senza pratiche
+       vere questa schermata mostrerebbe sempre lo stato vuoto, e le due
+       sezioni (aperte e chiuse) non si vedrebbero mai. Le righe portano
+       l'identificativo `esempio`, che nessun database può produrre. */
+    if (momento === "elenco") {
+      setPratiche(praticheEsempio() as unknown as Pratica[]);
+      setStato("pronto");
+      return;
+    }
     // Senza account non c'è niente da leggere: la schermata invita a entrare.
     if (!utente) {
       setPratiche([]);
@@ -72,7 +85,7 @@ export default function Pratiche() {
     caricato.current = true;
     setPratiche(lette);
     setStato("pronto");
-  }, [utente]);
+  }, [utente, momento]);
 
   // Al ritorno sulla tab l'elenco si riaggiorna: una transizione fatta dal
   // cron (sollecito, esito) deve vedersi senza riavviare l'app.

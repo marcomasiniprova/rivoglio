@@ -1,3 +1,5 @@
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import type { Metadata } from "next";
 import LavagnaApp from "@/components/rivolio/LavagnaApp";
 
@@ -21,6 +23,30 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+/**
+ * Il programma dell'app, letto dalla cartella al momento della build.
+ * Serve a scaricarlo UNA volta sola: senza, ognuno dei trentatré
+ * riquadri se lo chiede per conto suo e la lavagna ci mette mezzo
+ * minuto ad accendersi. Il nome porta l'impronta del contenuto, quindi
+ * cambia da solo a ogni ricostruzione e non va tenuto aggiornato a mano.
+ */
+function programmaApp(): string | null {
+  try {
+    const cartella = join(process.cwd(), "public", "app-anteprima", "_expo", "static", "js", "web");
+    const file = readdirSync(cartella).find((n) => n.endsWith(".js"));
+    return file ? `/app-anteprima/_expo/static/js/web/${file}` : null;
+  } catch {
+    /* anteprima non ancora generata: la lavagna lo dice da sé */
+    return null;
+  }
+}
+
 export default function PaginaAnteprimaApp() {
-  return <LavagnaApp />;
+  const programma = programmaApp();
+  return (
+    <>
+      {programma && <link rel="preload" as="script" href={programma} />}
+      <LavagnaApp />
+    </>
+  );
 }

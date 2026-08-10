@@ -45,6 +45,7 @@ import { useSessione } from "@/lib/sessione";
 import { leggiVoli, salvaVolo, togliVolo, type VoloSalvato } from "@/lib/voliSalvati";
 import { seguiVoli, smettiDiSeguire } from "@/lib/voliSeguiti";
 import { COLORI, FONT, OMBRA, RAGGIO, SPAZIO } from "@/lib/tema";
+import { scenaDa } from "@/lib/anteprima";
 import { TESTI } from "@/lib/testi";
 
 const T = TESTI.check;
@@ -60,6 +61,33 @@ const PASSO_MS = 2400;
 const PAUSA_FINALE_MS = 900;
 const PASSI_TOTALI = TESTI.analisi.passi.length;
 
+/* ── I momenti della lavagna ──────────────────────────────────────────
+   La lavagna del sito (/anteprima-app) apre questa schermata già su un
+   momento preciso, per farlo vedere senza doverci arrivare cliccando.
+   Nell'app vera questi valori non entrano mai in gioco: il parametro
+   `scena` non esiste in nessuna navigazione dell'app.
+
+   Gli errori si riconoscono dalle parole (vedi il riquadro rosso più
+   sotto): qui si usano le stesse frasi vere del server, non frasi
+   inventate per l'occasione. */
+const ERRORE_DI_SCENA: Record<string, string> = {
+  "errore-volo": "Questo volo non risulta negli archivi per la data indicata.",
+  "errore-rete": "Sembri offline: il check ha bisogno della rete.",
+  "errore-generico": "Qualcosa non ha funzionato. Riprova fra poco.",
+};
+
+/** Il volo dimostrativo della scena di analisi: ZZ non è di nessuno. */
+const SCENA_ANALISI = {
+  volo: { volo: "ZZ250", data: "2026-03-12" },
+  letto: {
+    tratta: "Bergamo → Lanzarote",
+    previsto: "08:40",
+    effettivo: "12:00",
+    ritardo: "3 h e 20 min",
+    km: 2980,
+  },
+};
+
 /** "2026-08-06T14:55:00Z" → "14:55" (ora di Greenwich, come sul sito). */
 function oraDa(iso: string | null | undefined): string | null {
   if (!iso) return null;
@@ -73,10 +101,13 @@ export default function SchermataCheck() {
   /* La Home può aprire il Check già sul modo giusto ("Scansiona la
      carta d'imbarco" deve atterrare sulla fotocamera, non su un'altra
      schermata da cui ricliccare). */
-  const parametri = useLocalSearchParams<{ modo?: string }>();
+  const parametri = useLocalSearchParams<{ modo?: string; scena?: string }>();
+  /* La lavagna del sito apre il check già sul momento da mostrare (un
+     errore, la scena dell'analisi). Nell'app vera è sempre vuoto. */
+  const momento = scenaDa(parametri.scena);
   const [volo, setVolo] = useState("");
   const [data, setData] = useState("");
-  const [errore, setErrore] = useState<string | null>(null);
+  const [errore, setErrore] = useState<string | null>(() => ERRORE_DI_SCENA[momento] ?? null);
   const [inCorso, setInCorso] = useState(false);
   const [salvati, setSalvati] = useState<VoloSalvato[]>([]);
   const [modo, setModo] = useState<Modo>("tratta");
@@ -92,16 +123,24 @@ export default function SchermataCheck() {
   /* IL TEATRO: durante l'analisi la scheda diventa la scena di scansione,
      come sul sito. `passo` avanza col tempo vero della sequenza, `letto`
      si riempie SOLO coi dati che il server ha davvero dato. */
-  const [fase, setFase] = useState<"campo" | "teatro">("campo");
-  const [passo, setPasso] = useState(0);
-  const [inAnalisi, setInAnalisi] = useState({ volo: "", data: "" });
+  const [fase, setFase] = useState<"campo" | "teatro">(() =>
+    momento === "analisi" ? "teatro" : "campo",
+  );
+  const [passo, setPasso] = useState(() => (momento === "analisi" ? 3 : 0));
+  const [inAnalisi, setInAnalisi] = useState(() =>
+    momento === "analisi" ? SCENA_ANALISI.volo : { volo: "", data: "" },
+  );
   const [letto, setLetto] = useState<{
     tratta: string | null;
     previsto: string | null;
     effettivo: string | null;
     ritardo: string | null;
     km: number | null;
-  }>({ tratta: null, previsto: null, effettivo: null, ritardo: null, km: null });
+  }>(() =>
+    momento === "analisi"
+      ? SCENA_ANALISI.letto
+      : { tratta: null, previsto: null, effettivo: null, ritardo: null, km: null },
+  );
   /* Vera finché sequenza e richiesta non sono chiuse: tiene il sipario
      giù anche se il focus va e torna (cambio tab a metà analisi). */
   const analisiViva = useRef(false);
@@ -128,7 +167,7 @@ export default function SchermataCheck() {
          giù: si riapre adesso, a schermata coperta ormai alle spalle.
          Ma se l'analisi sta ANCORA girando (cambio tab a metà), resta
          tutto in scena: al termine arriverà il verdetto da sola. */
-      if (!analisiViva.current) {
+      if (!analisiViva.current && momento !== "analisi") {
         setFase("campo");
         setInCorso(false);
         setPasso(0);
@@ -156,7 +195,7 @@ export default function SchermataCheck() {
         setPermesso(stato);
         if (stato === "concesso") await registraToken();
       });
-    }, [utente, parametri.modo, router]),
+    }, [utente, parametri.modo, momento, router]),
   );
 
   /** Il bottone della card: riapre il permesso o porta all'accesso. */

@@ -17,6 +17,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Bottone from "@/components/Bottone";
+import { scenaDa } from "@/lib/anteprima";
 import Campo from "@/components/Campo";
 import Titolo from "@/components/Titolo";
 import { accedi, mandaCodice, registrati, verificaCodice } from "@/lib/sessione";
@@ -29,7 +30,11 @@ const C = TESTI.codice;
 export default function SchermataAccesso() {
   const router = useRouter();
   /* L'email può arrivare già scritta dalla welcome: un campo in meno. */
-  const { email: emailIniziale } = useLocalSearchParams<{ email?: string }>();
+  const { email: emailIniziale, scena } = useLocalSearchParams<{
+    email?: string;
+    /* Solo la lavagna del sito: apre direttamente il codice via email. */
+    scena?: string;
+  }>();
   const [nuovo, setNuovo] = useState(Boolean(emailIniziale));
   const [email, setEmail] = useState(emailIniziale ?? "");
   const [password, setPassword] = useState("");
@@ -39,7 +44,7 @@ export default function SchermataAccesso() {
   /* Il codice via email (tavola 3c): "manda" scrive le sei cifre alla
      casella, "verifica" le controlla. Vale anche come registrazione:
      al primo codice l'account nasce da solo. */
-  const [conCodice, setConCodice] = useState(false);
+  const [conCodice, setConCodice] = useState(() => scenaDa(scena) === "codice");
   const [codiceMandato, setCodiceMandato] = useState(false);
   const [codice, setCodice] = useState("");
 

@@ -3,6 +3,7 @@ import { controlla, daOurAirports, leggiCsv, serializza } from "../scripts/aerop
 import { isoDaNome, nomeDaIso } from "../scripts/aeroporti/paesi.mjs";
 import aeroporti from "../lib/dati/aeroporti.json";
 import { zonaDiScalo } from "../lib/regole/territorio";
+import { cercaAeroporti } from "../lib/voli/aeroporti";
 
 /**
  * L'ARCHIVIO DEGLI SCALI NON DEVE PIÙ RESTARE FERMO.
@@ -194,5 +195,58 @@ test.describe("Archivio scali — paesi", () => {
   test("dal codice si torna al nome", () => {
     expect(nomeDaIso("IT")).toBe("Italy");
     expect(nomeDaIso("zz")).toBeNull();
+  });
+});
+
+/* ── L'AUTOPILOT NON DEVE ROMPERE LA RICERCA ──────────────────────────
+   Il 10/08, al suo primo giro, l'aggiornamento automatico ha portato
+   l'archivio da 6.073 a 9.016 scali e ha cambiato la città di due
+   aeroporti grossi: Malpensa da "Milano" a "Ferno", Charles de Gaulle
+   da "Paris" a "Paris (Roissy-en-France, Val-d'Oise)". OurAirports
+   scrive il COMUNE, che non è la città che una persona cerca. Chi
+   scriveva "milano" si vedeva rispondere "Ferno". Queste prove tengono
+   ferme le due difese messe nel convertitore. */
+test.describe("Archivio scali — l'aggiornamento automatico", () => {
+  test("la città di uno scalo già conosciuto non cambia", () => {
+    const vecchio = {
+      MXP: { icao: "LIMC", nome: "Malpensa", citta: "Milano", paese: "Italy", iso: "IT", lat: 45.63, lon: 8.72, tz: "Europe/Rome" },
+    };
+    const { archivio } = daOurAirports(
+      [
+        {
+          iata_code: "MXP",
+          icao_code: "LIMC",
+          type: "large_airport",
+          name: "Milan Malpensa International Airport",
+          municipality: "Ferno",
+          iso_country: "IT",
+          latitude_deg: "45.6306",
+          longitude_deg: "8.7281",
+        },
+      ],
+      vecchio,
+    );
+    expect(archivio.MXP.citta).toBe("Milano");
+  });
+
+  test("a uno scalo nuovo si toglie la specifica fra parentesi", () => {
+    const { archivio } = daOurAirports([
+      {
+        iata_code: "ZZZ",
+        icao_code: "LFZZ",
+        type: "medium_airport",
+        name: "Aeroporto di prova",
+        municipality: "Paris (Roissy-en-France, Val-d'Oise)",
+        iso_country: "FR",
+        latitude_deg: "49.0",
+        longitude_deg: "2.5",
+      },
+    ]);
+    expect(archivio.ZZZ.citta).toBe("Paris");
+  });
+
+  test("chi scrive Milano o Parigi trova lo scalo grande, non quello d'affari", () => {
+    expect(cercaAeroporti("milano")[0].citta).toBe("Milano");
+    expect(cercaAeroporti("parigi")[0].iata).toBe("CDG");
   });
 });
