@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { ArrowLeft, ArrowRight, FileText, Send, ShieldCheck } from "lucide-react";
 import Logo from "@/components/Logo";
 import CaricaDocumento from "@/components/pratica/CaricaDocumento";
+import DichiaraRifiuto from "@/components/pratica/DichiaraRifiuto";
 import { Button } from "@/components/ui/button";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
@@ -33,6 +34,11 @@ type VoloBreve = { volo_iata: string; data_locale: string };
 /* Gli stati in cui "Ho inviato il reclamo" ha senso: la lettera esiste
    ma l'invio non risulta ancora. Dopo, il bottone sparisce. */
 const CONFERMABILE: StatoPratica[] = ["pagata", "pronta"];
+
+/* Gli stati in cui "la compagnia mi ha risposto no" ha senso: il reclamo
+   è partito e l'esito non è ancora arrivato. Prima non c'è niente da
+   rifiutare, dopo la pratica è chiusa. */
+const DICHIARABILE: StatoPratica[] = ["inviata", "sollecito", "enac"];
 
 /* Da qui in poi la lettera esiste e il link si mostra. In `creata` no:
    la pagina della lettera direbbe solo "arriva col pagamento". */
@@ -130,6 +136,7 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
   const etichetteEventi: Record<string, string> = C.lineaTempo.eventi;
   const confermabile = CONFERMABILE.includes(pratica.stato);
   const conLettera = CON_LETTERA.includes(pratica.stato);
+  const dichiarabile = DICHIARABILE.includes(pratica.stato);
 
   return (
     <Cornice>
@@ -224,6 +231,11 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           </>
         )}
       </section>
+
+      {/* ---------------------------- il no della compagnia, dichiarato */}
+      {dichiarabile && (
+        <DichiaraRifiuto praticaId={pratica.id} giaDichiarato={pratica.rifiuto_motivo ?? null} />
+      )}
 
       {/* ------------------------------------------------ come si invia */}
       {confermabile && (

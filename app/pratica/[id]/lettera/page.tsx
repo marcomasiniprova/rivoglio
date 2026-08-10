@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { compagniaPerVettore } from "@/lib/lettera/compagnie";
-import { ALLEGATI, generaReclamo, istruzioniOrganismo } from "@/lib/lettera/genera";
+import { ALLEGATI, generaReclamo, generaSollecito, istruzioniOrganismo } from "@/lib/lettera/genera";
+import {
+  GIORNI_PRIMA_DEL_SOLLECITO,
+  prontoPerSollecito,
+  schedaRifiuto,
+  type MotivoRifiuto,
+} from "@/lib/pratiche/rifiuto";
 import { METEO_ATTIVO, fraseMeteo, meteoStorico } from "@/lib/meteo/openmeteo";
 import { aeroporto } from "@/lib/voli/distanza";
 import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
@@ -42,6 +48,8 @@ type RigaPratica = {
   tipo: TipoPratica;
   passeggeri: Passeggero[] | null;
   inviata_il: string | null;
+  /** Il motivo del no della compagnia, se il cliente l'ha dichiarato. */
+  rifiuto_motivo: string | null;
 };
 
 type RigaVolo = {
@@ -123,6 +131,15 @@ function Cornice({ children }: { children: ReactNode }) {
   );
 }
 
+/** Da quanti giorni è stato inviato il reclamo. Fuori dal componente:
+ *  leggere l'orologio dentro il corpo di un componente è un effetto, e la
+ *  regola di React lo vieta. */
+function giorniPassati(inviataIl: string | null): number {
+  if (!inviataIl) return 0;
+  const t = Date.parse(inviataIl);
+  return Number.isFinite(t) ? Math.floor((Date.now() - t) / 86_400_000) : 0;
+}
+
 export default async function PaginaLettera({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
@@ -143,7 +160,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   const db = supabaseServizio();
   const { data: pratica } = (await db
     .from("pratiche")
-    .select("id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, inviata_il")
+    .select("id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, inviata_il, rifiuto_motivo")
     .eq("id", id)
     .maybeSingle()) as { data: RigaPratica | null };
 
@@ -259,6 +276,25 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
       </Cornice>
     );
   }
+
+  /* IL SECONDO COLPO. Compare quando serve davvero: o la compagnia ha
+     già risposto no (e allora il motivo dichiarato decide la replica), o
+     sono passate sei settimane di silenzio. Prima non si mostra: un
+     sollecito mandato al giorno 10 arriva quando nessuno ha ancora
+     aperto la pratica, e ci fa sembrare automatici. */
+  const motivoRifiuto = (pratica.rifiuto_motivo ?? null) as MotivoRifiuto | null;
+  const giorniDallInvio = giorniPassati(pratica.inviata_il);
+  const scheda = schedaRifiuto(motivoRifiuto);
+  const sollecito =
+    pratica.inviata_il && prontoPerSollecito(giorniDallInvio, motivoRifiuto)
+      ? generaSollecito(
+          { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo },
+          fatto,
+          verdetto,
+          pratica.inviata_il.slice(0, 10),
+          motivoRifiuto,
+        )
+      : null;
 
   const compagnia =
     compagniaPerVettore(volo.vettore_operativo) ?? compagniaPerVettore(volo.volo_iata);
@@ -413,10 +449,75 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         <p className="mt-4 text-sm leading-relaxed text-fumo-2">{organismo.avvertenza}</p>
       </section>
 
+      {/* ------------------------------------------- il secondo colpo */}
+      {sollecito && (
+        <>
+          <section className="no-stampa rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-6">
+            <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde">
+              Il secondo colpo
+            </p>
+            <h2 className="mt-2 font-display text-xl tracking-[-0.03em] text-verde-notte">
+              {scheda && scheda.motivo !== "silenzio"
+                ? "La risposta al loro no è pronta."
+                : "Sono passate sei settimane. Il sollecito è pronto."}
+            </h2>
+            <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-verde-notte/85">
+              {scheda && scheda.motivo !== "silenzio"
+                ? scheda.spiegazione
+                : `Le compagnie rispondono in otto-quattordici settimane, quindi il silenzio a questo punto è normale. Ma da oggi ${GIORNI_PRIMA_DEL_SOLLECITO} giorni sono passati, e mettere agli atti che non hanno risposto serve al passo dopo: la segnalazione all'ente nazionale.`}
+            </p>
+            {scheda && scheda.peso === "dipende" && (
+              <p className="mt-3 max-w-xl rounded-xl bg-white/70 px-4 py-3 text-sm leading-relaxed text-verde-notte">
+                Qui non ti prometto niente: su questo motivo la compagnia può avere ragione. La
+                replica serve a farglielo dimostrare, che è una cosa diversa.
+              </p>
+            )}
+            {scheda && (
+              <p className="mt-4 text-xs leading-relaxed text-verde-notte/70">
+                Su cosa si fonda: {scheda.riferimenti.join(" · ")}
+              </p>
+            )}
+          </section>
+
+          <section
+            id="foglio-2"
+            className="rounded-2xl border border-bordo bg-white px-6 py-7 sm:px-9 sm:py-9"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <p className="text-[0.95rem] leading-relaxed">
+                <span className="font-medium">Oggetto:</span> {sollecito.oggetto}
+              </p>
+              <button
+                type="button"
+                data-copia="#t-oggetto-2"
+                className="no-stampa inline-flex shrink-0 items-center gap-1.5 rounded-pillola border border-bordo bg-nebbia px-3 py-1.5 text-xs font-medium text-fumo transition-colors hover:border-verde/40 hover:text-inchiostro"
+              >
+                <Copy className="size-3.5" aria-hidden="true" />
+                <span data-etichetta>Copia l&apos;oggetto</span>
+              </button>
+            </div>
+            <hr className="my-5 border-bordo" />
+            <div className="whitespace-pre-wrap text-[0.95rem] leading-[1.75]">
+              {sollecito.corpo}
+            </div>
+          </section>
+
+          <div className="no-stampa flex flex-wrap items-center gap-3">
+            <Button type="button" data-copia="#t-corpo-2">
+              <Copy className="size-4" aria-hidden="true" />
+              <span data-etichetta>Copia il sollecito</span>
+            </Button>
+          </div>
+
+          <textarea id="t-oggetto-2" hidden readOnly defaultValue={sollecito.oggetto} />
+          <textarea id="t-corpo-2" hidden readOnly defaultValue={sollecito.corpo} />
+        </>
+      )}
+
       <p className="no-stampa text-sm leading-relaxed text-fumo-2">
-        Quando l&apos;hai inviata, tienila: ti scriviamo noi al momento giusto per il sollecito,
-        col testo già pronto. E se la compagnia non paga, vale la garanzia: ti rimborsiamo la
-        pratica per intero.
+        {sollecito
+          ? "Mandalo dalla stessa casella del primo reclamo, in risposta al messaggio di prima se ce l'hai ancora: così la loro pratica resta una sola. Se anche stavolta non rispondono, il passo dopo è l'ente nazionale, e te lo prepariamo noi."
+          : "Quando l'hai inviata, tienila: ti scriviamo noi al momento giusto per il sollecito, col testo già pronto. E se la compagnia non paga, vale la garanzia: ti rimborsiamo la pratica per intero."}
       </p>
 
       {/* Il testo per i bottoni di copia: invisibile, mai stampato. */}

@@ -1,0 +1,170 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { AlertTriangle, Check } from "lucide-react";
+
+/**
+ * "LA COMPAGNIA MI HA RISPOSTO NO."
+ *
+ * Perché sta qui e non in un'email. Il no arriva quando arriva: dopo dieci
+ * giorni o dopo tre mesi, e noi non possiamo saperlo. Se aspettassimo il
+ * calendario, chi si becca un rifiuto scritto la settimana dopo l'invio
+ * resterebbe fermo a guardare per un mese e mezzo.
+ *
+ * Perché la scelta è chiusa. Il motivo decide la replica: a un guasto
+ * tecnico si risponde in un modo, a uno sciopero del personale in un
+ * altro. Un campo di testo libero sarebbe più comodo da scrivere e
+ * inutile da usare.
+ *
+ * Il testo della replica NON sta qui dentro: sta sul server. Nel browser
+ * gira solo l'etichetta.
+ */
+
+type Motivo = {
+  motivo: string;
+  etichetta: string;
+  aiuto: string;
+  peso: "debole" | "dipende" | "solido";
+};
+
+export default function DichiaraRifiuto({
+  praticaId,
+  giaDichiarato,
+}: {
+  praticaId: string;
+  /** Il motivo già registrato, se il cliente ha già risposto una volta. */
+  giaDichiarato?: string | null;
+}) {
+  const [aperto, setAperto] = useState(false);
+  const [motivi, setMotivi] = useState<Motivo[]>([]);
+  const [scelto, setScelto] = useState<string | null>(giaDichiarato ?? null);
+  const [invio, setInvio] = useState(false);
+  const [fatto, setFatto] = useState(Boolean(giaDichiarato));
+  const [errore, setErrore] = useState("");
+
+  useEffect(() => {
+    if (!aperto || motivi.length) return;
+    fetch("/api/pratiche/rifiuto")
+      .then((r) => r.json())
+      .then((d) => setMotivi(d?.motivi ?? []))
+      .catch(() => setErrore("Non riesco a caricare l'elenco. Riprova."));
+  }, [aperto, motivi.length]);
+
+  async function manda() {
+    if (!scelto || invio) return;
+    setInvio(true);
+    setErrore("");
+    try {
+      const r = await fetch("/api/pratiche/rifiuto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ praticaId, motivo: scelto }),
+      });
+      const d = await r.json().catch(() => null);
+      if (!r.ok || !d?.ok) {
+        setErrore(typeof d?.errore === "string" ? d.errore : "Qualcosa non ha funzionato.");
+        return;
+      }
+      setFatto(true);
+      /* La pagina si rifà: la lettera del secondo colpo la scrive il
+         server, e da qui non si può indovinare cosa dirà. */
+      window.location.reload();
+    } catch {
+      setErrore("Qualcosa non ha funzionato. Riprova tra poco.");
+    } finally {
+      setInvio(false);
+    }
+  }
+
+  if (fatto && !aperto) {
+    return (
+      <section className="rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-5">
+        <p className="flex items-center gap-2 text-[0.95rem] font-medium text-verde-notte">
+          <Check className="size-4 shrink-0" aria-hidden="true" />
+          Il loro no è registrato.
+        </p>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-verde-notte/80">
+          La risposta è pronta nella pagina della lettera: è scritta apposta sul motivo che ti
+          hanno dato, non è un testo generico.
+        </p>
+        <button
+          type="button"
+          onClick={() => setAperto(true)}
+          className="mt-3 text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
+        >
+          Ho sbagliato motivo, lo cambio
+        </button>
+      </section>
+    );
+  }
+
+  return (
+    <section className="rounded-2xl border border-bordo bg-white px-6 py-5">
+      <h2 className="flex items-center gap-2 font-display text-lg tracking-[-0.03em]">
+        <AlertTriangle className="size-4 shrink-0 text-sole" aria-hidden="true" />
+        La compagnia ti ha risposto no?
+      </h2>
+      <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
+        Succede alla maggior parte dei reclami validi, e quasi sempre è un no che non regge.
+        Dimmi cosa ti hanno scritto e ti preparo la risposta, senza aspettare.
+      </p>
+
+      {!aperto ? (
+        <button
+          type="button"
+          onClick={() => setAperto(true)}
+          className="riflesso mt-4 h-11 rounded-bottone bg-verde px-5 text-[0.95rem] font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro"
+        >
+          Mi hanno risposto no
+        </button>
+      ) : (
+        <>
+          <div className="mt-4 flex flex-col gap-2">
+            {motivi.map((m) => {
+              const attivo = scelto === m.motivo;
+              return (
+                <button
+                  key={m.motivo}
+                  type="button"
+                  onClick={() => setScelto(m.motivo)}
+                  aria-pressed={attivo}
+                  className={`rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
+                    attivo
+                      ? "border-verde bg-menta-tenue"
+                      : "border-bordo bg-white hover:border-verde/50 hover:bg-nebbia"
+                  }`}
+                >
+                  <span className="block text-[0.95rem] font-medium text-inchiostro">
+                    {m.etichetta}
+                  </span>
+                  <span className="mt-0.5 block text-sm leading-relaxed text-fumo">{m.aiuto}</span>
+                </button>
+              );
+            })}
+            {motivi.length === 0 && !errore && (
+              <p className="text-sm text-fumo">Un attimo.</p>
+            )}
+          </div>
+
+          {errore && (
+            <p role="alert" className="mt-3 text-sm text-red-600">
+              {errore}
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={() => void manda()}
+            disabled={!scelto || invio}
+            className="riflesso mt-4 h-11 rounded-bottone bg-verde px-5 text-[0.95rem] font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro disabled:pointer-events-none disabled:opacity-50"
+          >
+            {invio ? "Un attimo." : "Preparami la risposta"}
+          </button>
+          <p className="mt-3 text-sm leading-relaxed text-fumo-2">
+            È incluso nel prezzo che hai già pagato. Non ti chiediamo altro.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}

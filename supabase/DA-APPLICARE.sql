@@ -15,11 +15,15 @@
 --  Alla fine deve comparire "Success. No rows returned": è la risposta
 --  giusta, vuol dire che ha eseguito tutto e non c'era niente da mostrare.
 --
---  Dentro ci sono quattro cose, in ordine di data:
+--  Dentro ci sono cinque cose, in ordine di data:
 --   1. doppio opt-in dell'Osservatorio        (11/08)
 --   2. risposte sui voli cancellati           (12/08)
 --   3. negato imbarco e coincidenza persa     (13/08)
 --   4. paese degli scali + compagnia operativa dichiarata  (14/08)
+--   5. il no della compagnia, per il dopo-lettera           (15/08)
+--
+--  ⚠️ Le prime quattro Valerio le ha già eseguite il 10/08: rilanciarle
+--  non fa niente. La quinta è nuova.
 -- ═══════════════════════════════════════════════════════════════════════
 
 
@@ -151,9 +155,34 @@ comment on column public.verifiche.operativo_dichiarato is
   'Codice IATA della compagnia che il passeggero dichiara abbia operato il volo (solo casi in codeshare non risolto).';
 
 
+-- ─────────────────────────────────────────────────────────────────────
+-- 5. IL NO DELLA COMPAGNIA (il dopo-lettera)
+-- ─────────────────────────────────────────────────────────────────────
+-- Il 52% dei reclami validi viene respinto alla prima risposta, e quasi
+-- sempre è un no che non regge. La replica giusta però dipende da COSA
+-- hanno risposto: a un guasto tecnico si ribatte in un modo, a uno
+-- sciopero del personale in un altro. Il motivo si chiede a scelta chiusa
+-- e si scrive qui, perché da questo campo esce il paragrafo centrale del
+-- sollecito.
+
+alter table public.pratiche add column if not exists rifiuto_motivo text;
+alter table public.pratiche add column if not exists rifiuto_il     timestamptz;
+
+alter table public.pratiche drop constraint if exists pratiche_rifiuto_motivo_ck;
+alter table public.pratiche add constraint pratiche_rifiuto_motivo_ck
+  check (rifiuto_motivo is null or rifiuto_motivo in (
+    'eccezionale_generico','meteo','guasto_tecnico','sciopero_compagnia',
+    'sciopero_esterno','ritardo_contestato','gia_risarcito','silenzio'));
+
+comment on column public.pratiche.rifiuto_motivo is
+  'Il motivo del diniego della compagnia, dichiarato dal cliente a scelta chiusa. Decide la replica nel sollecito (lib/pratiche/rifiuto.ts).';
+comment on column public.pratiche.rifiuto_il is
+  'Quando il cliente ha dichiarato il diniego. Serve anche come prova dei tempi davanti all''ente nazionale.';
+
+
 -- ═══════════════════════════════════════════════════════════════════════
 --  CONTROLLO FINALE: togli le due barrette qui sotto e rilancia solo
---  questa parte per vedere l'elenco delle colonne nuove. Devono essere 13.
+--  questa parte per vedere l'elenco delle colonne nuove. Devono essere 15.
 -- ═══════════════════════════════════════════════════════════════════════
 -- select table_name, column_name
 --   from information_schema.columns
@@ -164,5 +193,6 @@ comment on column public.verifiche.operativo_dichiarato is
 --      ('verifiche','cancellato_risposto_il'), ('verifiche','caso_dichiarato'),
 --      ('verifiche','dichiarazione'), ('verifiche','dichiarato_il'),
 --      ('verifiche','operativo_dichiarato'), ('verifiche','operativo_dichiarato_il'),
---      ('voli','partenza_paese'), ('voli','arrivo_paese'), ('voli','partenza_icao'))
+--      ('voli','partenza_paese'), ('voli','arrivo_paese'), ('voli','partenza_icao'),
+--      ('pratiche','rifiuto_motivo'), ('pratiche','rifiuto_il'))
 --  order by table_name, column_name;

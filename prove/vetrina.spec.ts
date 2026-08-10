@@ -30,7 +30,16 @@ test.describe("Vetrina", () => {
   });
 
   test("l'immagine social esiste ed è un png della misura giusta", async ({ request }) => {
-    const r = await request.get("/opengraph-image");
+    /* L'immagine si DISEGNA a ogni richiesta (font, logo, testo), e in
+       sviluppo la prima volta ci mette qualche secondo. Con la suite
+       intera che gira in parallelo capitava un "socket hang up": non era
+       l'immagine a essere rotta, era il server locale sotto carico. Una
+       prova che fallisce a caso è peggio di una prova che non c'è, quindi
+       si riprova due volte prima di dire che è rotta. */
+    let r = await request.get("/opengraph-image", { timeout: 30_000 });
+    for (let giro = 0; giro < 2 && r.status() !== 200; giro++) {
+      r = await request.get("/opengraph-image", { timeout: 30_000 });
+    }
     expect(r.status()).toBe(200);
     expect(r.headers()["content-type"]).toContain("image/png");
     // 1200x630 non pesa mai pochi byte: se pesa poco, è un'immagine vuota
