@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-10 (giro #49: L'APP MIGRA AL DESIGN DELLA TAVOLA
+**Aggiornato:** 2026-08-10 (giro #50: LA LAVAGNA DELL'APP, tutte le
+schermate su un tavolo che si trascina, più la pratica messa al riparo
+dalla quinta migrazione non ancora applicata · giro #49: L'APP MIGRA AL DESIGN DELLA TAVOLA
 DEFINITIVA, terza ondata: la migrazione è COMPLETA per tutto ciò che è
 onesto costruire oggi · giro #48: IL QUARTO COLPO, cioè quello che i
 soldi li muove davvero, più la riforma del 2027 scritta e messa in
@@ -50,6 +52,47 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #50 (10/08): LA LAVAGNA DELL'APP, e un guasto chiuso prima che
+  arrivasse in faccia a un cliente.**
+  - 🔴 **LA PRATICA SI SAREBBE SPENTA SUL DATABASE VERO.** La scheda che
+    l'app chiede al sito (e la pagina della lettera) chiedevano la colonna
+    `rifiuto_motivo`, che arriva col **punto 5** di `DA-APPLICARE.sql`:
+    Valerio ha eseguito i primi quattro, non il quinto. Postgres non
+    risponde "colonna vuota", fa fallire **tutta la lettura**: la pratica
+    sarebbe sparita dall'app per un campo accessorio. Ora le due letture
+    riprovano senza quel campo, come già faceva la cache dei voli;
+    `colonnaMancante` è diventato condiviso invece di stare nascosto in
+    `verifica.ts`. **Il punto 5 resta da applicare, ma adesso non è più
+    una bomba a orologeria.**
+  - **`/anteprima-app` NON È PIÙ UN TELEFONO SOLO: È UN TAVOLO**
+    (`components/rivolio/LavagnaApp.tsx`, richiesta di Valerio col popup).
+    Tredici schermate accanto, si trascina col mouse, si zooma con la
+    rotellina tenendo fermo il punto sotto il puntatore, e il **modello di
+    telefono si cambia per tutte insieme**: iPhone 15 Pro, iPhone SE,
+    Pixel 8, solo schermo. Con "Vista" se ne guarda una sola, scalata per
+    entrare tutta nello schermo. Ogni riquadro è **l'app vera**, non una
+    figura: si tocca e risponde. Uno screenshot invecchierebbe al primo
+    push senza che nessuno se ne accorga.
+  - **Tre difetti trovati guardandola, tutti chiusi:** il benvenuto va
+    messo da parte PRIMA del primo disegno (se no metà del tavolo mostra
+    il logo che respira invece della propria schermata: l'app manda al
+    benvenuto chiunque non l'abbia visto, e ogni riquadro è un
+    "chiunque"); l'adattamento va fatto sulla LARGHEZZA (farci stare anche
+    i quattro gruppi in altezza portava lo zoom al 15%, telefoni grandi
+    come francobolli); la vista singola usciva dallo schermo.
+  - **E la lavagna ha già fatto il suo mestiere:** con l'iPhone SE si vede
+    a colpo d'occhio che la schermata dei permessi **trabocca** sullo
+    schermo corto. È esattamente per questo che serve.
+  - ⚠️ **Le schermate dentro una pratica** (i quattro fogli, la cassa, gli
+    esiti) **non sono sul tavolo**: hanno bisogno di un account e di una
+    pratica pagata. Si raggiungono entrando col proprio account da un
+    riquadro qualsiasi. Metterle lì con dati finti è vietato dalla regola 3.
+  - 🟡 **L'autopilot degli aeroporti NON L'HO POTUTO LANCIARE IO**: il
+    token di GitHub di questa sessione risponde `403 Resource not
+    accessible by integration` sul dispatch dei lavori. Il bottone lo deve
+    premere Valerio (istruzioni in "Serve Valerio", voce 1-bis).
+  - Prove: **834 verdi**, le stesse 2 rosse dell'Osservatorio in sandbox e
+    le 4 saltate della sveglia del 2027. Tipi e lint puliti.
 - **GIRO #49 (10/08): L'APP MIGRA AL DESIGN DELLA TAVOLA DEFINITIVA.**
   Valerio ha consegnato la tavola finale di Claude Design (34 schermate,
   con le 9 correzioni di sostanza chieste col prompt: via il "Termine
@@ -1255,6 +1298,17 @@ social rifatta (era rimasta al prodotto viaggi).
 1. **Deploy dell'ultimo giro** (design + Osservatorio dati veri): il ramo è
    pronto e collaudato, pubblichi tu (tua scelta col popup). Il motore
    online funziona già.
+1-bis. 🟡 **UN CLIC: L'AUTOPILOT DEGLI AEROPORTI, primo giro a mano.** È
+   armato su `main` ma non ha mai girato, e io non posso premerlo: il
+   token di GitHub di queste sessioni non ha il permesso di far partire i
+   lavori (`403 Resource not accessible by integration`). Apri
+   `https://github.com/marcomasiniprova/rivoglio/actions/workflows/aeroporti.yml`,
+   in alto a destra premi **Run workflow**, lascia il ramo `main` e premi
+   ancora **Run workflow**. Ci mette un minuto. Se trova scali nuovi
+   committa il file da solo e Netlify ricostruisce; se non trova niente
+   scrive "Nessuna novità" e finisce lì. Se la fonte è cambiata il lavoro
+   **fallisce e non pubblica niente**, e GitHub ti manda l'email: è quello
+   che deve fare.
 2. 🔴 **POLAR HA DETTO NO (10/08).** Il controllo automatico
    dell'iscrizione ha risposto "Use case not supported": prodotto legato
    ai reclami di viaggio, categoria a restrizione, e la garanzia più il
