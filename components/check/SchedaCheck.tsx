@@ -434,9 +434,10 @@ export default function SchedaCheck() {
       <MuroCheck
         dati={muro}
         onPaga={() => {
-          /* La cassa non c'è ancora: quando ci sarà, di qui si va al
-             venditore e si torna con la ricevuta nel cookie. */
-          router.push("/#prezzi");
+          /* Alla cassa, se c'è. Senza venditore si scende ai prezzi:
+             meglio una pagina che spiega che un bottone che non fa
+             niente. */
+          router.push(muro.cassa ?? "/#prezzi");
         }}
       />
     );

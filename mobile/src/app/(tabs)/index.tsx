@@ -37,7 +37,8 @@ import RicercaTratta from "@/components/RicercaTratta";
 import ScattaCarta from "@/components/ScattaCarta";
 import ScenaScan from "@/components/ScenaScan";
 import { VeloVerde } from "@/components/ScenaVerdetto";
-import { verificaVolo } from "@/lib/api";
+import { verificaVolo, type MuroCheckDati } from "@/lib/api";
+import MuroCheck from "@/components/MuroCheck";
 import { conBarre, dataIso, inItaliano, perEsteso } from "@/lib/data";
 import { dataBreve, durataLunga } from "@/lib/formati";
 import { chiediPermesso, registraToken, statoPermesso } from "@/lib/notifiche";
@@ -113,6 +114,9 @@ export default function SchermataCheck() {
   const [volo, setVolo] = useState("");
   const [data, setData] = useState("");
   const [errore, setErrore] = useState<string | null>(() => ERRORE_DI_SCENA[momento] ?? null);
+  /* Il muro del check a pagamento: lo accende il 402 del server, mai
+     una decisione presa qui dentro. */
+  const [muro, setMuro] = useState<MuroCheckDati | null>(null);
   const [inCorso, setInCorso] = useState(false);
   const [salvati, setSalvati] = useState<VoloSalvato[]>([]);
   const [modo, setModo] = useState<Modo>("tratta");
@@ -239,10 +243,15 @@ export default function SchermataCheck() {
     const esito = await verificaVolo(voloDaControllare, iso);
 
     if (!esito.ok) {
-      /* Un errore chiude la scena: si torna al campo, col motivo detto. */
+      /* Un errore chiude la scena: si torna al campo, col motivo detto.
+         Il muro invece non è un errore: è una schermata. */
       analisiViva.current = false;
       setFase("campo");
       setInCorso(false);
+      if (esito.muro) {
+        setMuro(esito.muro);
+        return;
+      }
       setErrore(esito.errore);
       return;
     }
@@ -379,6 +388,10 @@ export default function SchermataCheck() {
   }
 
   const testata = T.testate[modo];
+
+  /* IL MURO prende tutta la schermata: non è un avviso in mezzo a un
+     modulo, è il momento in cui si decide se pagare. */
+  if (muro) return <MuroCheck dati={muro} onAnnulla={() => setMuro(null)} />;
 
   return (
     <KeyboardAvoidingView

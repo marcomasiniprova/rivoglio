@@ -27,6 +27,8 @@ import { Button } from "@/components/ui/button";
  */
 
 export type DatiMuro = {
+  /** Dove si va a pagare. null = la cassa non c'è ancora. */
+  cassa?: string | null;
   prezzoTesto: string;
   prezzoPienoTesto: string;
   inLancio: boolean;

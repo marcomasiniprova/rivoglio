@@ -75,6 +75,13 @@ export async function POST(req: Request) {
         serveIlPass: true,
         errore: "L'analisi di questo volo si sblocca con un pagamento.",
         muro: {
+          /* Dove si va a pagare. Finché non c'è un venditore vero, con
+             CASSA_PROVA_SEGRETO acceso si va alla cassa di prova: serve
+             a percorrere il giro intero (muro, cassa, ricevuta, check
+             sbloccato) senza incassare niente. */
+          cassa: process.env.CASSA_PROVA_SEGRETO
+            ? `/cassa-prova?s=${encodeURIComponent(process.env.CASSA_PROVA_SEGRETO)}`
+            : null,
           prezzoTesto: prezzo.prezzoTesto,
           prezzoPienoTesto: prezzo.prezzoPienoTesto,
           inLancio: prezzo.inLancio,

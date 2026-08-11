@@ -14,6 +14,15 @@
  */
 export const SITO = process.env.EXPO_PUBLIC_SITO ?? "https://rivolio.netlify.app";
 
+/** Il muro del check a pagamento, come lo manda il server col 402. */
+export type MuroCheckDati = {
+  cassa: string | null;
+  prezzoTesto: string;
+  prezzoPienoTesto: string;
+  inLancio: boolean;
+  postiRimasti: number | null;
+};
+
 export type EsitoCheck =
   | {
       ok: true;
@@ -33,7 +42,7 @@ export type EsitoCheck =
       };
       demo: boolean;
     }
-  | { ok: false; errore: string };
+  | { ok: false; errore: string; muro?: MuroCheckDati };
 
 /**
  * Chiede il verdetto al motore. Non decide niente qui dentro: se la rete
@@ -47,6 +56,15 @@ export async function verificaVolo(volo: string, data: string): Promise<EsitoChe
       body: JSON.stringify({ volo: volo.trim(), data }),
     });
     const dati = await r.json().catch(() => null);
+
+    /* IL MURO (402): l'analisi si sblocca pagando. Non è un errore da
+       riga rossa, è una schermata: senza questo ramo l'app mostrava
+       "L'analisi si sblocca con un pagamento" come se fosse un guasto,
+       e chi lo leggeva restava fermo lì (visto il 11/08). */
+    if (r.status === 402 && dati?.serveIlPass && dati?.muro) {
+      return { ok: false, errore: "", muro: dati.muro as MuroCheckDati };
+    }
+
     if (!r.ok || !dati?.ok) {
       return {
         ok: false,
