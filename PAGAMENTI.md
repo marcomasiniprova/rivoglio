@@ -66,8 +66,36 @@ Non sono opinioni: sono le loro parole, aperte oggi.
 |---|---|---|
 | **Polar** | *"Travel Services;"* e *"Regulated services or products;"* | Sì, e infatti ha già detto no |
 | **Paddle** | *"Travel Services, including but not limited to reservation services, travel clubs, timeshares"* · *"pure consulting or advisory services, including but not limited to legal advice"* | Sì, ma con la formulazione più stretta |
-| **Lemon Squeezy** | *"Regulated services such as: ... bankruptcy, legal, merchant, debt-relief, collections"* e *"Services of any kind"* | Sì, due volte |
+| **Lemon Squeezy** | *"Regulated services such as: ... bankruptcy, legal, merchant, debt-relief, collections"* e *"Services of any kind"* | Sì, due volte · ⚠️ **e comunque sta chiudendo, vedi sotto** |
 | **Dodo Payments** | *"Legal, accounting, medical, and professional services ... Examples include advisory work, ... **document preparation**"* · *"Travel, Immigration & Visa services"* | Sì, ed è il più esplicito di tutti |
+
+## ⚠️ LEMON SQUEEZY ESCE DALLA LISTA (ricerca dell'11/08 sera)
+
+**Stripe l'ha comprata, e i suoi clienti stanno migrando su Stripe
+Managed Payments.** Il fondatore ha confermato a gennaio 2026 che stanno
+costruendo il percorso di migrazione; non c'è una data di spegnimento
+annunciata, ma non c'è nemmeno un motivo per salire su un treno che sta
+tornando in deposito. Iscriversi lì oggi è tempo speso su una porta che
+si chiude, **e in più il loro elenco ci vieta due volte** (riga qui
+sopra). Quindi: la quarta email non si manda.
+
+## E STRIPE MANAGED PAYMENTS, che sarebbe la porta naturale?
+
+**È merchant of record come Polar** (quindi niente partita IVA per
+incassare), costa **5% + 0,50 dollari**, cioè identico a quello che
+costava Lemon Squeezy.
+
+🟡 **Ma oggi è ancora in beta chiusa, e l'ammissione dipende da dove ha
+sede l'attività.** Le fonti concordano su tre cose: sta partendo dagli
+Stati Uniti, funziona solo con Checkout e Payment Links di Stripe, e
+Stripe rivede gli account prima di dare l'accesso. **Per un venditore
+italiano senza partita IVA, oggi, la porta probabilmente non è ancora
+aperta.**
+
+⚠️ **Non è verificato sulla fonte ufficiale**: da questo ambiente
+`stripe.com` è bloccato dal proxy. Va aperto dal PC di Valerio e
+guardato se il bottone dice *Get started* (aperto) o *Join the waitlist*
+(chiuso), e se l'Italia compare fra i paesi. In ARRETRATI.
 
 🔴 **La conclusione onesta: la categoria è chiusa sullo scaffale
 standard.** Non è che Polar ci abbia trattati peggio degli altri, e non

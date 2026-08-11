@@ -86,11 +86,16 @@ test.describe("Accesso", () => {
       .locator("header")
       .getByRole("link", { name: COPY.nav.cta })
       .click();
-    await expect(page).toHaveURL(/#controllo/);
+    /* ⚠️ L'indirizzo NON prende più il cancelletto (scelta di Valerio,
+       11/08: vedi components/AncoreLisce.tsx). Quello che conta non è
+       mai stato il testo nella barra degli indirizzi, ma dove finisce
+       la persona: quindi si guarda il check, non l'URL. */
+    await expect(page).toHaveURL(/\/$/);
     // il check c'è: il selettore dei modi è la sua faccia (tratta predefinita)
     await expect(
       page.getByRole("button", { name: COPY.check.modo.numero, exact: true }).first(),
     ).toBeVisible();
+    await expect(page.locator("#controllo")).toBeInViewport();
   });
 
   test("Entra porta al login, la web app resta nel footer (9/08)", async ({ page }) => {

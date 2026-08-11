@@ -3,6 +3,7 @@ import { Geist, Instrument_Serif, Poppins } from "next/font/google";
 import AntiCopia from "@/components/AntiCopia";
 import ScrollPesante from "@/components/ScrollPesante";
 import Visita from "@/components/Visita";
+import AncoreLisce from "@/components/AncoreLisce";
 import "./globals.css";
 
 import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
@@ -115,6 +116,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AntiCopia />
         <ScrollPesante />
         <Visita />
+        <AncoreLisce />
         {children}
       </body>
     </html>

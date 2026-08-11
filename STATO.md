@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-11 (giro #56: IL CRUSCOTTO E IL TIN, cioè vedere
+**Aggiornato:** 2026-08-11 (giro #57: il pannello non si apriva perché
+Valerio non aveva il ruolo admin, e i cancelletti spariscono
+dall'indirizzo · giro #56: IL CRUSCOTTO E IL TIN, cioè vedere
 in tempo reale chi arriva, dove si ferma e chi paga, col telefono che
 squilla sui soldi e sui guasti · giro #55: le tre email ai venditori
 SPEDITE, la cassa finta visibile, il blog da cui si esce, le impostazioni
@@ -65,6 +67,46 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #57 (11/08 sera): IL PANNELLO NON SI APRIVA PERCHÉ VALERIO NON
+  ERA ADMIN. Trovato in trenta secondi, e sono state settimane.**
+  - 🔴 **«/admin non funziona, mi rimbalza sempre su /app».** Aveva
+    ragione, e non era un guasto: **il codice faceva esattamente il suo
+    mestiere.** Sul database c'erano tre profili e **l'unico con ruolo
+    `admin` era `prova.interna@viaggioancheio.it`**, un account di
+    collaudo creato il 6/08 di cui Valerio non ha mai avuto la password.
+    Il suo (`trec.tun@gmail.com`) era un utente normale, quindi
+    `soloAdmin()` lo rimandava all'app. Promosso col connettore Supabase;
+    all'account di prova il ruolo è stato **tolto**, perché un account
+    che non è suo con accesso agli incassi è un buco che nessuno stava
+    guardando.
+    ⚠️ **La lezione vera è mia, non sua**: ho costruito tre pagine e non
+    gli ho mai detto né cosa fossero né che servisse un ruolo. Adesso
+    sono spiegate una per una, e da `/admin` si arriva alle altre due.
+  - **NIENTE PIÙ CANCELLETTI NELL'INDIRIZZO** (`components/AncoreLisce.tsx`,
+    richiesta sua). Cliccare "Prezzi" scriveva `rivolio.netlify.app/#prezzi`;
+    adesso la pagina scorre e l'indirizzo resta pulito. **E il marchio,
+    quando sei già sulla pagina, riporta in cima scorrendo** invece di
+    ricaricare.
+    ⚠️ **Un pezzo solo invece di venti**: gli ancoraggi stanno sparsi in
+    una ventina di componenti, e cambiandoli a mano il ventunesimo
+    nascerebbe col cancelletto. Si intercetta il clic una volta sola.
+    🔴 **E serviva la FASE DI CATTURA, non bastava fermare il clic.** Il
+    marchio è un `Link` di Next, che ha un suo gestore: senza cattura,
+    React arriva prima e ricarica la pagina. Trovato misurando (il
+    contatore restava a 3000 invece di andare a 0), non leggendo.
+    ⚠️ **Quello che NON si è rotto, ed era il rischio vero**: i link col
+    cancelletto che girano già (un video, una email) portano ancora dove
+    portavano, e i link da un'altra pagina navigano davvero. Quattro
+    prove nuove, verdi su schermo grande e su telefono.
+  - **LEMON SQUEEZY ESCE DALLA LISTA: la quarta email non si manda.**
+    Stripe l'ha comprata e sta migrando i suoi clienti su **Stripe
+    Managed Payments**; in più il loro elenco ci vieta due volte. Era la
+    porta più stretta, e sta anche chiudendo.
+    🟡 **Stripe Managed Payments sarebbe la porta naturale** (merchant of
+    record come Polar, quindi niente partita IVA, e 5% + 0,50 come Lemon
+    Squeezy), **ma oggi è in beta chiusa con rollout per paese**, e da
+    qui `stripe.com` è bloccato dal proxy: va guardato dal PC di Valerio.
+    In ARRETRATI, voce A8.
 - **GIRO #56 (11/08): IL CRUSCOTTO E IL TIN. «Così ho il controllo totale
   del mio business e vedo tutto concretamente» (richiesta di Valerio).**
   - **`/admin/cruscotto`: quello che succede, in diretta.** Si aggiorna da
