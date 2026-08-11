@@ -12,7 +12,7 @@
  * (`EXPO_PUBLIC_SITO=http://localhost:3000 npx expo start`) per provare
  * il flusso senza toccare la produzione.
  */
-export const SITO = process.env.EXPO_PUBLIC_SITO ?? "https://rivoglio.netlify.app";
+export const SITO = process.env.EXPO_PUBLIC_SITO ?? "https://rivolio.netlify.app";
 
 export type EsitoCheck =
   | {
