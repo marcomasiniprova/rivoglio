@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test, expect } from "@playwright/test";
 import {
   GIORNI_PRIMA_DELLA_CONCILIAZIONE,
@@ -285,5 +287,65 @@ test.describe("I tempi promessi combaciano con quelli veri", () => {
     /* "vettore" solo come parola intera: dentro altre parole non è il
        termine giuridico. */
     expect(minuscolo).not.toMatch(/\bvettor[ei]\b/);
+  });
+});
+
+/* ── LE SENTENZE CITATE PER QUELLO CHE DICONO DAVVERO ──────────────────
+   Errore vero, trovato l'11/08 leggendo il dispositivo di Sturgeon sul
+   PDF che l'ENAC pubblica sul proprio sito: la replica al "il volo non
+   era cosi' in ritardo" usava l'argomento dell'apertura delle porte e
+   citava SOLO Sturgeon. Ma in Sturgeon le porte non compaiono mai:
+   quella e' Germanwings, C-452/13. Un numero di causa sbagliato in una
+   lettera che il cliente manda alla compagnia lo fa sembrare
+   sprovveduto proprio nel punto in cui ha ragione. */
+test.describe("Ogni sentenza citata per quello che dice", () => {
+  const scheda = (motivo: string) => {
+    const s = RIFIUTI.find((r) => r.motivo === motivo);
+    expect(s, `manca la scheda del rifiuto "${motivo}"`).toBeTruthy();
+    return s!;
+  };
+
+  test("l'argomento delle porte cita Germanwings, non solo Sturgeon", () => {
+    const s = scheda("ritardo_contestato");
+    const parlaDiPorte = /porta dell'aeromobile|almeno una porta/i.test(s.replica);
+    expect(parlaDiPorte, "la replica non fa piu' l'argomento delle porte").toBe(true);
+
+    const rif = s.riferimenti.join(" ");
+    expect(rif, "l'argomento delle porte senza Germanwings e' una citazione sbagliata").toContain(
+      "C-452/13",
+    );
+    /* Sturgeon resta, ma per quello che dice lui: le tre ore. */
+    expect(rif).toContain("C-402/07");
+  });
+
+  test("Sturgeon non viene citata per le porte da nessuna parte", () => {
+    /* Il dispositivo di Sturgeon (letto sul testo ufficiale l'11/08) non
+       nomina mai le porte: se qualcuno le riattacca, la suite si ferma. */
+    for (const s of RIFIUTI) {
+      const rif = s.riferimenti.join(" ");
+      const soloSturgeon = rif.includes("C-402/07") && !rif.includes("C-452/13");
+      if (!soloSturgeon) continue;
+      expect(
+        /porta dell'aeromobile|almeno una porta/i.test(s.replica),
+        `"${s.motivo}" fa l'argomento delle porte citando solo Sturgeon`,
+      ).toBe(false);
+    }
+  });
+
+  test("le sentenze citate sono solo quelle che abbiamo scritto nel documento", () => {
+    /* Se qualcuno aggiunge una causa nuova alle repliche, deve anche
+       aggiungerla a SENTENZE-DA-CONTROLLARE.md, se no nessuno la
+       rileggera' mai sulla fonte. */
+    const doc = readFileSync(join(process.cwd(), "SENTENZE-DA-CONTROLLARE.md"), "utf8");
+    const cause = new Set<string>();
+    for (const s of RIFIUTI) {
+      for (const m of s.riferimenti.join(" ").matchAll(/C-\d+\/\d+/g)) cause.add(m[0]);
+    }
+    expect(cause.size).toBeGreaterThan(0);
+    for (const c of cause) {
+      expect(doc, `${c} e' citata in una lettera ma non sta in SENTENZE-DA-CONTROLLARE.md`).toContain(
+        c,
+      );
+    }
   });
 });

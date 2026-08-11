@@ -162,9 +162,19 @@ Vi chiedo di indicare l'orario e la natura del fenomeno, la sua incidenza sulla 
 L'orario di arrivo effettivo su cui si fonda la mia richiesta è tratto dal tracciamento del volo. Vi chiedo di indicare per iscritto l'orario di arrivo effettivo che ritenete corretto e la fonte da cui lo traete: i dati di rotazione dell'aeromobile e gli orari registrati sono nella vostra disponibilità e non nella mia.`,
     spiegazione:
       "Capita spesso, e quasi sempre stanno misurando un'altra cosa: il ritardo alla partenza invece che all'arrivo, o il momento in cui le ruote toccano terra invece di quando aprono la porta. Il dato che ti abbiamo dato viene dal tracciamento del volo, non da una stima.",
+    /* ⚠️ ERRORE VERO, TROVATO L'11/08 LEGGENDO IL TESTO UFFICIALE.
+       Qui c'era SOLO Sturgeon. Ma il dispositivo di Sturgeon (letto sul
+       PDF che l'ENAC pubblica sul proprio sito) parla del ritardo di tre
+       ore all'arrivo e **non nomina mai le porte dell'aeromobile**: la
+       definizione di "orario di arrivo" come momento in cui si apre
+       almeno una porta viene da una sentenza diversa, Germanwings.
+       Citare Sturgeon per l'argomento delle porte è il tipo di errore
+       che, in una lettera che il cliente manda alla compagnia, lo fa
+       sembrare sprovveduto proprio nel punto in cui ha ragione. */
     riferimenti: [
       "Reg. CE 261/2004, artt. 5 e 7",
-      "Corte di giustizia UE, Sturgeon e altri, cause riunite C-402/07 e C-432/07",
+      "Corte di giustizia UE, Sturgeon e altri, cause riunite C-402/07 e C-432/07 (il ritardo di tre ore all'arrivo)",
+      "Corte di giustizia UE, Germanwings contro Henning, causa C-452/13 (l'orario di arrivo è l'apertura delle porte)",
     ],
   },
   {
