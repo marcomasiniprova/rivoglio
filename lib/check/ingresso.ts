@@ -1,0 +1,117 @@
+/**
+ * IL PREZZO DEL CHECK (decisione di Valerio, 11/08).
+ *
+ * Perché esiste. Il check gratuito è l'unico pezzo del prodotto che non
+ * porta un euro, e Valerio deve fare cassa entro ottobre: 1,99 su ogni
+ * analisi è un numero piccolo per chi paga e grosso per chi incassa.
+ *
+ * ⚠️ NASCE SPENTO. Senza `CHECK_PREZZO_ATTIVO=1` fra le variabili, tutto
+ * si comporta come oggi: check libero, nessun muro, nessun cambiamento
+ * per nessuno. È di proposito: il venditore che incassa non c'è ancora
+ * (Polar ha detto no, vedi PAGAMENTI.md), e un muro davanti a una cassa
+ * chiusa sarebbe solo una porta sbarrata.
+ *
+ * IL PREZZO DI LANCIO, e perché è scritto così.
+ * "1,99 adesso, poi 4,99" è una promessa sul FUTURO, ed è lecita. Il
+ * finto sconto dal passato ("prima 4,99, ora 1,99") in Italia non si può
+ * fare: la direttiva Omnibus (d.lgs. 26/2023) impone che il prezzo
+ * barrato sia il più basso davvero praticato nei 30 giorni precedenti, e
+ * l'AGCM sanziona chi lo inventa. Quindi il prezzo pieno qui sotto è un
+ * impegno: quando i posti di lancio finiscono, si alza sul serio.
+ *
+ * IL TOTALE NON CAMBIA (richiesta di Valerio). Chi paga il check e poi
+ * apre la pratica non spende 16,89: i 1,99 si scalano, e il percorso
+ * completo resta 14,90 come sempre. Il check a pagamento non è un
+ * rincaro travestito, è un anticipo.
+ */
+
+import { euro, type Listino } from "@/lib/prezzi";
+
+/** L'interruttore. Assente o diverso da "1" = il check resta libero. */
+export const CHECK_A_PAGAMENTO = process.env.CHECK_PREZZO_ATTIVO === "1";
+
+/** Quanto costa un'analisi durante il lancio. */
+export const PREZZO_LANCIO = 1.99;
+
+/** Quanto costerà quando i posti di lancio finiscono. È un impegno. */
+export const PREZZO_PIENO = 4.99;
+
+/** Quante analisi al prezzo di lancio. Finiti questi, si alza davvero. */
+export const POSTI_DI_LANCIO = 500;
+
+/** Quanti check dà un pagamento: uno pagato, uno di cortesia se il primo
+ *  esce incerto (vedi `CORTESIA_SU_INCERTO`). */
+export const CHECK_PER_PAGAMENTO = 1;
+
+/**
+ * SE IL VERDETTO ESCE INCERTO, IL CHECK NON SI CONSUMA.
+ * È la difesa contro il problema più caro del cancello all'ingresso: uno
+ * paga 1,99 e si sente rispondere "non lo so". Quella è la strada per le
+ * recensioni da una stella e per le contestazioni sulla carta, che sono
+ * esattamente il motivo per cui un venditore ci guarda storto. Un
+ * incerto non è una risposta venduta: il credito resta e si riusa.
+ */
+export const CORTESIA_SU_INCERTO = true;
+
+/** Quanto vale il pass, in giorni. Chi paga oggi controlla anche domani. */
+export const GIORNI_DEL_PASS = 30;
+
+export type PrezzoCheck = {
+  /** Il prezzo che si paga adesso. */
+  prezzo: number;
+  prezzoTesto: string;
+  /** Quello a cui si arriverà: si mostra accanto, mai barrato come sconto. */
+  prezzoPieno: number;
+  prezzoPienoTesto: string;
+  /** Vero finché ci sono posti di lancio. */
+  inLancio: boolean;
+};
+
+/**
+ * Il prezzo di adesso, dato quante analisi sono già state pagate.
+ * Il conteggio arriva dal database: se non si riesce a leggerlo si serve
+ * il prezzo di lancio, che è il più basso. Mai il contrario: far pagare
+ * di più per un guasto nostro non si fa.
+ */
+export function prezzoCheck(analisiGiaPagate: number | null): PrezzoCheck {
+  const inLancio = analisiGiaPagate === null || analisiGiaPagate < POSTI_DI_LANCIO;
+  const prezzo = inLancio ? PREZZO_LANCIO : PREZZO_PIENO;
+  return {
+    prezzo,
+    prezzoTesto: euro(prezzo),
+    prezzoPieno: PREZZO_PIENO,
+    prezzoPienoTesto: euro(PREZZO_PIENO),
+    inLancio,
+  };
+}
+
+/**
+ * Quanti posti di lancio restano, da mostrare solo se il numero è VERO.
+ * Torna null quando il conteggio non si è potuto leggere: un contatore
+ * inventato è la cosa che distingue una scarsità onesta da un trucco, e
+ * qui si vende trasparenza.
+ */
+export function postiRimasti(analisiGiaPagate: number | null): number | null {
+  if (analisiGiaPagate === null) return null;
+  return Math.max(0, POSTI_DI_LANCIO - analisiGiaPagate);
+}
+
+/**
+ * Il prezzo della pratica per chi ha già pagato l'analisi.
+ * Il totale del percorso resta quello del listino: i 1,99 sono un
+ * anticipo, non un pedaggio in più.
+ */
+export function scontoDaCheck(
+  listino: Listino,
+  giaPagato: number,
+): { singola: number; famiglia: number; singolaTesto: string; famigliaTesto: string } {
+  const togli = (n: number) => Math.max(0, Math.round((n - giaPagato) * 100) / 100);
+  const singola = togli(listino.singola);
+  const famiglia = togli(listino.famiglia);
+  return {
+    singola,
+    famiglia,
+    singolaTesto: euro(singola),
+    famigliaTesto: euro(famiglia),
+  };
+}

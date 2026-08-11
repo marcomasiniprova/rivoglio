@@ -133,3 +133,64 @@ If the classification still stands after a human review, I would appreciate know
 Thank you,
 Valerio
 ```
+
+---
+
+## La decisione dell'11/08: il check si paga
+
+Valerio ha deciso, dopo il conto qui sotto: **il check non resta
+gratuito**. Cancello all'ingresso, **1,99** come prezzo di lancio, e il
+totale del percorso **resta 14,90**, perché i 1,99 si scalano dalla
+pratica. Il check a pagamento non è un rincaro: è un anticipo.
+
+### Il conto che ha portato alla decisione
+
+**Cosa costa oggi il check gratuito.** Non è un costo per chiamata, è un
+abbonamento: AeroDataBox va da 5,35 a 160 dollari al mese secondo il
+piano, e la nostra cache fa sì che un volo con 180 passeggeri costi UNA
+chiamata. Anche 10.000 check stanno dentro il piano più caro: circa 145
+euro al mese, cioè **1,4 centesimi a check**. Netlify e Supabase a quei
+volumi sono ancora gratis.
+
+**Cosa può portare il check a pagamento.** Su 10.000 analisi:
+- se paga il 50% (la stima di Valerio): circa 6.950 euro netti, molto
+  più dei 2.980 delle sole pratiche di oggi;
+- se paga il 5-10% (la stima prudente): 700-1.400 euro, cioè meno di
+  adesso, perché si perdono anche le pratiche di chi non entra.
+
+La differenza sta in un numero che nessuno conosce, e che **si misura**.
+
+### I tre rischi, scritti prima di partire
+
+1. **I concorrenti danno il check gratis.** AirHelp e Flightright lo
+   fanno gratuito e stanno a un clic di distanza. Il cancello va
+   giustificato da qualcosa che loro non danno.
+2. **Il finto sconto è illegale.** La direttiva Omnibus vuole che il
+   prezzo barrato sia il più basso praticato nei 30 giorni precedenti.
+   Per questo il testo dice "1,99 adesso, poi 4,99": è una promessa sul
+   futuro, ed è lecita **a patto di mantenerla**.
+3. **Le commissioni sui micro-importi.** Una tariffa tipo 5% + 50
+   centesimi su 1,99 lascia 1,39: il 30% se ne va. Sotto i 2 euro
+   conviene solo con un venditore adatto, oppure vendendo pacchetti.
+
+### Com'è costruito (e perché è spento)
+
+- `lib/check/ingresso.ts`: prezzi, posti di lancio, e l'interruttore
+  `CHECK_PREZZO_ATTIVO`. **Senza quella variabile non cambia niente per
+  nessuno.**
+- `lib/check/pass.ts`: la ricevuta firmata che apre il cancello. Niente
+  account, niente password: un cookie firmato, come i link delle email.
+- Il controllo sta sul **server**, dentro `/api/verifica`. Un muro che
+  vive solo nel browser lo scavalca chiunque, e ogni check scavalcato è
+  una chiamata che paghiamo noi.
+- **Un verdetto incerto non consuma il credito.** Chi paga per sapere e
+  si sente rispondere "non lo so" non ha comprato una risposta: tenergli
+  i soldi è la strada più breve per una contestazione sulla carta, che è
+  poi il motivo per cui un venditore guarda storto questo prodotto.
+
+### Cosa manca prima di poterlo accendere
+
+1. Un venditore che incassi (è tutto il resto di questo documento).
+2. Il muro visibile col prezzo, e il conteggio vero dei posti rimasti.
+3. La rinuncia al recesso in un tocco: per un contenuto digitale
+   consegnato subito serve, ma su 1,99 non può essere un modulo.

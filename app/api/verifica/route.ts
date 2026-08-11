@@ -3,6 +3,8 @@ import { scadenzaStimata } from "@/lib/regole/eu261";
 import { verificaVolo } from "@/lib/voli/verifica";
 import { inItaliano } from "@/lib/voli/aeroporti";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { CHECK_A_PAGAMENTO, CORTESIA_SU_INCERTO } from "@/lib/check/ingresso";
+import { COOKIE_PASS, consumaPass, leggiPass } from "@/lib/check/pass";
 
 /**
  * POST /api/verifica  {volo, data}
@@ -22,6 +24,15 @@ import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
    famiglia, l'andata e il ritorno); un ciclo automatico no. */
 const MASSIMO_AL_MINUTO = 20;
 
+/** Come si scrive il cookie della ricevuta: solo server, solo nostro sito. */
+const BISCOTTO = {
+  httpOnly: true,
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+  maxAge: 60 * 60 * 24 * 30,
+};
+
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS });
 }
@@ -34,6 +45,26 @@ export async function POST(req: Request) {
         errore: "Troppe richieste di fila. Aspetta un minuto e riprova.",
       },
       { status: 429, headers: CORS },
+    );
+  }
+
+  /* ── IL CANCELLO (spento finché CHECK_PREZZO_ATTIVO non vale "1") ───
+     Chi ha pagato porta con sé una ricevuta firmata nel cookie: niente
+     account, niente password, niente attesa. Chi non ce l'ha riceve un
+     402 con dentro il motivo, e la pagina mostra il muro col prezzo.
+     Il controllo sta QUI, sul server, e non in una schermata: un muro
+     che vive solo nel browser lo scavalca chiunque apra gli strumenti
+     per sviluppatori, e ogni check scavalcato è una chiamata pagata da
+     noi. */
+  const pass = CHECK_A_PAGAMENTO ? leggiPass(cookieDi(req, COOKIE_PASS)) : null;
+  if (CHECK_A_PAGAMENTO && !pass) {
+    return NextResponse.json(
+      {
+        ok: false,
+        serveIlPass: true,
+        errore: "L'analisi di questo volo si sblocca con un pagamento.",
+      },
+      { status: 402, headers: CORS },
     );
   }
 
@@ -67,7 +98,15 @@ export async function POST(req: Request) {
   }
 
   const { verdetto, fatto } = esito;
-  return NextResponse.json(
+
+  /* Il check si consuma SOLO se abbiamo dato una risposta. Su un incerto
+     il credito resta: chi paga per sapere e si sente rispondere "non lo
+     so" non ha comprato niente, e trattenergli i soldi è la strada più
+     breve per una contestazione sulla carta (vedi CORTESIA_SU_INCERTO). */
+  const daConsumare =
+    pass && !(CORTESIA_SU_INCERTO && verdetto.esito === "incerto") ? consumaPass(pass) : undefined;
+
+  const risposta = NextResponse.json(
     {
       ok: true,
       id: esito.verificaId,
@@ -102,4 +141,25 @@ export async function POST(req: Request) {
     },
     { headers: CORS },
   );
+
+  if (pass && daConsumare !== undefined) {
+    if (daConsumare === null) {
+      risposta.cookies.delete(COOKIE_PASS);
+    } else {
+      risposta.cookies.set(COOKIE_PASS, daConsumare, BISCOTTO);
+    }
+  }
+  return risposta;
+}
+
+/** Un cookie preso dall'intestazione grezza: qui non c'è il contesto di
+ *  Next, la richiesta arriva anche dall'app. */
+function cookieDi(req: Request, nome: string): string | null {
+  const testa = req.headers.get("cookie");
+  if (!testa) return null;
+  for (const pezzo of testa.split(";")) {
+    const [k, ...resto] = pezzo.trim().split("=");
+    if (k === nome) return decodeURIComponent(resto.join("="));
+  }
+  return null;
 }
