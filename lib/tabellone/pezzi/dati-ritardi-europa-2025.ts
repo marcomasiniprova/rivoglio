@@ -128,7 +128,10 @@ export const ARTICOLO: Articolo = {
       tipo: "check",
       titolo: "Il tuo volo dove cade: sotto o sopra le tre ore?",
       testo:
-        "Le statistiche parlano della rete, non del tuo volo. Qui guardiamo l'orario di arrivo effettivo registrato per il volo che hai preso, e ti diciamo i minuti veri. Gratis, senza account. Se il caso non regge, te lo diciamo lo stesso.",
+        seSiPaga(
+          `Le statistiche parlano della rete, non del tuo volo. Qui guardiamo l'orario di arrivo effettivo registrato per il volo che hai preso, e ti diciamo i minuti veri. ${euro(PREZZO_LANCIO)}, senza account. Se il verdetto esce incerto, l'analisi non si consuma.`,
+          "Le statistiche parlano della rete, non del tuo volo. Qui guardiamo l'orario di arrivo effettivo registrato per il volo che hai preso, e ti diciamo i minuti veri. Gratis, senza account. Se il caso non regge, te lo diciamo lo stesso.",
+        ),
     },
 
     { tipo: "h2", testo: "D'estate il quadro cambia del tutto" },

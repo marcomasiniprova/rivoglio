@@ -109,7 +109,10 @@ export const ARTICOLO: Articolo = {
       tipo: "check",
       titolo: "Il tuo volo Ryanair regge? Guarda il dato vero",
       testo:
-        "Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e la fascia. Gratis, senza account e senza carta. Se il caso non regge te lo diciamo e non paghi niente.",
+        seSiPaga(
+          `Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e la fascia. ${euro(PREZZO_LANCIO)}, senza account. Se il verdetto esce incerto, l'analisi non si consuma.`,
+          "Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e la fascia. Gratis, senza account e senza carta. Se il caso non regge te lo diciamo e non paghi niente.",
+        ),
     },
 
     { tipo: "h2", testo: "Quando Ryanair non ti deve la somma" },

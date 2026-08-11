@@ -8,6 +8,7 @@
 
 import type { Esito } from "./tipi";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 /**
  * Nomi con cui la gente chiama davvero le compagnie più comuni in Italia,
  * mappati sul codice IATA. Le chiavi sono minuscole e senza spazi:
@@ -116,7 +117,10 @@ export function normalizzaData(grezza: string): Esito<string> {
   if (valore > domani) {
     return {
       ok: false,
-      errore: "Questo volo non è ancora partito. Torna dopo l'atterraggio: il controllo resta gratuito.",
+      errore: seSiPaga(
+        "Questo volo non è ancora partito. Torna dopo l'atterraggio: non ti è stato addebitato niente.",
+        "Questo volo non è ancora partito. Torna dopo l'atterraggio: il controllo resta gratuito.",
+      ),
     };
   }
 

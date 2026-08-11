@@ -196,3 +196,37 @@ comment on column public.pratiche.rifiuto_il is
 --      ('voli','partenza_paese'), ('voli','arrivo_paese'), ('voli','partenza_icao'),
 --      ('pratiche','rifiuto_motivo'), ('pratiche','rifiuto_il'))
 --  order by table_name, column_name;
+
+
+-- ═══════════════════════════════════════════════════════════════════════
+-- 6. IL REGISTRO DELLE ANALISI PAGATE  (11/08, giro #54)
+-- ═══════════════════════════════════════════════════════════════════════
+-- PERCHÉ SERVE, in una riga: senza questa colonna chi paga 1,99 può
+-- copiarsi il cookie della ricevuta e riusarlo all'infinito.
+--
+-- La ricevuta è firmata da noi, quindi dimostra CHE HAI PAGATO. Ma dice
+-- anche QUANTO TI RESTA, e quel pezzo sta nel browser dell'utente: basta
+-- rimettere a mano il valore di prima per tornare ad avere il credito
+-- pieno. Provato l'11/08 attaccando il muro: seconda analisi con la
+-- stessa ricevuta già consumata, e passava.
+--
+-- Un conto lo tiene chi non lo può cambiare. Da qui in avanti ogni
+-- analisi consumata scrive il proprio ordine qui sopra, e il cancello
+-- conta le righe invece di fidarsi del cookie.
+--
+-- ⚠️ Finché questa colonna non c'è, il muro funziona lo stesso ma torna
+-- a fidarsi del cookie: si può riusare la ricevuta. Con la cassa vera
+-- accesa, questo punto va eseguito PRIMA.
+alter table public.verifiche
+  add column if not exists ordine_check text;
+
+-- L'indice serve al conteggio che gira a ogni analisi di chi ha pagato:
+-- senza, con la tabella grande diventa una scansione completa.
+create index if not exists verifiche_ordine_check_idx
+  on public.verifiche (ordine_check)
+  where ordine_check is not null;
+
+-- Controllo: deve rispondere una riga.
+select column_name
+from information_schema.columns
+where table_name = 'verifiche' and column_name = 'ordine_check';

@@ -1,5 +1,6 @@
 import { VERSIONE_REGOLE, type FattoVolo, type Verdetto } from "./eu261";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 /**
  * I CASI DICHIARATI: negato imbarco e coincidenza persa.
  *
@@ -86,7 +87,10 @@ function paletti(f: FattoVolo, km: number | null): Verdetto | null {
   }
   if (km === null || !Number.isFinite(km) || km <= 0) {
     return incerto(
-      "In base alle tue risposte la compensazione spetterebbe, ma non conosciamo la distanza che decide l'importo. Riprova più tardi: il controllo resta gratuito.",
+      seSiPaga(
+        "In base alle tue risposte la compensazione spetterebbe, ma non conosciamo la distanza che decide l'importo. Riprova più tardi: questa analisi non si consuma, il credito resta.",
+        "In base alle tue risposte la compensazione spetterebbe, ma non conosciamo la distanza che decide l'importo. Riprova più tardi: il controllo resta gratuito.",
+      ),
     );
   }
   return null;

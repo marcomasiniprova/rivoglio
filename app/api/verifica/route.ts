@@ -4,7 +4,7 @@ import { verificaVolo } from "@/lib/voli/verifica";
 import { inItaliano } from "@/lib/voli/aeroporti";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
 import { CHECK_A_PAGAMENTO, CORTESIA_SU_INCERTO } from "@/lib/check/ingresso";
-import { passDi, rispostaMuro } from "@/lib/check/cancello";
+import { creditoFinito, passDi, rispostaMuro, segnaConsumo } from "@/lib/check/cancello";
 import { COOKIE_PASS, consumaPass } from "@/lib/check/pass";
 
 /**
@@ -60,6 +60,14 @@ export async function POST(req: Request) {
   const pass = passDi(req);
   if (CHECK_A_PAGAMENTO && !pass) return rispostaMuro(req);
 
+  /* ⚠️ E NON BASTA AVERE UNA RICEVUTA VALIDA: bisogna che le analisi che
+     ha comprato non siano già finite. Il credito nel cookie non fa fede,
+     perché il cookie sta nel browser di chi lo usa: chi si copiava il
+     valore di prima tornava ad avere il credito pieno (provato l'11/08:
+     seconda analisi con la stessa ricevuta consumata, 200). Il conto lo
+     tiene il database. */
+  if (pass && (await creditoFinito(pass))) return rispostaMuro(req);
+
   let corpo: unknown;
   try {
     corpo = await req.json();
@@ -95,8 +103,12 @@ export async function POST(req: Request) {
      il credito resta: chi paga per sapere e si sente rispondere "non lo
      so" non ha comprato niente, e trattenergli i soldi è la strada più
      breve per una contestazione sulla carta (vedi CORTESIA_SU_INCERTO). */
-  const daConsumare =
-    pass && !(CORTESIA_SU_INCERTO && verdetto.esito === "incerto") ? consumaPass(pass) : undefined;
+  const siConsuma = Boolean(pass) && !(CORTESIA_SU_INCERTO && verdetto.esito === "incerto");
+  const daConsumare = siConsuma && pass ? consumaPass(pass) : undefined;
+
+  /* Il consumo si scrive nel REGISTRO, non solo nel cookie: è quello che
+     impedisce di riusare la stessa ricevuta copiandola a mano. */
+  if (siConsuma && pass) await segnaConsumo(esito.verificaId, pass.ordine);
 
   const risposta = NextResponse.json(
     {

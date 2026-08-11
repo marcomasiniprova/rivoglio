@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { passDi, rispostaMuro } from "@/lib/check/cancello";
+import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { estraiCampi, testoDaDocumento } from "@/lib/ocr/carta-imbarco";
 
 /**
@@ -43,6 +45,14 @@ export async function POST(req: Request) {
       { status: 429, headers: CORS },
     );
   }
+
+  /* IL CANCELLO. Questa rotta non dà verdetti, ma **costa a chiamata**:
+     ogni foto è una richiesta a Mistral che paghiamo noi. Lasciata aperta
+     col muro acceso, Rivolio diventa un servizio di lettura documenti
+     gratuito per chiunque, e il conto arriva a noi. Il tetto per IP non
+     basta: vive nella memoria della singola funzione Netlify, quindi con
+     dieci istanze in parallelo sono dieci tetti diversi. */
+  if (CHECK_A_PAGAMENTO && !passDi(req)) return rispostaMuro(req);
 
   let corpo: unknown;
   try {

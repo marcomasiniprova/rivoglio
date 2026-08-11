@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { CORS } from "@/lib/api/limite";
-import { supabaseServizio } from "@/lib/supabase/servizio";
+import { colonnaMancante } from "@/lib/supabase/colonne";
+import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { conteggioCheck } from "./conteggio";
 import { CHECK_A_PAGAMENTO, postiRimasti, prezzoCheck } from "./ingresso";
 import {
@@ -51,6 +52,67 @@ export function inCollaudo(req: Request): boolean {
   const segreto = process.env.CASSA_PROVA_SEGRETO ?? "";
   if (!segreto) return false;
   return chiaveDiProvaValida(cookieDi(req, COOKIE_PROVA), segreto);
+}
+
+/**
+ * IL REGISTRO: quante analisi ha già consumato questo ordine.
+ *
+ * 🔴 IL BUCO CHE CHIUDE, trovato attaccando il muro l'11/08. Il cookie
+ * della ricevuta si "consuma" scrivendone uno nuovo col credito calato,
+ * ma **il cookie sta nel browser dell'utente**: chi si copiava il valore
+ * di prima e lo rimetteva a mano tornava ad avere il credito pieno.
+ * Provato: prima analisi 200, seconda con la STESSA ricevuta già
+ * consumata, ancora 200. Uno paga 1,99 e controlla mille voli, o passa
+ * la stringa agli amici.
+ *
+ * La ricevuta firmata dimostra CHE HAI PAGATO, non QUANTO TI RESTA:
+ * quanto ti resta è un conto, e un conto lo tiene chi non lo può
+ * cambiare, cioè il nostro database. Ogni analisi consumata scrive il
+ * proprio ordine sulla riga di `verifiche`; qui si contano.
+ *
+ * ⚠️ Se il registro non si può leggere (colonna non ancora aggiunta,
+ * database irraggiungibile) si torna al conto del cookie: degradato ma
+ * funzionante, e scritto nei log. Non si blocca chi ha pagato per un
+ * guasto nostro.
+ */
+export async function creditoFinito(pass: Pass): Promise<boolean> {
+  if (!SERVIZIO_ATTIVO) return pass.restano <= 0;
+  try {
+    const { count, error } = await supabaseServizio()
+      .from("verifiche")
+      .select("id", { count: "exact", head: true })
+      .eq("ordine_check", pass.ordine);
+    if (error) {
+      if (!colonnaMancante(error.message)) {
+        console.error("[cancello] registro non leggibile:", error.message);
+      }
+      return pass.restano <= 0;
+    }
+    return (count ?? 0) >= pass.quanti;
+  } catch (e) {
+    console.error("[cancello] registro non leggibile:", e);
+    return pass.restano <= 0;
+  }
+}
+
+/**
+ * Scrive nel registro che questa analisi è stata consumata da quest'ordine.
+ * Se fallisce lo dice forte: senza questa riga la stessa ricevuta si
+ * potrebbe riusare, ed è il buco che il registro esiste per chiudere.
+ */
+export async function segnaConsumo(verificaId: string | null, ordine: string): Promise<void> {
+  if (!verificaId || !SERVIZIO_ATTIVO) return;
+  try {
+    const { error } = await supabaseServizio()
+      .from("verifiche")
+      .update({ ordine_check: ordine })
+      .eq("id", verificaId);
+    if (error && !colonnaMancante(error.message)) {
+      console.error("[cancello] consumo NON registrato:", error.message);
+    }
+  } catch (e) {
+    console.error("[cancello] consumo NON registrato:", e);
+  }
 }
 
 /** I dati che il muro mostra: prezzo, posti, e dove si paga. */
@@ -105,19 +167,23 @@ export async function cancelloDelSeguito(
   if (!CHECK_A_PAGAMENTO) return null;
   if (passDi(req)) return null;
 
-  if (typeof verificaId === "string" && verificaId) {
-    const db = supabaseServizio();
-    if (!db) {
-      /* Senza database non si può dimostrare che ha pagato. Il muro
-         resta chiuso: sbagliare qui vuol dire regalare il prodotto. */
-      return rispostaMuro(req);
+  /* ⚠️ SI CHIUDE, NON SI APRE, QUANDO QUALCOSA VA STORTO.
+     Senza database non si può dimostrare che quella verifica esiste, e
+     `supabaseServizio()` alza un'eccezione se la chiave manca: lasciarla
+     scappare farebbe rispondere 500 alla rotta, cioè un guasto al posto
+     del muro. Qualunque cosa succeda qui dentro, la risposta è il muro:
+     sbagliare dall'altra parte vuol dire regalare il prodotto. */
+  if (typeof verificaId === "string" && verificaId && SERVIZIO_ATTIVO) {
+    try {
+      const { data } = await supabaseServizio()
+        .from("verifiche")
+        .select("id")
+        .eq("id", verificaId)
+        .maybeSingle();
+      if (data) return null;
+    } catch (e) {
+      console.warn("[cancello] verifica non controllabile, resta chiuso:", e);
     }
-    const { data } = await db
-      .from("verifiche")
-      .select("id")
-      .eq("id", verificaId)
-      .maybeSingle();
-    if (data) return null;
   }
 
   return rispostaMuro(req);

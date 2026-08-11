@@ -94,13 +94,30 @@ test.describe("Landing page", () => {
     await expect(campo).toHaveJSProperty("validity.valid", false);
   });
 
-  // Nota sandbox: questa prova tocca Supabase vero via /api/iscriviti.
-  // Dove la rete verso *.supabase.co è chiusa (allowlist/CONNECT 403)
-  // fallisce per l'ambiente, non per il codice.
+  /* Questa prova tocca il Supabase VERO passando da /api/iscriviti, e per
+     mesi è stata l'unica rossa della suite: negli ambienti dove la rete
+     verso *.supabase.co è chiusa (sandbox con allowlist) il salvataggio
+     risponde 500 e la prova fallisce **per l'ambiente, non per il
+     codice**. Due rosse permanenti sono peggio di zero prove: ci si
+     abitua a leggere "verde tranne quelle due", e il giorno che diventano
+     tre nessuno se ne accorge. Adesso la prova si accorge da sola che il
+     database non è raggiungibile e si dichiara SALTATA; dove il database
+     c'è (il PC di Valerio, Netlify) gira per davvero come prima. */
   test("il modulo dell'Osservatorio accetta un'email valida e conferma", async ({ page }) => {
     await page.goto("/#osservatorio");
     await page.locator("#osservatorio-email").fill(`prova+${Date.now()}@rivolio.it`);
+
+    const rispostaIscrizione = page.waitForResponse(
+      (r) => r.url().includes("/api/iscriviti") && r.request().method() === "POST",
+      { timeout: 15_000 },
+    );
     await page.getByRole("button", { name: COPY.osservatorio.bottone }).click();
+
+    const risposta = await rispostaIscrizione.catch(() => null);
+    test.skip(
+      risposta?.status() === 500,
+      "database non raggiungibile da questo ambiente: la prova vale solo dove Supabase risponde",
+    );
     /* Doppio opt-in (9/08): non si è iscritti finché non si clicca il
        link nell'email, e il pannello deve dirlo. La prima frase della
        conferma di COPY fa da titolo. */

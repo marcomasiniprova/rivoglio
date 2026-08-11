@@ -1,3 +1,4 @@
+import { seSiPaga } from "@/lib/check/ingresso";
 import {
   VERSIONE_REGOLE,
   type FattoVolo,
@@ -119,7 +120,10 @@ export function valutaCancellato(f: FattoVolo, r: RisposteCancellato): Verdetto 
      non paga. È la regola dei tre stati, applicata a una memoria. */
   if (r.preavviso === "nonRicordo") {
     return incerto(
-      "Senza sapere quanti giorni prima ti hanno avvisato non si può dire se la compensazione spetta: è la prima cosa che chiede il Regolamento. Cerca l'email o l'SMS della compagnia, di solito la data è lì, e torna a rispondere. Il controllo resta gratuito.",
+      seSiPaga(
+        "Senza sapere quanti giorni prima ti hanno avvisato non si può dire se la compensazione spetta: è la prima cosa che chiede il Regolamento. Cerca l'email o l'SMS della compagnia, di solito la data è lì, e torna a rispondere: questa analisi non si consuma, il credito resta.",
+        "Senza sapere quanti giorni prima ti hanno avvisato non si può dire se la compensazione spetta: è la prima cosa che chiede il Regolamento. Cerca l'email o l'SMS della compagnia, di solito la data è lì, e torna a rispondere. Il controllo resta gratuito.",
+      ),
     );
   }
 
@@ -139,7 +143,10 @@ export function valutaCancellato(f: FattoVolo, r: RisposteCancellato): Verdetto 
 
   if (r.alternativa === "nonRicordo") {
     return incerto(
-      "Manca l'ultimo pezzo: con il volo alternativo, quanto dopo sei arrivato rispetto all'orario previsto? Da quello dipende se la compensazione spetta. Guarda la carta d'imbarco del volo che hai preso davvero e torna a rispondere: il controllo resta gratuito.",
+      seSiPaga(
+        "Manca l'ultimo pezzo: con il volo alternativo, quanto dopo sei arrivato rispetto all'orario previsto? Da quello dipende se la compensazione spetta. Guarda la carta d'imbarco del volo che hai preso davvero e torna a rispondere: questa analisi non si consuma, il credito resta.",
+        "Manca l'ultimo pezzo: con il volo alternativo, quanto dopo sei arrivato rispetto all'orario previsto? Da quello dipende se la compensazione spetta. Guarda la carta d'imbarco del volo che hai preso davvero e torna a rispondere: il controllo resta gratuito.",
+      ),
     );
   }
 
@@ -171,7 +178,10 @@ export function valutaCancellato(f: FattoVolo, r: RisposteCancellato): Verdetto 
 
   if (f.kmOrtodromica === null || !Number.isFinite(f.kmOrtodromica) || f.kmOrtodromica <= 0) {
     return incerto(
-      "In base alle tue risposte la compensazione spetterebbe, ma non conosciamo la distanza della tratta, che decide l'importo. Riprova più tardi: il controllo resta gratuito.",
+      seSiPaga(
+        "In base alle tue risposte la compensazione spetterebbe, ma non conosciamo la distanza della tratta, che decide l'importo. Riprova più tardi: questa analisi non si consuma, il credito resta.",
+        "In base alle tue risposte la compensazione spetterebbe, ma non conosciamo la distanza della tratta, che decide l'importo. Riprova più tardi: il controllo resta gratuito.",
+      ),
     );
   }
 

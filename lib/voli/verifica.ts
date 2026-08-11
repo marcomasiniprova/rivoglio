@@ -28,6 +28,7 @@ import { scioperoInData } from "@/lib/scioperi/scioperi";
 import { normalizzaData, normalizzaVolo } from "./normalizza";
 import type { FattoConPayload, FornitoreVoli } from "./tipi";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 export type EsitoVerifica =
   | {
       ok: true;
@@ -340,7 +341,10 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
          scrivere il numero: domani quel volo non esisterà lo stesso.
          Un refuso è comune quanto un volo fresco. */
       motivo:
-        "Di questo volo non abbiamo ancora l'orario di arrivo certificato. Può essere per due motivi: il volo è di ieri o dell'altro ieri e il dato arriva di solito entro un giorno, oppure il numero non è quello giusto. Controlla il numero sulla carta d'imbarco; se è corretto, ricontrolla domani. Il check resta gratuito, e se ci lasci l'email ti avvisiamo noi.",
+        seSiPaga(
+          "Di questo volo non abbiamo ancora l'orario di arrivo certificato. Può essere per due motivi: il volo è di ieri o dell'altro ieri e il dato arriva di solito entro un giorno, oppure il numero non è quello giusto. Controlla il numero sulla carta d'imbarco; se è corretto, ricontrolla domani. Questa analisi non si consuma: il credito resta, e se ci lasci l'email ti avvisiamo noi.",
+          "Di questo volo non abbiamo ancora l'orario di arrivo certificato. Può essere per due motivi: il volo è di ieri o dell'altro ieri e il dato arriva di solito entro un giorno, oppure il numero non è quello giusto. Controlla il numero sulla carta d'imbarco; se è corretto, ricontrolla domani. Il check resta gratuito, e se ci lasci l'email ti avvisiamo noi.",
+        ),
     };
   }
 

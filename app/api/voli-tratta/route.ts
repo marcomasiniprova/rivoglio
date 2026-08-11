@@ -18,9 +18,34 @@ import { voliDiTratta } from "@/lib/voli/tratta";
  *
  * Ogni chiamata costa due richieste ad AeroDataBox (la finestra massima
  * del fornitore è di 12 ore), quindi il tetto per IP qui è stretto.
+ *
+ * ⚠️ ED È LA ROTTA PIÙ CARA CHE ABBIAMO, per un motivo che non si vede:
+ * il check ha la cache sulla tabella `voli`, quindi un volo con 180
+ * passeggeri costa UNA chiamata. Qui la cache non c'era: mille persone
+ * che cercano lo stesso Roma → Barcellona erano duemila chiamate. Con la
+ * distribuzione addosso è la voce che fa il conto.
+ *
+ * La cache adesso c'è ed è la RETE di Netlify, non un database: stessa
+ * tratta e stessa data = stesso indirizzo = una risposta sola servita a
+ * tutti. Zero tabelle nuove, zero migrazioni da applicare.
+ *
+ * ⚠️ E si può fare SOLO perché la risposta che si mette in cache è quella
+ * SENZA l'orario di atterraggio. Se si mettesse in cache la versione
+ * completa di chi ha pagato, la rete la servirebbe poi a chi non ha
+ * pagato: la cache diventerebbe il buco. Chi ha la ricevuta riceve la
+ * risposta piena e `no-store`, e non entra in nessuna cache.
  */
 
 const MASSIMO_AL_MINUTO = 10;
+
+/* Una giornata passata non cambia più: i voli sono atterrati e l'elenco
+   è definitivo. Sei ore sono prudenti e tagliano comunque il 99% delle
+   chiamate su una tratta popolare. */
+const CACHE_PASSATO = 6 * 60 * 60;
+
+/* Oggi e domani cambiano mentre la giornata scorre: cinque minuti
+   bastano a reggere un'ondata senza mostrare un elenco vecchio. */
+const CACHE_OGGI = 5 * 60;
 
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS });
@@ -65,13 +90,26 @@ export async function GET(req: Request) {
      far riconoscere all'utente il proprio volo: senza, la lista di undici
      voli identici non si distingue e la ricerca per tratta smette di
      funzionare. */
-  const voli =
-    CHECK_A_PAGAMENTO && !passDi(req)
-      ? esito.voli.map((v) => ({ ...v, arrivoEffettivoOra: "" }))
-      : esito.voli;
+  const haPagato = !CHECK_A_PAGAMENTO || Boolean(passDi(req));
+  const voli = haPagato
+    ? esito.voli
+    : esito.voli.map((v) => ({ ...v, arrivoEffettivoOra: "" }));
+
+  /* La cache va SOLO sulla risposta ridotta (vedi la nota in testa).
+     `Vary: Cookie` è la cintura di sicurezza: dice a qualsiasi cache di
+     mezzo che due browser con cookie diversi non condividono la
+     risposta, così una versione piena non può finire a un altro. */
+  const oggi = new Date().toISOString().slice(0, 10);
+  const durata = data.valore < oggi ? CACHE_PASSATO : CACHE_OGGI;
+  const cache: Record<string, string> = haPagato
+    ? { "Cache-Control": "private, no-store" }
+    : {
+        "Cache-Control": `public, max-age=0, s-maxage=${durata}, stale-while-revalidate=60`,
+        "Netlify-CDN-Cache-Control": `public, s-maxage=${durata}, stale-while-revalidate=60`,
+      };
 
   return NextResponse.json(
     { ok: true, da, a, data: data.valore, voli, demo: esito.demo },
-    { headers: CORS },
+    { headers: { ...CORS, ...cache, Vary: "Cookie, Origin" } },
   );
 }

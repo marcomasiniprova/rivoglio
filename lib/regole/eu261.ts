@@ -18,6 +18,7 @@
 
 import { ambitoCE261, vettoreConLicenzaUE, zonaDiScalo } from "./territorio";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 export const VERSIONE_REGOLE = "2026.08.8";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
@@ -174,7 +175,10 @@ export function valuta(f: FattoVolo): Verdetto {
   // Dati che non combaciano fra fonti: non si vende su un dato conteso.
   if (f.fontiDiscordanti) {
     return incerto(
-      "Le due fonti dati non concordano sull'orario di arrivo. Non vendiamo su un dato incerto: riprova più tardi, il controllo resta gratuito.",
+      seSiPaga(
+        "Le due fonti dati non concordano sull'orario di arrivo. Non diamo un verdetto su un dato conteso: riprova più tardi, questa analisi non si consuma e il credito resta.",
+        "Le due fonti dati non concordano sull'orario di arrivo. Non vendiamo su un dato incerto: riprova più tardi, il controllo resta gratuito.",
+      ),
     );
   }
 
@@ -213,7 +217,10 @@ export function valuta(f: FattoVolo): Verdetto {
      un "no": 179 minuti stimati possono essere 185 veri. */
   if (f.orarioVerificato !== true) {
     return incerto(
-      "L'orario di arrivo di questo volo non è confermato dal tracciamento. Non diamo verdetti su dati non verificati: riprova più tardi, il controllo resta gratuito.",
+      seSiPaga(
+        "L'orario di arrivo di questo volo non è confermato dal tracciamento. Non diamo verdetti su dati non verificati: riprova più tardi, questa analisi non si consuma e il credito resta.",
+        "L'orario di arrivo di questo volo non è confermato dal tracciamento. Non diamo verdetti su dati non verificati: riprova più tardi, il controllo resta gratuito.",
+      ),
     );
   }
 

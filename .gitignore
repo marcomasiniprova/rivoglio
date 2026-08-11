@@ -50,3 +50,6 @@ prove/nostro/
 prove/zentivo/
 prove/schermate/
 mobile/anteprima-web/
+
+# Le schermate del giro visivo: si rigenerano con `node scripts/giro-visivo.mjs`
+schermate/

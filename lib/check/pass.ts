@@ -81,8 +81,10 @@ const firma = (corpo: string, k: string) =>
   createHmac("sha256", k).update(corpo).digest("base64url");
 
 export type Pass = {
-  /** Quanti check restano da fare. */
+  /** Quanti check restano da fare, secondo il cookie. */
   restano: number;
+  /** Quanti check ha comprato l'ordine. È il tetto vero. */
+  quanti: number;
   /** Quando scade, in millisecondi. */
   scadenza: number;
   /** L'ordine che l'ha pagato: serve a ritrovare la ricevuta contabile. */
@@ -96,7 +98,11 @@ export function creaPass(ordine: string, quanti: number, adesso = Date.now()): s
     console.error("[pass] nessun segreto in produzione: pass non emesso");
     return null;
   }
-  const corpo = b64(JSON.stringify({ r: quanti, x: adesso + DURATA_MS, o: ordine }));
+  /* `q` è quanti check ha comprato l'ordine e non cambia mai; `r` è
+     quanti ne restano secondo il cookie. Servono tutti e due perché il
+     cookie da solo non fa fede: il conto vero lo tiene il database
+     (vedi `creditoFinito` in cancello.ts). */
+  const corpo = b64(JSON.stringify({ r: quanti, q: quanti, x: adesso + DURATA_MS, o: ordine }));
   return `${corpo}.${firma(corpo, k)}`;
 }
 
@@ -116,7 +122,7 @@ export function leggiPass(pass: string | null | undefined, adesso = Date.now()):
   const ricevuto = Buffer.from(data);
   if (atteso.length !== ricevuto.length || !timingSafeEqual(atteso, ricevuto)) return null;
 
-  let letto: { r?: unknown; x?: unknown; o?: unknown };
+  let letto: { r?: unknown; q?: unknown; x?: unknown; o?: unknown };
   try {
     letto = JSON.parse(daB64(corpo));
   } catch {
@@ -127,7 +133,11 @@ export function leggiPass(pass: string | null | undefined, adesso = Date.now()):
   if (typeof letto.x !== "number" || letto.x < adesso) return null;
   if (typeof letto.o !== "string" || !letto.o) return null;
 
-  return { restano: letto.r, scadenza: letto.x, ordine: letto.o };
+  /* Le ricevute emesse prima dell'11/08 non portano `q`: il tetto lo si
+     prende da quanto restava, che per loro coincide col comprato. */
+  const quanti = typeof letto.q === "number" && letto.q > 0 ? letto.q : letto.r;
+
+  return { restano: letto.r, quanti, scadenza: letto.x, ordine: letto.o };
 }
 
 /**
@@ -143,7 +153,9 @@ export function consumaPass(pass: Pass, adesso = Date.now()): string | null {
   if (pass.restano <= 1) return null;
   const k = chiave();
   if (!k) return null;
-  const corpo = b64(JSON.stringify({ r: pass.restano - 1, x: pass.scadenza, o: pass.ordine }));
+  const corpo = b64(
+    JSON.stringify({ r: pass.restano - 1, q: pass.quanti, x: pass.scadenza, o: pass.ordine }),
+  );
   void adesso;
   return `${corpo}.${firma(corpo, k)}`;
 }
