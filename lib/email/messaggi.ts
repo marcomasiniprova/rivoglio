@@ -2,6 +2,7 @@ import { casa, spedisci, type Esito } from "./posta";
 import { bottone, COLORI as C, FONT, riga, rigaScalo, vestito } from "./modello";
 import { linkConferma, linkDisdetta } from "@/lib/iscritti/gettone";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 /**
  * Le email di servizio, una funzione ciascuna.
  *
@@ -101,7 +102,7 @@ export function componiBenvenuto(scali: ScaloOggi[], disdetta: string | null) {
           "Ogni settimana ti mando i voli più in ritardo sui cieli italiani, presi dai dati che verifichiamo per i check. Una email a settimana, niente altro.",
         ) +
         tabella +
-        bottone("Controlla un tuo volo, gratis", `${casa()}/app`) +
+        bottone(seSiPaga("Analizza un tuo volo", "Controlla un tuo volo, gratis"), `${casa()}/app`) +
         p(
           `<strong style="color:${C.inchiostro}">Intanto una cosa utile:</strong> se nell'ultimo anno hai preso un volo atterrato con più di 3 ore di ritardo, il check dice in trenta secondi in che fascia rientri (250, 400 o 600 euro). Non serve account.`,
         ),
@@ -113,7 +114,7 @@ export function componiBenvenuto(scali: ScaloOggi[], disdetta: string | null) {
       (scali.length
         ? `\nGli aeroporti italiani adesso:\n${scali.map((s) => `- ${s.nome}: ${s.indice.toLocaleString("it-IT", { maximumFractionDigits: 1 })}/5${s.medianaMinuti !== null ? ` (mediana ${s.medianaMinuti} min)` : ""}`).join("\n")}\n`
         : "") +
-      `\nControlla un tuo volo, gratis: ${casa()}/app` +
+      `\n${seSiPaga("Analizza un tuo volo", "Controlla un tuo volo, gratis")}: ${casa()}/app` +
       (disdetta ? `\n\nPer non ricevere più queste email: ${disdetta}` : ""),
   };
 }
@@ -132,7 +133,10 @@ export function benvenuto(a: string): Promise<Esito> {
       corpo:
         h("Il tuo account è pronto.") +
         p(
-          "Il check dei voli resta gratis e senza account, per te e per chiunque. L'account serve al resto: le tue pratiche e gli avvisi.",
+          seSiPaga(
+            "L'analisi di un volo si fa anche senza account. L'account serve al resto: le tue pratiche e gli avvisi.",
+            "Il check dei voli resta gratis e senza account, per te e per chiunque. L'account serve al resto: le tue pratiche e gli avvisi.",
+          ),
         ) +
         `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.menta};border-radius:14px;padding:20px 22px;margin:0 0 8px;">
            <tr><td style="font-family:${FONT};font-size:15px;line-height:1.7;color:${C.verdeNotte};">
@@ -142,13 +146,13 @@ export function benvenuto(a: string): Promise<Esito> {
              3. Con questa email ritrovi tutto, su sito e app.
            </td></tr>
          </table>` +
-        bottone("Controlla un volo, gratis", `${casa()}/app`) +
+        bottone(seSiPaga("Analizza un volo", "Controlla un volo, gratis"), `${casa()}/app`) +
         p(
           "Nessun abbonamento e nessun addebito: si paga solo se apri una pratica, una volta sola. Se questo account non l'hai chiesto tu, rispondi a questa email e lo cancelliamo.",
         ),
       coda: "Ricevi questa email perché è stato creato un account Rivolio con questo indirizzo.",
     }),
-    testo: `Il tuo account è pronto.\n\nIl check dei voli resta gratis e senza account. L'account serve al resto:\n1. Le pratiche si seguono passo per passo, dal sito e dall'app.\n2. I voli che salvi nell'app li ricontrolliamo il giorno dopo: se rientrano in una fascia, ti avvisiamo noi.\n3. Con questa email ritrovi tutto, su sito e app.\n\nControlla un volo, gratis: ${casa()}/app\n\nNessun abbonamento e nessun addebito: si paga solo se apri una pratica, una volta sola.`,
+    testo: `Il tuo account è pronto.\n\n${seSiPaga("L'analisi di un volo si fa anche senza account.", "Il check dei voli resta gratis e senza account.")} L'account serve al resto:\n1. Le pratiche si seguono passo per passo, dal sito e dall'app.\n2. I voli che salvi nell'app li ricontrolliamo il giorno dopo: se rientrano in una fascia, ti avvisiamo noi.\n3. Con questa email ritrovi tutto, su sito e app.\n\n${seSiPaga("Analizza un volo", "Controlla un volo, gratis")}: ${casa()}/app\n\nNessun abbonamento: si paga una volta sola, per quello che chiedi.`,
   });
 }
 

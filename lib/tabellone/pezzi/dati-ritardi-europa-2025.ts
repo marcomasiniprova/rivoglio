@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * ARTICOLO DATI. Serve a due cose: rispondere alla query "statistiche
  * ritardi aerei Europa 2025" e dare a stampa e social un pezzo citabile.
@@ -230,7 +232,10 @@ export const ARTICOLO: Articolo = {
         {
           domanda: "Questi dati mi servono a qualcosa per il mio reclamo?",
           risposta:
-            "Servono a inquadrare il contesto, non a vincere il caso. Quello che conta nel tuo reclamo è l'orario di arrivo effettivo registrato per il tuo volo e la distanza della tratta. Il check è gratuito e ti dice tutti e due.",
+            seSiPaga(
+              `Servono a inquadrare il contesto, non a vincere il caso. Quello che conta nel tuo reclamo è l'orario di arrivo effettivo registrato per il tuo volo e la distanza della tratta. L'analisi costa ${euro(PREZZO_LANCIO)} e ti dice tutti e due.`,
+              "Servono a inquadrare il contesto, non a vincere il caso. Quello che conta nel tuo reclamo è l'orario di arrivo effettivo registrato per il tuo volo e la distanza della tratta. Il check è gratuito e ti dice tutti e due.",
+            ),
         },
       ],
     },

@@ -18,6 +18,7 @@ import { dataInItaliano, giorniDa, giornoEData } from "@/lib/date";
 import { oggiInItalia, scioperiDelGiorno } from "@/lib/scioperi/scioperi";
 import { CASA, datiBriciole, scriptDati } from "@/lib/tabellone/seo";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 /**
  * LA PAGINA DI UN SINGOLO GIORNO DI SCIOPERO.
  *
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: Parametri): Promise<Metadata>
   const quando = dataInItaliano(data);
   return {
     title: `Sciopero aerei ${quando}: i voli e cosa ti spetta | Rivolio`,
-    description: `Chi si ferma il ${quando}, quali voli sono a rischio e cosa ti spetta se il tuo salta. Con il controllo gratuito del volo.`,
+    description: `Chi si ferma il ${quando}, quali voli sono a rischio e cosa ti spetta se il tuo salta. ${seSiPaga("Con l'analisi del volo sul dato ufficiale.", "Con il controllo gratuito del volo.")}`,
     alternates: { canonical: `/sciopero-aerei/${data}` },
     openGraph: {
       title: `Sciopero aerei ${quando}`,
@@ -155,7 +156,7 @@ export default async function PaginaGiornoSciopero({ params }: Parametri) {
               titolo={
                 giorni < 0
                   ? "Il tuo volo di quel giorno: controlla cosa dicono i dati"
-                  : "Controlla il tuo volo, gratis"
+                  : seSiPaga("Analizza il tuo volo", "Controlla il tuo volo, gratis")
               }
               testo="Senza account e senza carta. Guardiamo l'orario di arrivo effettivo registrato dal tracciamento e ti diciamo se il caso regge. Nei giorni di sciopero restiamo prudenti per costruzione: se l'esito dipende da chi si è fermato, non ti vendiamo niente."
             />

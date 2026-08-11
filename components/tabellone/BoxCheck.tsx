@@ -1,5 +1,6 @@
 import SchedaCheck from "@/components/check/SchedaCheck";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 /**
  * IL GANCIO, dentro l'articolo.
  *
@@ -12,7 +13,7 @@ import SchedaCheck from "@/components/check/SchedaCheck";
  * Va messo a METÀ articolo, non solo in fondo.
  */
 export default function BoxCheck({
-  titolo = "Controlla il tuo volo, gratis",
+  titolo = seSiPaga("Analizza il tuo volo", "Controlla il tuo volo, gratis"),
   testo = "Non serve un account e non serve la carta. Ti dico cosa dicono i dati ufficiali del tuo volo e se il caso regge.",
 }: {
   titolo?: string;

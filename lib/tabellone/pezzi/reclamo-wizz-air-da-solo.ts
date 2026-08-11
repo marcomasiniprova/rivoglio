@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * ARTICOLO PER COMPAGNIA. L'angolo è il portale che Wizz Air riserva alle
  * società di reclami: esiste, è dichiarato, e non serve al passeggero.
@@ -147,7 +149,10 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "p",
       testo:
-        "Noi stiamo dalla parte opposta del portale a percentuale: **un prezzo fisso, scritto prima**, che non cresce con la cifra che recuperi, e una tariffa unica per tutta la famiglia. Il check per sapere se il caso regge è sempre gratuito. La lettera la mandi tu dalla tua email, con il tuo nome: Wizz Air paga te, direttamente, e la somma arriva intera. Se la compagnia rifiuta senza un motivo valido o non risponde nei termini di legge, la pratica te la rimborsiamo. [Il listino sta qui](/#prezzi).",
+        seSiPaga(
+          `Noi stiamo dalla parte opposta del portale a percentuale: **un prezzo fisso, scritto prima**, che non cresce con la cifra che recuperi, e una tariffa unica per tutta la famiglia. L'analisi per sapere se il caso regge costa ${euro(PREZZO_LANCIO)} e si scala dalla pratica. La lettera la mandi tu dalla tua email, con il tuo nome: Wizz Air paga te, direttamente, e la somma arriva intera. Se la compagnia rifiuta senza un motivo valido o non risponde nei termini di legge, la pratica te la rimborsiamo. [Il listino sta qui](/#prezzi).`,
+          "Noi stiamo dalla parte opposta del portale a percentuale: **un prezzo fisso, scritto prima**, che non cresce con la cifra che recuperi, e una tariffa unica per tutta la famiglia. Il check per sapere se il caso regge è sempre gratuito. La lettera la mandi tu dalla tua email, con il tuo nome: Wizz Air paga te, direttamente, e la somma arriva intera. Se la compagnia rifiuta senza un motivo valido o non risponde nei termini di legge, la pratica te la rimborsiamo. [Il listino sta qui](/#prezzi).",
+        ),
     },
 
     { tipo: "h2", testo: "Come si manda il reclamo, in ordine" },

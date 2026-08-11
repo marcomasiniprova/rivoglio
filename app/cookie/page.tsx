@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import PaginaLegale from "@/components/legale/PaginaLegale";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 export const metadata: Metadata = {
   title: "Cookie | Rivolio",
   description:
@@ -39,7 +40,7 @@ export default function PaginaCookie() {
         </li>
       </ul>
       <p>
-        Il check gratuito, la landing e l&apos;Osservatorio non impostano cookie di
+        {seSiPaga("L'analisi del volo", "Il check gratuito")}, la landing e l&apos;Osservatorio non impostano cookie di
         profilazione né cookie di terze parti a fini pubblicitari. Non usiamo strumenti di
         analisi che tracciano la tua identità.
       </p>

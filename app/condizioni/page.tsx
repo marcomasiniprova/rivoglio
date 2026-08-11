@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import PaginaLegale from "@/components/legale/PaginaLegale";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 export const metadata: Metadata = {
   title: "Condizioni d'uso | Rivolio",
   description:
@@ -39,9 +41,13 @@ export default function PaginaCondizioni() {
         pubbliche.
       </p>
 
-      <h2>Il check gratuito e il verdetto</h2>
+      <h2>{seSiPaga("L'analisi del volo e il verdetto", "Il check gratuito e il verdetto")}</h2>
       <p>
-        Il check è gratuito e senza account. Il verdetto ha tre esiti possibili: idoneo,
+        {seSiPaga(
+          `L'analisi di un volo costa ${euro(PREZZO_LANCIO)} e non richiede un account. Se il verdetto esce incerto l'analisi non si consuma: il credito resta e lo usi su un altro volo.`,
+          "Il check è gratuito e senza account.",
+        )}{" "}
+        Il verdetto ha tre esiti possibili: idoneo,
         non idoneo, oppure incerto. Vendiamo la pratica solo quando il dato è solido: se il
         caso è incerto, te lo diciamo e non ti facciamo pagare. Il verdetto si basa sui dati
         di volo delle nostre fonti e sul Regolamento (CE) 261/2004:{" "}

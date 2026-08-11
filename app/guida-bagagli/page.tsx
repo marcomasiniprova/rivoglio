@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PaginaLegale from "@/components/legale/PaginaLegale";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 export const metadata: Metadata = {
   title: "Bagaglio perso, in ritardo o danneggiato: la guida | Rivolio",
   description:
@@ -97,7 +98,7 @@ export default function PaginaGuidaBagagli() {
         Quella è un&apos;altra storia, e un&apos;altra legge: il Regolamento CE 261/2004. Se
         il tuo volo è atterrato con 3 ore di ritardo o più, la compensazione va da 250€ a
         600€ a passeggero, e lì Rivolio fa il lavoro sporco:{" "}
-        <Link href="/#controllo">controlla il volo gratis</Link>, il verdetto arriva in
+        <Link href="/#controllo">{seSiPaga("analizza il volo", "controlla il volo gratis")}</Link>, il verdetto arriva in
         trenta secondi.
       </p>
 

@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * EMERGENZA. Si legge in piedi, davanti a un banco, con il 20% di
  * batteria. Quindi: risposta nella prima riga, liste corte, niente
@@ -119,7 +121,10 @@ export const ARTICOLO: Articolo = {
       tipo: "check",
       titolo: "Il tuo volo cancellato vale una compensazione? Guardalo adesso",
       testo:
-        "Il check è gratuito e non serve un account. Sui voli cancellati ti facciamo due domande, perché le risposte non stanno in nessun archivio. Se il caso non regge te lo diciamo e non paghi niente.",
+        seSiPaga(
+          `L'analisi costa ${euro(PREZZO_LANCIO)} e non serve un account. Sui voli cancellati ti facciamo due domande, perché le risposte non stanno in nessun archivio. Se il verdetto esce incerto l'analisi non si consuma.`,
+          "Il check è gratuito e non serve un account. Sui voli cancellati ti facciamo due domande, perché le risposte non stanno in nessun archivio. Se il caso non regge te lo diciamo e non paghi niente.",
+        ),
     },
 
     { tipo: "h2", testo: "I soldi in più: da cosa dipendono davvero" },

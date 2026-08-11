@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * ARTICOLO DI COMPAGNIA. L'angolo è tutto qui: le condizioni di trasporto
  * di Ryanair chiedono al passeggero di reclamare DA SOLO e di concedere
@@ -151,7 +153,10 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "p",
       testo:
-        "Noi facciamo il contrario: **un prezzo fisso, scritto prima di sapere l'esito**, che non cambia con la cifra che recuperi, e il check per capire se il caso regge è sempre gratuito. La lettera la mandi tu, dalla tua email, con il tuo nome: esattamente come Ryanair chiede all'articolo 15.2.2. La compagnia paga te, e la somma arriva intera. [Il listino sta qui](/#prezzi).",
+        seSiPaga(
+          `Noi facciamo il contrario: **un prezzo fisso, scritto prima di sapere l'esito**, che non cambia con la cifra che recuperi, e l'analisi per capire se il caso regge costa ${euro(PREZZO_LANCIO)} che si scalano dalla pratica. La lettera la mandi tu, dalla tua email, con il tuo nome: esattamente come Ryanair chiede all'articolo 15.2.2. La compagnia paga te, e la somma arriva intera. [Il listino sta qui](/#prezzi).`,
+          "Noi facciamo il contrario: **un prezzo fisso, scritto prima di sapere l'esito**, che non cambia con la cifra che recuperi, e il check per capire se il caso regge è sempre gratuito. La lettera la mandi tu, dalla tua email, con il tuo nome: esattamente come Ryanair chiede all'articolo 15.2.2. La compagnia paga te, e la somma arriva intera. [Il listino sta qui](/#prezzi).",
+        ),
     },
 
     { tipo: "h2", testo: "Come si manda il reclamo, in ordine" },

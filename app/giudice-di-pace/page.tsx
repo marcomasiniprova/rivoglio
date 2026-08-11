@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import PaginaLegale from "@/components/legale/PaginaLegale";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 export const metadata: Metadata = {
   title: "La compagnia non paga: il giudice di pace, spiegato | Rivolio",
   description:
@@ -194,7 +196,8 @@ export default function PaginaGiudiceDiPace() {
 
       <p>
         Non sei ancora arrivato a questo punto?{" "}
-        <Link href="/">Controlla il tuo volo</Link>: il check è gratuito, e se ti spetta qualcosa
+        <Link href="/">Controlla il tuo volo</Link>:{" "}
+        {seSiPaga(`l'analisi costa ${euro(PREZZO_LANCIO)}`, "il check è gratuito")}, e se ti spetta qualcosa
         prepariamo noi la lettera, il sollecito e la segnalazione all&apos;ente. Tutto compreso nel
         prezzo, senza percentuali sul tuo rimborso.
       </p>

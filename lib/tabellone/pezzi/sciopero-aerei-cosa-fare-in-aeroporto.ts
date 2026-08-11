@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * EMERGENZA. Si legge in piedi, col trolley in mano e il 20% di batteria.
  * Forma: il primo passo nella prima riga, liste corte, niente premesse.
@@ -107,7 +109,10 @@ export const ARTICOLO: Articolo = {
       tipo: "check",
       titolo: "Il tuo volo di oggi: cosa risulta davvero",
       testo:
-        "Guardiamo il dato registrato del volo, non quello che ti hanno detto al banco: orario di arrivo effettivo, minuti di ritardo, fascia di importo. Gratis, senza account. Se il caso non regge te lo diciamo subito e non paghi niente.",
+        seSiPaga(
+          `Guardiamo il dato registrato del volo, non quello che ti hanno detto al banco: orario di arrivo effettivo, minuti di ritardo, fascia di importo. ${euro(PREZZO_LANCIO)}, senza account. Se il verdetto esce incerto, l'analisi non si consuma.`,
+          "Guardiamo il dato registrato del volo, non quello che ti hanno detto al banco: orario di arrivo effettivo, minuti di ritardo, fascia di importo. Gratis, senza account. Se il caso non regge te lo diciamo subito e non paghi niente.",
+        ),
     },
 
     { tipo: "h2", testo: "Cosa ti spetta mentre aspetti, sempre" },

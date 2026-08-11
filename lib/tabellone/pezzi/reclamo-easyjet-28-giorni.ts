@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * ARTICOLO PER COMPAGNIA. L'angolo è il doppio modulo: su easyJet la
  * compensazione e le spese si chiedono in due punti diversi, e chi ne
@@ -114,7 +116,10 @@ export const ARTICOLO: Articolo = {
       tipo: "check",
       titolo: "Prima dei moduli: il tuo volo regge davvero?",
       testo:
-        "Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e la fascia di importo. Gratis, senza account e senza carta. Se il caso non regge te lo diciamo, e non paghi niente.",
+        seSiPaga(
+          `Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e la fascia di importo. ${euro(PREZZO_LANCIO)}, senza account. Se il verdetto esce incerto, l'analisi non si consuma.`,
+          "Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e la fascia di importo. Gratis, senza account e senza carta. Se il caso non regge te lo diciamo, e non paghi niente.",
+        ),
     },
 
     { tipo: "h2", testo: "Il voucher non è il rimborso, ed è già costato caro" },

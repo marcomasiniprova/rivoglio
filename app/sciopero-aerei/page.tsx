@@ -18,6 +18,8 @@ import { dataInItaliano, giorniDa, giornoEData } from "@/lib/date";
 import { oggiInItalia, scioperiInArrivo, scioperiPassati } from "@/lib/scioperi/scioperi";
 import { datiBriciole, scriptDati } from "@/lib/tabellone/seo";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * LA PAGINA FISSA DEGLI SCIOPERI.
  *
@@ -37,12 +39,18 @@ export const revalidate = 900; // un quarto d'ora: uno sciopero non nasce ogni m
 export const metadata: Metadata = {
   title: "Sciopero aerei oggi: cosa succede al tuo volo | Rivolio",
   description:
-    "Le date degli scioperi aerei in Italia, cosa ti spetta se il tuo volo salta e quando la compagnia deve pagarti lo stesso. Con il controllo gratuito del volo.",
+    seSiPaga(
+      "Le date degli scioperi aerei in Italia, cosa ti spetta se il tuo volo salta e quando la compagnia deve pagarti lo stesso. Con l'analisi del volo sul dato ufficiale.",
+      "Le date degli scioperi aerei in Italia, cosa ti spetta se il tuo volo salta e quando la compagnia deve pagarti lo stesso. Con il controllo gratuito del volo.",
+    ),
   alternates: { canonical: "/sciopero-aerei" },
   openGraph: {
     title: "Sciopero aerei: cosa succede al tuo volo",
     description:
-      "Le date, cosa ti spetta comunque e quando la compensazione spetta lo stesso. Controllo del volo gratuito.",
+      seSiPaga(
+        "Le date, cosa ti spetta comunque e quando la compensazione spetta lo stesso. Analisi del volo sul dato ufficiale.",
+        "Le date, cosa ti spetta comunque e quando la compensazione spetta lo stesso. Controllo del volo gratuito.",
+      ),
     locale: "it_IT",
     type: "website",
   },
@@ -75,7 +83,10 @@ export default async function PaginaScioperi() {
         stato: "brutto" as const,
         titolo: `Oggi, ${dataInItaliano(oggi)}, c'è uno sciopero del trasporto aereo`,
         testo:
-          "Sotto trovi chi si è fermato e cosa vuol dire per il tuo volo. Se il tuo volo è saltato o è arrivato tardi, il controllo qui sotto è gratuito.",
+          seSiPaga(
+            `Sotto trovi chi si è fermato e cosa vuol dire per il tuo volo. Se il tuo volo è saltato o è arrivato tardi, l'analisi qui sotto costa ${euro(PREZZO_LANCIO)}.`,
+            "Sotto trovi chi si è fermato e cosa vuol dire per il tuo volo. Se il tuo volo è saltato o è arrivato tardi, il controllo qui sotto è gratuito.",
+          ),
       }
     : primo
       ? {
@@ -87,7 +98,10 @@ export default async function PaginaScioperi() {
           stato: "calmo" as const,
           titolo: `Oggi, ${dataInItaliano(oggi)}, non risultano scioperi del trasporto aereo`,
           testo:
-            "Nel nostro calendario non ci sono agitazioni proclamate nei prossimi giorni. Se il tuo volo è saltato lo stesso, il motivo è un altro: controllalo qui sotto, è gratis.",
+            seSiPaga(
+              "Nel nostro calendario non ci sono agitazioni proclamate nei prossimi giorni. Se il tuo volo è saltato lo stesso, il motivo è un altro: controllalo qui sotto.",
+              "Nel nostro calendario non ci sono agitazioni proclamate nei prossimi giorni. Se il tuo volo è saltato lo stesso, il motivo è un altro: controllalo qui sotto, è gratis.",
+            ),
         };
 
   return (
@@ -133,7 +147,10 @@ export default async function PaginaScioperi() {
 
             <BoxCheck
               titolo="Il tuo volo è saltato? Guarda cosa dicono i dati"
-              testo="Controllo gratuito, senza account e senza carta. Ti diciamo l'orario di arrivo effettivo registrato e se il caso regge. Nei giorni di sciopero il verdetto resta prudente per costruzione: se dipende da chi si è fermato, non ti vendiamo niente."
+              testo={seSiPaga(
+                `Analisi ${euro(PREZZO_LANCIO)}, senza account. Ti diciamo l'orario di arrivo effettivo registrato e se il caso regge. Nei giorni di sciopero il verdetto resta prudente per costruzione: se dipende da chi si è fermato, il caso esce incerto e l'analisi non si consuma.`,
+                "Controllo gratuito, senza account e senza carta. Ti diciamo l'orario di arrivo effettivo registrato e se il caso regge. Nei giorni di sciopero il verdetto resta prudente per costruzione: se dipende da chi si è fermato, non ti vendiamo niente.",
+              )}
             />
 
             {prossimi.length > 0 ? (

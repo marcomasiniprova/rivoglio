@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import PaginaLegale from "@/components/legale/PaginaLegale";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 export const metadata: Metadata = {
   title: "Privacy | Rivolio",
   description:
@@ -32,7 +33,7 @@ export default function PaginaPrivacy() {
       <h2>Quali dati trattiamo, e perché</h2>
       <ul>
         <li>
-          <strong>Il check gratuito</strong>: per verificare un volo ci servono solo numero di
+          <strong>{seSiPaga("L'analisi del volo", "Il check gratuito")}</strong>: per verificare un volo ci servono solo numero di
           volo e data. Non sono dati che ti identificano e non ti chiediamo né email né
           account per usare il check. Base giuridica: esecuzione del servizio che richiedi
           (art. 6.1.b GDPR).

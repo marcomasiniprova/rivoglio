@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * SITUAZIONE. Il pezzo sulla prescrizione: in Italia il termine è
  * CONTESTATO e nessuno lo scrive. Qui si scrive, con le due tesi
@@ -111,7 +113,10 @@ export const ARTICOLO: Articolo = {
 
     {
       tipo: "check",
-      titolo: "Il tuo volo è ancora in tempo? Controllalo adesso, è gratis",
+      titolo: seSiPaga(
+        "Il tuo volo è ancora in tempo? Controllalo adesso",
+        "Il tuo volo è ancora in tempo? Controllalo adesso, è gratis",
+      ),
       testo:
         "Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e se il caso regge. Non serve un account e non serve la carta. Se il caso non regge, te lo diciamo e non paghi niente.",
     },
@@ -205,7 +210,10 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "p",
       testo:
-        "Noi facciamo il contrario: **un prezzo fisso, scritto prima**, uguale qualunque sia la cifra che recuperi, con una tariffa unica per tutta la famiglia. Il check è sempre gratuito e la lettera la mandi tu dalla tua email: la compagnia paga te, direttamente, e la somma arriva intera. Se rifiuta senza un motivo valido o non risponde nei termini di legge, il prezzo della pratica torna indietro. [Il listino sta qui](/#prezzi).",
+        seSiPaga(
+          `Noi facciamo il contrario: **un prezzo fisso, scritto prima**, uguale qualunque sia la cifra che recuperi, con una tariffa unica per tutta la famiglia. L'analisi del volo costa ${euro(PREZZO_LANCIO)} e si scala dalla pratica; la lettera la mandi tu dalla tua email: la compagnia paga te, direttamente, e la somma arriva intera. Se rifiuta senza un motivo valido o non risponde nei termini di legge, il prezzo della pratica torna indietro. [Il listino sta qui](/#prezzi).`,
+          "Noi facciamo il contrario: **un prezzo fisso, scritto prima**, uguale qualunque sia la cifra che recuperi, con una tariffa unica per tutta la famiglia. Il check è sempre gratuito e la lettera la mandi tu dalla tua email: la compagnia paga te, direttamente, e la somma arriva intera. Se rifiuta senza un motivo valido o non risponde nei termini di legge, il prezzo della pratica torna indietro. [Il listino sta qui](/#prezzi).",
+        ),
     },
 
     { tipo: "osservatorio" },

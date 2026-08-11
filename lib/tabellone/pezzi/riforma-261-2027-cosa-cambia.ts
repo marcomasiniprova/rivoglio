@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * SITUAZIONE. La riforma del Regolamento 261, approvata il 7 e il 13
  * luglio 2026 e applicabile dall'estate 2027.
@@ -142,7 +144,10 @@ export const ARTICOLO: Articolo = {
       tipo: "check",
       titolo: "Hai un volo in ritardo? Controllalo adesso, con le regole di oggi",
       testo:
-        "Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e se il caso regge. Gratis, senza account e senza carta. Se il caso non regge, te lo diciamo e non paghi niente.",
+        seSiPaga(
+          `Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e se il caso regge. ${euro(PREZZO_LANCIO)}, senza account. Se il verdetto esce incerto, l'analisi non si consuma.`,
+          "Ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e se il caso regge. Gratis, senza account e senza carta. Se il caso non regge, te lo diciamo e non paghi niente.",
+        ),
     },
 
     { tipo: "h2", testo: "Quello che è stato tolto dal testo finale" },
@@ -183,7 +188,10 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "p",
       testo:
-        "Noi facciamo il contrario: **un prezzo fisso, scritto prima**, uguale qualunque sia la cifra che recuperi. Il check è sempre gratuito, la lettera la mandi tu dalla tua email e la compagnia paga te, direttamente, quindi la somma arriva intera. [Il listino sta qui](/#prezzi).",
+        seSiPaga(
+          `Noi facciamo il contrario: **un prezzo fisso, scritto prima**, uguale qualunque sia la cifra che recuperi. L'analisi del volo costa ${euro(PREZZO_LANCIO)} e si scala dal prezzo della pratica, la lettera la mandi tu dalla tua email e la compagnia paga te, direttamente, quindi la somma arriva intera. [Il listino sta qui](/#prezzi).`,
+          "Noi facciamo il contrario: **un prezzo fisso, scritto prima**, uguale qualunque sia la cifra che recuperi. Il check è sempre gratuito, la lettera la mandi tu dalla tua email e la compagnia paga te, direttamente, quindi la somma arriva intera. [Il listino sta qui](/#prezzi).",
+        ),
     },
 
     { tipo: "osservatorio" },

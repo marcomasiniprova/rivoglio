@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * DATI. È il pezzo che aggancia il blog all'Osservatorio: i report annuali
  * dei concorrenti raccontano l'anno scorso, noi misuriamo la giornata di
@@ -116,7 +118,10 @@ export const ARTICOLO: Articolo = {
       tipo: "check",
       titolo: "Il tuo scalo è in affanno? Guarda il tuo volo, non la media",
       testo:
-        "Inserisci il volo e ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e la fascia. Il check è gratuito, non serve un account e se il caso non regge te lo diciamo subito.",
+        seSiPaga(
+          `Inserisci il volo e ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e la fascia. L'analisi costa ${euro(PREZZO_LANCIO)}, non serve un account e se il verdetto esce incerto non si consuma.`,
+          "Inserisci il volo e ti diciamo l'orario di arrivo effettivo registrato, i minuti di ritardo e la fascia. Il check è gratuito, non serve un account e se il caso non regge te lo diciamo subito.",
+        ),
     },
 
     { tipo: "h2", testo: "Cosa cambia per te, in concreto" },
@@ -200,7 +205,10 @@ export const ARTICOLO: Articolo = {
         {
           domanda: "L'Osservatorio dice se il mio volo è in ritardo adesso?",
           risposta:
-            "No. L'Osservatorio misura un indice da 0 a 5 sugli arrivi delle ultime due ore di otto scali italiani, e si aggiorna al massimo una volta al giorno: serve a capire come sta andando l'aeroporto, non a seguire un singolo volo. Per il tuo volo c'è il check gratuito.",
+            seSiPaga(
+              "No. L'Osservatorio misura un indice da 0 a 5 sugli arrivi delle ultime due ore di otto scali italiani, e si aggiorna al massimo una volta al giorno: serve a capire come sta andando l'aeroporto, non a seguire un singolo volo. Per il tuo volo c'è l'analisi sul dato certificato.",
+              "No. L'Osservatorio misura un indice da 0 a 5 sugli arrivi delle ultime due ore di otto scali italiani, e si aggiorna al massimo una volta al giorno: serve a capire come sta andando l'aeroporto, non a seguire un singolo volo. Per il tuo volo c'è il check gratuito.",
+            ),
         },
         {
           domanda: "Perché a volte un aeroporto non compare nella striscia?",

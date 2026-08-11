@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { seSiPaga } from "@/lib/check/ingresso";
 type Modo = "accedi" | "registrati" | "magico";
 
 const VUOTO: Esito = {};
@@ -21,7 +22,10 @@ const TITOLI: Record<Modo, { titolo: string; sotto: string; bottone: string }> =
   },
   registrati: {
     titolo: "Crea il tuo account",
-    sotto: "L'account serve a seguire la pratica. Il check resta gratis, senza registrazione.",
+    sotto: seSiPaga(
+      "L'account serve a seguire la pratica. L'analisi di un volo si fa anche senza registrarsi.",
+      "L'account serve a seguire la pratica. Il check resta gratis, senza registrazione.",
+    ),
     bottone: "Crea l'account",
   },
   magico: {

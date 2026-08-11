@@ -1,3 +1,5 @@
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/ingresso";
+
 /**
  * Ogni stringa che l'app mostra vive qui (contratto in PROGETTO.md).
  * Solo dati, nessuna funzione. Dove serve un valore, la stringa porta un
@@ -16,17 +18,17 @@ export const TESTI = {
        generico che vale per tutte. */
     testate: {
       tratta: {
-        occhiello: "Il check gratuito",
+        occhiello: seSiPaga("L'analisi del volo", "Il check gratuito"),
         titolo: "Che viaggio era?",
         sottotitolo: "Le città bastano. Il numero del volo, se non ce l'hai, lo trovo io.",
       },
       numero: {
-        occhiello: "Il check gratuito",
+        occhiello: seSiPaga("L'analisi del volo", "Il check gratuito"),
         titolo: "Hai il numero del volo?",
         sottotitolo: "È la via più corta. Due campi e ho finito.",
       },
       carta: {
-        occhiello: "Il check gratuito",
+        occhiello: seSiPaga("L'analisi del volo", "Il check gratuito"),
         titolo: "Inquadra la carta d'imbarco",
         sottotitolo: "Fotografala o prendila dalla galleria: leggo io volo e data.",
       },
@@ -56,9 +58,12 @@ export const TESTI = {
     },
     bottoneTratta: "Controlla questo volo",
     bottoneNumero: "Cerca il volo",
-    rassicurazione: "Il check resta gratuito.",
+    rassicurazione: seSiPaga(
+      `L'analisi costa ${PREZZO_LANCIO}, e si scala dal prezzo della pratica.`,
+      "Il check resta gratuito.",
+    ),
     punti: [
-      "Il check è gratis, sempre",
+      seSiPaga(`L'analisi costa ${PREZZO_LANCIO} e si scala dalla pratica`, "Il check è gratis, sempre"),
       "Nessuna percentuale sulla compensazione",
       "Se la compagnia non paga, non paghi neanche tu",
     ],
@@ -335,7 +340,10 @@ export const TESTI = {
         },
       },
       bottone: "Vedi il verdetto",
-      nota: "Le risposte restano sulla tua verifica. Il check resta gratuito.",
+      nota: seSiPaga(
+        "Le risposte restano sulla tua verifica.",
+        "Le risposte restano sulla tua verifica. Il check resta gratuito.",
+      ),
       notaDemo: "Esempio dimostrativo: il verdetto qui non vale per una pratica vera.",
     },
     chiuso: "Ecco com'è andata.",
@@ -358,7 +366,10 @@ export const TESTI = {
     nonIdoneo: {
       occhiello: "Verifica completata",
       titolo: { prima: "Per questo volo non risulta", corsivo: "una compensazione." },
-      nota: "Meglio così. Il check resta gratis: se un altro volo ti è andato peggio, controllalo.",
+      nota: seSiPaga(
+        "Meglio così. Se un altro volo ti è andato peggio, analizza quello.",
+        "Meglio così. Il check resta gratis: se un altro volo ti è andato peggio, controllalo.",
+      ),
     },
     previsto: "Arrivo previsto",
     effettivo: "Arrivo effettivo",
@@ -492,7 +503,10 @@ export const TESTI = {
       titolo: "La compagnia ha pagato.",
       /* {importo} è la fascia a passeggero: la cifra vera del bonifico
          la conosce solo il suo conto corrente. */
-      testo: "La fascia della pratica era {importo} a passeggero, e la compensazione è arrivata a te, intera. Se un altro volo ti è andato storto, il check resta gratis.",
+      testo: seSiPaga(
+        "La fascia della pratica era {importo} a passeggero, e la compensazione è arrivata a te, intera. Se un altro volo ti è andato storto, analizza anche quello.",
+        "La fascia della pratica era {importo} a passeggero, e la compensazione è arrivata a te, intera. Se un altro volo ti è andato storto, il check resta gratis.",
+      ),
       bottone: "Controlla un altro volo",
     },
     rimborsata: {
@@ -600,7 +614,7 @@ export const TESTI = {
     statCheck: "Check",
     statAttesa: "In attesa",
     nuovoCheck: "Nuovo check",
-    nuovoCheckSotto: "30 secondi, gratis",
+    nuovoCheckSotto: seSiPaga(`30 secondi, ${PREZZO_LANCIO}`, "30 secondi, gratis"),
     scansiona: "Scansiona",
     scansionaSotto: "la carta d'imbarco",
     daFare: "Da fare oggi",
@@ -710,14 +724,20 @@ export const TESTI = {
     },
     invita: {
       titolo: "Fai controllare un volo a chi ami",
-      testo: "Il check è gratis: passa Rivolio a chi ha preso un volo in ritardo.",
+      testo: seSiPaga(
+        "Passa Rivolio a chi ha preso un volo in ritardo: in trenta secondi sa se il caso regge.",
+        "Il check è gratis: passa Rivolio a chi ha preso un volo in ritardo.",
+      ),
       // Il messaggio che parte con la condivisione. Niente promesse.
       /* {sito} lo riempie chi mostra il testo, leggendo SITO da api.ts.
          Prima l'indirizzo era scritto a mano qui dentro: il giorno che
          cambia il dominio, un invito che porta a un sito morto è peggio
          di nessun invito. */
       messaggio:
-        "Ho controllato il mio volo con Rivolio: se è atterrato in ritardo ti dice subito se rientra in una fascia di compensazione fino a 600€. Gratis: {sito}",
+        seSiPaga(
+          "Ho controllato il mio volo con Rivolio: se è atterrato in ritardo ti dice subito se rientra in una fascia di compensazione fino a 600€. {sito}",
+          "Ho controllato il mio volo con Rivolio: se è atterrato in ritardo ti dice subito se rientra in una fascia di compensazione fino a 600€. Gratis: {sito}",
+        ),
     },
     voci: {
       dati: "Dati personali",
@@ -844,7 +864,10 @@ export const TESTI = {
     vuoto: {
       titolo: "Non hai ancora nessuna pratica.",
       testo:
-        "Si parte dal check, qui nell'app: gratis, in trenta secondi. Se il volo rientra in una fascia, apri la pratica e la segui qui, passo per passo.",
+        seSiPaga(
+          `Si parte dall'analisi, qui nell'app: ${PREZZO_LANCIO}, in trenta secondi, e si scalano dal prezzo della pratica. Se il volo rientra in una fascia, apri la pratica e la segui qui, passo per passo.`,
+          "Si parte dal check, qui nell'app: gratis, in trenta secondi. Se il volo rientra in una fascia, apri la pratica e la segui qui, passo per passo.",
+        ),
       azione: "Controlla un volo",
     },
     apri: "Apri la pratica",
@@ -1111,7 +1134,10 @@ export const TESTI = {
     crediti: {
       etichetta: "Crediti",
       spiegazione:
-        "I crediti vengono dalla prima versione dell'app. Per le pratiche non servono: il check del volo è gratis, sempre.",
+        seSiPaga(
+          "I crediti vengono dalla prima versione dell'app. Per le pratiche non servono: qui non si spende un credito, mai.",
+          "I crediti vengono dalla prima versione dell'app. Per le pratiche non servono: il check del volo è gratis, sempre.",
+        ),
       finiti:
         "Crediti a zero. Non cambia niente: nessun addebito automatico, mai.",
     },
@@ -1120,7 +1146,10 @@ export const TESTI = {
       titolo: "Pagamenti",
       stato: "Sul sito",
       testo:
-        "La pratica si apre e si paga sul sito, dopo il check gratis. Dall'app non compri niente: qui la segui, passo per passo.",
+        seSiPaga(
+          "La pratica si apre e si paga sul sito, dopo l'analisi del volo. Dall'app non compri niente: qui la segui, passo per passo.",
+          "La pratica si apre e si paga sul sito, dopo il check gratis. Dall'app non compri niente: qui la segui, passo per passo.",
+        ),
     },
     tetto: {
       etichetta: "Tetto settimanale",

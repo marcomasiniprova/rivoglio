@@ -10,7 +10,8 @@
  *   bottone in fondo, come nella tavola.
  *
  * Regole del prodotto, identiche al sito:
- * - il check è gratis e NON richiede account;
+ * - il check NON richiede account (che si paghi o no: lo decide il
+ *   server, e l'app lo scopre dal muro);
  * - il verdetto lo dà il motore sul server, mai l'app (lib/api.ts);
  * - niente promesse: "forse ti devono", mai "hai diritto a".
  */

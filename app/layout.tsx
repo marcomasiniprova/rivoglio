@@ -4,6 +4,8 @@ import AntiCopia from "@/components/AntiCopia";
 import ScrollPesante from "@/components/ScrollPesante";
 import "./globals.css";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 // Geist per i titoli, Poppins per il testo.
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"], display: "swap" });
 const poppins = Poppins({
@@ -42,7 +44,10 @@ export const metadata: Metadata = {
   metadataBase: CASA,
   title: "Rivolio | Riprenditi i soldi che ti devono.",
   description:
-    "Scopri in 30 secondi se una compagnia ti deve dei soldi. Check gratuito col dato oggettivo del volo; se ti spetta, il reclamo te lo prepariamo noi e tieni il 100%.",
+    seSiPaga(
+      `Scopri in 30 secondi se una compagnia ti deve dei soldi. L'analisi del volo costa ${euro(PREZZO_LANCIO)} col dato oggettivo; se ti spetta, il reclamo te lo prepariamo noi e tieni il 100%.`,
+      "Scopri in 30 secondi se una compagnia ti deve dei soldi. Check gratuito col dato oggettivo del volo; se ti spetta, il reclamo te lo prepariamo noi e tieni il 100%.",
+    ),
   openGraph: {
     title: "Rivolio",
     description:
@@ -50,7 +55,10 @@ export const metadata: Metadata = {
          il check verifica 12 mesi indietro, e un volo più vecchio torna
          incerto, che per regola non si vende. Promettere 5 anni portava
          traffico che non poteva convertire per costruzione. */
-      "Volo in ritardo o cancellato? Forse ti devono fino a 600€. Controlla gratis in 30 secondi, col dato ufficiale del tuo volo.",
+      seSiPaga(
+        `Volo in ritardo o cancellato? Forse ti devono fino a 600€. Controlla in 30 secondi per ${euro(PREZZO_LANCIO)}, col dato ufficiale del tuo volo.`,
+        "Volo in ritardo o cancellato? Forse ti devono fino a 600€. Controlla gratis in 30 secondi, col dato ufficiale del tuo volo.",
+      ),
     locale: "it_IT",
     type: "website",
   },
@@ -71,7 +79,10 @@ const DATI_STRUTTURATI = {
       url: CASA.href,
       logo: `${CASA.href}icon.png`,
       description:
-        "Lo scanner dei rimborsi: verifica gratuita dei voli in ritardo e reclamo pronto da inviare. CE 261/2004.",
+        seSiPaga(
+          "Lo scanner dei rimborsi: analisi dei voli in ritardo col dato ufficiale e reclamo pronto da inviare. CE 261/2004.",
+          "Lo scanner dei rimborsi: verifica gratuita dei voli in ritardo e reclamo pronto da inviare. CE 261/2004.",
+        ),
     },
     {
       "@type": "WebSite",

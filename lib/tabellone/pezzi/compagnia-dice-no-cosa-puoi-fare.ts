@@ -1,5 +1,7 @@
 import type { Articolo } from "../tipi";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * PILASTRO 2. È la guida di chi ha già scritto alla compagnia e si è
  * preso un no, o un silenzio. Da qui si scende ai pezzi sulle singole
@@ -226,7 +228,10 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "p",
       testo:
-        "Noi stiamo dall'altra parte: **un prezzo fisso, scritto prima**, che non cambia con la cifra che recuperi, e una tariffa unica per tutta la famiglia. Il check è gratuito e la lettera la mandi tu, dalla tua email: la compagnia paga te, direttamente, e la somma arriva intera. Se rifiuta senza un motivo valido o non risponde nei termini di legge, il prezzo della pratica te lo rendiamo. [Il listino sta qui](/#prezzi).",
+        seSiPaga(
+          `Noi stiamo dall'altra parte: **un prezzo fisso, scritto prima**, che non cambia con la cifra che recuperi, e una tariffa unica per tutta la famiglia. L'analisi del volo costa ${euro(PREZZO_LANCIO)} e si scala dalla pratica; la lettera la mandi tu, dalla tua email: la compagnia paga te, direttamente, e la somma arriva intera. Se rifiuta senza un motivo valido o non risponde nei termini di legge, il prezzo della pratica te lo rendiamo. [Il listino sta qui](/#prezzi).`,
+          "Noi stiamo dall'altra parte: **un prezzo fisso, scritto prima**, che non cambia con la cifra che recuperi, e una tariffa unica per tutta la famiglia. Il check è gratuito e la lettera la mandi tu, dalla tua email: la compagnia paga te, direttamente, e la somma arriva intera. Se rifiuta senza un motivo valido o non risponde nei termini di legge, il prezzo della pratica te lo rendiamo. [Il listino sta qui](/#prezzi).",
+        ),
     },
     {
       tipo: "p",

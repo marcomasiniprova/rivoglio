@@ -17,6 +17,8 @@ import { dataInItaliano } from "@/lib/date";
 import { oggiInItalia, scioperiInArrivo } from "@/lib/scioperi/scioperi";
 import { CASA, datiBriciole, scriptDati } from "@/lib/tabellone/seo";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * LA PAGINA DI UNO SCALO: com'è messo oggi.
  *
@@ -200,7 +202,10 @@ export default async function PaginaAeroporto({ params }: Parametri) {
 
             <BoxCheck
               titolo={`Il tuo volo da o per ${scalo.nome}`}
-              testo="L'indice dello scalo dice com'è la giornata, non cosa ti spetta: quello dipende dal TUO volo. Il controllo è gratuito, non serve un account e non serve la carta."
+              testo={seSiPaga(
+                `L'indice dello scalo dice com'è la giornata, non cosa ti spetta: quello dipende dal TUO volo. L'analisi costa ${euro(PREZZO_LANCIO)} e non serve un account.`,
+                "L'indice dello scalo dice com'è la giornata, non cosa ti spetta: quello dipende dal TUO volo. Il controllo è gratuito, non serve un account e non serve la carta.",
+              )}
             />
 
             <CosaTiSpettaComunque />

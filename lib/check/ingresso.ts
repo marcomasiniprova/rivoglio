@@ -44,6 +44,20 @@ import { euro, type Listino } from "@/lib/prezzi";
  */
 export const CHECK_A_PAGAMENTO = process.env.NEXT_PUBLIC_CHECK_PREZZO_ATTIVO === "1";
 
+/**
+ * SCEGLIE LE PAROLE, secondo l'interruttore.
+ *
+ * `seSiPaga(pagando, gratis)`. Esiste perché la promessa "il check è
+ * gratis" vive in sessanta punti sparsi fra landing, blog, pagine
+ * sciopero, guide, email, condizioni d'uso e app: riscriverli a mano il
+ * giorno dell'accensione vuol dire dimenticarne la metà, e il sito
+ * resterebbe a promettere gratis quello che fa pagare. Passando tutti da
+ * qui, l'interruttore che accende il muro riscrive anche le parole, nello
+ * stesso istante e nei due versi.
+ */
+export const seSiPaga = <T,>(pagando: T, gratis: T): T =>
+  CHECK_A_PAGAMENTO ? pagando : gratis;
+
 /** Quanto costa un'analisi durante il lancio. */
 export const PREZZO_LANCIO = 1.99;
 

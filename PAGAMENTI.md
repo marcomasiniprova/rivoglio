@@ -57,17 +57,59 @@ notare tre cose che il classificatore non può vedere:
 Il testo pronto è in fondo a questo documento.
 
 ### 2. Provare un altro venditore ufficiale
-**Costo: un pomeriggio. Probabilità: bassa.**
+**Costo: un pomeriggio. Probabilità: bassa, e adesso sappiamo perché.**
 
-Gli altri sono Lemon Squeezy (di Stripe), Paddle e FastSpring. Il
-problema è che gli elenchi delle categorie vietate si somigliano tutti:
-Lemon Squeezy, per dire, vieta esplicitamente i servizi regolamentati fra
-cui "legal", "debt-relief" e "collections", che è la famiglia in cui i
-loro modelli mettono anche l'assistenza ai reclami.
+**RICERCA FATTA L'11/08, leggendo le pagine ufficiali una per una.**
+Non sono opinioni: sono le loro parole, aperte oggi.
+
+| Chi | La riga che ci riguarda | Fuori? |
+|---|---|---|
+| **Polar** | *"Travel Services;"* e *"Regulated services or products;"* | Sì, e infatti ha già detto no |
+| **Paddle** | *"Travel Services, including but not limited to reservation services, travel clubs, timeshares"* · *"pure consulting or advisory services, including but not limited to legal advice"* | Sì, ma con la formulazione più stretta |
+| **Lemon Squeezy** | *"Regulated services such as: ... bankruptcy, legal, merchant, debt-relief, collections"* e *"Services of any kind"* | Sì, due volte |
+| **Dodo Payments** | *"Legal, accounting, medical, and professional services ... Examples include advisory work, ... **document preparation**"* · *"Travel, Immigration & Visa services"* | Sì, ed è il più esplicito di tutti |
+
+🔴 **La conclusione onesta: la categoria è chiusa sullo scaffale
+standard.** Non è che Polar ci abbia trattati peggio degli altri, e non
+è che il testo dell'iscrizione fosse scritto male. Tutti e quattro hanno
+una riga che ci prende. **Riscrivere la descrizione per farla passare
+sarebbe la mossa peggiore possibile**: al momento della verifica
+guardano il sito vero, e a quel punto i bonifici si bloccano coi soldi
+dei clienti dentro.
+
+**Ma due argomenti veri esistono, e vanno usati con un essere umano.**
+1. **Non vendiamo viaggi.** Le loro righe sui viaggi nominano tre cose
+   precise: prenotazioni, club vacanze, multiproprietà (Paddle), oppure
+   biglietti aerei, crociere, visti (Dodo). Noi non vendiamo, non
+   rivendiamo e non prenotiamo niente: vendiamo un documento su un volo
+   **già avvenuto**. La categoria merceologica non è la stessa.
+2. **Non è un servizio umano né una professione regolamentata.** Dodo
+   scrive che va bene *"un prodotto digitale fisso e predefinito,
+   consegnato allo stesso modo a ogni acquirente"*, ed è esattamente cosa
+   siamo: il motore è deterministico, a parità di volo esce lo stesso
+   documento. E la loro riga sulle professioni dice *"servizi che
+   richiedono licenza, certificazione o conformità normativa"*: preparare
+   una lettera che poi manda il passeggero, dalla propria email, non
+   richiede una licenza in Italia. È il motivo per cui su tutti e tre i
+   fogli c'è scritto **"non costituisce parere legale"**.
+
+**Chi provare per primo, e perché: Paddle.** La sua riga sui viaggi è la
+più stretta delle quattro (nomina solo tre cose che noi non siamo), e la
+sua esclusione dei *"servizi umani"* gioca **a nostro favore**, non
+contro: quella riga esclude chi vende consulenza, e noi vendiamo
+software. ⚠️ Paddle però ha stretto le maglie dopo un accordo con la FTC
+americana (giugno 2025) e chiede una verifica più severa: aspettarsi
+domande, non un sì automatico.
 
 ⚠️ **Vanno provati dicendo la verità, come con Polar.** Se uno di loro
 dice sì avendo capito cosa vendiamo, è una strada solida. Se dice sì
 perché ha capito un'altra cosa, il problema torna al primo bonifico.
+
+**Fonti** (riaperte l'11/08 da questa sessione):
+`paddle.com/help/start/intro-to-paddle/what-am-i-not-allowed-to-sell-on-paddle` ·
+`polar.sh/legal/acceptable-use-policy` ·
+`docs.lemonsqueezy.com/help/getting-started/prohibited-products` ·
+`docs.dodopayments.com/miscellaneous/merchant-acceptance`
 
 ### 3. Partita IVA e Stripe diretto
 **Costo: soldi veri e un commercialista. Probabilità: alta.**

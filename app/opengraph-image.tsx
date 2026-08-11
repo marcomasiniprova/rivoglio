@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 import { ImageResponse } from "next/og";
 import { COPY } from "@/lib/copy";
 
+import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
 /**
  * L'immagine che si vede quando qualcuno incolla il link su WhatsApp,
  * Telegram, Facebook o X. Vende esattamente quello che vende il sito:
@@ -87,7 +89,8 @@ export default async function Anteprima() {
               che ti devono.
             </span>
             <span style={{ color: "#a7d9c2", fontSize: 27, marginTop: 26, lineHeight: 1.4 }}>
-              Volo in ritardo nell&apos;ultimo anno? Check gratuito
+              Volo in ritardo nell&apos;ultimo anno?{" "}
+              {seSiPaga(`Analisi ${euro(PREZZO_LANCIO)}`, "Check gratuito")}
               <br />
               in 30 secondi, senza account. Reg. CE 261/2004.
             </span>
