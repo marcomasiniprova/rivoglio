@@ -24,6 +24,30 @@ test.describe("il registro non raccoglie persone", () => {
     );
   });
 
+  test("le anteprime di Netlify non sono 'gente che arriva da fuori'", () => {
+    /* 🔴 Difetto vero, trovato facendo partire il primo riepilogo dal
+       sito online (11/08): fra le provenienze comparivano tre indirizzi
+       tipo `6a7b89e1...--rivolio.netlify.app`, che sono le copie che
+       Netlify pubblica a ogni deploy. Era il sito che navigava sé
+       stesso, contato come traffico in arrivo: il numero più inutile
+       che si possa mettere in un cruscotto, perché si legge come
+       pubblico e non lo è. */
+    const prima = process.env.NEXT_PUBLIC_SITO;
+    process.env.NEXT_PUBLIC_SITO = "https://rivolio.netlify.app";
+    try {
+      expect(soloIlDominio("https://rivolio.netlify.app/prezzi")).toBeNull();
+      expect(soloIlDominio("https://6a7b89e169f331000899b69d--rivolio.netlify.app/")).toBeNull();
+      expect(soloIlDominio("https://qualche-ramo--rivolio.netlify.app/tabellone")).toBeNull();
+      // ma un sito che si chiama in modo simile NON è nostro
+      expect(soloIlDominio("https://rivolio.netlify.app.finto.it/")).toBe("rivolio.netlify.app.finto.it");
+      // e quello che arriva davvero da fuori resta contato
+      expect(soloIlDominio("https://www.tiktok.com/@x/video/1")).toBe("tiktok.com");
+    } finally {
+      if (prima === undefined) delete process.env.NEXT_PUBLIC_SITO;
+      else process.env.NEXT_PUBLIC_SITO = prima;
+    }
+  });
+
   test("senza provenienza non si inventa niente", () => {
     expect(soloIlDominio(null)).toBeNull();
     expect(soloIlDominio("")).toBeNull();
@@ -63,6 +87,29 @@ test.describe("il registro non raccoglie persone", () => {
     expect(privacy).toContain("Statistiche d&apos;uso");
     expect(privacy).toContain("tiktok.com");
     expect(privacy).toContain("indirizzo IP");
+  });
+});
+
+test.describe("il riepilogo della sera non confonde zero con non letto", () => {
+  /**
+   * 🔴 Il primo riepilogo vero diceva «Analisi lanciate: ?» mentre il
+   * dato era letto e valeva zero (11/08). In questo progetto "?" e "non
+   * letto" vogliono dire una cosa sola: non sono riuscito a leggerlo.
+   * Usarli per dire "nessuno l'ha fatto" fa rincorrere un guasto che non
+   * esiste, e il giorno del guasto vero non lo si distingue più.
+   */
+  test("un conteggio a zero si scrive 0, non un punto interrogativo", () => {
+    const codice = readFileSync(join(process.cwd(), "app/api/motore/riepilogo/route.ts"), "utf8");
+    const corpo = codice.slice(codice.indexOf("export async function scriviRiepilogo"));
+    /* Il "?" resta ammesso su una cosa sola, l'incasso, perché quella
+       lettura può davvero mancare. Su tutto il resto è vietato. */
+    const righeCol = corpo.split("\n").filter((r) => r.includes('"?"'));
+    for (const r of righeCol) {
+      expect(r, `punto interrogativo fuori dall'incasso: ${r.trim()}`).toContain("incasso");
+    }
+    // e i conteggi passano dalla funzione che tratta il vuoto come zero
+    expect(corpo).toContain("conta(o.visita)");
+    expect(corpo).toContain("conta(o.check)");
   });
 });
 

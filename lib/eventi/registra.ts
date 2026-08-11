@@ -68,13 +68,28 @@ export function soloIlDominio(referer: string | null | undefined): string | null
   if (!referer) return null;
   try {
     const h = new URL(referer).hostname.replace(/^www\./, "");
+
     /* Chi arriva da una nostra pagina non è una "provenienza": è
-       navigazione interna, e contarla gonfierebbe i numeri. */
-    const nostro = (process.env.NEXT_PUBLIC_SITO ?? process.env.URL ?? "").replace(
-      /^https?:\/\/(www\.)?/,
-      "",
-    );
-    if (nostro && h === nostro.replace(/\/.*$/, "")) return null;
+       navigazione interna, e contarla gonfierebbe i numeri.
+       ⚠️ E NON BASTA CONFRONTARE IL DOMINIO ESATTO. Netlify pubblica una
+       copia del sito a ogni deploy, su indirizzi tipo
+       `6a7b89e1...--rivolio.netlify.app`: sono nostri a tutti gli
+       effetti, ma non sono uguali al dominio principale. Il primo
+       riepilogo vero elencava tre di quegli indirizzi come "da dove
+       arrivano le persone" (visto l'11/08). Erano il sito che navigava
+       sé stesso, cioè il numero più inutile che si possa mettere in un
+       cruscotto: si legge come traffico e non lo è. */
+    const nostro = (process.env.NEXT_PUBLIC_SITO ?? process.env.URL ?? "")
+      .replace(/^https?:\/\/(www\.)?/, "")
+      .replace(/\/.*$/, "");
+    if (nostro) {
+      /* Le anteprime di deploy hanno il nome del sito dopo un "--"; i
+         rami hanno un sottodominio. Tutti e due finiscono col nostro. */
+      const radice = nostro.replace(/^[^.]*--/, "");
+      if (h === nostro || h === radice || h.endsWith(`--${radice}`) || h.endsWith(`.${radice}`)) {
+        return null;
+      }
+    }
     return h.slice(0, 80);
   } catch {
     return null;

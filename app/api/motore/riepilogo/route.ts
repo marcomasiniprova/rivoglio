@@ -23,8 +23,21 @@ export const dynamic = "force-dynamic";
 
 const euro = (n: number) => `${n.toFixed(2).replace(".", ",")}€`;
 
-/** Il numero, oppure un punto interrogativo se non si è potuto leggere. */
-const q = (n: number | null | undefined) => (n === null || n === undefined ? "?" : String(n));
+/**
+ * Il conteggio di un fatto, dentro una giornata GIÀ LETTA.
+ *
+ * ⚠️ QUI ZERO È ZERO, e non è un dettaglio. `leggiCruscotto` torna una
+ * mappa parziale: se oggi nessuno ha lanciato un'analisi, la chiave
+ * "check" semplicemente non c'è. Prima si scriveva "?", che nel resto
+ * del progetto vuol dire "non l'ho potuto leggere": il primo riepilogo
+ * vero diceva «Analisi lanciate: ?» mentre il dato era letto e valeva
+ * zero (visto l'11/08 provando la catena sul sito online).
+ * Confondere "nessuno l'ha fatto" con "non lo so" porta a rincorrere un
+ * guasto che non esiste, o a non accorgersi di quello vero.
+ * Il "non letto" resta, ma solo dove la lettura può davvero mancare:
+ * l'incasso, e l'intera giornata quando il registro non si apre.
+ */
+const conta = (n: number | undefined) => n ?? 0;
 
 export async function scriviRiepilogo(): Promise<string> {
   const c = await leggiCruscotto(0);
@@ -38,20 +51,20 @@ export async function scriviRiepilogo(): Promise<string> {
     ``,
     `💚 Incassato: <b>${c.incassoOggi === null ? "?" : euro(c.incassoOggi)}</b>`,
     ``,
-    `Sono arrivate <b>${q(o.visita)}</b> persone`,
-    `Analisi lanciate: <b>${q(o.check)}</b>`,
+    `Sono arrivate <b>${conta(o.visita)}</b> persone`,
+    `Analisi lanciate: <b>${conta(o.check)}</b>`,
   ];
 
   if (o.muro) {
     righe.push(
       `Hanno visto il muro: <b>${o.muro}</b>`,
-      `Hanno pagato l'analisi: <b>${q(o.sbloccato)}</b>${
+      `Hanno pagato l'analisi: <b>${conta(o.sbloccato)}</b>${
         c.conversioneMuro !== null ? ` (${c.conversioneMuro}%)` : ""
       }`,
     );
   }
   if (o.pratica || o.pagato) {
-    righe.push(`Pratiche aperte: <b>${q(o.pratica)}</b> · pagate: <b>${q(o.pagato)}</b>`);
+    righe.push(`Pratiche aperte: <b>${conta(o.pratica)}</b> · pagate: <b>${conta(o.pagato)}</b>`);
   }
   if (o.iscritto) righe.push(`Iscritti all'Osservatorio: <b>${o.iscritto}</b>`);
 
