@@ -371,8 +371,14 @@ test.describe("Nessuna promessa di check gratuito fuori dall'interruttore", () =
 
     expect(file.length, "la prova non sta leggendo niente").toBeGreaterThan(5);
 
+    /* L'unica esenzione, e va motivata: le pagine di /admin le vede solo
+       Valerio, e la pagina delle impostazioni DEVE poter dire "senza
+       questa variabile il check torna gratuito per tutti", perché è
+       esattamente la diagnosi che serve. Non è una promessa a un
+       cliente: è un cruscotto. */
     const colpevoli: string[] = [];
     for (const f of file) {
+      if (f.startsWith("app/admin/")) continue;
       const righe = readFileSync(join(process.cwd(), f), "utf8").split("\n");
       righe.forEach((riga, i) => {
         const spoglio = riga.trim();
@@ -453,5 +459,43 @@ test.describe("La ricevuta non si riusa", () => {
     const sql = readFileSync(join(process.cwd(), "supabase/DA-APPLICARE.sql"), "utf8");
     expect(sql).toContain("ordine_check");
     expect(sql).toContain("verifiche_ordine_check_idx");
+  });
+});
+
+/* ── LE PAGINE DA CUI NON SI TORNAVA ───────────────────────────────────
+   Valerio, 11/08: «quando uno entra nel blog resta bloccato e non puo'
+   uscirne». Il Tabellone e le pagine evento hanno una testata loro, non
+   la barra della landing: il filo che riporta al check si spezza. */
+test.describe("Dal blog si torna indietro", () => {
+  test("i link della landing verso le sezioni a parte aprono una scheda nuova", async () => {
+    const { apreAParte, SEZIONI_A_PARTE } = await import("../lib/link");
+    for (const p of SEZIONI_A_PARTE) {
+      expect(apreAParte(p).target, `${p} deve aprirsi di fianco`).toBe("_blank");
+      /* Senza noopener la pagina che si apre puo' toccare quella che
+         l'ha aperta: e' una regola di sicurezza, non di stile. */
+      expect(apreAParte(p).rel).toContain("noopener");
+    }
+  });
+
+  test("le ancore della landing NON aprono schede nuove", async () => {
+    const { apreAParte } = await import("../lib/link");
+    for (const p of ["#prezzi", "/", "/app", "/entra", "/privacy"]) {
+      expect(apreAParte(p).target, `${p} non deve aprire una scheda`).toBeUndefined();
+    }
+  });
+
+  test("dentro il Tabellone c'è una via d'uscita verso il sito", () => {
+    const testata = readFileSync(join(process.cwd(), "components/tabellone/Masthead.tsx"), "utf8");
+    expect(testata, "manca il ritorno alla landing dalla testata del blog").toContain('href="/"');
+  });
+
+  test("il marchio del Tabellone è cliccabile e riporta in cima", () => {
+    const m = readFileSync(
+      join(process.cwd(), "components/tabellone/MarchioTabellone.tsx"),
+      "utf8",
+    );
+    expect(m).toContain("scrollTo");
+    /* Chi ha chiesto meno animazioni riceve il salto secco. */
+    expect(m).toContain("prefers-reduced-motion");
   });
 });

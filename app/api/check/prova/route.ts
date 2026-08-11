@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { inCollaudo } from "@/lib/check/cancello";
+import { cassaDiProvaAperta } from "@/lib/check/cancello";
 import { CHECK_PER_PAGAMENTO, PREZZO_LANCIO } from "@/lib/check/ingresso";
 import { COOKIE_PASS, creaPass } from "@/lib/check/pass";
 
@@ -34,10 +34,10 @@ const BISCOTTO = {
   maxAge: 60 * 60 * 24 * 30,
 };
 
-export async function POST(req: Request) {
-  /* Stessa risposta di quando la rotta non esiste: chi tenta a caso non
-     deve nemmeno capire di aver trovato la porta giusta. */
-  if (!inCollaudo(req)) {
+export async function POST() {
+  /* Senza la variabile questa rotta non esiste: 404, come una pagina
+     inventata. È l'interruttore che la spegne il giorno del venditore. */
+  if (!cassaDiProvaAperta()) {
     return NextResponse.json({ ok: false, errore: "Non trovato." }, { status: 404 });
   }
 

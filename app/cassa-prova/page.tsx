@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import CassaProva from "@/components/rivolio/CassaProva";
+import { cassaDiProvaAperta } from "@/lib/check/cancello";
 import { conteggioCheck } from "@/lib/check/conteggio";
 import { prezzoCheck } from "@/lib/check/ingresso";
-import { COOKIE_PROVA, chiaveDiProvaValida } from "@/lib/check/pass";
 
 /**
  * LA CASSA DI PROVA: la pagina.
@@ -30,9 +29,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PaginaCassaProva() {
-  const segreto = process.env.CASSA_PROVA_SEGRETO ?? "";
-  const magazzino = await cookies();
-  if (!chiaveDiProvaValida(magazzino.get(COOKIE_PROVA)?.value, segreto)) notFound();
+  if (!cassaDiProvaAperta()) notFound();
 
   const { pagati } = await conteggioCheck();
   const prezzo = prezzoCheck(pagati);

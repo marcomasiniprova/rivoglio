@@ -1,0 +1,207 @@
+import type { Metadata } from "next";
+
+/**
+ * LE IMPOSTAZIONI, SPIEGATE DA SOLE (richiesta di Valerio, 11/08).
+ *
+ * Il problema, con le sue parole: «ogni volta mi dici aggiungi variables
+ * nomi strani non si capisce un cazzo, ne mancano alcune, è un casino».
+ * Aveva ragione: su Netlify si vede un elenco di nomi in maiuscolo senza
+ * nessuna spiegazione, e per sapere se ne manca una bisogna aprire il
+ * codice.
+ *
+ * Questa pagina guarda le variabili VERE del server e per ognuna dice
+ * tre cose in italiano: a cosa serve, se c'è, e **cosa succede se
+ * manca**. Non è un elenco: è una diagnosi.
+ *
+ * ⚠️ NON MOSTRA MAI IL VALORE. Solo se c'è o non c'è. Una pagina che
+ * stampa le chiavi è una pagina che, il giorno che qualcuno ci finisce
+ * dentro o ne fa uno screenshot, regala tutto. Sta comunque dietro
+ * `/admin`, che il proxy chiude a chi non è collegato.
+ */
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Impostazioni | Rivolio",
+  robots: { index: false, follow: false },
+};
+
+type Voce = {
+  nome: string;
+  /** A cosa serve, in una riga, senza gergo. */
+  serve: string;
+  /** Cosa succede se non c'è. È la parte che conta. */
+  seManca: string;
+  /** Serve per forza, oppure il sito gira lo stesso? */
+  peso: "obbligatoria" | "importante" | "facoltativa";
+  /** Il valore c'è? Calcolato sul server, mai mostrato. */
+  ceSta: boolean;
+};
+
+function stato(): Voce[] {
+  const c = (v: string | undefined) => Boolean(v && v.trim());
+  return [
+    {
+      nome: "SUPABASE_SECRET_KEY",
+      serve: "La chiave che fa scrivere il sito sul database: verifiche, pratiche, iscritti.",
+      seManca:
+        "Il check funziona ma non ricorda niente: nessuna cache dei voli (quindi si paga il fornitore ogni volta), nessuna pratica, nessuna iscrizione salvata.",
+      peso: "obbligatoria",
+      ceSta: c(process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY),
+    },
+    {
+      nome: "NEXT_PUBLIC_SUPABASE_URL",
+      serve: "L'indirizzo del database. Serve anche nel browser, per il login.",
+      seManca: "Login e area personale non funzionano.",
+      peso: "obbligatoria",
+      ceSta: c(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    },
+    {
+      nome: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      serve: "La chiave pubblica del database: quella che può stare nel browser.",
+      seManca: "Login e area personale non funzionano.",
+      peso: "obbligatoria",
+      ceSta: c(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    },
+    {
+      nome: "AERODATABOX_API_KEY",
+      serve: "Gli orari veri dei voli. È la fonte del verdetto.",
+      seManca:
+        "🔴 Il sito passa ai voli DIMOSTRATIVI: risponde solo ai voli che iniziano per ZZ e ogni risposta esce marcata demo. Un vero utente non ottiene niente.",
+      peso: "obbligatoria",
+      ceSta: c(process.env.AERODATABOX_API_KEY),
+    },
+    {
+      nome: "RESEND_API_KEY",
+      serve: "Spedisce le email: conferma iscrizione, benvenuto, avvisi sulla pratica.",
+      seManca: "Nessuna email parte. Il resto del sito funziona.",
+      peso: "importante",
+      ceSta: c(process.env.RESEND_API_KEY),
+    },
+    {
+      nome: "RESEND_MITTENTE",
+      serve: 'Da chi arrivano le email. Va messa così: Valerio di Rivolio <valerio@iltuodominio>.',
+      seManca:
+        "Le email partono da un indirizzo di prova di Resend, e SOLO verso l'indirizzo con cui ti sei registrato. ⚠️ Va messa solo DOPO che Resend ha verificato il dominio: prima, le email si fermano del tutto.",
+      peso: "importante",
+      ceSta: c(process.env.RESEND_MITTENTE),
+    },
+    {
+      nome: "MISTRAL_API_KEY",
+      serve: "Legge la foto della carta d'imbarco e ne ricava volo e data.",
+      seManca: "Il pulsante della foto dice che non è disponibile. Gli altri due modi funzionano.",
+      peso: "facoltativa",
+      ceSta: c(process.env.MISTRAL_API_KEY),
+    },
+    {
+      nome: "NEXT_PUBLIC_CHECK_PREZZO_ATTIVO",
+      serve: 'Il muro del check. Vale "1" per farlo pagare, qualsiasi altra cosa lo spegne.',
+      seManca: "Il check torna gratuito per tutti, e i testi del sito tornano a dire gratis da soli.",
+      peso: "facoltativa",
+      ceSta: process.env.NEXT_PUBLIC_CHECK_PREZZO_ATTIVO === "1",
+    },
+    {
+      nome: "CASSA_PROVA_SEGRETO",
+      serve:
+        "Tiene accesa la cassa FINTA, quella che non incassa. Non è più un segreto: adesso è solo un interruttore, basta che ci sia un valore qualsiasi.",
+      seManca:
+        "La cassa finta sparisce (404) e il bottone del muro porta ai prezzi. 🔴 È la prima cosa da togliere il giorno del venditore vero.",
+      peso: "facoltativa",
+      ceSta: c(process.env.CASSA_PROVA_SEGRETO),
+    },
+    {
+      nome: "MOTORE_SEGRETO",
+      serve: "Chiude i lavori notturni (avvisi push, scioperi) a chi non è Netlify.",
+      seManca: "In produzione quelle rotte non si aprono: i lavori notturni non partono.",
+      peso: "importante",
+      ceSta: c(process.env.MOTORE_SEGRETO),
+    },
+    {
+      nome: "NEXT_PUBLIC_SITO",
+      serve:
+        "L'indirizzo del sito, usato nelle email e nella mappa per Google. ⚠️ Si può TOGLIERE: senza, il sito legge l'indirizzo che Netlify gli dà da solo, e quello non diventa mai vecchio.",
+      seManca: "Niente: si usa l'indirizzo di Netlify. È il comportamento consigliato.",
+      peso: "facoltativa",
+      ceSta: c(process.env.NEXT_PUBLIC_SITO),
+    },
+    {
+      nome: "SHADOW_MODE",
+      serve:
+        'Fa nascere ogni verdetto "in attesa di conferma umana". ⚠️ Si può TOGLIERE: in produzione ormai è acceso da solo.',
+      seManca: "Niente: in produzione resta acceso lo stesso. Per spegnerlo davvero serve SHADOW_MODE=0.",
+      peso: "facoltativa",
+      ceSta: process.env.SHADOW_MODE !== "0",
+    },
+  ];
+}
+
+const COLORE = {
+  obbligatoria: "text-errore",
+  importante: "text-inchiostro",
+  facoltativa: "text-fumo",
+} as const;
+
+export default function PaginaImpostazioni() {
+  const voci = stato();
+  const mancanti = voci.filter((v) => !v.ceSta && v.peso !== "facoltativa");
+
+  return (
+    <main className="mx-auto w-full max-w-3xl px-5 py-12">
+      <h1 className="font-display text-[2rem] leading-tight tracking-[-0.03em]">
+        Le impostazioni del sito
+      </h1>
+      <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">
+        Quello che c&apos;è su Netlify, spiegato. Qui non si vede nessun valore:
+        solo se una cosa c&apos;è o non c&apos;è, e cosa succede se manca.
+      </p>
+
+      <div
+        className={`mt-7 rounded-2xl border p-5 ${
+          mancanti.length === 0
+            ? "border-verde/30 bg-verde/5"
+            : "border-errore/30 bg-errore/5"
+        }`}
+      >
+        <p className="font-display text-[1.15rem] tracking-[-0.02em]">
+          {mancanti.length === 0
+            ? "Non manca niente di importante."
+            : `Mancano ${mancanti.length} cose che servono.`}
+        </p>
+        {mancanti.length > 0 && (
+          <ul className="mt-2 space-y-1 text-[14px] text-fumo">
+            {mancanti.map((v) => (
+              <li key={v.nome}>
+                <code className="text-inchiostro">{v.nome}</code> · {v.seManca}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="mt-8 space-y-3">
+        {voci.map((v) => (
+          <div key={v.nome} className="rounded-2xl border border-bordo bg-white p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <code className="text-[13.5px] font-medium text-inchiostro">{v.nome}</code>
+              <span
+                className={`text-[12.5px] font-medium ${v.ceSta ? "text-verde" : COLORE[v.peso]}`}
+              >
+                {v.ceSta ? "c'è" : v.peso === "facoltativa" ? "non c'è (va bene)" : "MANCA"}
+              </span>
+            </div>
+            <p className="mt-2 text-[14px] leading-relaxed text-fumo">{v.serve}</p>
+            <p className="mt-1.5 text-[13px] leading-relaxed text-fumo-2">
+              <span className="font-medium text-inchiostro">Se manca:</span> {v.seManca}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-8 text-[13px] leading-relaxed text-fumo-2">
+        Si cambiano su Netlify, in <em>Project configuration → Environment
+        variables</em>. ⚠️ Dopo ogni cambio serve un deploy nuovo (<em>Deploys →
+        Trigger deploy → Clear cache and deploy site</em>): questi valori
+        entrano nel sito quando viene costruito, non quando qualcuno lo apre.
+      </p>
+    </main>
+  );
+}

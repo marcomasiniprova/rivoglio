@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-11 (giro #54: I QUATTRO TAPPI DEL LANCIO, il
+**Aggiornato:** 2026-08-11 (giro #55: le tre email ai venditori
+SPEDITE, la cassa finta visibile, il blog da cui si esce, le impostazioni
+che si spiegano da sole · giro #54: I QUATTRO TAPPI DEL LANCIO, il
 database completo e collaudato online, le quattro email ai venditori, un
 errore vero nelle citazioni delle sentenze, la coda con ritentativo ·
 giro #53: IL MURO NON SI APRIVA SOLO SULLA
@@ -61,6 +63,51 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #55 (11/08): LE TRE EMAIL PARTITE, LA CASSA CHE SI VEDE, E IL
+  BLOG DA CUI SI ESCE.**
+  - ✅ **TRE EMAIL AI VENDITORI SPEDITE DAVVERO** dall'account di Valerio
+    (valerio@artecai.it, via Composio): `support@polar.sh` (revisione
+    umana del rifiuto), `legal@paddle.com` e `support@dodopayments.com`
+    (la domanda prima di iscriversi). Lemon Squeezy non pubblica un
+    indirizzo: quella si manda dal loro modulo, il testo è pronto in
+    `EMAIL-VENDITORI.md`.
+  - **LA CASSA FINTA È APERTA A TUTTI** (decisione di Valerio): il
+    bottone del muro ci porta chiunque, così lui prova il giro da
+    qualsiasi telefono senza armare quel browser. Rifatta con l'impianto
+    di una cassa vera (riepilogo a sinistra, totale e bottone a destra).
+    ⚠️ **Nessun campo per la carta, e non ci sarà**: un modulo che chiede
+    numero e codice, anche se non manda niente, è indistinguibile da una
+    truffa per chi ci finisce sopra per caso, e la pagina è pubblica. Il
+    bollo "Modalità di prova" sta sopra il totale, cioè nel punto che si
+    guarda per forza.
+    🔴 **Chi la trova sblocca un'analisi gratis**: oggi non c'è niente da
+    rubare, ma è la prima cosa da spegnere il giorno del venditore
+    (basta togliere `CASSA_PROVA_SEGRETO`). In ARRETRATI, voce A3.
+  - **DAL BLOG SI ESCE.** Prima ci entravi e restavi dentro: il Tabellone
+    ha una testata sua, non la barra della landing. Adesso il marchio è
+    cliccabile (dall'elenco riporta in cima **scorrendo**, da un articolo
+    porta all'elenco), accanto c'è un ritorno discreto "Al sito", e dalla
+    landing quelle pagine **si aprono in una scheda nuova**
+    (`lib/link.ts`, scelta di Valerio). ⚠️ Una prova ha subito preso la
+    regressione: il bottone nuovo spingeva la testata fuori dallo schermo
+    a 320 punti.
+  - **LE IMPOSTAZIONI SI SPIEGANO DA SOLE** (`/admin/impostazioni`).
+    Valerio: «nomi strani, non si capisce un cazzo, ne mancano alcune».
+    La pagina guarda le variabili vere e per ognuna dice a cosa serve, se
+    c'è, e **cosa succede se manca**. ⚠️ Non mostra mai un valore: una
+    pagina che stampa le chiavi, il giorno di uno screenshot, regala
+    tutto.
+    **Ne bastano due in meno, non tre**: `NEXT_PUBLIC_SITO` si può
+    togliere (senza, il sito legge l'indirizzo che gli dà Netlify, e
+    quello non diventa mai vecchio: è il bug del giro #52) e
+    `SHADOW_MODE` pure, perché adesso in produzione **è acceso da solo** e
+    si spegne solo scrivendo `SHADOW_MODE=0`. Dimenticarsene porta dalla
+    parte prudente.
+  - **COME FUNZIONA LO SBLOCCO, per iscritto**: la ricevuta è un cookie
+    di 30 giorni. Regge il ricaricamento, la chiusura del sito e lo
+    spegnimento del telefono. **Non regge il cambio di dispositivo**, ed
+    è il limite vero della scelta "niente account": in ARRETRATI, voce A4.
+  - Prove: **962 verdi, zero rosse.**
 - **GIRO #54 (11/08): I QUATTRO TAPPI DEL LANCIO, presi in ordine.**
   - ✅ **IL DATABASE È COMPLETO E COLLAUDATO ONLINE.** Applicati col
     connettore Supabase i punti **5** (il no della compagnia) e **6**

@@ -305,7 +305,19 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
           motivo: verdetto.motivo,
           versione_regole: verdetto.versioneRegole,
           // Shadow mode (SPEC §4): il verdetto aspetta la conferma umana in /admin.
-          conferma: process.env.SHADOW_MODE === "1" ? "in_attesa" : "automatica",
+          /* Shadow mode ACCESO di default in produzione (11/08): prima
+             serviva la variabile SHADOW_MODE=1 su Netlify, e una
+             variabile che va messa a mano è una variabile che un giorno
+             qualcuno dimentica, spegnendo la conferma umana senza
+             volerlo. Adesso in produzione è acceso da solo e si spegne
+             solo scrivendo esplicitamente SHADOW_MODE=0: dimenticarsene
+             porta dalla parte prudente, non dall'altra. */
+          conferma:
+            process.env.SHADOW_MODE === "0"
+              ? "automatica"
+              : process.env.SHADOW_MODE === "1" || process.env.NODE_ENV === "production"
+                ? "in_attesa"
+                : "automatica",
         })
         .select("id")
         .single();

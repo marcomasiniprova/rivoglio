@@ -1,5 +1,6 @@
 import Logo from "./Logo";
 import { COPY } from "@/lib/copy";
+import { apreAParte } from "@/lib/link";
 
 /**
  * Barra a pillola fluttuante, come Zentivo. Voci e CTA vengono da COPY.nav.
@@ -17,6 +18,7 @@ export default function Nav() {
             <a
               key={v.ancora}
               href={v.ancora}
+              {...apreAParte(v.ancora)}
               className="text-[15px] text-fumo transition-colors hover:text-inchiostro"
             >
               {v.testo}

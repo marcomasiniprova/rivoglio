@@ -43,11 +43,32 @@ export function passDi(req: Request): Pass | null {
 }
 
 /**
- * Vero se questo browser è quello del collaudatore.
+ * LA CASSA DI PROVA È APERTA (decisione di Valerio, 11/08).
  *
- * Solo a lui il muro dice dove sta la cassa di prova: quella cassa
- * emette ricevute vere, e una porta che si apre da sola non è un muro.
+ * Finché non esiste un venditore vero, il bottone del muro porta alla
+ * cassa di prova **per chiunque**. Il motivo è pratico: Valerio deve
+ * poter percorrere il giro da qualsiasi telefono senza ricordarsi di
+ * armare quel browser, e con la cassa chiusa a chiave si ritrovava
+ * davanti a un bottone che lo mandava ai prezzi.
+ *
+ * ⚠️ SÌ, VUOL DIRE CHE CHI LA TROVA SBLOCCA UN'ANALISI GRATIS. Oggi non
+ * c'è niente da rubare: non incassiamo un euro, e l'unico costo è una
+ * chiamata al fornitore, che è protetta dal tetto per IP.
+ *
+ * 🔴 SI SPEGNE TOGLIENDO `CASSA_PROVA_SEGRETO` DA NETLIFY, ed è la prima
+ * cosa da fare il giorno del venditore vero: senza quella variabile la
+ * pagina e la rotta smettono di esistere (404) e il muro torna a
+ * mandare ai prezzi. È scritto anche in LANCIO.md e in ARRETRATI.
+ *
+ * Il cookie del collaudatore resta in piedi e non fa male a nessuno: il
+ * giorno che la cassa va richiusa a chiave basta rimettere questa
+ * funzione a guardare il cookie invece della sola variabile.
  */
+export function cassaDiProvaAperta(): boolean {
+  return Boolean(process.env.CASSA_PROVA_SEGRETO);
+}
+
+/** Vero se questo browser porta la chiave del collaudatore. */
 export function inCollaudo(req: Request): boolean {
   const segreto = process.env.CASSA_PROVA_SEGRETO ?? "";
   if (!segreto) return false;
@@ -123,7 +144,10 @@ export async function datiDelMuro(req: Request) {
   const { pagati } = await conteggioCheck();
   const prezzo = prezzoCheck(pagati);
   return {
-    cassa: inCollaudo(req) ? "/cassa-prova" : null,
+    /* Finché la cassa di prova esiste, il bottone del muro ci porta.
+       ⚠️ Il segreto NON viaggia mai qui dentro: l'indirizzo è nudo, e
+       una prova lo vieta per sempre (era il buco dell'11/08). */
+    cassa: cassaDiProvaAperta() ? "/cassa-prova" : null,
     prezzoTesto: prezzo.prezzoTesto,
     prezzoPienoTesto: prezzo.prezzoPienoTesto,
     inLancio: prezzo.inLancio,

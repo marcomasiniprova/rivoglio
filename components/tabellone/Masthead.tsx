@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Marchio } from "@/components/Logo";
-import { NOME_BLOG, RADICE, tagUsati } from "@/lib/tabellone/indice";
+import MarchioTabellone from "./MarchioTabellone";
+import { RADICE, tagUsati } from "@/lib/tabellone/indice";
 
 /**
  * La testata del Tabellone, com'è nel riferimento: piatta, larga quanto la
@@ -33,14 +33,9 @@ export default function Masthead() {
   return (
     <header className="sticky top-0 z-50 border-b border-verde-notte/10 bg-carta/92 backdrop-blur-xl">
       <div className="mx-auto flex h-[68px] max-w-[1216px] items-center justify-between gap-4 px-5 sm:px-8">
-        {/* la testata */}
-        <Link href={RADICE} className="group flex shrink-0 items-center gap-2.5">
-          <Marchio className="h-8 w-8 transition-transform duration-500 group-hover:-rotate-6" />
-          <span className="font-display text-[17px] font-semibold leading-none tracking-[-0.03em] text-verde-notte sm:text-[18.5px]">
-            Rivolio{" "}
-            <span className="corsivo font-normal text-verde-scuro">{NOME_BLOG}</span>
-          </span>
-        </Link>
+        {/* la testata: dall'elenco riporta in cima scorrendo, da un
+            articolo porta all'elenco (vedi MarchioTabellone) */}
+        <MarchioTabellone />
 
         {/* le voci */}
         <nav className="hidden items-center gap-7 lg:flex">
@@ -90,11 +85,35 @@ export default function Masthead() {
           </Link>
         </nav>
 
-        {/* le due azioni */}
+        {/* le azioni */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
+          {/* ⚠️ LA VIA D'USCITA (richiesta di Valerio, 11/08): dal blog
+              non si tornava al sito. Il Tabellone ha una testata sua e
+              non la barra della landing, quindi il filo che riporta al
+              check si spezzava e il visitatore restava dentro.
+              È discreto di proposito: la freccia e due parole, non un
+              bottone che compete con "Controlla il tuo volo". */}
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-[9px] px-2.5 py-2.5 text-[14px] font-medium text-verde-notte/70 transition-colors hover:text-verde-notte sm:px-3"
+            aria-label="Torna al sito Rivolio"
+          >
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M9.5 3.5L5 8l4.5 4.5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {/* Sotto i 640 punti resta la sola freccia: il testo pieno
+                spingerebbe fuori il bottone del check. */}
+            <span className="hidden sm:inline">Al sito</span>
+          </Link>
           <Link
             href="/#come-funziona"
-            className="hidden items-center gap-2 rounded-[9px] border border-verde-notte/22 bg-white px-4 py-2.5 text-[14px] font-semibold text-verde-notte transition-all duration-300 hover:-translate-y-0.5 hover:border-verde-notte/40 sm:inline-flex"
+            className="hidden items-center gap-2 rounded-[9px] border border-verde-notte/22 bg-white px-4 py-2.5 text-[14px] font-semibold text-verde-notte transition-all duration-300 hover:-translate-y-0.5 hover:border-verde-notte/40 lg:inline-flex"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <circle cx="8" cy="8" r="6.6" stroke="currentColor" strokeWidth="1.6" />

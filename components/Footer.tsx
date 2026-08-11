@@ -4,6 +4,7 @@ import BadgeStore from "./BadgeStore";
 import ManoRivelata from "./rivolio/ManoRivelata";
 import { COPY } from "@/lib/copy";
 
+import { apreAParte } from "@/lib/link";
 /**
  * Il footer di Rivolio.
  *
@@ -172,6 +173,7 @@ export default function Footer() {
                   <li key={v.testo}>
                     <Link
                       href={casa(v.ancora)}
+                      {...apreAParte(casa(v.ancora))}
                       className="inline-block text-[14.5px] transition-all duration-200 hover:translate-x-0.5 hover:text-menta"
                     >
                       {v.testo}
@@ -203,6 +205,7 @@ export default function Footer() {
               <Link
                 key={v.testo}
                 href={casa(v.ancora)}
+                      {...apreAParte(casa(v.ancora))}
                 className="transition-colors hover:text-menta"
               >
                 {v.testo}
