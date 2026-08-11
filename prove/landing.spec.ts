@@ -79,9 +79,19 @@ test.describe("Landing page", () => {
     expect(testo).toContain("390€");
     expect(testo).toContain("585,10€");
 
-    // e la cifra si apre: il dettaglio dichiara da dove viene il 35-50%
-    await prezzi.getByText(COPY.comune.apriIlConto).first().click();
-    await expect(prezzi.getByText(COPY.prezzi.notaConfronto)).toBeVisible();
+    /* E la cifra si apre: il dettaglio dichiara da dove viene il 35-50%.
+       ⚠️ Si punta al dettaglio che CONTIENE la nota, non a `.first()`.
+       "Come nasce questa cifra" compare più volte dentro la sezione
+       prezzi (ogni numero mostrato è apribile, è la regola del progetto),
+       quindi `.first()` apriva un dettaglio a caso: quando ne apriva un
+       altro la nota restava chiusa e la prova falliva. Passava solo
+       perché di solito l'ordine nel DOM era quello comodo, e infatti
+       nella suite piena su telefono ha ceduto (11/08). */
+    const conto = prezzi.locator("details", {
+      has: page.getByText(COPY.prezzi.notaConfronto),
+    });
+    await conto.getByText(COPY.comune.apriIlConto).click();
+    await expect(conto.getByText(COPY.prezzi.notaConfronto)).toBeVisible();
   });
 
   test("il modulo dell'Osservatorio c'è e rifiuta un'email sbagliata", async ({ page }) => {

@@ -1,6 +1,5 @@
 import { Area, BarreOrizzontali, Legenda, Scheda } from "@/components/admin/Grafici";
 import { Avviso, Kpi, oNonLetto } from "@/components/admin/Pezzi";
-import DaGoogle from "@/components/admin/DaGoogle";
 import { soloAdmin } from "@/lib/admin/guardia";
 import { leggiCruscotto, leggiSerie } from "@/lib/eventi/lettura";
 
@@ -132,13 +131,6 @@ export default async function PaginaTraffico() {
           ]}
         />
       </Scheda>
-
-      {/* ⚠️ Search Console sta QUI e non in una sezione sua: e' la stessa
-          domanda ("da dove arriva la gente"), solo che il registro
-          risponde per chi e' gia' arrivato e Google per chi non e'
-          ancora arrivato. Separarle vorrebbe dire guardare in due posti
-          per capire una cosa sola. */}
-      <DaGoogle />
 
       <p className="pb-2 text-[12.5px] leading-relaxed text-fumo-2">
         Qui non si può sapere se una persona è tornata due volte, ed è voluto: il registro
