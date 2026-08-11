@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-11 (giro #52: IL CHECK SI PAGA, deciso da
+**Aggiornato:** 2026-08-11 (giro #53: IL MURO NON SI APRIVA SOLO SULLA
+PORTA PRINCIPALE, tre buchi chiusi, e le 60 promesse di gratis legate
+all'interruttore · giro #52: IL CHECK SI PAGA, deciso da
 Valerio: 1,99 di lancio col totale che resta 14,90, tutto spento dietro
 un interruttore · lo scroll pesante · giro #51: TUTTE E 34 LE SCHERMATE SULLA
 LAVAGNA col 404 chiuso alla radice, l'autopilot che ha girato per la
@@ -56,6 +58,63 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #53 (11/08): IL MURO SI APRIVA DA SOLO. Tre buchi veri, trovati
+  leggendo il codice e verificati sul sito online.**
+  - 🔴 **LA CASSA DI PROVA ERA APERTA A TUTTI.** La risposta 402 del muro
+    conteneva `/cassa-prova?s=<segreto>`: la parola segreta la riceveva
+    **chiunque** premesse "Sblocca l'analisi", e quella cassa emette
+    ricevute VERE. Non era un muro, era una porta col cartello.
+    Adesso la chiave sta in un **cookie firmato** che si prende una volta
+    sola da `/api/check/prova/chiave?s=...`, e nel cookie non c'è la
+    parola ma la sua firma: chi legge il cookie non impara niente di
+    riutilizzabile. Il muro dice dove sta la cassa **solo a quel
+    browser**; per tutti gli altri il bottone porta ai prezzi.
+  - 🔴 **TRE ROTTE DAVANO IL VERDETTO SENZA PASSARE DAL MURO.**
+    `/api/verifica/cancellato`, `/dichiara` e `/operativo` chiamano
+    `verificaVolo()` per conto loro: bastava conoscere l'indirizzo.
+    ⚠️ Ma non basta chiedere la ricevuta, e il motivo vale soldi: chi ha
+    pagato e ha già avuto il verdetto ha finito il credito. Se poi
+    dichiara di essere rimasto a terra, quella domanda fa parte di quello
+    che ha comprato. Quindi `cancelloDelSeguito` lascia entrare chi ha la
+    ricevuta **oppure** chi porta l'id di una verifica che esiste, e
+    quell'id si ottiene in un modo solo: passando dal cancello.
+  - 🔴 **LA RICERCA PER TRATTA REGALAVA LA SOSTANZA.** L'elenco dei voli
+    restituiva l'orario di atterraggio vero ("Atterrato alle 13:47"), che
+    è esattamente ciò che vendiamo: chi lo leggeva non aveva più motivo
+    di pagare. Col muro acceso esce solo l'orario **previsto**, che serve
+    a far riconoscere il proprio volo e sta già sul biglietto.
+  - **Il cancello vive in un file solo** (`lib/check/cancello.ts`):
+    scritto in quattro punti diventava quattro regole diverse al primo
+    cambio.
+  - **LE 60 PROMESSE DI GRATIS SEGUONO L'INTERRUTTORE.** Prima lo
+    seguivano solo i testi di `lib/copy.ts`; le altre sessanta righe
+    erano scritte a mano in venticinque file, **condizioni d'uso
+    comprese**, che sono un impegno scritto e non un titolo di pagina.
+    Ora passano tutte da `seSiPaga(pagando, gratis)`: legali (4), titolo
+    e descrizione per Google e social (4), articoli del Tabellone (13),
+    pagine sciopero e aeroporto (8), guide, login ed email (8), app (14).
+    Restano gratuiti nei testi **solo i canali che lo sono davvero**: il
+    reclamo alla compagnia, la segnalazione all'ente e la conciliazione.
+  - ⚠️ **L'APP AVEVA LO STESSO DIFETTO DELLA LANDING DI IERI.** Expo
+    legge solo le variabili che cominciano per `EXPO_PUBLIC_`, quindi
+    `NEXT_PUBLIC_CHECK_PREZZO_ATTIVO` dentro l'app non arriva mai. Nasce
+    `mobile/src/lib/ingresso.ts` con **`EXPO_PUBLIC_CHECK_PREZZO_ATTIVO`**,
+    che va tenuta allineata: se il muro è acceso di là e questa è spenta,
+    l'app promette gratis e poi mostra il muro.
+  - **LA RICERCA SUL VENDITORE, fatta aprendo le quattro pagine
+    ufficiali** (in `PAGAMENTI.md`). Hanno **tutti** una riga che ci
+    prende: Polar e Paddle *"Travel Services"*, Lemon Squeezy *"legal /
+    debt-relief / collections"*, Dodo *"document preparation"*. **La
+    categoria è chiusa sullo scaffale standard**, e non è che Polar ci
+    abbia trattati peggio. Riscrivere la descrizione più vaga per passare
+    il controllo automatico è la mossa peggiore: alla verifica guardano
+    il sito vero e i bonifici si bloccano coi soldi dei clienti dentro.
+    I due argomenti da fare a un essere umano (non vendiamo viaggi; è un
+    prodotto digitale fisso, non una professione con licenza) e il motivo
+    per cui **il primo da provare è Paddle** stanno nel file.
+  - Prove: **906 verdi** (erano 890), di cui 8 nuove sul cancello. Una
+    vieta per sempre di rimettere il segreto dentro la risposta del muro.
+    Restano le 2 dell'Osservatorio in sandbox e le 4 della sveglia 2027.
 - **GIRO #52 (11/08): IL CHECK SI PAGA (deciso da Valerio), LO SCROLL
   PESANTE, E LA REGOLA DELLE 4 DOMANDE BLINDATA.**
   - **LA DECISIONE: il check non resta gratuito.** Cancello
@@ -1407,6 +1466,20 @@ social rifatta (era rimasta al prodotto viaggi).
   (Android Studio + emulatore, oppure `expo start --web` in 2 minuti).
 
 ## Serve Valerio (in ordine)
+0-zero. **DUE COSE DA UN MINUTO, sul muro appena acceso.**
+   a. **Prendi la chiave della cassa di prova.** Incolla nel browser, una
+      volta sola: `https://rivolio.netlify.app/api/check/prova/chiave?s=RIVOLIO`
+      (al posto di RIVOLIO metti il valore vero di `CASSA_PROVA_SEGRETO`).
+      Ti porta alla cassa e da lì in avanti quel browser è "il tuo": il
+      bottone del muro ti porterà sempre lì. Prima il segreto viaggiava
+      nella risposta del muro e la cassa era aperta a tutti.
+   b. **Su Netlify aggiungi `EXPO_PUBLIC_CHECK_PREZZO_ATTIVO`** con lo
+      stesso valore di `NEXT_PUBLIC_CHECK_PREZZO_ATTIVO`. Serve all'app:
+      Expo non legge le variabili che non cominciano per `EXPO_PUBLIC_`,
+      quindi senza quella l'app continua a scrivere "il check è gratis"
+      mentre il sito fa pagare. ⚠️ L'app va poi riesportata
+      (`npm run anteprima` dentro `mobile/`) perché quel testo si decide
+      quando l'app viene costruita, non quando la si apre.
 0-bis. ~~LE MIGRAZIONI DEL DATABASE~~ ✅ **FATTE da Valerio il 10/08**:
    `supabase/DA-APPLICARE.sql` è stato eseguito sul Supabase vero. Da qui
    in avanti sono attivi il doppio opt-in, i voli cancellati, il negato

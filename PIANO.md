@@ -75,7 +75,8 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 |---|---|
 | Netlify: progetto `rivolio` creato, variabili impostate, rivoglio.netlify.app | ✅ 07/08 via connettore |
 | Primo deploy di produzione | ✅ 8/08: **https://rivoglio.netlify.app** (via workbench + connettore; netlify.toml con build e plugin Next). Il rivoglioo.netlify.app di Valerio è un altro account, senza variabili: da dismettere |
-| Polar: account aperto (Valerio) | ✅ · ⏳ prodotti, webhook, richiesta approvazione organizzazione (2 settimane, farla SUBITO) |
+| Polar: account aperto (Valerio) | 🔴 **RIFIUTATO il 10/08** ("Use case not supported"). E l'11/08 la ricerca ha mostrato che **non è un problema di Polar**: le pagine ufficiali di Paddle, Lemon Squeezy e Dodo hanno tutte una riga che ci prende (viaggi, servizi legali, preparazione di documenti). La categoria è chiusa sullo scaffale standard. Le strade, i due argomenti da fare a un essere umano e il motivo per cui il primo da provare è **Paddle**: `PAGAMENTI.md`. **Serve una decisione di Valerio** |
+| Cassa di prova, per percorrere il giro senza un venditore | ✅ 11/08: `CASSA_PROVA_SEGRETO` su Netlify, chiusa a chiave (cookie firmato). ⚠️ Da **togliere** il giorno del venditore vero |
 | Chiavi su Netlify: SUPABASE_SECRET_KEY, RESEND_API_KEY, AERODATABOX, MISTRAL | ✅ 8/08: tutte e 4 online, motore vero collaudato (FR4001) · ⏳ POLAR quando esiste |
 | Dominio di Rivolio (slot Hostinger gratuito da configurare) | ⏳ **serve Valerio** |
 | Legale: condizioni d'uso + disclaimer da avvocato; commercialista sul fiscale | ⏳ prima del lancio vero |
@@ -127,7 +128,7 @@ Niente gamification, mai: si torna perché "mi devono dei soldi" succede
 ## Cosa blocca cosa
 
 ```
- Polar: 2 checkout link + webhook secret ──→ si incassa (È IL COLLO DI BOTTIGLIA)
+ UN VENDITORE CHE ACCETTI IL CASO D'USO ──→ si incassa (È IL COLLO DI BOTTIGLIA)
  deploy dell'ultimo ramo (Valerio) ──→ online anche design nuovo e Osservatorio dati veri
  dominio ──→ Resend verificato ──→ email a chiunque + link puliti nei video
  account social ──→ FASE 2
@@ -149,6 +150,13 @@ Il motore è chiuso: da qui il collo di bottiglia non è più il prodotto,
 1% al lancio, 2-3% a regime, e il traffico è quello che manca).
 Quindi: deploy, le due cose che sbloccano le email (dominio su Resend e
 migrazioni), poi FASE 2, distribuzione.
+
+⚠️ **Ma dall'11/08 c'è un secondo collo di bottiglia, ed è più duro:
+nessun venditore ufficiale accetta il caso d'uso.** Il muro del check è
+costruito, provato e acceso, e il bottone "Sblocca l'analisi" porta a una
+cassa che non incassa. Finché quello non si risolve, ogni miglioramento
+del prodotto è lavoro che non porta un euro: **la decisione sul venditore
+viene prima di tutto il resto** (`PAGAMENTI.md`).
 
 **Il dopo-lettera è finito, e adesso ha quattro colpi**: reclamo, replica
 al loro no, segnalazione all'ente, conciliazione. È il pezzo che dalla
