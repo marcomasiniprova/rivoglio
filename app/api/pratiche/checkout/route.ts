@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { linkCheckout } from "@/lib/polar";
 import { COOKIE_PREZZO, varianteValida } from "@/lib/prezzi";
+import { traccia } from "@/lib/eventi/registra";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 
 /**
@@ -80,6 +81,12 @@ export async function GET(req: NextRequest) {
       varianteValida(req.cookies.get(COOKIE_PREZZO)?.value) ?? "a";
     const link = linkCheckout(tipo, verifica.id, verifica.email, variante);
     if (!link) return paginaRisultato("non-attivo");
+
+    /* «Ha aperto la pratica»: da qui in poi la persona è alla cassa. La
+       distanza fra questo numero e quello dei pagamenti è la cosa più
+       importante del cruscotto, perché è l'unico punto dove si perde
+       gente che aveva già deciso di pagare. */
+    traccia(req, { tipo: "pratica", extra: { tipo, variante } });
 
     return NextResponse.redirect(link);
   } catch (e) {

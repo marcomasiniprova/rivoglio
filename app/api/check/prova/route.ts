@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { cassaDiProvaAperta } from "@/lib/check/cancello";
 import { CHECK_PER_PAGAMENTO, PREZZO_LANCIO } from "@/lib/check/ingresso";
 import { COOKIE_PASS, creaPass } from "@/lib/check/pass";
+import { dopo, traccia } from "@/lib/eventi/registra";
+import { tin } from "@/lib/eventi/telegram";
 
 /**
  * LA CASSA DI PROVA (richiesta di Valerio, 11/08).
@@ -34,7 +36,7 @@ const BISCOTTO = {
   maxAge: 60 * 60 * 24 * 30,
 };
 
-export async function POST() {
+export async function POST(req: Request) {
   /* Senza la variabile questa rotta non esiste: 404, come una pagina
      inventata. È l'interruttore che la spegne il giorno del venditore. */
   if (!cassaDiProvaAperta()) {
@@ -51,6 +53,19 @@ export async function POST() {
       { status: 503 },
     );
   }
+
+  /* ⚠️ L'importo NON si registra: qui non è entrato un euro, e un incasso
+     finto nel cruscotto è esattamente il genere di numero che poi si
+     legge come vero. Resta il passo dell'imbuto, che invece è reale:
+     qualcuno ha sbloccato l'analisi. */
+  traccia(req, { tipo: "sbloccato", extra: { prova: true, ordine } });
+  /* Il TIN si manda apposta, ed è marcato prova: serve a Valerio per
+     vedere una volta che il telefono suona davvero, prima che ci sia un
+     venditore vero. `tin` e non `tinIncasso`: il messaggio dei soldi
+     dev'essere inconfondibile. */
+  dopo(async () => {
+    await tin("🧪 <b>Cassa di prova</b> — ricevuta emessa. Nessun soldo incassato.");
+  });
 
   const risposta = NextResponse.json({
     ok: true,

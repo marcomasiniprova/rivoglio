@@ -22,7 +22,7 @@ export default function HeroTabellone({
   testo?: string;
 }) {
   return (
-    <section className="relative overflow-hidden px-5 pb-4 pt-16 sm:px-8 sm:pt-24">
+    <section className="relative overflow-hidden px-5 pb-4 pt-[3.25rem] sm:px-8 sm:pt-[4.75rem]">
       <div className="relative mx-auto max-w-[1216px]">
         {/* l'adesivo olografico */}
         <div

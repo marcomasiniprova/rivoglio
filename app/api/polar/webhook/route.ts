@@ -9,6 +9,8 @@ import {
 import { praticaPronta } from "@/lib/email/pratiche";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { casa } from "@/lib/email/posta";
+import { registraDa } from "@/lib/eventi/registra";
+import { tinGuasto, tinIncasso } from "@/lib/eventi/telegram";
 
 /**
  * Il webhook di Polar: qui un pagamento diventa una pratica.
@@ -97,6 +99,13 @@ export async function POST(req: NextRequest) {
   if (!verificaId || !email) {
     console.error(
       `[polar] ORDINE ${ordineId ?? "?"} PAGATO MA SENZA verifica_id O EMAIL: da guardare a mano. metadata=${JSON.stringify(metadata)}`,
+    );
+    /* Qualcuno ha pagato e non sappiamo per cosa: è il guasto più caro
+       che esista, perché il cliente aspetta una pratica che non nascerà
+       mai. Deve squillare il telefono, non finire in un log. */
+    await tinGuasto(
+      "ordine-orfano",
+      `Ordine ${ordineId ?? "?"} PAGATO ma senza volo o email collegati.\nIl cliente aspetta e la pratica non esiste.`,
     );
     return NextResponse.json({ ok: true, gestito: false, motivo: "Dati mancanti, loggato." });
   }
@@ -191,8 +200,29 @@ export async function POST(req: NextRequest) {
   if (!passaggio.ok) {
     // La pratica esiste già: al prossimo recapito si riparte da qui.
     console.error("[polar] transizione a pagata fallita, riproverà:", passaggio.motivo);
+    await tinGuasto(
+      "pratica-non-pagata",
+      `Pagamento arrivato ma la pratica non è passata a "pagata".\nOrdine ${ordineId ?? "?"}, verifica ${verificaId}.\nI soldi ci sono, la pratica no: da guardare adesso.`,
+    );
     return NextResponse.json({ errore: "Transizione fallita." }, { status: 500 });
   }
+
+  /* ⚠️ IL TIN DEI SOLDI SI ASPETTA, non si rimanda a dopo la risposta.
+     Qui non c'è nessun utente fermo davanti allo schermo (risponde a
+     Polar, non a una persona), quindi il mezzo secondo non lo paga
+     nessuno; e in cambio la notifica parte di sicuro, invece di
+     dipendere da quanto vive la funzione dopo aver risposto. */
+  await registraDa(req, {
+    tipo: "pagato",
+    volo: verifica.volo_iata,
+    importo: prezzo,
+    extra: { tipo, ordine: ordineId },
+  });
+  await tinIncasso(
+    tipo === "famiglia" ? "Pratica famiglia" : "Pratica",
+    prezzo ?? 0,
+    `Volo ${verifica.volo_iata} del ${verifica.data_locale}`,
+  );
 
   // ---- link magico: chi ha appena pagato entra senza password
   let link = `${casa()}/pratica/${pratica.id}`;

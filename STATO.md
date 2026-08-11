@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-11 (giro #55: le tre email ai venditori
+**Aggiornato:** 2026-08-11 (giro #56: IL CRUSCOTTO E IL TIN, cioè vedere
+in tempo reale chi arriva, dove si ferma e chi paga, col telefono che
+squilla sui soldi e sui guasti · giro #55: le tre email ai venditori
 SPEDITE, la cassa finta visibile, il blog da cui si esce, le impostazioni
 che si spiegano da sole · giro #54: I QUATTRO TAPPI DEL LANCIO, il
 database completo e collaudato online, le quattro email ai venditori, un
@@ -63,6 +65,87 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #56 (11/08): IL CRUSCOTTO E IL TIN. «Così ho il controllo totale
+  del mio business e vedo tutto concretamente» (richiesta di Valerio).**
+  - **`/admin/cruscotto`: quello che succede, in diretta.** Si aggiorna da
+    solo ogni 20 secondi, quindi si può lasciare aperto su un secondo
+    schermo durante la distribuzione. In ordine di quanto conta: i soldi
+    di oggi e della settimana; **l'imbuto** (arrivano → lanciano
+    un'analisi → vedono il muro → pagano l'analisi → aprono la pratica →
+    pagano la pratica), dove il numero crolla è lì che si perde la gente;
+    **da dove arrivano** e da che paese; e gli ultimi 40 fatti, uno per
+    riga, con l'ora.
+  - ⚠️ **QUANDO UN NUMERO NON SI LEGGE, SI SCRIVE CHE NON SI È LETTO.**
+    Mai zero. Uno zero inventato si legge come «oggi non è venuto
+    nessuno», ed è il modo più veloce per prendere una decisione
+    sbagliata su un dato che non c'era.
+  - **IL TIN SUL TELEFONO (Telegram), e suona per due sole cose:
+    i soldi e i guasti.** Più il riepilogo della sera alle 21 (scelta di
+    Valerio: «sia soldi e guasti che riepilogo sera»). Un TIN a ogni
+    analisi sarebbe bello il primo giorno e insopportabile il secondo:
+    dopo due ore si silenzia il canale, cioè si perdono anche gli avvisi
+    che contano. Il guasto ha un silenziatore da un quarto d'ora, quindi
+    mille errori di fila restano **un** messaggio.
+  - **I tre allarmi che valgono davvero**, e sono tutti casi in cui i
+    soldi si muovono o si fermano: il fornitore dei dati di volo che non
+    risponde più (i check escono incerti: nessuno paga per un verdetto
+    sbagliato, ma le vendite si fermano); un pagamento arrivato **senza
+    volo o email collegati**, cioè un cliente che aspetta una pratica che
+    non nascerà; un pagamento incassato che **non è diventato una
+    pratica**.
+  - **IL REGISTRO NON RACCOGLIE PERSONE, RACCOGLIE FATTI.** Niente
+    indirizzo IP, niente impronta del browser, nessun modo di riconoscere
+    la stessa persona domani. In più ci sono due sole informazioni di
+    contorno, e sono quelle che servono per non distribuire alla cieca:
+    **il dominio da cui arriva** (`tiktok.com`, mai l'indirizzo del
+    singolo video) e **il paese**, che ce lo dice già Netlify.
+    ⚠️ **La privacy adesso lo dichiara**, con la base giuridica e la
+    conservazione a 12 mesi: raccogliere due dati veri e non scriverli
+    nell'informativa era la cosa più facile da dimenticare e la più cara
+    da spiegare dopo.
+  - **Il registro non rallenta niente**: usa `after` di Next, cioè scrive
+    QUANDO LA RISPOSTA È GIÀ PARTITA. Il TIN dei soldi invece si aspetta,
+    ed è voluto: lì risponde a Polar, non a una persona, quindi il mezzo
+    secondo non lo paga nessuno e in cambio la notifica parte di sicuro.
+  - ⚠️ **Chi sbatte sul muro conta ANCHE come analisi lanciata.** Se no
+    il cruscotto mostrerebbe più muri che analisi, cioè un imbuto che si
+    allarga scendendo: un numero impossibile fa dubitare di tutti gli
+    altri.
+  - **`NETLIFY.md`: le variabili una per una, col valore che ci va
+    dentro** (richiesta di Valerio: «mi dici ognuna il valore che deve
+    contenere?»). Divise per cosa succede se mancano: le 10 senza cui il
+    sito è monco, i 5 interruttori, la cassa di prova, le 2 di Telegram,
+    le 5 di Polar, e **le 2 che si possono togliere** (AviationStack, che
+    per noi è morto dall'8/08, ed EXA, resto del prodotto viaggi).
+  - 🔴 **E IL CRUSCOTTO NASCEVA APERTO A TUTTI I CLIENTI.** Trovato
+    guardandolo, non da una prova. `proxy.ts` chiude `/admin` a chi non è
+    collegato, ma **collegato lo è anche un cliente che ha comprato una
+    pratica**: il controllo del RUOLO stava scritto a mano dentro
+    `app/admin/page.tsx`, quindi le due pagine nuove sono nate senza.
+    Chiunque avesse un account e l'indirizzo avrebbe visto gli incassi,
+    l'imbuto, da dove arriva il traffico e **quali chiavi sono
+    configurate**. Adesso il guardiano vive in un file solo
+    (`lib/admin/guardia.ts`) e ogni pagina comincia con
+    `await soloAdmin()`; una prova gira la cartella `app/admin` e
+    boccia la suite se una pagina non lo chiama.
+  - **Il pannello non è più un labirinto**: da `/admin` si arriva a
+    Cruscotto e Impostazioni, e da lì si torna indietro. Prima gli
+    indirizzi andavano ricordati a memoria, che è come non averli.
+  - 🔴 **E LA TESTATA DEL BLOG SI MANGIAVA UNA LETTERA A 390 PUNTI**,
+    cioè su un telefono normalissimo: il bottone "Controlla il tuo volo"
+    arrivava addosso a "Il Tabellone". Il testo del bottone si accorcia
+    a "Controlla" già sotto i 640 punti (prima sotto i 360): ad
+    accorciarsi è l'azione e non il nome, perché su una rivista la
+    testata è l'identità. Adesso a 390 ci sono 77 punti di aria, a 320
+    ne restano 145 col solo segno.
+  - Prove: **8 nuove** su `prove/registro.spec.ts`, e sono tutte
+    promesse: la provenienza si riduce al dominio, il paese non si deduce
+    mai da un indirizzo IP, nel registro non entra nessun campo che
+    identifichi una persona, la privacy dichiara quello che raccogliamo
+    davvero, e ogni pagina del retrobottega chiede il ruolo admin.
+    ⚠️ Una di queste prove ha bocciato il codice giusto mentre la
+    scrivevo: cercava la parola «ip» dentro il codice, e «ip» sta dentro
+    «tipo». Adesso cerca parole intere.
 - **GIRO #55 (11/08): LE TRE EMAIL PARTITE, LA CASSA CHE SI VEDE, E IL
   BLOG DA CUI SI ESCE.**
   - ✅ **TRE EMAIL AI VENDITORI SPEDITE DAVVERO** dall'account di Valerio
@@ -1566,6 +1649,32 @@ social rifatta (era rimasta al prodotto viaggi).
   (Android Studio + emulatore, oppure `expo start --web` in 2 minuti).
 
 ## Serve Valerio (in ordine)
+0-prima. **TRE MINUTI SU TELEGRAM, e il telefono comincia a squillare
+   sui soldi.** Il cruscotto (`/admin/cruscotto`) funziona già senza
+   fare niente; le notifiche no, perché servono due variabili.
+   1. Su Telegram scrivi a **@BotFather**, mandi `/newbot`, scegli un
+      nome. Lui ti risponde con un gettone lungo tipo
+      `1234567890:AAF...`: quello è `TELEGRAM_BOT_TOKEN`.
+   2. Scrivi a **@userinfobot**: ti risponde col tuo numero (`Id`).
+      Quello è `TELEGRAM_ADMIN_CHAT`.
+   3. **Manda un messaggio qualsiasi al bot che hai appena creato.**
+      Senza, Telegram non gli permette di scriverti per primo.
+   4. Le due variabili su Netlify, poi *Trigger deploy*.
+   Per provare che funziona: apri il muro, premi "Sblocca l'analisi",
+   paga alla cassa di prova. Deve arrivarti un messaggio marcato
+   🧪 *Cassa di prova*. Tutti i valori sono in `NETLIFY.md`.
+0-bis-sicurezza. **UNA SPUNTA SU SUPABASE, dieci secondi.** Il controllo
+   di sicurezza del database (fatto l'11/08) segnala una cosa vera:
+   **le password compromesse non vengono bloccate**. Supabase sa
+   confrontare la password scelta con gli elenchi pubblici delle password
+   già rubate in giro, ma la funzione è spenta. Si accende da
+   *Authentication → Policies → Password Security → Leaked password
+   protection*. Costa zero e impedisce che qualcuno apra un account
+   Rivolio con una password che è già in mano a tutti.
+   (Le altre voci del controllo dicono "tabella protetta senza regole di
+   lettura": è **voluto**. Vuol dire che quelle tabelle le legge solo il
+   server con la chiave segreta, che è esattamente quello che serve per
+   il registro degli eventi.)
 0-zero. **DUE COSE DA UN MINUTO, sul muro appena acceso.**
    a. **Prendi la chiave della cassa di prova.** Incolla nel browser, una
       volta sola: `https://rivolio.netlify.app/api/check/prova/chiave?s=RIVOLIO`

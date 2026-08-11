@@ -32,10 +32,35 @@ export default function Masthead() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-verde-notte/10 bg-carta/92 backdrop-blur-xl">
-      <div className="mx-auto flex h-[68px] max-w-[1216px] items-center justify-between gap-4 px-5 sm:px-8">
-        {/* la testata: dall'elenco riporta in cima scorrendo, da un
-            articolo porta all'elenco (vedi MarchioTabellone) */}
-        <MarchioTabellone />
+      <div className="mx-auto flex h-[62px] max-w-[1216px] items-center justify-between gap-4 px-5 sm:px-8">
+        {/* ⚠️ IL RITORNO STA A SINISTRA, PRIMA DEL MARCHIO, e non in
+            mezzo ai bottoni di destra dov'era finito l'11/08: là
+            affollava la barra e competeva con "Controlla il tuo volo".
+            A sinistra invece è dove il cervello cerca il tasto indietro,
+            ed è lo stesso posto in cui lo mettono i browser.
+            Sotto i 640 punti sparisce: il ritorno c'è comunque, ed è il
+            marchio stesso (vedi MarchioTabellone). */}
+        <div className="flex min-w-0 shrink items-center gap-1.5 sm:gap-2.5">
+          <Link
+            href="/"
+            aria-label="Torna al sito Rivolio"
+            className="hidden shrink-0 items-center gap-1 rounded-[8px] py-1.5 pl-1 pr-2 text-[13.5px] font-medium text-verde-notte/55 transition-colors hover:text-verde-notte sm:inline-flex"
+          >
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                d="M9.5 3.5L5 8l4.5 4.5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Al sito
+          </Link>
+          {/* la testata: dall'elenco riporta in cima scorrendo, da un
+              articolo porta all'elenco (vedi MarchioTabellone) */}
+          <MarchioTabellone />
+        </div>
 
         {/* le voci */}
         <nav className="hidden items-center gap-7 lg:flex">
@@ -87,30 +112,6 @@ export default function Masthead() {
 
         {/* le azioni */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
-          {/* ⚠️ LA VIA D'USCITA (richiesta di Valerio, 11/08): dal blog
-              non si tornava al sito. Il Tabellone ha una testata sua e
-              non la barra della landing, quindi il filo che riporta al
-              check si spezzava e il visitatore restava dentro.
-              È discreto di proposito: la freccia e due parole, non un
-              bottone che compete con "Controlla il tuo volo". */}
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 rounded-[9px] px-2.5 py-2.5 text-[14px] font-medium text-verde-notte/70 transition-colors hover:text-verde-notte sm:px-3"
-            aria-label="Torna al sito Rivolio"
-          >
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path
-                d="M9.5 3.5L5 8l4.5 4.5"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            {/* Sotto i 640 punti resta la sola freccia: il testo pieno
-                spingerebbe fuori il bottone del check. */}
-            <span className="hidden sm:inline">Al sito</span>
-          </Link>
           <Link
             href="/#come-funziona"
             className="hidden items-center gap-2 rounded-[9px] border border-verde-notte/22 bg-white px-4 py-2.5 text-[14px] font-semibold text-verde-notte transition-all duration-300 hover:-translate-y-0.5 hover:border-verde-notte/40 lg:inline-flex"
@@ -125,10 +126,16 @@ export default function Masthead() {
             href="/#controllo"
             className="riflesso inline-flex items-center whitespace-nowrap rounded-[9px] bg-verde-notte px-4 py-2.5 text-[14px] font-semibold text-carta shadow-[0_10px_24px_-12px_rgba(5,46,31,.8)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro sm:px-5"
           >
-            {/* Sotto i 360 punti il testo pieno spinge la testata fuori
-                dallo schermo e il blog scorre di lato. */}
-            <span className="max-[359px]:hidden">Controlla il tuo volo</span>
-            <span className="hidden max-[359px]:inline">Controlla</span>
+            {/* ⚠️ SOTTO I 640 PUNTI IL TESTO SI ACCORCIA, e prima si
+                accorciava solo sotto i 360: a 390 (cioè un telefono
+                normalissimo) il bottone arrivava addosso alla testata e
+                mangiava l'ultima lettera di "Il Tabellone". Visto in una
+                schermata, non da una prova.
+                Ad accorciarsi è il bottone e non il nome perché su una
+                rivista la testata è l'identità: "Controlla" si capisce
+                lo stesso, "Rivolio Il Tabell" no. */}
+            <span className="max-sm:hidden">Controlla il tuo volo</span>
+            <span className="hidden max-sm:inline">Controlla</span>
           </Link>
         </div>
       </div>

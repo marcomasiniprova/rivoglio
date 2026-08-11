@@ -23,13 +23,13 @@ export default function SezioneNewsletter({
   return (
     <section
       id="newsletter"
-      className={compatta ? "scroll-mt-24" : "scroll-mt-24 px-5 pb-24 pt-8 sm:px-8"}
+      className={compatta ? "scroll-mt-24" : "scroll-mt-24 px-5 pb-[4.75rem] pt-8 sm:px-8"}
     >
       <div
         className={`relative mx-auto overflow-hidden bg-verde-notte text-white ${
           compatta
             ? "rounded-[16px] px-6 py-10 sm:px-9"
-            : "max-w-[1216px] rounded-[24px] px-6 py-16 sm:px-14 sm:py-20"
+            : "max-w-[1216px] rounded-[24px] px-6 py-[3.25rem] sm:px-14 sm:py-16"
         }`}
       >
         <div

@@ -6,6 +6,7 @@ import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
 import { CHECK_A_PAGAMENTO, CORTESIA_SU_INCERTO } from "@/lib/check/ingresso";
 import { creditoFinito, passDi, rispostaMuro, segnaConsumo } from "@/lib/check/cancello";
 import { COOKIE_PASS, consumaPass } from "@/lib/check/pass";
+import { traccia } from "@/lib/eventi/registra";
 
 /**
  * POST /api/verifica  {volo, data}
@@ -58,7 +59,14 @@ export async function POST(req: Request) {
      per sviluppatori, e ogni check scavalcato è una chiamata pagata da
      noi. */
   const pass = passDi(req);
-  if (CHECK_A_PAGAMENTO && !pass) return rispostaMuro(req);
+  /* ⚠️ Chi sbatte sul muro conta ANCHE come "ha lanciato un'analisi": se
+     no il cruscotto mostrerebbe più muri che analisi, cioè un imbuto che
+     si allarga scendendo, e un numero impossibile fa dubitare di tutti
+     gli altri. */
+  if (CHECK_A_PAGAMENTO && !pass) {
+    traccia(req, { tipo: "check" }, { tipo: "muro" });
+    return rispostaMuro(req);
+  }
 
   /* ⚠️ E NON BASTA AVERE UNA RICEVUTA VALIDA: bisogna che le analisi che
      ha comprato non siano già finite. Il credito nel cookie non fa fede,
@@ -66,7 +74,10 @@ export async function POST(req: Request) {
      valore di prima tornava ad avere il credito pieno (provato l'11/08:
      seconda analisi con la stessa ricevuta consumata, 200). Il conto lo
      tiene il database. */
-  if (pass && (await creditoFinito(pass))) return rispostaMuro(req);
+  if (pass && (await creditoFinito(pass))) {
+    traccia(req, { tipo: "check" }, { tipo: "muro", extra: { motivo: "credito finito" } });
+    return rispostaMuro(req);
+  }
 
   let corpo: unknown;
   try {
@@ -91,6 +102,10 @@ export async function POST(req: Request) {
   // Da qui in giù verificaVolo non lancia mai: un guasto diventa esito incerto.
   const esito = await verificaVolo(volo, data);
   if (!esito.ok) {
+    /* Non è un guasto: quasi sempre è un numero di volo scritto male o
+       un volo che quel giorno non esiste. Si conta come analisi lanciata
+       perché la persona ci ha provato davvero. */
+    traccia(req, { tipo: "check", volo, esito: "non trovato" });
     return NextResponse.json(
       { ok: false, errore: esito.errore },
       { status: 400, headers: CORS },
@@ -98,6 +113,11 @@ export async function POST(req: Request) {
   }
 
   const { verdetto, fatto } = esito;
+  traccia(
+    req,
+    { tipo: "check", volo },
+    { tipo: "verdetto", volo, esito: verdetto.esito, extra: esito.demo ? { demo: true } : null },
+  );
 
   /* Il check si consuma SOLO se abbiamo dato una risposta. Su un incerto
      il credito resta: chi paga per sapere e si sente rispondere "non lo

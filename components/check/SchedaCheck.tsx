@@ -287,12 +287,18 @@ export default function SchedaCheck() {
       if (r.status === 402 && dati?.serveIlPass) {
         setFase("campo");
         setMuro(dati.muro as DatiMuro);
-        /* Il muro va portato sotto la barra in alto: se compare mentre
-           la pagina è a metà, la cifra grossa resta coperta e la prima
-           cosa che si legge è il prezzo invece del valore. */
-        requestAnimationFrame(() => {
-          document.getElementById("controllo")?.scrollIntoView({ block: "start" });
-        });
+        /* ⚠️ QUI NON SI SCROLLA, e prima si scrollava. C'era un
+           `scrollIntoView` che riportava la pagina in cima al riquadro
+           del check: sulla carta serviva a non far comparire la cifra
+           grossa già coperta, in pratica la pagina saltava sotto le
+           mani proprio nel momento in cui uno aveva appena premuto un
+           bottone. Sembrava un ricaricamento, e un ricaricamento dopo
+           un clic si legge come "qualcosa è andato storto" (segnalato
+           da Valerio, 11/08).
+           Adesso il muro compare dov'è il riquadro, la pagina resta
+           ferma, e a tenerlo leggibile ci pensa `scroll-mt` sulla
+           sezione: se il riquadro sta già sotto la barra si vede tutto
+           lo stesso. */
         inCorso.current = false;
         return;
       }

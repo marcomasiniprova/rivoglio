@@ -20,7 +20,7 @@ export default function GrigliaArticoli({
   paginazione?: boolean;
 }) {
   return (
-    <section className="px-5 pb-8 pt-14 sm:px-8 sm:pt-20">
+    <section className="px-5 pb-8 pt-11 sm:px-8 sm:pt-16">
       <div className="mx-auto max-w-[1216px]">
         <h2 className="font-display text-[23px] font-semibold tracking-[-0.03em] text-verde-notte">
           {titolo}

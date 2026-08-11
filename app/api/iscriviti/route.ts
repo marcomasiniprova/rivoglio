@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { salvaIscritto } from "@/lib/archivio";
 import { chiediConferma } from "@/lib/email/messaggi";
+import { traccia } from "@/lib/eventi/registra";
 
 /** Controllo volutamente permissivo: meglio un'email strana che perdere un iscritto. */
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -49,6 +50,10 @@ export async function POST(req: Request) {
      risposta lo dice, senza fingere. */
   const invio = await chiediConferma(pulita);
   if (!invio.ok) console.warn("[iscriviti] richiesta di conferma non spedita:", invio.motivo);
+
+  /* ⚠️ L'indirizzo NON entra nel registro: chi si iscrive lo sa già la
+     tabella degli iscritti, e qui teniamo fatti, non persone. */
+  traccia(req, { tipo: "iscritto", extra: invio.ok ? null : { emailNonPartita: true } });
 
   return NextResponse.json({ ok: true, email: invio.ok });
 }

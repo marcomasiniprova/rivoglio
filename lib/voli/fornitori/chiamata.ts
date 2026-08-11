@@ -27,6 +27,9 @@
  * dieci volte darebbe dieci volte lo stesso 404 costando dieci volte.
  */
 
+import { dopo } from "@/lib/eventi/registra";
+import { tinGuasto } from "@/lib/eventi/telegram";
+
 /** Tempo totale che possiamo spendere, tentativi e attese comprese. */
 export const BUDGET_MS = 8_000;
 
@@ -40,6 +43,30 @@ const ATTESA_BASE_MS = 450;
 const ATTESA_MASSIMA_MS = 1_500;
 
 const dormi = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Il fornitore ha smesso di rispondere: fai squillare il telefono.
+ *
+ * ⚠️ SOLO QUANDO I TENTATIVI SONO FINITI, e mai su un 404. Un volo che
+ * non c'è non è un guasto; il fornitore giù invece è la cosa che durante
+ * una distribuzione va saputa nel minuto, non la sera.
+ *
+ * Il messaggio parte DOPO la risposta all'utente e non si aspetta: chi
+ * sta facendo il check ha già avuto il suo verdetto (incerto, onesto), e
+ * non deve restare fermo perché noi stiamo avvisando qualcuno.
+ * `tinGuasto` ha già il suo silenziatore da un quarto d'ora, quindi un
+ * picco di mille errori resta un messaggio solo.
+ */
+function allarmeFornitore(etichetta: string, stato: number): void {
+  dopo(() =>
+    tinGuasto(
+      `fornitore-${etichetta}`,
+      stato === 0
+        ? `Il fornitore dei dati di volo non risponde (${etichetta}).\nI check escono "incerto": nessuno paga per un verdetto sbagliato, ma le vendite si fermano.`
+        : `Il fornitore dei dati di volo risponde ${stato} (${etichetta}).\n${stato === 429 ? "È il tetto delle richieste al secondo: sta arrivando troppa gente insieme." : "È un guasto dalla loro parte."}`,
+    ),
+  );
+}
 
 /** Vale la pena riprovare? Solo se il problema è loro e passa da solo. */
 function daRiprovare(stato: number): boolean {
@@ -103,6 +130,7 @@ export async function chiamaConRitentativo(
         await dormi(quantoAspettare(null, tentativo));
         continue;
       }
+      allarmeFornitore(etichetta, 0);
       return { ok: false, stato: 0 };
     }
 
@@ -131,8 +159,10 @@ export async function chiamaConRitentativo(
         continue;
       }
     }
+    allarmeFornitore(etichetta, risposta.status);
     return { ok: false, stato: risposta.status };
   }
 
+  allarmeFornitore(etichetta, 0);
   return { ok: false, stato: 0 };
 }

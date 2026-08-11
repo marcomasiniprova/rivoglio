@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import Logo from "@/components/Logo";
 import Comandi from "@/components/admin/Comandi";
 import { Button } from "@/components/ui/button";
 import { confermaVerifica, correggiVerifica } from "./azioni";
-import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
+import { soloAdmin } from "@/lib/admin/guardia";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 
 /**
@@ -103,17 +102,10 @@ function inizioOggiRoma(): string {
 }
 
 export default async function PaginaAdmin() {
-  const utente = await utenteCollegato();
-  if (!utente) redirect("/entra");
-
-  const supabase = await supabaseServer();
-  const { data: profilo } = await supabase
-    .from("profili")
-    .select("ruolo")
-    .eq("id", utente.id)
-    .single();
-  // chi non è admin non deve nemmeno sapere che questa pagina esiste
-  if (profilo?.ruolo !== "admin") redirect("/app");
+  /* Il controllo del ruolo sta in `lib/admin/guardia.ts`, scritto una
+     volta sola: quando viveva qui dentro, le pagine nuove nascevano
+     senza e bastava avere un account per vederle. */
+  await soloAdmin();
 
   if (!SERVIZIO_ATTIVO) {
     return (
@@ -199,13 +191,30 @@ export default async function PaginaAdmin() {
       <header className="border-b border-bordo bg-white/85 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5 sm:px-8">
           <Logo />
-          <Link
-            href="/app"
-            className="inline-flex items-center gap-1.5 text-sm text-fumo transition-colors hover:text-inchiostro"
-          >
-            <ArrowLeft className="size-4" aria-hidden="true" />
-            Torna all&apos;app
-          </Link>
+          {/* Le tre stanze del retrobottega. Senza questi due link il
+              cruscotto esisteva ma bisognava ricordarsi l'indirizzo a
+              memoria, che è come non averlo. */}
+          <nav className="flex items-center gap-4 sm:gap-5">
+            <Link
+              href="/admin/cruscotto"
+              className="text-sm font-medium text-fumo transition-colors hover:text-inchiostro"
+            >
+              Cruscotto
+            </Link>
+            <Link
+              href="/admin/impostazioni"
+              className="text-sm font-medium text-fumo transition-colors hover:text-inchiostro"
+            >
+              Impostazioni
+            </Link>
+            <Link
+              href="/app"
+              className="inline-flex items-center gap-1.5 text-sm text-fumo transition-colors hover:text-inchiostro"
+            >
+              <ArrowLeft className="size-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Torna all&apos;app</span>
+            </Link>
+          </nav>
         </div>
       </header>
 

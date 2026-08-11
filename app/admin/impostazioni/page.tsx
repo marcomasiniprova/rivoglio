@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { soloAdmin } from "@/lib/admin/guardia";
 
 /**
  * LE IMPOSTAZIONI, SPIEGATE DA SOLE (richiesta di Valerio, 11/08).
@@ -56,11 +57,15 @@ function stato(): Voce[] {
       ceSta: c(process.env.NEXT_PUBLIC_SUPABASE_URL),
     },
     {
-      nome: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-      serve: "La chiave pubblica del database: quella che può stare nel browser.",
+      nome: "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+      serve:
+        "La chiave pubblica del database: quella che può stare nel browser. Va bene anche col nome vecchio, NEXT_PUBLIC_SUPABASE_ANON_KEY.",
       seManca: "Login e area personale non funzionano.",
       peso: "obbligatoria",
-      ceSta: c(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+      ceSta: c(
+        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      ),
     },
     {
       nome: "AERODATABOX_API_KEY",
@@ -140,13 +145,23 @@ const COLORE = {
   facoltativa: "text-fumo",
 } as const;
 
-export default function PaginaImpostazioni() {
+export default async function PaginaImpostazioni() {
+  /* ⚠️ Prima riga, sempre: questa pagina dice QUALI segreti sono
+     configurati, e non è un elenco da lasciare a chiunque abbia un
+     account. Vedi lib/admin/guardia.ts. */
+  await soloAdmin();
   const voci = stato();
   const mancanti = voci.filter((v) => !v.ceSta && v.peso !== "facoltativa");
 
   return (
     <main className="mx-auto w-full max-w-3xl px-5 py-12">
-      <h1 className="font-display text-[2rem] leading-tight tracking-[-0.03em]">
+      <a
+        href="/admin"
+        className="text-[13.5px] font-medium text-fumo transition-colors hover:text-inchiostro"
+      >
+        ← Pannello
+      </a>
+      <h1 className="mt-4 font-display text-[2rem] leading-tight tracking-[-0.03em]">
         Le impostazioni del sito
       </h1>
       <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">

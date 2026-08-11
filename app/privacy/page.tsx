@@ -68,6 +68,23 @@ export default function PaginaPrivacy() {
           qualità di merchant of record). Noi non vediamo e non conserviamo i dati della tua
           carta.
         </li>
+        <li>
+          <strong>Statistiche d&apos;uso</strong>: registriamo i fatti che succedono sul
+          sito (una pagina aperta, un&apos;analisi lanciata su un certo numero di volo, una
+          pratica pagata) insieme a due sole informazioni di contorno: il{" "}
+          <strong>sito da cui sei arrivato</strong>,
+          ridotto al nome del dominio (per esempio &laquo;tiktok.com&raquo;, mai
+          l&apos;indirizzo esatto della pagina o del video), e il tuo{" "}
+          <strong>paese</strong>, così come ce lo dichiara il nostro hosting. Servono a
+          capire cosa funziona e dove le persone si fermano. Base giuridica: legittimo
+          interesse (art. 6.1.f GDPR) a far funzionare e migliorare il servizio.{" "}
+          <strong>
+            Non registriamo il tuo indirizzo IP, non usiamo impronte del browser e non
+            c&apos;è nessun modo di ricollegare due visite alla stessa persona
+          </strong>
+          : sono conteggi, non profili. Per lo stesso motivo non usiamo Google Analytics né
+          altri strumenti di terze parti.
+        </li>
       </ul>
       <p>
         Non facciamo profilazione, non vendiamo dati a terzi e non usiamo i tuoi dati per
@@ -95,6 +112,10 @@ export default function PaginaPrivacy() {
         </li>
         <li>
           L&apos;iscrizione all&apos;Osservatorio: finché non ti disiscrivi.
+        </li>
+        <li>
+          Le statistiche d&apos;uso: 12 mesi. Sono già anonime dal momento in cui vengono
+          scritte, quindi dopo quel periodo restano solo come numeri aggregati.
         </li>
         <li>
           Account e pratiche: per la durata della pratica e poi per il tempo richiesto dagli

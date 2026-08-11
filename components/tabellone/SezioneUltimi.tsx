@@ -14,7 +14,7 @@ export default function SezioneUltimi({ articoli }: { articoli: Articolo[] }) {
   const [primo, ...resto] = articoli;
 
   return (
-    <section className="px-5 pb-6 pt-12 sm:px-8 sm:pt-16">
+    <section className="px-5 pb-6 pt-10 sm:px-8 sm:pt-[3.25rem]">
       <div className="mx-auto max-w-[1216px]">
         <h2 className="font-display text-[23px] font-semibold tracking-[-0.03em] text-verde-notte">
           Gli ultimi articoli

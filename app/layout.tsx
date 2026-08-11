@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Instrument_Serif, Poppins } from "next/font/google";
 import AntiCopia from "@/components/AntiCopia";
 import ScrollPesante from "@/components/ScrollPesante";
+import Visita from "@/components/Visita";
 import "./globals.css";
 
 import { PREZZO_LANCIO, seSiPaga } from "@/lib/check/ingresso";
@@ -113,6 +114,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
         <AntiCopia />
         <ScrollPesante />
+        <Visita />
         {children}
       </body>
     </html>

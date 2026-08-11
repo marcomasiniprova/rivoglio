@@ -107,6 +107,15 @@ riceve la lettera, la invia e la sequenza di follow-up parte da sola.
 | Pagine evento: `/sciopero-aerei`, `/sciopero-aerei/<data>`, `/aeroporto/<sigla>` | ✅ 9/08 giro #41 |
 | Autopilot: gli scioperi si aggiornano da soli ogni notte, con allarme se si rompe | ✅ 9/08 giro #41 · ⏳ primo giro vero dopo il deploy |
 | Un articolo nuovo a settimana, sempre lo stesso giorno | ⏳ da qui in avanti |
+| **Il cruscotto**: `/admin/cruscotto`, chi arriva, da dove, dove si ferma, chi paga | ✅ 11/08 giro #56 |
+| Il TIN sul telefono: soldi, guasti, riepilogo della sera | ✅ 11/08 · ⏳ **serve Valerio**: 3 minuti su Telegram |
+
+**Perché il cruscotto sta in FASE 2 e non in FASE 1.** Non serve a
+costruire il prodotto, serve a distribuirlo: senza, il primo video si
+giudica a sensazione. Con, si vede quale ha portato gente e a quale
+gradino si ferma; e la distanza fra "aprono la pratica" e "pagano la
+pratica" è l'unico punto dove si perde qualcuno che aveva già deciso
+di pagare.
 
 # FASE 3 — MIGLIORAMENTO, ITERAZIONE E MANTENIMENTO
 
