@@ -119,7 +119,7 @@ function stato(): Voce[] {
       serve:
         "Il gettone del bot che ti manda le notifiche (te lo dà @BotFather). Identifica il BOT, non te.",
       seManca:
-        "Niente TIN sul telefono: né i soldi, né i guasti, né il riepilogo della sera. Il cruscotto su /admin/cruscotto funziona lo stesso.",
+        "Niente TIN sul telefono: né i soldi, né i guasti, né il riepilogo della sera. La Panoramica del pannello funziona lo stesso.",
       peso: "facoltativa",
       ceSta: c(process.env.TELEGRAM_BOT_TOKEN),
     },
@@ -157,8 +157,14 @@ function stato(): Voce[] {
   ];
 }
 
+/* ⚠️ `text-errore` non colorava NIENTE: in app/globals.css il token
+   `--color-errore` non esiste, quindi Tailwind non genera quella classe e
+   la scritta "MANCA" usciva del colore del testo intorno. Trovato
+   guardando il codice mentre si rifaceva il pannello. Il marchio non ha
+   un rosso (ha l'oro per gli avvisi), quindi si usa quello che il
+   retrobottega usava già altrove. */
 const COLORE = {
-  obbligatoria: "text-errore",
+  obbligatoria: "text-red-600",
   importante: "text-inchiostro",
   facoltativa: "text-fumo",
 } as const;
@@ -183,26 +189,18 @@ export default async function PaginaImpostazioni() {
   const mancanti = voci.filter((v) => !v.ceSta && v.peso !== "facoltativa");
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-5 py-12">
-      <a
-        href="/admin"
-        className="text-[13.5px] font-medium text-fumo transition-colors hover:text-inchiostro"
-      >
-        ← Pannello
-      </a>
-      <h1 className="mt-4 font-display text-[2rem] leading-tight tracking-[-0.03em]">
-        Le impostazioni del sito
-      </h1>
-      <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">
-        Quello che c&apos;è su Netlify, spiegato. Qui non si vede nessun valore:
-        solo se una cosa c&apos;è o non c&apos;è, e cosa succede se manca.
-      </p>
-
+    /* Il titolo e il ritorno al pannello adesso stanno nella testata e
+       nella barra laterale del guscio: ripeterli qui vorrebbe dire due
+       titoli uno sopra l'altro. I contenuti sono gli stessi di prima. */
+    <div className="w-full max-w-3xl">
+      {/* Il paragrafo che stava qui diceva parola per parola quello che
+          la testata scrive già sotto il titolo: due volte la stessa frase
+          a tre centimetri di distanza. */}
       <div
-        className={`mt-7 rounded-2xl border p-5 ${
+        className={`rounded-[14px] border p-5 ${
           mancanti.length === 0
             ? "border-verde/30 bg-verde/5"
-            : "border-errore/30 bg-errore/5"
+            : "border-red-200 bg-red-50"
         }`}
       >
         <p className="font-display text-[1.15rem] tracking-[-0.02em]">
@@ -224,14 +222,10 @@ export default async function PaginaImpostazioni() {
       {/* ⚠️ IL PEZZO CHE BLOCCA TUTTI: il gettone del bot e il chat id si
           somigliano, e chi li vede per la prima volta passa il primo
           credendo di passare il secondo (successo l'11/08). Qui il numero
-          si scopre da soli: si scrive al bot e si ricarica la pagina. */}
-      {/* ⚠️ IL PEZZO CHE BLOCCA TUTTI: il gettone del bot e il chat id si
-          somigliano, e chi li vede per la prima volta passa il primo
-          credendo di passare il secondo (successo l'11/08). Qui il numero
           si scopre da soli: si scrive al bot e si ricarica la pagina.
           Compare SOLO se il chat id manca davvero. */}
       {chatDaTrovare !== null || (process.env.TELEGRAM_BOT_TOKEN && !process.env.TELEGRAM_ADMIN_CHAT) ? (
-        <div className="mt-6 rounded-2xl border border-bordo bg-white p-5">
+        <div className="mt-6 rounded-[14px] border border-bordo bg-white p-5">
           <p className="font-display text-[1.15rem] tracking-[-0.02em]">
             {chatDaTrovare ? "Il tuo chat id è questo" : "Manca il tuo chat id"}
           </p>
@@ -258,7 +252,7 @@ export default async function PaginaImpostazioni() {
 
       <div className="mt-8 space-y-3">
         {voci.map((v) => (
-          <div key={v.nome} className="rounded-2xl border border-bordo bg-white p-5">
+          <div key={v.nome} className="rounded-[14px] border border-bordo bg-white p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <code className="text-[13.5px] font-medium text-inchiostro">{v.nome}</code>
               <span
@@ -281,6 +275,6 @@ export default async function PaginaImpostazioni() {
         Trigger deploy → Clear cache and deploy site</em>): questi valori
         entrano nel sito quando viene costruito, non quando qualcuno lo apre.
       </p>
-    </main>
+    </div>
   );
 }

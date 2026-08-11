@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-11 (giro #57: il pannello non si apriva perché
+**Aggiornato:** 2026-08-11 (giro #58: il retrobottega diventa un
+gestionale, con la barra laterale e i grafici · giro #57: il pannello
+non si apriva perché
 Valerio non aveva il ruolo admin, e i cancelletti spariscono
 dall'indirizzo · giro #56: IL CRUSCOTTO E IL TIN, cioè vedere
 in tempo reale chi arriva, dove si ferma e chi paga, col telefono che
@@ -67,6 +69,66 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #58 (11/08 notte): IL RETROBOTTEGA DIVENTA UN GESTIONALE.**
+  «La parte admin è inguardabile, sviluppala come un software
+  gestionale, sezioni a LATO non sopra» (richiesta di Valerio, con
+  un'immagine di riferimento allegata: dashboard con barra laterale,
+  card KPI, grafici).
+  - **Sette sezioni nella barra laterale** (scelta sua col popup, le ha
+    volute tutte): Panoramica, Verdetti, Pratiche, Traffico, Registro,
+    Iscritti, Impostazioni. La barra vive nel **layout**, non nelle
+    pagine, quindi non si smonta cambiando sezione. Sotto i 768 punti
+    diventa un cassetto che entra da sinistra: **non** un menu in cima,
+    che era la cosa che aveva chiesto di non fare.
+  - **L'imbuto è il pezzo che si riconosce**: bande centrate che si
+    stringono una sotto l'altra, con la perdita scritta sulla spalla.
+    Non è un grafico a barre girato, è la fotografia di dove si fermano
+    i soldi.
+  - **L'aggiornamento non ricarica più la pagina.** Prima c'era
+    `<meta http-equiv="refresh">`, che ogni 20 secondi sbiancava lo
+    schermo e faceva perdere il punto in cui stavi guardando. Adesso
+    `router.refresh()` rifà solo i dati. Si ferma da solo quando la
+    scheda va in secondo piano, e **l'ora in testata la calcola il
+    server**: è l'ora in cui i numeri sono stati letti, non quella in
+    cui il browser ha chiesto.
+  - ⚠️ **I grafici esistono anche da vuoti** (scelta di Valerio col
+    popup): assi, giorni e la scritta «non letto» al posto dei dati.
+    Il giorno del primo video si riempiono da soli, invece di cambiare
+    forma sotto gli occhi.
+  - **Tre difetti veri trovati strada facendo, che col design non
+    c'entravano:**
+    🔴 **`text-errore` non colorava NIENTE**: in `globals.css` il token
+    `--color-errore` non è mai esistito, quindi Tailwind quella classe
+    non la genera. La scritta «MANCA» su Impostazioni e le righe dei
+    guasti uscivano del colore del testo intorno: rosse solo nelle
+    intenzioni. ⚠️ Resta invisibile anche in
+    `components/rivolio/CassaProva.tsx`, che stava fuori dai confini del
+    giro: in ARRETRATI.
+    🔴 **Il pannello dichiarava tempi che il motore non usa più**: il
+    giro di follow-up diceva «T+2, T+15, T+30, T+60», che sono quelli di
+    prima del giro #45. I veri sono **T+2, T+42, T+56, T+90**.
+    Un errore di grammatica in una didascalia («lo spazio fra le due
+    curve *sono* le analisi»).
+  - **Quattordici difetti trovati guardando le schermate**, chiusi in un
+    batch solo. I due che contano: a 390 punti le tabelle erano
+    illeggibili (il volo andava a capo quattro volte e gli importi
+    uscivano dallo schermo) e adesso ogni pratica è una **scheda**; e la
+    serie dei pagamenti spariva, perché due pagamenti contro sessanta
+    visite facevano barre da meno di due pixel.
+  - ⚠️ **Il pannello coi dati veri non l'ha visto nessuno**: in questa
+    sandbox manca `SUPABASE_SECRET_KEY`, quindi le pagine vere dicono
+    «non letto» dappertutto. Per giudicare i grafici con dei numeri
+    dentro è stata fatta una pagina di prova con dati inventati,
+    **fuori** dal pannello e poi **cancellata**; controllato che non
+    resti traccia né della pagina né dei nomi finti.
+  - ⚠️ **Per vedere le pagine sono state aperte due porte** (il
+    guardiano del ruolo e il proxy) **e richiuse**: `git diff` su
+    `lib/admin/guardia.ts` e `proxy.ts` è vuoto. Controllato a mano,
+    perché una scorciatoia di autenticazione dimenticata è il modo più
+    silenzioso di regalare il pannello.
+  - `/admin/cruscotto` non sparisce: reindirizza alla Panoramica **dopo**
+    aver controllato il ruolo, così un segnalibro non finisce su un 404
+    e chi non è admin non scopre che quell'indirizzo esiste.
 - **GIRO #57 (11/08 sera): IL PANNELLO NON SI APRIVA PERCHÉ VALERIO NON
   ERA ADMIN. Trovato in trenta secondi, e sono state settimane.**
   - 🔴 **«/admin non funziona, mi rimbalza sempre su /app».** Aveva

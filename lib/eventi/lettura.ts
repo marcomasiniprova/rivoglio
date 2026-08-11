@@ -19,6 +19,22 @@ export type Riga = { quando: string; tipo: string; testo: string; euro: number |
 /** «Questa cosa, tante volte»: vale per le provenienze e per i paesi. */
 export type Conteggio = { nome: string; quanti: number };
 
+/** Un giorno della serie: cosa è successo e quanto è entrato. */
+export type GiornoSerie = {
+  /** La data italiana in forma "2026-08-11": è la chiave, non si mostra. */
+  giorno: string;
+  /** L'etichetta sotto la colonna: "lun 11". */
+  etichetta: string;
+  /** Quante volte è successo ogni fatto, quel giorno. */
+  per: Partial<Record<TipoEvento, number>>;
+  /** Quanti verdetti idonei: sono le sole analisi che possono vendere. */
+  idonei: number;
+  /** Quanto è entrato, in euro. */
+  euro: number;
+  /** È oggi? Serve alla linea tratteggiata sui grafici. */
+  oggi: boolean;
+};
+
 export type Cruscotto = {
   /** I conteggi di oggi e degli ultimi 7 giorni. null = non letto. */
   oggi: Record<TipoEvento, number> | null;
@@ -156,5 +172,189 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
   } catch (e) {
     console.error("[cruscotto] lettura fallita:", e);
     return VUOTO;
+  }
+}
+
+/* ── IL REGISTRO PER INTERO ──────────────────────────────────────────
+   Il cruscotto mostra gli ultimi fatti; questa serve alla sezione
+   Registro, che li vuole tutti, filtrabili e cercabili. */
+
+export type RigaRegistro = Riga & {
+  volo: string | null;
+  provenienza: string | null;
+  paese: string | null;
+};
+
+export type Registro = {
+  righe: RigaRegistro[];
+  /** Quante volte compare ogni tipo, dentro la finestra letta. */
+  perTipo: Record<string, number>;
+};
+
+/**
+ * Ripulisce il testo cercato.
+ *
+ * ⚠️ NON È PIGNOLERIA. Il filtro di PostgREST si scrive come una stringa
+ * (`volo.ilike.%x%,paese.ilike.%y%`), quindi una virgola o una parentesi
+ * dentro quello che l'utente ha scritto cambierebbe la struttura della
+ * domanda invece del suo contenuto. Si tolgono i caratteri che quella
+ * grammatica usa, e si taglia la lunghezza.
+ */
+function ripulisci(cerca: string): string {
+  return cerca.replace(/[,()"\\%*]/g, " ").trim().slice(0, 40);
+}
+
+/**
+ * I fatti, dal più recente, eventualmente filtrati per testo.
+ *
+ * Il filtro per TIPO invece si fa a valle, in memoria: così i contatori
+ * sulle linguette continuano a dire quanti ce ne sono di ogni tipo anche
+ * mentre ne guardi uno solo. Con un filtro in SQL, scelto "guasto",
+ * tutte le altre linguette direbbero zero.
+ */
+export async function leggiRegistro(cerca = "", quante = 400): Promise<Registro | null> {
+  if (!SERVIZIO_ATTIVO) return null;
+  try {
+    const db = supabaseServizio();
+    let domanda = db
+      .from("eventi")
+      .select("creato_il, tipo, volo, esito, importo, provenienza, paese")
+      .order("creato_il", { ascending: false })
+      .limit(quante);
+
+    const testo = ripulisci(cerca);
+    if (testo) {
+      domanda = domanda.or(
+        [
+          `volo.ilike.%${testo}%`,
+          `provenienza.ilike.%${testo}%`,
+          `paese.ilike.%${testo}%`,
+          `tipo.ilike.%${testo}%`,
+          `esito.ilike.%${testo}%`,
+        ].join(","),
+      );
+    }
+
+    const { data, error } = await domanda;
+    if (error || !data) {
+      if (error && !/does not exist|schema cache/i.test(error.message)) {
+        console.error("[registro] lettura fallita:", error.message);
+      }
+      return null;
+    }
+
+    const righe = (data as RigaGrezza[]).map((r) => ({
+      quando: r.creato_il,
+      tipo: r.tipo,
+      testo: racconta(r),
+      euro: r.importo === null ? null : Number(r.importo),
+      volo: r.volo,
+      provenienza: r.provenienza,
+      paese: r.paese,
+    }));
+
+    const perTipo: Record<string, number> = {};
+    for (const r of righe) perTipo[r.tipo] = (perTipo[r.tipo] ?? 0) + 1;
+
+    return { righe, perTipo };
+  } catch (e) {
+    console.error("[registro] lettura fallita:", e);
+    return null;
+  }
+}
+
+/* ── LA SERIE PER GIORNO ─────────────────────────────────────────────
+   Sta in una funzione SUA e non dentro `leggiCruscotto`, e il motivo è
+   che allargando la finestra là dentro cambierebbe in silenzio il
+   significato di "7 giorni" per tutti quelli che già la chiamano: la
+   riga della conversione sul cruscotto e il riepilogo della sera su
+   Telegram direbbero un'altra cosa senza che nessuno l'abbia chiesto.
+   Due letture su una tabella di eventi costano meno di un numero che
+   cambia senso da solo. */
+
+/** La data italiana in forma "2026-08-11": è la chiave dei mucchietti. */
+const GIORNO_ROMA = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "Europe/Rome",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+/** Quello che si legge sotto la colonna: "lun 11". */
+const ETICHETTA_GIORNO = new Intl.DateTimeFormat("it-IT", {
+  timeZone: "Europe/Rome",
+  weekday: "short",
+  day: "numeric",
+});
+
+/**
+ * Cosa è successo giorno per giorno, negli ultimi `giorni` giorni.
+ *
+ * ⚠️ I giorni sono quelli ITALIANI, non quelli del server: su Netlify
+ * l'orologio è a Londra, e un'analisi fatta alle 00:30 di martedì
+ * finirebbe nella colonna di lunedì. Chi guarda il grafico la mattina
+ * confronta con la propria giornata, non con quella della macchina.
+ *
+ * ⚠️ Torna `null` se il registro non si è aperto. Uno zero al posto di un
+ * "non letto" qui sarebbe peggio che altrove: un grafico piatto a zero si
+ * legge come "non è venuto nessuno per due settimane", ed è una bugia
+ * detta in grande.
+ *
+ * Gli zeri VERI invece restano zeri: un giorno letto in cui non è
+ * successo niente è un dato, e va disegnato.
+ */
+export async function leggiSerie(giorni = 14): Promise<GiornoSerie[] | null> {
+  if (!SERVIZIO_ATTIVO) return null;
+  try {
+    const db = supabaseServizio();
+
+    /* Il mezzogiorno come ancora: sommare e sottrarre giorni da
+       mezzanotte salta (o ripete) una data nelle due notti dell'ora
+       legale, e il grafico si ritroverebbe due colonne uguali. */
+    const oggiRoma = GIORNO_ROMA.format(new Date());
+    const ancora = Date.parse(`${oggiRoma}T12:00:00Z`);
+    const scheletro: GiornoSerie[] = [];
+    for (let i = giorni - 1; i >= 0; i--) {
+      const quando = new Date(ancora - i * 86_400_000);
+      scheletro.push({
+        giorno: GIORNO_ROMA.format(quando),
+        etichetta: ETICHETTA_GIORNO.format(quando).replace(".", ""),
+        per: {},
+        idonei: 0,
+        euro: 0,
+        oggi: i === 0,
+      });
+    }
+
+    /* Due ore di margine: la finestra è in giorni italiani, la colonna
+       nel database è in UTC, e in estate l'Italia è due ore avanti. */
+    const da = new Date(ancora - (giorni - 1) * 86_400_000 - 14 * 3_600_000);
+    const { data, error } = await db
+      .from("eventi")
+      .select("creato_il, tipo, esito, importo")
+      .gte("creato_il", da.toISOString())
+      .limit(20_000);
+
+    if (error || !data) {
+      if (error && !/does not exist|schema cache/i.test(error.message)) {
+        console.error("[serie] lettura fallita:", error.message);
+      }
+      return null;
+    }
+
+    const perGiorno = new Map(scheletro.map((g) => [g.giorno, g]));
+    for (const r of data as Pick<RigaGrezza, "creato_il" | "tipo" | "esito" | "importo">[]) {
+      const g = perGiorno.get(GIORNO_ROMA.format(new Date(r.creato_il)));
+      if (!g) continue; // fuori finestra: è il margine delle due ore
+      const t = r.tipo as TipoEvento;
+      g.per[t] = (g.per[t] ?? 0) + 1;
+      if (t === "verdetto" && r.esito === "idoneo") g.idonei += 1;
+      if (t === "pagato") g.euro += Number(r.importo ?? 0);
+    }
+
+    return scheletro;
+  } catch (e) {
+    console.error("[serie] lettura fallita:", e);
+    return null;
   }
 }

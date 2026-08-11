@@ -69,6 +69,11 @@ export async function confermaVerifica(id: string): Promise<EsitoAdmin> {
     .select("id");
   if (error || !cambiata?.length) return { errore: "Conferma fallita: ricarica la pagina." };
 
+  /* La coda dei verdetti vive su /admin/verdetti dal giro del pannello;
+     la Panoramica mostra lo stesso numero, quindi si rinfrescano tutte e
+     due. Lasciarne fuori una vorrebbe dire vedere "1 da confermare" su
+     una schermata e "0" sull'altra. */
+  revalidatePath("/admin/verdetti");
   revalidatePath("/admin");
   if (!v.email) return { ok: "Confermata. Nessuna email da avvisare." };
 
@@ -172,6 +177,7 @@ export async function correggiVerifica(
     ].join("\n"),
   );
 
+  revalidatePath("/admin/verdetti");
   revalidatePath("/admin");
   return { ok: `Corretta in "${esitoGiusto}". Il caso è nei log per il golden set.` };
 }
@@ -205,6 +211,7 @@ export async function giroFollowUp(): Promise<EsitoAdmin> {
       return { errore: corpo.motivo ?? corpo.errore ?? `Giro fallito (HTTP ${risposta.status}).` };
     }
 
+    revalidatePath("/admin/pratiche");
     revalidatePath("/admin");
     const inviate = corpo.inviate ?? [];
     return {
