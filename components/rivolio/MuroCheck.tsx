@@ -3,7 +3,6 @@
 import { Check, Lock } from "lucide-react";
 import { Anima } from "@/components/Anima";
 import { Button } from "@/components/ui/button";
-import { euro } from "@/lib/prezzi";
 
 /**
  * IL MURO DEL CHECK.
@@ -59,7 +58,7 @@ export default function MuroCheck({
       <p className="mt-3 font-display text-[clamp(2.2rem,7vw,3.2rem)] leading-[1] tracking-[-0.03em]">
         Voli come il tuo valgono
         <br />
-        fino a <span className="text-verde">{euro(FASCIA_MASSIMA)}</span>
+        fino a <span className="text-verde">{FASCIA_MASSIMA}€</span>
       </p>
       <p className="mt-3 max-w-md text-[0.95rem] leading-relaxed text-fumo">
         Quanto spetta a te lo dice il ritardo certificato del tuo volo, e può
@@ -72,7 +71,9 @@ export default function MuroCheck({
         <span className="font-display text-[2.4rem] leading-none tracking-[-0.03em]">
           {prezzoTesto}
         </span>
-        <span className="text-[0.95rem] text-fumo">una volta, per questo volo</span>
+        <span className="text-[0.95rem] text-fumo">
+          una volta, per questo volo
+        </span>
       </div>
 
       {inLancio && (
@@ -80,8 +81,11 @@ export default function MuroCheck({
           Prezzo di lancio.{" "}
           {postiRimasti !== null ? (
             <>
-              Ne restano <span className="font-medium text-inchiostro">{postiRimasti}</span> a
-              questa cifra, poi passa a {prezzoPienoTesto}.
+              Ne restano{" "}
+              <span className="font-medium text-inchiostro">
+                {postiRimasti}
+              </span>{" "}
+              a questa cifra, poi passa a {prezzoPienoTesto}.
             </>
           ) : (
             <>Quando i posti di lancio finiscono passa a {prezzoPienoTesto}.</>
@@ -96,8 +100,14 @@ export default function MuroCheck({
           "Gli avvisi sul volo e la scadenza calcolata sul tuo caso",
           "Se apri la pratica, questi euro si scalano dal prezzo",
         ].map((v) => (
-          <li key={v} className="flex gap-2.5 text-[14.5px] leading-relaxed text-fumo">
-            <Check className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
+          <li
+            key={v}
+            className="flex gap-2.5 text-[14.5px] leading-relaxed text-fumo"
+          >
+            <Check
+              className="mt-0.5 size-4 shrink-0 text-verde"
+              aria-hidden="true"
+            />
             {v}
           </li>
         ))}

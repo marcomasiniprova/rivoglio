@@ -176,7 +176,7 @@ La differenza sta in un numero che nessuno conosce, e che **si misura**.
 ### Com'è costruito (e perché è spento)
 
 - `lib/check/ingresso.ts`: prezzi, posti di lancio, e l'interruttore
-  `CHECK_PREZZO_ATTIVO`. **Senza quella variabile non cambia niente per
+  `NEXT_PUBLIC_CHECK_PREZZO_ATTIVO`. **Senza quella variabile non cambia niente per
   nessuno.**
 - `lib/check/pass.ts`: la ricevuta firmata che apre il cancello. Niente
   account, niente password: un cookie firmato, come i link delle email.

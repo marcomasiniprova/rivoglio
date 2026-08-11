@@ -21,6 +21,24 @@
  */
 
 import { TESTO_RINUNCIA } from "@/lib/pratiche/recesso";
+import { CHECK_A_PAGAMENTO, PREZZO_LANCIO } from "@/lib/check/ingresso";
+import { euro } from "@/lib/prezzi";
+
+/**
+ * IL CHECK COSTA O NO: i testi seguono l'interruttore, non il contrario.
+ *
+ * Ogni frase che parla del prezzo del check esiste in due versioni, e a
+ * scegliere è la stessa costante che decide se il muro c'è davvero
+ * (`CHECK_PREZZO_ATTIVO`). Così non può esistere il momento in cui il
+ * sito promette gratis quello che fa pagare, o il contrario: sono la
+ * stessa riga di codice.
+ *
+ * L'angolo, scelto da Valerio l'11/08: **meno di un caffè**. Il prezzo
+ * non si nasconde, si mette accanto alla cifra che vale il volo, dove
+ * diventa piccolo da solo.
+ */
+const PREZZO = euro(PREZZO_LANCIO);
+const seSiPaga = <T,>(pagando: T, gratis: T): T => (CHECK_A_PAGAMENTO ? pagando : gratis);
 
 export const COPY = {
   /** 3-6 parole. Regge anche bagagli, treni e bollette, non solo i voli. */
@@ -58,8 +76,10 @@ export const COPY = {
       accessibile a tutti, quante analisi si vogliono). */
   appOspite: {
     titolo: "Controlla un volo",
-    testo:
+    testo: seSiPaga(
+      `Senza account, in trenta secondi. L'analisi costa ${PREZZO} e si scala dalla pratica, se poi la apri.`,
       "Gratis, senza account, tutte le volte che vuoi. Se il volo è idoneo, dal risultato apri la pratica.",
+    ),
     entra: "Hai già una pratica? Entra",
     nota: "Con un account le tue pratiche restano qui, pronte da seguire.",
   },
@@ -158,7 +178,10 @@ export const COPY = {
   hero: {
     occhiello: "Lo scanner dei rimborsi",
     titolo: "Hai preso un volo nell'ultimo anno?",
-    sottotitolo: "Forse ti devono fino a 600€. Controllalo gratis in 30 secondi.",
+    sottotitolo: seSiPaga(
+      `Forse ti devono fino a 600€. Scoprilo in 30 secondi: l'analisi costa ${PREZZO}, meno di un caffè.`,
+      "Forse ti devono fino a 600€. Controllalo gratis in 30 secondi.",
+    ),
     /** Apre il "fino a 600€". */
     notaImporto:
       "600€ è l'importo massimo del Regolamento CE 261/2004: ritardi di 4 ore o più sulle tratte oltre i 3.500 km. Le altre fasce: 250€ fino a 1.500 km, 400€ fino a 3.500 km.",
@@ -178,7 +201,7 @@ export const COPY = {
         etichetta: "Data del volo",
         aiuto: "Il giorno della partenza.",
       },
-      bottone: "Controlla gratis",
+      bottone: seSiPaga(`Analizza il volo · ${PREZZO}`, "Controlla gratis"),
       rassicurazione: "Niente email, niente account. Il risultato lo vedi subito.",
       /** Errori di validazione lato campo, prima ancora di chiamare l'API. */
       errori: {
@@ -187,7 +210,7 @@ export const COPY = {
       },
     },
     puntiFiducia: [
-      "Il check è gratis, sempre",
+      seSiPaga(`L'analisi costa ${PREZZO}: meno di un caffè`, "Il check è gratis, sempre"),
       "Nessuna percentuale sulla compensazione",
       "Se la compagnia non paga, non paghi neanche tu",
     ],
@@ -348,11 +371,14 @@ export const COPY = {
     },
     piani: {
       check: {
-        nome: "Il check del volo",
-        nastro: "Sempre gratis",
-        prezzo: "0€",
-        periodo: "per sempre",
-        rassicurazione: "Niente carta, niente account. Paghi solo se decidi di aprire la pratica.",
+        nome: seSiPaga("L'analisi del volo", "Il check del volo"),
+        nastro: seSiPaga("Prezzo di lancio", "Sempre gratis"),
+        prezzo: seSiPaga(PREZZO, "0€"),
+        periodo: seSiPaga("per volo", "per sempre"),
+        rassicurazione: seSiPaga(
+          "Meno di un caffè. E se poi apri la pratica, questi euro si scalano dal prezzo: il totale non cambia.",
+          "Niente carta, niente account. Paghi solo se decidi di aprire la pratica.",
+        ),
         descrizione:
           "Numero di volo e data, oppure la foto della carta d'imbarco: in trenta secondi sai se il tuo volo rientra in una fascia del CE 261/2004, e vedi gli orari veri su cui l'abbiamo deciso.",
         punti: [
@@ -360,7 +386,7 @@ export const COPY = {
           "Verifica sui dati ufficiali del volo",
           "Risposta chiara anche quando è un no",
         ],
-        bottone: "Controlla gratis",
+        bottone: seSiPaga(`Analizza il volo · ${PREZZO}`, "Controlla gratis"),
       },
       pratica: {
         nome: "Una pratica",
@@ -584,7 +610,10 @@ export const COPY = {
         fonte: "Euronews",
       },
     ],
-    chiusa: "Il primo passo per non essere in quei numeri è un check gratuito.",
+    chiusa: seSiPaga(
+      `Il primo passo per non essere in quei numeri costa ${PREZZO}.`,
+      "Il primo passo per non essere in quei numeri è un check gratuito.",
+    ),
   },
 
   faq: {
@@ -679,7 +708,7 @@ export const COPY = {
         titolo: "Fatto, non ti scrivo più.",
         corpo:
           "Il tuo indirizzo è fuori dall'Osservatorio da adesso. Nessuna domanda e nessun modulo: se un giorno cambi idea, il campo sulla home è sempre lì.",
-        azione: { testo: "Controlla un volo, gratis", dove: "/app" },
+        azione: { testo: seSiPaga("Analizza un volo", "Controlla un volo, gratis"), dove: "/app" },
       },
       scaduto: {
         titolo: "Questo link è scaduto.",
@@ -764,7 +793,10 @@ export const COPY = {
         },
       },
       bottone: "Vedi il verdetto",
-      nota: "Le risposte restano sulla tua verifica come dichiarazione. Il check resta gratuito.",
+      nota: seSiPaga(
+        "Le risposte restano sulla tua verifica come dichiarazione. Rispondere non costa niente.",
+        "Le risposte restano sulla tua verifica come dichiarazione. Il check resta gratuito.",
+      ),
       notaDemo: "Esempio dimostrativo: il verdetto qui non vale per una pratica vera.",
     },
 
@@ -804,7 +836,10 @@ export const COPY = {
         ],
       },
       bottone: "Vedi il verdetto",
-      nota: "Le risposte restano sulla tua verifica. Il check resta gratuito.",
+      nota: seSiPaga(
+        "Le risposte restano sulla tua verifica. Rispondere non costa niente.",
+        "Le risposte restano sulla tua verifica. Il check resta gratuito.",
+      ),
       notaDemo: "Esempio dimostrativo: il verdetto qui non vale per una pratica vera.",
       titoloChiuso: "Ecco com'è andata.",
       esitoIdoneo: "Rientri in una fascia",
@@ -829,7 +864,10 @@ export const COPY = {
       segnaposto: "Scrivi il nome, per esempio Delta",
       nessuna: "Nessuna compagnia con questo nome fra quelle che conosciamo.",
       bottone: "Vedi il verdetto",
-      nota: "La tua risposta resta sulla verifica. Il check resta gratuito.",
+      nota: seSiPaga(
+        "La tua risposta resta sulla verifica. Rispondere non costa niente.",
+        "La tua risposta resta sulla verifica. Il check resta gratuito.",
+      ),
       notaDemo: "Esempio dimostrativo: il verdetto qui non vale per una pratica vera.",
       nonSo: "Non me lo ricordo",
       nonSoTesto:
@@ -929,7 +967,10 @@ export const COPY = {
         "Volo {volo} del {data}: atterrato con {ritardo} di ritardo. La soglia del Regolamento CE 261/2004 è di 3 ore all'arrivo.",
       fattoPuntuale: "Volo {volo} del {data}: atterrato in orario.",
       saluto:
-        "Meglio così. Il check resta gratis: se un altro volo ti è andato peggio, controllalo.",
+        seSiPaga(
+          "Meglio così: vuol dire che sei atterrato quasi in orario. Se un altro volo ti è andato peggio, analizzalo.",
+          "Meglio così. Il check resta gratis: se un altro volo ti è andato peggio, controllalo.",
+        ),
       cta: "Controlla un altro volo",
       linkPromemoria: "Questo risultato resta a questo link: salvalo se ti serve.",
       suggerimentoOsservatorio:
@@ -939,7 +980,10 @@ export const COPY = {
     /** Il link porta a un controllo che non esiste (o non esiste più). */
     nonTrovata: {
       titolo: "Questo controllo non lo troviamo.",
-      testo: "Il link può essere sbagliato o vecchio. Il check è gratis: rifallo in 30 secondi.",
+      testo: seSiPaga(
+        "Il link può essere sbagliato o vecchio. Rifai l'analisi in 30 secondi.",
+        "Il link può essere sbagliato o vecchio. Il check è gratis: rifallo in 30 secondi.",
+      ),
       cta: "Controlla un volo",
     },
 
@@ -969,12 +1013,15 @@ export const COPY = {
 
   condivisione: {
     titolo: "C'era qualcuno con te su quel volo?",
-    didascalia: "Il check è gratis e la compensazione spetta a ogni passeggero.",
+    didascalia: seSiPaga(
+      "La compensazione spetta a ogni passeggero: chi era con te può analizzare il suo volo.",
+      "Il check è gratis e la compensazione spetta a ogni passeggero.",
+    ),
     /** La card che si condivide con un tocco. */
     card: {
       titoloTemplate: "Fascia da {importo}",
       sottotitoloTemplate: "Volo {volo}, atterrato con {ritardo} di ritardo",
-      piede: "Controlla il tuo gratis su Rivolio",
+      piede: seSiPaga("Controlla il tuo su Rivolio", "Controlla il tuo gratis su Rivolio"),
     },
     bottone: "Condividi la card",
     /** Dove navigator.share non c'è, si copia negli appunti e lo si dice. */
@@ -982,7 +1029,10 @@ export const COPY = {
     nonRiuscita: "Non riesco a copiare da qui. Condividi il link dalla barra del browser.",
     /** Testo pronto per la condivisione; il link lo aggiunge il codice. */
     testoTemplate:
-      "Il mio volo {volo} è atterrato con {ritardo} di ritardo: fascia da {importo} secondo il Regolamento CE 261/2004. Controlla il tuo, è gratis:",
+      seSiPaga(
+        "Il mio volo {volo} è atterrato con {ritardo} di ritardo: fascia da {importo} secondo il Regolamento CE 261/2004. Controlla il tuo:",
+        "Il mio volo {volo} è atterrato con {ritardo} di ritardo: fascia da {importo} secondo il Regolamento CE 261/2004. Controlla il tuo, è gratis:",
+      ),
   },
 
   /**
@@ -1031,7 +1081,10 @@ export const COPY = {
       vuoto: {
         titolo: "Non hai ancora nessuna pratica.",
         testo:
-          "Si parte sempre dal check: numero di volo e data, gratis. Se il volo rientra in una fascia, da lì apri la pratica.",
+          seSiPaga(
+            `Si parte sempre dall'analisi del volo: numero e data, ${PREZZO}. Se il volo rientra in una fascia, da lì apri la pratica e quei soldi si scalano.`,
+            "Si parte sempre dal check: numero di volo e data, gratis. Se il volo rientra in una fascia, da lì apri la pratica.",
+          ),
         cta: "Controlla un volo",
       },
       errore: "Non riesco a leggere le tue pratiche. Riprova tra qualche minuto.",
@@ -1085,7 +1138,10 @@ export const COPY = {
         nome: "Pagata dalla compagnia",
         descrizione: "La compagnia ha pagato. La compensazione è arrivata a te, per intero.",
         prossimoPasso:
-          "Niente da fare: la pratica è chiusa. Se un altro volo ti è andato storto, il check resta gratis.",
+          seSiPaga(
+            "Niente da fare: la pratica è chiusa. Se un altro volo ti è andato storto, analizzalo.",
+            "Niente da fare: la pratica è chiusa. Se un altro volo ti è andato storto, il check resta gratis.",
+          ),
       },
       esito_rifiutata: {
         nome: "Rifiutata",
@@ -1193,7 +1249,10 @@ export const COPY = {
   invito: {
     titolo: "Quel ritardo può valere ancora qualcosa.",
     corsivo: "Scoprilo adesso.",
-    testo: "Trenta secondi, niente email, nessun conto da creare. Il check è gratis, sempre.",
+    testo: seSiPaga(
+      `Trenta secondi, niente email, nessun conto da creare. L'analisi costa ${PREZZO}.`,
+      "Trenta secondi, niente email, nessun conto da creare. Il check è gratis, sempre.",
+    ),
     cta: "Controlla il tuo volo",
     /** Sotto i 360 punti di larghezza: il testo pieno non ci sta. */
     ctaCorta: "Controlla",
@@ -1202,7 +1261,7 @@ export const COPY = {
   footer: {
     frase: "Rivolio è lo scanner dei rimborsi. Oggi i voli. Presto bagagli e treni.",
     cartolina: {
-      titolo: "Il check è gratis.",
+      titolo: seSiPaga(`L'analisi costa ${PREZZO}.`, "Il check è gratis."),
       corsivo: "Il ritardo è già tuo.",
       testo:
         "Numero del volo e data: in 30 secondi sai se rientri nelle fasce del CE 261/2004. Senza account, senza carta.",
@@ -1213,7 +1272,7 @@ export const COPY = {
       prodotto: {
         titolo: "Prodotto",
         voci: [
-          { testo: "Il check gratuito", ancora: "#controllo" },
+          { testo: seSiPaga("L'analisi del volo", "Il check gratuito"), ancora: "#controllo" },
           { testo: "La web app", ancora: "/app" },
           { testo: "Come funziona", ancora: "#come-funziona" },
           { testo: "Prezzi", ancora: "#prezzi" },

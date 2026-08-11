@@ -88,10 +88,20 @@ social rifatta (era rimasta al prodotto viaggi).
     "1,99 adesso, poi 4,99" perché la direttiva Omnibus vieta di barrare
     un prezzo mai praticato. Quando i 500 posti finiscono, si alza sul
     serio. E i posti rimasti si mostrano **solo se sono contati**.
-  - 🔴 **PRIMA DI ACCENDERE VANNO RISCRITTI I TESTI**: la landing dice
-    "il check è gratis, sempre" in una dozzina di punti. Una prova lega
-    le due cose: se l'interruttore è acceso e il sito promette ancora
-    gratis, **la suite si ferma**.
+  - ✅ **I TESTI SONO RISCRITTI** (11/08). Venti punti fra landing, card
+    prezzi, FAQ, verdetti, condivisione e stati della pratica esistono in
+    **due versioni**, e a sceglierle è la stessa costante che decide se
+    il muro c'è: non può esistere il momento in cui il sito promette
+    gratis quello che fa pagare. L'angolo scelto da Valerio: **meno di un
+    caffè**. Restano gratuiti nei testi il reclamo alla compagnia, la
+    segnalazione all'ente e la conciliazione, perché lo sono davvero.
+  - 🔴 **L'INTERRUTTORE NON ARRIVAVA NEL BROWSER.** Si chiamava
+    `CHECK_PREZZO_ATTIVO` e le variabili senza `NEXT_PUBLIC_` restano
+    sul server: il muro era acceso ma la landing continuava a promettere
+    "gratis", perché quei testi sono componenti client. Visto guardando
+    la pagina. Adesso l'interruttore è **`NEXT_PUBLIC_CHECK_PREZZO_ATTIVO`**,
+    uno solo, letto dai due lati. Non è un buco: il browser decide le
+    parole, il cancello vero resta dentro `/api/verifica`.
   - **LO SCROLL PESANTE su sito e web app.** La rotellina non muove la
     pagina: alimenta un obiettivo raggiunto con inerzia. Misurato su 900
     punti: primo pixel a 120 ms, metà strada a 338, il 95% a 1,06

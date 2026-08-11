@@ -5,7 +5,8 @@
  * porta un euro, e Valerio deve fare cassa entro ottobre: 1,99 su ogni
  * analisi è un numero piccolo per chi paga e grosso per chi incassa.
  *
- * ⚠️ NASCE SPENTO. Senza `CHECK_PREZZO_ATTIVO=1` fra le variabili, tutto
+ * ⚠️ NASCE SPENTO. Senza `NEXT_PUBLIC_CHECK_PREZZO_ATTIVO=1` fra le
+ * variabili, tutto
  * si comporta come oggi: check libero, nessun muro, nessun cambiamento
  * per nessuno. È di proposito: il venditore che incassa non c'è ancora
  * (Polar ha detto no, vedi PAGAMENTI.md), e un muro davanti a una cassa
@@ -27,8 +28,21 @@
 
 import { euro, type Listino } from "@/lib/prezzi";
 
-/** L'interruttore. Assente o diverso da "1" = il check resta libero. */
-export const CHECK_A_PAGAMENTO = process.env.CHECK_PREZZO_ATTIVO === "1";
+/**
+ * L'INTERRUTTORE. Assente o diverso da "1" = il check resta libero.
+ *
+ * ⚠️ Il nome comincia con `NEXT_PUBLIC_` per un motivo preciso, non per
+ * distrazione: le variabili senza quel prefisso NON arrivano nel
+ * browser, e i testi della landing (che sono componenti client) sono
+ * rimasti a promettere "gratis" mentre il muro era già acceso sul
+ * server. Visto il 11/08 guardando la pagina. Una variabile sola, letta
+ * da tutti e due i lati, è l'unico modo perché non si disallineino.
+ *
+ * Non è un buco di sicurezza: qui il browser decide solo le PAROLE. Il
+ * cancello vero sta dentro /api/verifica, sul server, e chi lo cambia
+ * dal browser si ritrova comunque il 402.
+ */
+export const CHECK_A_PAGAMENTO = process.env.NEXT_PUBLIC_CHECK_PREZZO_ATTIVO === "1";
 
 /** Quanto costa un'analisi durante il lancio. */
 export const PREZZO_LANCIO = 1.99;

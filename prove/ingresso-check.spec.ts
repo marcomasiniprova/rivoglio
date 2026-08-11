@@ -26,7 +26,7 @@ test.describe("Il cancello nasce spento", () => {
     /* Se un giorno questa prova diventa rossa, vuol dire che qualcuno ha
        acceso il muro per tutti scrivendolo nel codice invece che nelle
        variabili: è il modo di mandare offline il check senza volerlo. */
-    expect(CHECK_A_PAGAMENTO).toBe(process.env.CHECK_PREZZO_ATTIVO === "1");
+    expect(CHECK_A_PAGAMENTO).toBe(process.env.NEXT_PUBLIC_CHECK_PREZZO_ATTIVO === "1");
   });
 });
 
@@ -135,11 +135,14 @@ test.describe("Un incerto non si fa pagare", () => {
 test.describe("Se il check si paga, il sito non dice gratis", () => {
   test("i testi e l'interruttore non si contraddicono", () => {
     const testi = JSON.stringify(COPY).toLowerCase();
-    /* Si cerca la PAROLA, non una frase precisa: le promesse di
-       gratuità sono sparse in una dozzina di forme diverse ("controlla
-       gratis", "il check è gratis, sempre", "0€", "sempre gratis") e
-       inseguirle una per una vuol dire dimenticarne una. */
-    const prometteGratis = /gratis|gratuit/.test(testi);
+    /* Si cercano le promesse sul CHECK, non ogni "gratis": il reclamo
+       alla compagnia, la segnalazione all'ente e la conciliazione sono
+       gratuiti DAVVERO, e dirlo è uno dei motivi per cui la gente si
+       fida. Quelle frasi restano anche quando il check si paga. */
+    const prometteGratis =
+      /(check|analisi|controlla\w*)[^"]{0,40}(gratis|gratuit)/.test(testi) ||
+      /(gratis|gratuit)\w*[^"]{0,40}(check|analisi)/.test(testi) ||
+      /sempre gratis|gratis, sempre|gratis, senza account/.test(testi);
 
     if (CHECK_A_PAGAMENTO) {
       expect(
