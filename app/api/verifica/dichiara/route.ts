@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { cancelloDelSeguito } from "@/lib/check/cancello";
 import {
   rispostaCoincidenzaValida,
   rispostaNegatoValida,
@@ -68,6 +69,11 @@ export async function POST(req: Request) {
       { status: 400, headers: CORS },
     );
   }
+
+  /* IL CANCELLO: vedi lib/check/cancello.ts. Questa rotta dà un verdetto
+     vero, e col muro acceso il verdetto si paga. */
+  const chiuso = await cancelloDelSeguito(req, c.verificaId);
+  if (chiuso) return chiuso;
 
   const esito = await verificaVolo(c.volo, c.data);
   if (!esito.ok) {

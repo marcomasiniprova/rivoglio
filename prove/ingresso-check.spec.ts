@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test, expect } from "@playwright/test";
 import {
   CHECK_A_PAGAMENTO,
@@ -9,7 +11,13 @@ import {
   prezzoCheck,
   scontoDaCheck,
 } from "../lib/check/ingresso";
-import { consumaPass, creaPass, leggiPass } from "../lib/check/pass";
+import {
+  chiaveDiProvaValida,
+  consumaPass,
+  creaPass,
+  leggiPass,
+  segnaturaProva,
+} from "../lib/check/pass";
 import { LISTINI } from "../lib/prezzi";
 import { COPY } from "../lib/copy";
 
@@ -155,5 +163,78 @@ test.describe("Se il check si paga, il sito non dice gratis", () => {
          per una cassa che non è ancora aperta. */
       expect(prometteGratis).toBe(true);
     }
+  });
+});
+
+/* ── LA CHIAVE DEL COLLAUDATORE ────────────────────────────────────────
+   La cassa di prova emette ricevute VERE. Finché esiste, la porta deve
+   essere di Valerio e di nessun altro. L'11/08 non lo era: il muro
+   spediva `/cassa-prova?s=<segreto>` dentro la propria risposta, quindi
+   la parola segreta la riceveva chiunque premesse il bottone e il muro
+   si apriva da solo. */
+test.describe("La cassa di prova è chiusa a chiave", () => {
+  const SEGRETO = "parola-di-prova";
+
+  test("la chiave nel cookie non contiene la parola segreta", () => {
+    const chiave = segnaturaProva(SEGRETO);
+    expect(chiave).not.toBeNull();
+    expect(chiave!).not.toContain(SEGRETO);
+  });
+
+  test("passa solo la chiave giusta", () => {
+    expect(chiaveDiProvaValida(segnaturaProva(SEGRETO), SEGRETO)).toBe(true);
+    expect(chiaveDiProvaValida("qualcosa", SEGRETO)).toBe(false);
+    expect(chiaveDiProvaValida(null, SEGRETO)).toBe(false);
+    expect(chiaveDiProvaValida("", SEGRETO)).toBe(false);
+    /* La chiave di un'altra parola non apre questa porta. */
+    expect(chiaveDiProvaValida(segnaturaProva("altra-parola"), SEGRETO)).toBe(false);
+  });
+
+  test("senza segreto non si apre niente", () => {
+    expect(segnaturaProva("")).toBeNull();
+    expect(chiaveDiProvaValida("qualsiasi-cosa", "")).toBe(false);
+  });
+
+  test("la parola segreta non finisce MAI nella risposta del muro", () => {
+    /* Il difetto vero dell'11/08, scritto come prova: nel muro non si
+       costruisce un indirizzo mettendoci dentro CASSA_PROVA_SEGRETO. */
+    for (const f of ["lib/check/cancello.ts", "app/api/verifica/route.ts"]) {
+      const testo = readFileSync(join(process.cwd(), f), "utf8");
+      const codice = testo.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+      expect(
+        /cassa-prova\?s=|\$\{[^}]*CASSA_PROVA_SEGRETO/.test(codice),
+        `${f} rimette il segreto nella risposta del muro`,
+      ).toBe(false);
+    }
+  });
+});
+
+/* ── LE PORTE DI SERVIZIO ──────────────────────────────────────────────
+   Il verdetto non esce solo da /api/verifica. Tre rotte lo producono per
+   conto loro, e la ricerca per tratta mostra l'orario di atterraggio
+   vero, cioè la sostanza che vendiamo. Con il muro su una porta sola
+   bastava conoscere l'indirizzo di un'altra per non pagare mai. */
+test.describe("Il muro copre tutte le porte", () => {
+  const codiceDi = (f: string) =>
+    readFileSync(join(process.cwd(), f), "utf8")
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/^\s*\/\/.*$/gm, "");
+
+  for (const rotta of ["cancellato", "dichiara", "operativo"]) {
+    test(`/api/verifica/${rotta} passa dal cancello prima del verdetto`, () => {
+      const codice = codiceDi(`app/api/verifica/${rotta}/route.ts`);
+      expect(codice).toContain("cancelloDelSeguito");
+      /* E ci passa PRIMA di interrogare il motore, se no la chiamata al
+         fornitore la paghiamo comunque noi. */
+      expect(codice.indexOf("cancelloDelSeguito(")).toBeLessThan(
+        codice.indexOf("verificaVolo("),
+      );
+    });
+  }
+
+  test("la ricerca per tratta non regala l'orario di atterraggio", () => {
+    const codice = codiceDi("app/api/voli-tratta/route.ts");
+    expect(codice).toContain("arrivoEffettivoOra");
+    expect(codice).toContain("passDi");
   });
 });

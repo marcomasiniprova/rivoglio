@@ -3,14 +3,9 @@ import { scadenzaStimata } from "@/lib/regole/eu261";
 import { verificaVolo } from "@/lib/voli/verifica";
 import { inItaliano } from "@/lib/voli/aeroporti";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
-import {
-  CHECK_A_PAGAMENTO,
-  CORTESIA_SU_INCERTO,
-  postiRimasti,
-  prezzoCheck,
-} from "@/lib/check/ingresso";
-import { conteggioCheck } from "@/lib/check/conteggio";
-import { COOKIE_PASS, consumaPass, leggiPass } from "@/lib/check/pass";
+import { CHECK_A_PAGAMENTO, CORTESIA_SU_INCERTO } from "@/lib/check/ingresso";
+import { passDi, rispostaMuro } from "@/lib/check/cancello";
+import { COOKIE_PASS, consumaPass } from "@/lib/check/pass";
 
 /**
  * POST /api/verifica  {volo, data}
@@ -62,35 +57,8 @@ export async function POST(req: Request) {
      che vive solo nel browser lo scavalca chiunque apra gli strumenti
      per sviluppatori, e ogni check scavalcato è una chiamata pagata da
      noi. */
-  const pass = CHECK_A_PAGAMENTO ? leggiPass(cookieDi(req, COOKIE_PASS)) : null;
-  if (CHECK_A_PAGAMENTO && !pass) {
-    /* Il prezzo e i posti rimasti li calcola il SERVER: sono un dato,
-       non una decisione del browser. E i posti si scrivono solo se sono
-       stati contati davvero (vedi postiRimasti). */
-    const { pagati } = await conteggioCheck();
-    const prezzo = prezzoCheck(pagati);
-    return NextResponse.json(
-      {
-        ok: false,
-        serveIlPass: true,
-        errore: "L'analisi di questo volo si sblocca con un pagamento.",
-        muro: {
-          /* Dove si va a pagare. Finché non c'è un venditore vero, con
-             CASSA_PROVA_SEGRETO acceso si va alla cassa di prova: serve
-             a percorrere il giro intero (muro, cassa, ricevuta, check
-             sbloccato) senza incassare niente. */
-          cassa: process.env.CASSA_PROVA_SEGRETO
-            ? `/cassa-prova?s=${encodeURIComponent(process.env.CASSA_PROVA_SEGRETO)}`
-            : null,
-          prezzoTesto: prezzo.prezzoTesto,
-          prezzoPienoTesto: prezzo.prezzoPienoTesto,
-          inLancio: prezzo.inLancio,
-          postiRimasti: postiRimasti(pagati),
-        },
-      },
-      { status: 402, headers: CORS },
-    );
-  }
+  const pass = passDi(req);
+  if (CHECK_A_PAGAMENTO && !pass) return rispostaMuro(req);
 
   let corpo: unknown;
   try {
@@ -174,16 +142,4 @@ export async function POST(req: Request) {
     }
   }
   return risposta;
-}
-
-/** Un cookie preso dall'intestazione grezza: qui non c'è il contesto di
- *  Next, la richiesta arriva anche dall'app. */
-function cookieDi(req: Request, nome: string): string | null {
-  const testa = req.headers.get("cookie");
-  if (!testa) return null;
-  for (const pezzo of testa.split(";")) {
-    const [k, ...resto] = pezzo.trim().split("=");
-    if (k === nome) return decodeURIComponent(resto.join("="));
-  }
-  return null;
 }

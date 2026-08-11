@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { cancelloDelSeguito } from "@/lib/check/cancello";
 import { cercaVettore, valutaOperativo, vettoreValido } from "@/lib/regole/operativo";
 import { verificaVolo } from "@/lib/voli/verifica";
 import { inItaliano } from "@/lib/voli/aeroporti";
@@ -63,6 +64,11 @@ export async function POST(req: Request) {
       { status: 400, headers: CORS },
     );
   }
+
+  /* IL CANCELLO: vedi lib/check/cancello.ts. Questa rotta richiude un
+     verdetto, e col muro acceso il verdetto si paga. */
+  const chiuso = await cancelloDelSeguito(req, verificaId);
+  if (chiuso) return chiuso;
 
   /* Si ripassa dal verificatore invece di fidarsi del browser: gli orari
      e la distanza devono venire dai nostri dati. L'utente aggiunge una

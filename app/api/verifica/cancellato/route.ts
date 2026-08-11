@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { cancelloDelSeguito } from "@/lib/check/cancello";
 import { rispostaValida, valutaCancellato } from "@/lib/regole/cancellato";
 import { verificaVolo } from "@/lib/voli/verifica";
 import { inItaliano } from "@/lib/voli/aeroporti";
@@ -69,6 +70,13 @@ export async function POST(req: Request) {
       { status: 400, headers: CORS },
     );
   }
+
+  /* IL CANCELLO. Questa rotta dà un verdetto vero, quindi col muro acceso
+     non può restare aperta: chi ne conosceva l'indirizzo saltava il
+     pagamento. Passa chi ha la ricevuta o chi porta l'identificativo di
+     una verifica che esiste, cioè chi ha già pagato quel volo. */
+  const chiuso = await cancelloDelSeguito(req, verificaId);
+  if (chiuso) return chiuso;
 
   /* Si ripassa dal verificatore invece di fidarsi di quello che arriva dal
      browser: il fatto (stato, distanza, sciopero) deve venire dai nostri

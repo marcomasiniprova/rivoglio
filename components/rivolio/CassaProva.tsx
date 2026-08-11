@@ -18,13 +18,7 @@ import Logo from "@/components/Logo";
  * l'unica somiglianza utile è il PERCORSO (muro → cassa → ricevuta →
  * check sbloccato), che è quello che c'è da provare.
  */
-export default function CassaProva({
-  prezzoTesto,
-  segreto,
-}: {
-  prezzoTesto: string;
-  segreto: string;
-}) {
+export default function CassaProva({ prezzoTesto }: { prezzoTesto: string }) {
   const router = useRouter();
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
@@ -33,11 +27,9 @@ export default function CassaProva({
     setErrore(null);
     setInCorso(true);
     try {
-      const r = await fetch("/api/check/prova", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ segreto }),
-      });
+      /* Niente parola segreta nella richiesta: chi arriva fin qui ha già
+         la chiave nel cookie, e il server guarda quella. */
+      const r = await fetch("/api/check/prova", { method: "POST" });
       const dati = await r.json().catch(() => null);
       if (!r.ok || !dati?.ok) {
         setErrore(typeof dati?.errore === "string" ? dati.errore : "Non ha funzionato.");

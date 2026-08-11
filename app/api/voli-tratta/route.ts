@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { passDi } from "@/lib/check/cancello";
+import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { aeroportoPerIata } from "@/lib/voli/aeroporti";
 import { normalizzaData } from "@/lib/voli/normalizza";
 import { voliDiTratta } from "@/lib/voli/tratta";
@@ -54,8 +56,22 @@ export async function GET(req: Request) {
   }
 
   const esito = await voliDiTratta(da.iata, a.iata, data.valore);
+
+  /* ⚠️ L'ORARIO DI ATTERRAGGIO VERO NON ESCE DA QUI COL MURO ACCESO.
+     "Doveva arrivare alle 09:55, atterrato alle 13:47" non è un dettaglio
+     dell'elenco: è la cosa che vendiamo. Chi la legge qui ha già la
+     risposta e non ha nessun motivo di pagare (visto l'11/08). Resta
+     l'orario PREVISTO, che è quello stampato sul biglietto e serve solo a
+     far riconoscere all'utente il proprio volo: senza, la lista di undici
+     voli identici non si distingue e la ricerca per tratta smette di
+     funzionare. */
+  const voli =
+    CHECK_A_PAGAMENTO && !passDi(req)
+      ? esito.voli.map((v) => ({ ...v, arrivoEffettivoOra: "" }))
+      : esito.voli;
+
   return NextResponse.json(
-    { ok: true, da, a, data: data.valore, voli: esito.voli, demo: esito.demo },
+    { ok: true, da, a, data: data.valore, voli, demo: esito.demo },
     { headers: CORS },
   );
 }
