@@ -42,14 +42,19 @@ const ICONE: Record<ChiaveSezione, typeof LayoutDashboard> = {
   traffico: TrendingUp,
   registro: Activity,
   iscritti: Mail,
+  prodotto: Smartphone,
   impostazioni: Settings,
 };
 
-/** Le voci di servizio: portano FUORI dal pannello, per questo sono staccate. */
-const FUORI = [
-  { href: "/", nome: "Vedi il sito", icona: ExternalLink },
-  { href: "/app", nome: "La web app", icona: Smartphone },
-];
+/**
+ * L'unica voce che porta fuori dal pannello.
+ *
+ * ⚠️ Prima qui c'erano "Vedi il sito" e "La web app", e l'app non
+ * compariva da nessuna parte: tre cose che il cliente vede, sparse in due
+ * posti e una mancante. Adesso stanno tutte nella sezione Prodotto, e qui
+ * resta solo la strada per uscire.
+ */
+const FUORI = [{ href: "/app", nome: "Esci dal pannello", icona: ExternalLink }];
 
 type Props = {
   attiva: ChiaveSezione;

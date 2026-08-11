@@ -18,6 +18,7 @@ export type ChiaveSezione =
   | "traffico"
   | "registro"
   | "iscritti"
+  | "prodotto"
   | "impostazioni";
 
 export type Sezione = {
@@ -65,6 +66,17 @@ export const SEZIONI: Sezione[] = [
     href: "/admin/iscritti",
     nome: "Iscritti",
     sotto: "L'Osservatorio: chi si è iscritto, chi ha confermato, chi se ne è andato.",
+  },
+  {
+    /* ⚠️ Sta QUI dentro e non fra le voci di servizio in fondo alla
+       barra. Prima "Vedi il sito" e "La web app" erano due link staccati
+       e l'app non c'era proprio: tre cose che il cliente vede, sparse in
+       due posti e una mancante. Adesso c'è un posto solo, e il giorno
+       che nasce una quarta superficie si sa dove metterla. */
+    chiave: "prodotto",
+    href: "/admin/prodotto",
+    nome: "Prodotto",
+    sotto: "Le tre cose che vede il cliente: il sito, la web app e l'app. Aprile e guardale.",
   },
   {
     chiave: "impostazioni",
