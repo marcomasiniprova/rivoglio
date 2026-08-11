@@ -12,13 +12,14 @@ mai da una stima travestita da fatto.*
 | | Stato |
 |---|---|
 | Il motore che decide (CE 261/2004) | 🟢 **collaudato**: 58 casi d'oro, 58 su 58, falsi positivi 0 |
-| Il muro del check | 🟢 **invalicabile**, provato attaccandolo: 20 tentativi su 20 respinti |
+| Il muro del check | 🟢 **invalicabile**, provato attaccandolo sul sito vero |
+| Il registro delle analisi pagate | 🟢 **applicato sul database vero e collaudato online**: la ricevuta riusata riceve 402 |
 | I testi (mai "check gratis" col muro acceso) | 🟢 **setacciato tutto**, con una prova che lo tiene fermo per sempre |
 | Il sito visto da fuori | 🟢 26 schermate a 1440 e 390: zero errori, zero scorrimenti storti |
-| Le prove | 🟢 **922 verdi, zero rosse** |
-| **La cassa che incassa** | 🔴 **NON ESISTE** |
-| **La capienza a 2 milioni di visite** | 🟡 **il tetto è 3 richieste al secondo**, non i soldi |
-| Il registro delle analisi pagate | 🟡 **serve il punto 6 della migrazione**, altrimenti la ricevuta si riusa |
+| La capienza nel minuto di punta | 🟢 **coda con ritentativo**: al "troppe richieste" aspetta e riprova invece di mollare |
+| Le sentenze citate nelle lettere | 🟡 **Sturgeon verificata sul testo, un errore corretto**, tre da rileggere dal tuo PC |
+| Il dominio e le email | 🟡 **istruzioni pronte per IONOS**, i venti minuti li devi fare tu |
+| **La cassa che incassa** | 🔴 **NON ESISTE** · le quattro email sono pronte in `EMAIL-VENDITORI.md` |
 
 ---
 
@@ -159,26 +160,37 @@ venditore**. Quindi: **la costruzione è finita, la fase no.**
 
 ## 6. La lista, in ordine
 
-### 🔴 Prima della distribuzione (senza questi, non si parte)
-1. **Un venditore che accetti il caso d'uso.** È il tappo. `PAGAMENTI.md`.
-2. **Il punto 6 della migrazione** (`supabase/DA-APPLICARE.sql`). Senza,
-   una ricevuta si riusa all'infinito: uno paga 1,99 e la passa agli
-   amici.
-3. **Le sentenze citate nelle repliche**, rilette su EUR-Lex. Un numero
-   di causa sbagliato in una lettera che il cliente manda alla compagnia
-   lo fa sembrare sprovveduto. `ARRETRATI` voce M.
-4. **Il dominio e le email.** Finché il dominio non è verificato su
-   Resend, **le email partono SOLO verso valerio@artecai.it**: chi si
-   iscrive non riceve niente.
+### 🔴 Quello che resta, e lo devi fare tu
+1. **Un venditore che accetti il caso d'uso.** È il tappo, ed è l'unica
+   cosa che non posso fare io: servono la tua identità e il tuo conto.
+   Le quattro email sono scritte e pronte da incollare in
+   `EMAIL-VENDITORI.md`. **Mandale tutte e quattro lo stesso giorno e
+   NON iscriverti prima.**
+2. **Il dominio su IONOS e Resend.** Venti minuti, passo per passo in
+   `DOMINIO-E-EMAIL.md`. Finché non è fatto, **le email partono SOLO
+   verso valerio@artecai.it**: chi si iscrive non riceve niente.
+3. **Le tre sentenze da rileggere** dal tuo PC (da qui EUR-Lex non si
+   apre). La più urgente è Germanwings C-452/13: elenco e frase esatta
+   da cercare in `SENTENZE-DA-CONTROLLARE.md`.
 
-### 🟡 Prima del picco di traffico
-5. **Il piano AeroDataBox**, scelto sapendo che il tetto è 3 al secondo.
-6. **La coda con ritentativo** sul fornitore, per non buttare via le
-   richieste nel minuto di punta.
-7. **Il contatore delle richieste è per singola funzione**, quindi con
+### ✅ Fatto in questo giro
+- **Il registro delle analisi pagate** è applicato sul database vero e
+  collaudato online: una ricevuta già usata riceve 402.
+- **La coda con ritentativo** sul fornitore: nel minuto di punta si
+  aspetta e si riprova invece di rispondere "non lo so".
+- **Sturgeon verificata sul testo ufficiale**, e l'errore di citazione
+  che ne è emerso corretto.
+
+### 🟡 Quando arriva il traffico vero
+4. **Il piano AeroDataBox**, sapendo che il tetto è 3 al secondo. La
+   coda col ritentativo compra tempo, non alza il tetto.
+5. **Il contatore delle richieste è per singola funzione**, quindi con
    dieci funzioni in parallelo sono dieci contatori diversi. Col muro
    acceso conta poco (il cancello ferma prima la spesa), ma con la cassa
    vera va rifatto condiviso.
+6. **La protezione contro le password rubate** su Supabase: è un
+   interruttore nel pannello (*Authentication* → *Policies*), lo
+   segnala il loro stesso controllo di sicurezza.
 
 ### 🟢 Quando c'è tempo
 8. Le fonti degli articoli rilette dal tuo PC.
@@ -207,12 +219,14 @@ rieseguibile (`attacco.sh`).
 | La cassa di prova senza chiave | 404 |
 | Emettere una ricevuta senza chiave | 404 |
 | La chiave con la parola sbagliata | 404 |
-| **Riusare una ricevuta già consumata** | **era 200 🔴, ora chiuso col registro** |
+| **Riusare una ricevuta già consumata** | **era 200 🔴, ora 402 · verificato sul sito online** |
 
 **I due che sono passati, e come li ho chiusi:**
 - **La ricevuta riusabile.** Il credito stava nel cookie, cioè nel
   browser dell'utente: bastava rimettere il valore di prima. Adesso il
-  conto lo tiene il database (serve il punto 6 della migrazione).
+  conto lo tiene il database. **Collaudato sul sito vero l'11/08**:
+  primo check 200, secondo con la stessa ricevuta 402, e nel database
+  c'è la riga che dice quale ordine l'ha consumata.
 - **Il muro che rispondeva 500** quando il database non rispondeva:
   restituiva un guasto invece del muro. Adesso qualunque cosa vada
   storta chiude, non apre.

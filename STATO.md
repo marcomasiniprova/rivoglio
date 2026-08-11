@@ -1,6 +1,9 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-11 (giro #53: IL MURO NON SI APRIVA SOLO SULLA
+**Aggiornato:** 2026-08-11 (giro #54: I QUATTRO TAPPI DEL LANCIO, il
+database completo e collaudato online, le quattro email ai venditori, un
+errore vero nelle citazioni delle sentenze, la coda con ritentativo ·
+giro #53: IL MURO NON SI APRIVA SOLO SULLA
 PORTA PRINCIPALE, tre buchi chiusi, e le 60 promesse di gratis legate
 all'interruttore · giro #52: IL CHECK SI PAGA, deciso da
 Valerio: 1,99 di lancio col totale che resta 14,90, tutto spento dietro
@@ -58,6 +61,56 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #54 (11/08): I QUATTRO TAPPI DEL LANCIO, presi in ordine.**
+  - ✅ **IL DATABASE È COMPLETO E COLLAUDATO ONLINE.** Applicati col
+    connettore Supabase i punti **5** (il no della compagnia) e **6**
+    (il registro delle analisi pagate): 15 colonne su 15, indice e
+    vincolo creati. 🔴 Il punto 6 chiudeva un buco vero: la ricevuta
+    del check si "consumava" scrivendo un cookie nuovo, ma **il cookie
+    sta nel browser dell'utente**, quindi bastava rimettere il valore di
+    prima per tornare al credito pieno. **Provato sul sito vero prima e
+    dopo**: prima 200 e 200, adesso 200 e **402**, con la riga nel
+    database che dice quale ordine ha consumato l'analisi.
+  - **CHIUSA UNA FUNZIONE ESPOSTA SENZA MOTIVO.** Il controllo di
+    sicurezza di Supabase segnalava `crea_profilo()` chiamabile da
+    chiunque: è una funzione trigger, quindi da fuori non fa niente (le
+    manca la riga nuova), ma girava come SECURITY DEFINER e non serviva
+    a nessuno. Tolto il permesso. ⚠️ Resta da accendere a mano la
+    protezione contro le password rubate (interruttore nel pannello).
+  - **LE QUATTRO EMAIL AI VENDITORI** (`EMAIL-VENDITORI.md`), con la
+    traduzione sotto ognuna. Scritte perché non finiscano nella casella
+    sbagliata: in nessuna c'è una parola che possa far pensare a uno
+    studio legale, a un'agenzia di recupero crediti o a un'agenzia
+    viaggi, che sono le tre caselle in cui i loro elenchi ci
+    metterebbero. Le tre frasi che fanno il lavoro sono uguali in tutte
+    e quattro e sono vere: **il volo è già avvenuto**; **la compagnia
+    paga il passeggero e noi non tocchiamo mai i soldi**; **la lettera
+    la manda lui dalla propria email**. Tutte chiedono la stessa cosa:
+    conferma per iscritto PRIMA di iscriversi, e abilitazione
+    dell'account da parte loro.
+  - 🔴 **UN ERRORE VERO NELLE LETTERE, trovato leggendo il testo.**
+    Sturgeon è stata **verificata sul dispositivo ufficiale** (il PDF
+    che l'ENAC pubblica sul proprio sito) e dice esattamente quello che
+    scriviamo. Ma **le porte dell'aeromobile lì non compaiono mai**, e
+    la nostra replica al "il volo non era così in ritardo" faceva
+    proprio l'argomento delle porte citando **solo Sturgeon**. Quello è
+    **Germanwings contro Henning, C-452/13**. Corretto: adesso cita
+    tutte e due, ognuna per quello che dice. ⚠️ Le altre tre restano da
+    rileggere dal PC di Valerio: da qui EUR-Lex risponde con una pagina
+    vuota e il browser non esce in rete.
+  - **LA CODA CON RITENTATIVO** (`lib/voli/fornitori/chiamata.ts`). Il
+    tetto di AeroDataBox non è mensile, è **al secondo**: 3 al secondo
+    anche sul piano più caro. Prima al primo "troppe richieste" si
+    mollava e la vendita diventava un incerto, proprio nel minuto in cui
+    arrivano più persone. Adesso aspetta e riprova, con un tetto totale
+    sotto i 10 secondi delle funzioni Netlify. Non si riprova su 404 e
+    204: quel volo non ce l'hanno, riprovare costerebbe uguale.
+  - **`DOMINIO-E-EMAIL.md` rifatto per IONOS** (non Hostinger): i record
+    per far puntare rivolio.it, quelli di Resend con le tre trappole che
+    fanno perdere il pomeriggio, e l'ordine giusto (il mittente si
+    cambia **dopo** la verifica, se no le email si fermano del tutto).
+  - Prove: **954 verdi, zero rosse.** Le nuove sono sul ritentativo (13)
+    e sulle citazioni delle sentenze (3).
 - **GIRO #53 (11/08): IL MURO SI APRIVA DA SOLO. Tre buchi veri, trovati
   leggendo il codice e verificati sul sito online.**
   - 🔴 **LA CASSA DI PROVA ERA APERTA A TUTTI.** La risposta 402 del muro
@@ -1488,9 +1541,10 @@ social rifatta (era rimasta al prodotto viaggi).
 0-ter. ~~IL RAMO NON È MAI STATO UNITO A `main`~~ ✅ **FATTO il 10/08**:
    79 commit uniti, zero conflitti. Da qui in avanti si lavora su `main`
    e basta. L'autopilot degli aeroporti adesso compare in Actions.
-0-quater. 🟡 **LA QUINTA MIGRAZIONE.** `supabase/DA-APPLICARE.sql` ha un
-   punto 5 nuovo (il no della compagnia, per il dopo-lettera). Le prime
-   quattro le hai già eseguite: rilanciare tutto il file non fa danni.
+0-quater. ~~LA QUINTA E LA SESTA MIGRAZIONE~~ ✅ **FATTE l'11/08 col
+   connettore Supabase**: 15 colonne su 15, più il registro delle
+   analisi pagate col suo indice. Collaudato sul sito vero: una ricevuta
+   già usata riceve 402.
 0. **DUE COSE SOLO TUE, e sbloccano le email:**
    a. **Il dominio.** Finché `rivolio.it` (o quello che scegli) non è
       verificato su Resend, le email partono SOLO verso

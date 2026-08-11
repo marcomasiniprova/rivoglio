@@ -28,6 +28,7 @@
 
 import { aeroportoPerIata } from "@/lib/voli/aeroporti";
 
+import { BUDGET_MS, chiamaConRitentativo } from "./fornitori/chiamata";
 const HOST = "aerodatabox.p.rapidapi.com";
 
 export type VoloDiTratta = {
@@ -113,21 +114,21 @@ async function unaFinestra(
     `?direction=Departure&withLeg=true&withCancelled=true` +
     `&withCodeshared=false&withCargo=false&withPrivate=false&withLocation=false`;
 
+  /* Qui le finestre sono DUE e girano insieme, quindi il tempo si divide:
+     metà budget a testa, se no due ritentativi in fila farebbero morire
+     la funzione a 10 secondi. */
+  const esito = await chiamaConRitentativo(
+    url,
+    { "X-RapidAPI-Key": chiave, "X-RapidAPI-Host": HOST },
+    `tratta ${iataPartenza} ${da}`,
+    BUDGET_MS / 2,
+  );
+  if (!esito.ok) return [];
   try {
-    const risposta = await fetch(url, {
-      headers: { "X-RapidAPI-Key": chiave, "X-RapidAPI-Host": HOST },
-      signal: AbortSignal.timeout(7_000),
-      cache: "no-store",
-    });
-    if (risposta.status === 204 || risposta.status === 404) return [];
-    if (!risposta.ok) {
-      console.warn(`[tratta] risposta ${risposta.status} per ${iataPartenza} ${da}`);
-      return [];
-    }
-    const corpo = (await risposta.json()) as { departures?: VoceAdb[] };
+    const corpo = (await esito.risposta.json()) as { departures?: VoceAdb[] };
     return Array.isArray(corpo?.departures) ? corpo.departures : [];
   } catch (e) {
-    console.warn(`[tratta] chiamata fallita per ${iataPartenza} ${da}:`, e);
+    console.warn(`[tratta] risposta illeggibile per ${iataPartenza} ${da}:`, e);
     return [];
   }
 }

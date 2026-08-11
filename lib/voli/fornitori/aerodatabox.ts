@@ -20,6 +20,7 @@
 import { kmFraAeroporti } from "@/lib/voli/distanza";
 import type { FattoConPayload, FattoVolo, FornitoreVoli } from "../tipi";
 
+import { chiamaConRitentativo } from "./chiamata";
 const HOST = "aerodatabox.p.rapidapi.com";
 
 type OrarioAdb = { utc?: string | null; local?: string | null } | null;
@@ -98,23 +99,22 @@ export const aerodatabox: FornitoreVoli = {
       `https://${HOST}/flights/number/${encodeURIComponent(voloIata)}/${dataLocale}` +
       `?dateLocalRole=Departure&withAircraftImage=false&withLocation=false`;
 
+    /* Il tetto del fornitore è al SECONDO, non al mese: in un picco
+       risponde "troppe richieste" e prima si mollava al primo colpo,
+       trasformando una vendita in un incerto. Adesso aspetta e riprova
+       (vedi chiamata.ts). 204 e 404 non si riprovano: quel volo su
+       quella data non ce l'hanno, e riprovare costerebbe uguale. */
     let corpo: VoloAdb[];
+    const esito = await chiamaConRitentativo(
+      url,
+      { "X-RapidAPI-Key": chiave, "X-RapidAPI-Host": HOST },
+      `aerodatabox ${voloIata} ${dataLocale}`,
+    );
+    if (!esito.ok) return null;
     try {
-      const risposta = await fetch(url, {
-        headers: { "X-RapidAPI-Key": chiave, "X-RapidAPI-Host": HOST },
-        signal: AbortSignal.timeout(8_000), // le funzioni Netlify muoiono a 10s
-        cache: "no-store",
-      });
-      // 204/404: il volo su quella data non esiste per loro. Non è un errore.
-      if (risposta.status === 204 || risposta.status === 404) return null;
-      if (!risposta.ok) {
-        console.warn(`[aerodatabox] risposta ${risposta.status} per ${voloIata} ${dataLocale}`);
-        return null;
-      }
-      corpo = (await risposta.json()) as VoloAdb[];
+      corpo = (await esito.risposta.json()) as VoloAdb[];
     } catch (e) {
-      // Rete giù o timeout: nessuna eccezione verso l'alto, diventerà "incerto".
-      console.warn(`[aerodatabox] chiamata fallita per ${voloIata} ${dataLocale}:`, e);
+      console.warn(`[aerodatabox] risposta illeggibile per ${voloIata} ${dataLocale}:`, e);
       return null;
     }
     if (!Array.isArray(corpo) || corpo.length === 0) return null;
