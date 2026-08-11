@@ -65,6 +65,43 @@ export async function tin(testo: string): Promise<boolean> {
   }
 }
 
+/**
+ * «Qual è il mio chat id?» — la domanda che blocca tutti.
+ *
+ * Il gettone del bot e il chat id si somigliano (sono due numeri lunghi)
+ * ma sono due cose diverse: il primo dice QUALE bot, il secondo dice A
+ * CHI scrivere. Per sapere il secondo bisogna che una persona scriva al
+ * bot almeno una volta, e poi leggere quel messaggio.
+ *
+ * Questa funzione fa il secondo passo al posto suo: la chiama la pagina
+ * delle impostazioni quando il gettone c'è ma il chat id manca, e mostra
+ * il numero da copiare.
+ *
+ * ⚠️ NON lo usiamo per mandare i messaggi. Il chat id resta una
+ * variabile scritta a mano, perché il nome di un bot lo può trovare
+ * chiunque: se scegliessimo da soli "il primo che ha scritto", basterebbe
+ * che un estraneo scrivesse per primo per farsi mandare gli incassi.
+ */
+export async function chatIdDaScoprire(): Promise<{ id: number; nome: string } | null> {
+  const gettone = process.env.TELEGRAM_BOT_TOKEN;
+  if (!gettone) return null;
+  try {
+    const r = await fetch(`${API}/bot${gettone}/getUpdates`, {
+      signal: AbortSignal.timeout(6_000),
+      cache: "no-store",
+    });
+    if (!r.ok) return null;
+    const d = (await r.json()) as {
+      ok?: boolean;
+      result?: Array<{ message?: { chat?: { id?: number; first_name?: string } } }>;
+    };
+    const chat = d.result?.find((u) => u.message?.chat?.id)?.message?.chat;
+    return chat?.id ? { id: chat.id, nome: chat.first_name ?? "" } : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Il TIN dei soldi: è l'unico che vale la pena sentire mentre si dorme. */
 export async function tinIncasso(cosa: string, euro: number, dettaglio?: string): Promise<void> {
   await tin(

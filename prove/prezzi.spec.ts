@@ -40,27 +40,42 @@ test.describe("I due listini", () => {
   });
 });
 
-test.describe("La variante segue la persona", () => {
-  test("il sito assegna un prezzo alla prima visita e non lo cambia piu'", async ({ page }) => {
+/**
+ * ⚠️ IL TEST È SPENTO DALL'11/08 (`TEST_DUE_PREZZI = false`), e queste
+ * prove descrivono lo stato di adesso, non quello di prima.
+ *
+ * Il motivo dello spegnimento è la velocità: per scegliere fra i due
+ * prezzi bisogna leggere un cookie, e una pagina che legge un cookie va
+ * ricostruita a ogni visita invece di essere consegnata già pronta. La
+ * landing è la pagina che vede più gente, quindi quel costo lo paga
+ * ognuno che arriva. In cambio oggi non si misurava niente: senza
+ * venditore non c'è una vendita da contare.
+ *
+ * Il giorno che si riaccende, queste due prove vanno riscritte al
+ * contrario. È voluto che si accorgano del cambio.
+ */
+test.describe("Col test spento c'è un prezzo solo", () => {
+  test("nessuno riceve più la moneta: il cookie del prezzo non si scrive", async ({ page }) => {
     await page.goto("/");
     const cookie = (await page.context().cookies()).find((c) => c.name === COOKIE_PREZZO);
-    expect(cookie, "il proxy deve assegnare la variante alla prima visita").toBeTruthy();
-    const primo = cookie!.value;
-    expect(["a", "b"]).toContain(primo);
-
-    // seconda visita: stessa persona, stesso prezzo
-    await page.goto("/#prezzi");
-    const dopo = (await page.context().cookies()).find((c) => c.name === COOKIE_PREZZO);
-    expect(dopo?.value).toBe(primo);
+    expect(
+      cookie,
+      "col test spento il proxy non deve assegnare nessuna variante",
+    ).toBeFalsy();
   });
 
-  test("il prezzo mostrato nei piani e' quello della variante assegnata", async ({ page }) => {
+  test("un cookie vecchio NON cambia il prezzo che si legge", async ({ page }) => {
+    /* ⚠️ Questa è la crepa trovata spegnendo il test, ed è sui soldi: il
+       cookie della variante dura SEI MESI. Chi l'aveva preso da acceso
+       avrebbe letto 14,90 sulla landing e trovato 24,90 alla cassa. Un
+       prezzo che cambia fra il bottone e il pagamento è il motivo per cui
+       uno chiude la pagina. */
     await page.context().addCookies([
       { name: COOKIE_PREZZO, value: "b", url: "http://localhost:3100" },
     ]);
     await page.goto("/#prezzi");
     const sezione = page.locator("#prezzi");
-    await expect(sezione).toContainText("24,90€");
-    await expect(sezione).toContainText("39,90€");
+    await expect(sezione).toContainText("14,90€");
+    await expect(sezione).not.toContainText("39,90€");
   });
 });

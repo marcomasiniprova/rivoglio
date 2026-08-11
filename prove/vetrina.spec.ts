@@ -32,14 +32,30 @@ test.describe("Vetrina", () => {
   test("l'immagine social esiste ed è un png della misura giusta", async ({ request }) => {
     /* L'immagine si DISEGNA a ogni richiesta (font, logo, testo), e in
        sviluppo la prima volta ci mette qualche secondo. Con la suite
-       intera che gira in parallelo capitava un "socket hang up": non era
-       l'immagine a essere rotta, era il server locale sotto carico. Una
-       prova che fallisce a caso è peggio di una prova che non c'è, quindi
-       si riprova due volte prima di dire che è rotta. */
-    let r = await request.get("/opengraph-image", { timeout: 30_000 });
-    for (let giro = 0; giro < 2 && r.status() !== 200; giro++) {
-      r = await request.get("/opengraph-image", { timeout: 30_000 });
+       intera che gira in parallelo capita un "socket hang up": non è
+       l'immagine a essere rotta, è il server locale sotto carico.
+       ⚠️ E il "socket hang up" LANCIA, non torna uno stato: la riprova
+       scritta prima guardava `r.status()`, quindi non partiva mai e la
+       prova falliva al primo colpo lo stesso (visto l'11/08, due rosse
+       nella suite piena). Qui si riprova anche su eccezione, con una
+       pausa in mezzo per dare tempo al server di respirare. */
+    const chiedi = async () => {
+      try {
+        const r = await request.get("/opengraph-image", { timeout: 30_000 });
+        return { r, guasto: null as unknown };
+      } catch (e) {
+        return { r: null, guasto: e };
+      }
+    };
+
+    let esito = await chiedi();
+    for (let giro = 0; giro < 2 && esito.r?.status() !== 200; giro++) {
+      await new Promise((ok) => setTimeout(ok, 1_500));
+      esito = await chiedi();
     }
+
+    const r = esito.r;
+    if (!r) throw new Error(`il server non ha mai risposto: ${String(esito.guasto)}`);
     expect(r.status()).toBe(200);
     expect(r.headers()["content-type"]).toContain("image/png");
     // 1200x630 non pesa mai pochi byte: se pesa poco, è un'immagine vuota

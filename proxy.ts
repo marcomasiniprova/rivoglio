@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { CHIAVE_PUBBLICA, SUPABASE_CONFIGURATO, URL_SUPABASE } from "@/lib/supabase/chiavi";
-import { COOKIE_PREZZO, tiraLaMoneta, varianteValida } from "@/lib/prezzi";
+import { COOKIE_PREZZO, TEST_DUE_PREZZI, tiraLaMoneta, varianteValida } from "@/lib/prezzi";
 
 /** Pagine che esistono solo per chi è collegato. La web app (/app) NON
  * è più qui: dall'8/08 il check è aperto a tutti (decisione di Valerio),
@@ -30,9 +30,10 @@ export async function proxy(request: NextRequest) {
      ATTENZIONE all'ordine: il cookie NON si può scrivere qui, perché il
      client Supabase più sotto rifà la risposta da capo e se lo mangerebbe.
      Si decide adesso e si scrive su OGNI risposta che esce (conPrezzo). */
-  const prezzoDaScrivere = varianteValida(request.cookies.get(COOKIE_PREZZO)?.value)
-    ? null
-    : tiraLaMoneta();
+  const prezzoDaScrivere =
+    !TEST_DUE_PREZZI || varianteValida(request.cookies.get(COOKIE_PREZZO)?.value)
+      ? null
+      : tiraLaMoneta();
 
   const conPrezzo = (res: NextResponse) => {
     if (prezzoDaScrivere) {

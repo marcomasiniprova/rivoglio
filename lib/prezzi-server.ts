@@ -1,5 +1,13 @@
 import { cookies } from "next/headers";
-import { COOKIE_PREZZO, LISTINI, LISTINO_BASE, varianteValida, type Listino, type Variante } from "./prezzi";
+import {
+  COOKIE_PREZZO,
+  LISTINI,
+  LISTINO_BASE,
+  TEST_DUE_PREZZI,
+  varianteValida,
+  type Listino,
+  type Variante,
+} from "./prezzi";
 
 /**
  * Il listino che questa persona sta vedendo, letto dal cookie che il proxy
@@ -13,6 +21,11 @@ import { COOKIE_PREZZO, LISTINI, LISTINO_BASE, varianteValida, type Listino, typ
  * meglio un prezzo vecchio che una pagina rotta.
  */
 export async function listinoCorrente(): Promise<{ variante: Variante; listino: Listino }> {
+  /* ⚠️ QUESTA RIGA È QUELLA CHE RENDE LA LANDING VELOCE. Col test spento
+     si esce PRIMA di toccare i cookie: una pagina che legge un cookie
+     Next la deve ricostruire a ogni visita, mentre una che non lo fa la
+     consegna già pronta la rete di distribuzione. */
+  if (!TEST_DUE_PREZZI) return { variante: "a", listino: LISTINO_BASE };
   try {
     const c = await cookies();
     const variante = varianteValida(c.get(COOKIE_PREZZO)?.value);

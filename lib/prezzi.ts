@@ -22,6 +22,23 @@
  * (nessun errore: si degrada al prezzo di sempre).
  */
 
+/**
+ * ⚠️ IL TEST È SPENTO (scelta di Valerio, 11/08), e il motivo è la
+ * velocità della landing.
+ *
+ * Per sapere quale dei due prezzi mostrare bisogna leggere un cookie, e
+ * una pagina che legge un cookie **va ricostruita a ogni visita**: non
+ * può essere consegnata già pronta dalla rete di distribuzione. La
+ * landing è la pagina che vede più gente, quindi quel costo lo paga
+ * ognuno che arriva.
+ *
+ * E in cambio oggi non si misura niente: senza un venditore il test non
+ * ha mai prodotto una vendita, quindi non c'è nessun risultato da
+ * perdere. Il giorno che l'incasso esiste si rimette `true` e riparte
+ * tutto: il meccanismo resta scritto, non è stato buttato.
+ */
+export const TEST_DUE_PREZZI = false;
+
 export type Variante = "a" | "b";
 
 /** Il cookie che tiene la persona sullo stesso prezzo, sempre. */

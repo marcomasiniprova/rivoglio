@@ -111,12 +111,11 @@ social rifatta (era rimasta al prodotto viaggi).
     il cruscotto mostrerebbe più muri che analisi, cioè un imbuto che si
     allarga scendendo: un numero impossibile fa dubitare di tutti gli
     altri.
-  - **`NETLIFY.md`: le variabili una per una, col valore che ci va
-    dentro** (richiesta di Valerio: «mi dici ognuna il valore che deve
-    contenere?»). Divise per cosa succede se mancano: le 10 senza cui il
-    sito è monco, i 5 interruttori, la cassa di prova, le 2 di Telegram,
-    le 5 di Polar, e **le 2 che si possono togliere** (AviationStack, che
-    per noi è morto dall'8/08, ed EXA, resto del prodotto viaggi).
+  - **Le variabili di Netlify spiegate stanno in `/admin/impostazioni`**,
+    non in un file. ⚠️ Ne avevo scritto uno (`NETLIFY.md`) e Valerio l'ha
+    fatto cancellare con una regola che vale da qui in avanti: **«non lo
+    leggerò mai, dammi il sunto in chat, sempre»**. Le spiegazioni per lui
+    vanno in chat o dentro il sito, non in un documento nel repository.
   - 🔴 **E IL CRUSCOTTO NASCEVA APERTO A TUTTI I CLIENTI.** Trovato
     guardandolo, non da una prova. `proxy.ts` chiude `/admin` a chi non è
     collegato, ma **collegato lo è anche un cliente che ha comprato una
@@ -138,6 +137,22 @@ social rifatta (era rimasta al prodotto viaggi).
     accorciarsi è l'azione e non il nome, perché su una rivista la
     testata è l'identità. Adesso a 390 ci sono 77 punti di aria, a 320
     ne restano 145 col solo segno.
+  - **LA LANDING È DIVENTATA STATICA** (scelta di Valerio col popup, sul
+    conto della velocità). Nella tabella delle rotte è passata da **`ƒ`**
+    (ricostruita a ogni visita) a **`○`** (già pronta, la consegna la rete
+    di distribuzione). Il motivo per cui prima non poteva esserlo era uno
+    solo: doveva leggere il cookie del test dei due prezzi, e **una pagina
+    che legge un cookie Next non la può servire già fatta**.
+    ⚠️ Il test **non è stato buttato**: `TEST_DUE_PREZZI` in
+    `lib/prezzi.ts` è un interruttore, si rimette `true` il giorno che c'è
+    un venditore e riparte tutto. Oggi non misurava niente, perché senza
+    incasso non c'è una vendita da contare.
+  - 🔴 **E SPEGNENDOLO SI APRIVA UNA CREPA SUI SOLDI.** Il cookie della
+    variante dura **sei mesi**: chi l'aveva preso oggi avrebbe letto
+    14,90 sulla landing e si sarebbe trovato **24,90 alla cassa**. Un
+    prezzo che cambia fra il bottone e il pagamento è il motivo per cui
+    uno chiude la pagina. Col test spento il cookie adesso si ignora in
+    tutti e tre i punti che lo leggevano.
   - Prove: **8 nuove** su `prove/registro.spec.ts`, e sono tutte
     promesse: la provenienza si riduce al dominio, il paese non si deduce
     mai da un indirizzo IP, nel registro non entra nessun campo che
@@ -146,6 +161,13 @@ social rifatta (era rimasta al prodotto viaggi).
     ⚠️ Una di queste prove ha bocciato il codice giusto mentre la
     scrivevo: cercava la parola «ip» dentro il codice, e «ip» sta dentro
     «tipo». Adesso cerca parole intere.
+  - **E LA RIPROVA DELL'IMMAGINE SOCIAL NON HA MAI RIPROVATO.** Era stata
+    scritta il 10/08 per una prova che falliva a caso, e guardava lo
+    stato della risposta; ma il guasto vero («socket hang up») **lancia**
+    invece di tornare uno stato, quindi il ciclo non partiva e la prova
+    falliva al primo colpo lo stesso. Adesso riprova anche sull'eccezione,
+    con una pausa in mezzo. È il genere di errore che si scopre solo
+    quando la prova fallisce davvero.
 - **GIRO #55 (11/08): LE TRE EMAIL PARTITE, LA CASSA CHE SI VEDE, E IL
   BLOG DA CUI SI ESCE.**
   - ✅ **TRE EMAIL AI VENDITORI SPEDITE DAVVERO** dall'account di Valerio
@@ -1649,20 +1671,17 @@ social rifatta (era rimasta al prodotto viaggi).
   (Android Studio + emulatore, oppure `expo start --web` in 2 minuti).
 
 ## Serve Valerio (in ordine)
-0-prima. **TRE MINUTI SU TELEGRAM, e il telefono comincia a squillare
-   sui soldi.** Il cruscotto (`/admin/cruscotto`) funziona già senza
-   fare niente; le notifiche no, perché servono due variabili.
-   1. Su Telegram scrivi a **@BotFather**, mandi `/newbot`, scegli un
-      nome. Lui ti risponde con un gettone lungo tipo
-      `1234567890:AAF...`: quello è `TELEGRAM_BOT_TOKEN`.
-   2. Scrivi a **@userinfobot**: ti risponde col tuo numero (`Id`).
-      Quello è `TELEGRAM_ADMIN_CHAT`.
-   3. **Manda un messaggio qualsiasi al bot che hai appena creato.**
-      Senza, Telegram non gli permette di scriverti per primo.
-   4. Le due variabili su Netlify, poi *Trigger deploy*.
-   Per provare che funziona: apri il muro, premi "Sblocca l'analisi",
-   paga alla cassa di prova. Deve arrivarti un messaggio marcato
-   🧪 *Cassa di prova*. Tutti i valori sono in `NETLIFY.md`.
+0-prima. **TELEGRAM: MANCANO DUE RIGHE SU NETLIFY, e basta.** Il bot è
+   **@Rivolio_AI_bot**, il canale è già stato provato l'11/08 mandando un
+   messaggio vero al telefono di Valerio: è arrivato. Restano da
+   incollare su Netlify (poi *Trigger deploy*):
+   `TELEGRAM_BOT_TOKEN` e `TELEGRAM_ADMIN_CHAT` (il chat id è 8534801784).
+   ⚠️ I valori stanno in `.env.development.local`, che NON è tracciato:
+   in un file del repository non ci vanno mai.
+   ⚠️ Il numero che Valerio ha passato per primo era il **gettone del
+   bot**, non il chat id: si somigliano e si scambiano facilissimamente.
+   Per questo `/admin/impostazioni` adesso il chat id lo trova da solo e
+   lo mostra da copiare, invece di far cercare @userinfobot.
 0-bis-sicurezza. **UNA SPUNTA SU SUPABASE, dieci secondi.** Il controllo
    di sicurezza del database (fatto l'11/08) segnala una cosa vera:
    **le password compromesse non vengono bloccate**. Supabase sa
@@ -1766,6 +1785,16 @@ social rifatta (era rimasta al prodotto viaggi).
    Gemini e UNSPLASH_ACCESS_KEY quando l'approvazione arriva.
 
 ## Da non rifare
+- 🔴 **MAI lanciare `npm run build` mentre gira `npm run dev`.** Scrivono
+  nella stessa cartella `.next`, e il server di sviluppo si ritrova a
+  leggere pezzi della build: l'errore che ne esce non somiglia per niente
+  alla causa. L'11/08 l'immagine social ha cominciato a rispondere 500
+  con *"Input buffer contains unsupported image format"*, e sembrava un
+  PNG rotto: il file era intatto, era il logo impacchettato che il server
+  risolveva su un artefatto della build. Si chiude il dev, si cancella
+  `.next`, si riparte: torna 200 al primo colpo.
+  ⚠️ Va sospettato ogni volta che un errore compare **dopo** un build
+  fatto a metà sessione e non c'entra niente col codice toccato.
 - **Nella sandbox il watcher di Metro NON vede gli edit**: dopo una
   modifica al codice mobile il dev server Expo va riavviato con
   `--clear`, o l'anteprima continua a servire il codice VECCHIO (pagato

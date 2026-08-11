@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { soloAdmin } from "@/lib/admin/guardia";
+import { chatIdDaScoprire } from "@/lib/eventi/telegram";
 
 /**
  * LE IMPOSTAZIONI, SPIEGATE DA SOLE (richiesta di Valerio, 11/08).
@@ -114,6 +115,23 @@ function stato(): Voce[] {
       ceSta: c(process.env.CASSA_PROVA_SEGRETO),
     },
     {
+      nome: "TELEGRAM_BOT_TOKEN",
+      serve:
+        "Il gettone del bot che ti manda le notifiche (te lo dà @BotFather). Identifica il BOT, non te.",
+      seManca:
+        "Niente TIN sul telefono: né i soldi, né i guasti, né il riepilogo della sera. Il cruscotto su /admin/cruscotto funziona lo stesso.",
+      peso: "facoltativa",
+      ceSta: c(process.env.TELEGRAM_BOT_TOKEN),
+    },
+    {
+      nome: "TELEGRAM_ADMIN_CHAT",
+      serve:
+        "Il numero che identifica TE, cioè a chi scrivere. È diverso dal gettone: se il gettone c'è e questo manca, qui sopra compare il riquadro che te lo trova.",
+      seManca: "Come sopra: nessuna notifica parte.",
+      peso: "facoltativa",
+      ceSta: c(process.env.TELEGRAM_ADMIN_CHAT),
+    },
+    {
       nome: "MOTORE_SEGRETO",
       serve: "Chiude i lavori notturni (avvisi push, scioperi) a chi non è Netlify.",
       seManca: "In produzione quelle rotte non si aprono: i lavori notturni non partono.",
@@ -151,6 +169,11 @@ export default async function PaginaImpostazioni() {
      account. Vedi lib/admin/guardia.ts. */
   await soloAdmin();
   const voci = stato();
+  /* Il riquadro del chat id si mostra solo quando serve: gettone messo,
+     destinatario ancora no. */
+  const telegram = process.env.TELEGRAM_BOT_TOKEN
+    ? { chat: process.env.TELEGRAM_ADMIN_CHAT ? null : await chatIdDaScoprire() }
+    : null;
   const mancanti = voci.filter((v) => !v.ceSta && v.peso !== "facoltativa");
 
   return (
@@ -191,6 +214,36 @@ export default async function PaginaImpostazioni() {
           </ul>
         )}
       </div>
+
+      {/* ⚠️ IL PEZZO CHE BLOCCA TUTTI: il gettone del bot e il chat id si
+          somigliano, e chi li vede per la prima volta passa il primo
+          credendo di passare il secondo (successo l'11/08). Qui il numero
+          si scopre da soli: si scrive al bot e si ricarica la pagina. */}
+      {telegram && (
+        <div className="mt-6 rounded-2xl border border-bordo bg-white p-5">
+          <p className="font-display text-[1.15rem] tracking-[-0.02em]">
+            {telegram.chat ? "Il tuo chat id è questo" : "Manca il tuo chat id"}
+          </p>
+          {telegram.chat ? (
+            <>
+              <p className="mt-2 text-[14px] leading-relaxed text-fumo">
+                Copialo su Netlify in <code className="text-inchiostro">TELEGRAM_ADMIN_CHAT</code>,
+                poi <em>Trigger deploy</em>. È il numero di{" "}
+                {telegram.chat.nome || "chi ha scritto al bot"}.
+              </p>
+              <p className="mt-3 font-mono text-[1.5rem] font-medium text-verde">
+                {telegram.chat.id}
+              </p>
+            </>
+          ) : (
+            <p className="mt-2 text-[14px] leading-relaxed text-fumo">
+              Il gettone del bot c&apos;è, ma Telegram non sa ancora a chi scrivere. Apri
+              Telegram, manda una parola qualsiasi al bot, e <strong>ricarica questa
+              pagina</strong>: il numero comparirà qui, da copiare.
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="mt-8 space-y-3">
         {voci.map((v) => (

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { linkCheckout } from "@/lib/polar";
-import { COOKIE_PREZZO, varianteValida } from "@/lib/prezzi";
+import { COOKIE_PREZZO, TEST_DUE_PREZZI, varianteValida } from "@/lib/prezzi";
 import { traccia } from "@/lib/eventi/registra";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 
@@ -76,9 +76,14 @@ export async function GET(req: NextRequest) {
 
     /* Il prezzo che questa persona ha visto da quando è arrivata: il
        cookie lo scrive il proxy alla prima visita. Se manca (o è sporco)
-       si serve il listino di sempre. */
+       si serve il listino di sempre.
+       ⚠️ COL TEST SPENTO IL COOKIE SI IGNORA, e non è pignoleria: quel
+       cookie dura sei mesi, quindi chi l'ha preso quando il test era
+       acceso leggerebbe 14,90 sulla landing e si troverebbe 24,90 alla
+       cassa. Un prezzo che cambia fra il bottone e il pagamento non è un
+       dettaglio: è il motivo per cui uno chiude la pagina. */
     const variante =
-      varianteValida(req.cookies.get(COOKIE_PREZZO)?.value) ?? "a";
+      (TEST_DUE_PREZZI ? varianteValida(req.cookies.get(COOKIE_PREZZO)?.value) : null) ?? "a";
     const link = linkCheckout(tipo, verifica.id, verifica.email, variante);
     if (!link) return paginaRisultato("non-attivo");
 
