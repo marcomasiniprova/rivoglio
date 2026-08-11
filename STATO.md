@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-10 (giro #51: TUTTE E 34 LE SCHERMATE SULLA
+**Aggiornato:** 2026-08-11 (giro #52: IL CHECK SI PAGA, deciso da
+Valerio: 1,99 di lancio col totale che resta 14,90, tutto spento dietro
+un interruttore · lo scroll pesante · giro #51: TUTTE E 34 LE SCHERMATE SULLA
 LAVAGNA col 404 chiuso alla radice, l'autopilot che ha girato per la
 prima volta (+2.943 scali) e la rifinitura in tre pezzi · giro #50: LA LAVAGNA DELL'APP, tutte le
 schermate su un tavolo che si trascina, più la pratica messa al riparo
@@ -54,6 +56,56 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #52 (11/08): IL CHECK SI PAGA (deciso da Valerio), LO SCROLL
+  PESANTE, E LA REGOLA DELLE 4 DOMANDE BLINDATA.**
+  - **LA DECISIONE: il check non resta gratuito.** Cancello
+    all'ingresso, **1,99** di lancio, **e il totale del percorso resta
+    14,90** perché i 1,99 si scalano dalla pratica. Non è un rincaro
+    travestito: è un anticipo. Il conto che ha portato alla decisione,
+    coi tre rischi dichiarati prima di partire, sta in `PAGAMENTI.md`.
+  - ⚠️ **NASCE SPENTO.** Senza `CHECK_PREZZO_ATTIVO=1` su Netlify non
+    cambia niente per nessuno: il venditore che incassa non c'è ancora
+    (Polar ha detto no) e un muro davanti a una cassa chiusa è solo una
+    porta sbarrata.
+  - 🔴 **IL COSTO DEL CHECK GRATIS ERA MOLTO MINORE DI QUANTO SEMBRAVA.**
+    AeroDataBox non si paga a chiamata: è un abbonamento (5,35-160
+    dollari al mese), e la cache fa sì che un volo con 180 passeggeri
+    costi UNA chiamata. Anche 10.000 check stanno nel piano più caro:
+    **circa 145 euro al mese, 1,4 centesimi a check.**
+  - **Com'è fatto:** `lib/check/ingresso.ts` (prezzi, posti di lancio,
+    interruttore), `lib/check/pass.ts` (la ricevuta firmata nel cookie:
+    niente account, niente password), il cancello dentro
+    `/api/verifica` **sul server**, `components/rivolio/MuroCheck.tsx`
+    (la schermata) e `lib/check/conteggio.ts` (quanti check si fanno e
+    quanti si pagano).
+  - **Il muro mostra per primo QUANTO VALE il volo**, non il prezzo:
+    1,99 accanto a 600 è un confronto che si fa in un secondo, 1,99 da
+    solo è solo un costo. E i 600 sono la fascia dell'art. 7, non un
+    numero da pubblicità.
+  - **Un verdetto incerto NON consuma il credito.** Chi paga per sapere
+    e si sente rispondere "non lo so" non ha comprato una risposta.
+  - **Il prezzo che sale è un impegno, non un finto sconto**: si scrive
+    "1,99 adesso, poi 4,99" perché la direttiva Omnibus vieta di barrare
+    un prezzo mai praticato. Quando i 500 posti finiscono, si alza sul
+    serio. E i posti rimasti si mostrano **solo se sono contati**.
+  - 🔴 **PRIMA DI ACCENDERE VANNO RISCRITTI I TESTI**: la landing dice
+    "il check è gratis, sempre" in una dozzina di punti. Una prova lega
+    le due cose: se l'interruttore è acceso e il sito promette ancora
+    gratis, **la suite si ferma**.
+  - **LO SCROLL PESANTE su sito e web app.** La rotellina non muove la
+    pagina: alimenta un obiettivo raggiunto con inerzia. Misurato su 900
+    punti: primo pixel a 120 ms, metà strada a 338, il 95% a 1,06
+    secondi, ferma a 1,44. Restano nativi il dito, le aree che scorrono
+    da sé, la tastiera, le ancore, lo zoom con Ctrl e tutto per chi ha
+    chiesto meno animazioni. Entrate in dissolvenza a 22 punti in 0,6s,
+    un figlio ogni 60 millesimi.
+  - **La regola delle 4 domande riscritta in CLAUDE.md**: vale SEMPRE,
+    anche dopo "vai", "procedi", "lock in", "fai tutto".
+  - ⚠️ **Il sito dichiarava a Google il nome vecchio**: `NEXT_PUBLIC_SITO`
+    valeva ancora rivoglio.netlify.app. **Valerio l'ha cambiata l'11/08.**
+    Nell'app l'indirizzo di riserva è stato corretto nel codice.
+  - Prove: **890 verdi**, le stesse 2 rosse dell'Osservatorio in sandbox
+    e le 4 saltate della sveglia del 2027.
 - **GIRO #51 (10/08): TUTTE E 34 LE SCHERMATE SULLA LAVAGNA, il 404
   chiuso, e il giro di rifinitura in tre pezzi.**
   - 🔴 **I RIQUADRI ERANO TUTTI NERI CON 404**, e il motivo stava alla

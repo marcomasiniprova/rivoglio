@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
 import { COPY } from "@/lib/copy";
+import MuroCheck, { type DatiMuro } from "@/components/rivolio/MuroCheck";
 
 /**
  * LA SCHEDA DEL CHECK: lo standard, identico ovunque.
@@ -202,6 +203,10 @@ export default function SchedaCheck() {
   const [fase, setFase] = useState<Fase>("campo");
   const [passo, setPasso] = useState(0);
   const [errore, setErrore] = useState<string | null>(null);
+  /* Il muro del check a pagamento: acceso dal 402 del server, mai da qui.
+     Se un giorno il muro dipendesse da una decisione presa nel browser,
+     lo scavalcherebbe chiunque apra gli strumenti per sviluppatori. */
+  const [muro, setMuro] = useState<DatiMuro | null>(null);
   const [avviso, setAvviso] = useState<{ testo: string; demo: boolean } | null>(null);
   const inCorso = useRef(false);
 
@@ -275,6 +280,21 @@ export default function SchedaCheck() {
           previsto: oraDa(dati.dato.previsto),
           effettivo: oraDa(dati.dato.effettivo),
         });
+      }
+
+      /* IL MURO. Il server risponde 402 quando l'analisi si sblocca
+         pagando: non è un errore da riga rossa, è una schermata. */
+      if (r.status === 402 && dati?.serveIlPass) {
+        setFase("campo");
+        setMuro(dati.muro as DatiMuro);
+        /* Il muro va portato sotto la barra in alto: se compare mentre
+           la pagina è a metà, la cifra grossa resta coperta e la prima
+           cosa che si legge è il prezzo invece del valore. */
+        requestAnimationFrame(() => {
+          document.getElementById("controllo")?.scrollIntoView({ block: "start" });
+        });
+        inCorso.current = false;
+        return;
       }
 
       if (!r.ok || !dati?.ok) {
@@ -407,6 +427,20 @@ export default function SchedaCheck() {
       className="h-14 w-full min-w-0 cursor-pointer rounded-bottone border border-bordo bg-white px-4 text-[16px] text-inchiostro outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/12"
     />
   );
+
+  /* ────────────────────────────── il muro ──────────────────────────── */
+  if (muro) {
+    return (
+      <MuroCheck
+        dati={muro}
+        onPaga={() => {
+          /* La cassa non c'è ancora: quando ci sarà, di qui si va al
+             venditore e si torna con la ricevuta nel cookie. */
+          router.push("/#prezzi");
+        }}
+      />
+    );
+  }
 
   /* ───────────────────────────── il teatro ─────────────────────────── */
   if (fase === "teatro") {

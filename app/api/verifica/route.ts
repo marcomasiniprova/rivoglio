@@ -3,7 +3,13 @@ import { scadenzaStimata } from "@/lib/regole/eu261";
 import { verificaVolo } from "@/lib/voli/verifica";
 import { inItaliano } from "@/lib/voli/aeroporti";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
-import { CHECK_A_PAGAMENTO, CORTESIA_SU_INCERTO } from "@/lib/check/ingresso";
+import {
+  CHECK_A_PAGAMENTO,
+  CORTESIA_SU_INCERTO,
+  postiRimasti,
+  prezzoCheck,
+} from "@/lib/check/ingresso";
+import { conteggioCheck } from "@/lib/check/conteggio";
 import { COOKIE_PASS, consumaPass, leggiPass } from "@/lib/check/pass";
 
 /**
@@ -58,11 +64,22 @@ export async function POST(req: Request) {
      noi. */
   const pass = CHECK_A_PAGAMENTO ? leggiPass(cookieDi(req, COOKIE_PASS)) : null;
   if (CHECK_A_PAGAMENTO && !pass) {
+    /* Il prezzo e i posti rimasti li calcola il SERVER: sono un dato,
+       non una decisione del browser. E i posti si scrivono solo se sono
+       stati contati davvero (vedi postiRimasti). */
+    const { pagati } = await conteggioCheck();
+    const prezzo = prezzoCheck(pagati);
     return NextResponse.json(
       {
         ok: false,
         serveIlPass: true,
         errore: "L'analisi di questo volo si sblocca con un pagamento.",
+        muro: {
+          prezzoTesto: prezzo.prezzoTesto,
+          prezzoPienoTesto: prezzo.prezzoPienoTesto,
+          inLancio: prezzo.inLancio,
+          postiRimasti: postiRimasti(pagati),
+        },
       },
       { status: 402, headers: CORS },
     );

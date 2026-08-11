@@ -11,6 +11,7 @@ import {
 } from "../lib/check/ingresso";
 import { consumaPass, creaPass, leggiPass } from "../lib/check/pass";
 import { LISTINI } from "../lib/prezzi";
+import { COPY } from "../lib/copy";
 
 /**
  * IL CHECK A PAGAMENTO (decisione di Valerio, 11/08).
@@ -122,5 +123,34 @@ test.describe("Un incerto non si fa pagare", () => {
        strada più breve per una contestazione sulla carta, ed è il motivo
        per cui un venditore guarda storto questo genere di prodotto. */
     expect(CORTESIA_SU_INCERTO).toBe(true);
+  });
+});
+
+/* ── IL SITO NON PUÒ PROMETTERE GRATIS QUELLO CHE FA PAGARE ───────────
+   Il muro nasce spento, e questa prova esiste perché il giorno che si
+   accende non si accenda anche una bugia: la landing oggi dice "il
+   check è gratis, sempre" in più punti, ed è vero SOLO finché
+   CHECK_PREZZO_ATTIVO non vale "1". Se qualcuno accende l'interruttore
+   senza riscrivere quei testi, la suite si ferma qui. */
+test.describe("Se il check si paga, il sito non dice gratis", () => {
+  test("i testi e l'interruttore non si contraddicono", () => {
+    const testi = JSON.stringify(COPY).toLowerCase();
+    /* Si cerca la PAROLA, non una frase precisa: le promesse di
+       gratuità sono sparse in una dozzina di forme diverse ("controlla
+       gratis", "il check è gratis, sempre", "0€", "sempre gratis") e
+       inseguirle una per una vuol dire dimenticarne una. */
+    const prometteGratis = /gratis|gratuit/.test(testi);
+
+    if (CHECK_A_PAGAMENTO) {
+      expect(
+        prometteGratis,
+        "il check è a pagamento ma il sito lo promette ancora gratuito",
+      ).toBe(false);
+    } else {
+      /* Da spento la promessa deve esserci: è il gancio che porta la
+         gente dentro, e toglierlo "in anticipo" sarebbe perdere traffico
+         per una cassa che non è ancora aperta. */
+      expect(prometteGratis).toBe(true);
+    }
   });
 });
