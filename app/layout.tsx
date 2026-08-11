@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Instrument_Serif, Poppins } from "next/font/google";
 import AntiCopia from "@/components/AntiCopia";
+import ScrollPesante from "@/components/ScrollPesante";
 import "./globals.css";
 
 // Geist per i titoli, Poppins per il testo.
@@ -100,6 +101,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         <AntiCopia />
+        <ScrollPesante />
         {children}
       </body>
     </html>

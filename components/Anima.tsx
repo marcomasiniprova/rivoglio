@@ -20,9 +20,17 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
  */
 const CURVA = [0.16, 1, 0.3, 1] as const;
 
+/* I valori (scelta di Valerio, 11/08: "sobrie e a cascata"). 22 punti di
+   salita in 0,6 secondi, e dentro una lista un figlio ogni 60
+   millesimi: si nota che è curato, non si nota il trucco. Più in alto e
+   più lento diventa "da agenzia" e stanca alla ventesima sezione. */
+const SALITA = 22;
+const DURATA = 0.6;
+export const PASSO_LISTA = 0.06;
+
 export const salita: Variants = {
-  fermo: { opacity: 0, y: 26 },
-  vivo: { opacity: 1, y: 0, transition: { duration: 0.7, ease: CURVA } },
+  fermo: { opacity: 0, y: SALITA },
+  vivo: { opacity: 1, y: 0, transition: { duration: DURATA, ease: CURVA } },
 };
 
 /** Un blocco che sale entrando in vista. */
@@ -38,10 +46,10 @@ export function Anima({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 26 }}
+      initial={{ opacity: 0, y: SALITA }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.7, ease: CURVA, delay: ritardo }}
+      transition={{ duration: DURATA, ease: CURVA, delay: ritardo }}
     >
       {children}
     </motion.div>
@@ -52,7 +60,7 @@ export function Anima({
 export function AnimaLista({
   children,
   className,
-  passo = 0.09,
+  passo = PASSO_LISTA,
 }: {
   children: ReactNode;
   className?: string;

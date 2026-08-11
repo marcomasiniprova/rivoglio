@@ -15,12 +15,20 @@ Mappa: `PIANO.md`. Arretrati: `ARRETRATI.md`. Cosa costruiamo: `SPEC.md`.
 Scelte chiuse: `DECISIONI.md`. Marchio: `BRAND.md`. Social: `CONTENUTI.md`.
 
 ## Come devi lavorare — questa parte è la più importante
-- **A OGNI prompt di Valerio: 4 domande col popup** (regola sua, 8/08,
-  "ogni mio prompt"). Prima di costruire, AskUserQuestion con 4 domande
-  sulle decisioni VERE di quel giro: opzioni concrete, la consigliata
-  marcata, mai domande di riempimento. Se il giro ha meno di 4 decisioni
-  vere, le restanti si usano per scelte di prodotto che prima o poi
-  andranno prese comunque.
+- **A OGNI prompt di Valerio: 4 domande col popup. SEMPRE. Senza
+  eccezioni.** (regola sua, 8/08, ribadita l'11/08: "sempre sempre
+  sempre"). Vale anche quando scrive "vai", "procedi", "lock in",
+  "fai tutto": quelle parole dicono di non fermarsi DOPO, non di saltare
+  le domande PRIMA. Vale anche quando la risposta sembra ovvia, anche a
+  metà di un lavoro lungo, anche se il popup precedente è di due minuti
+  fa.
+  Come si fanno: AskUserQuestion **prima di costruire**, 4 domande sulle
+  decisioni VERE di quel giro, opzioni concrete, la consigliata marcata
+  "(consigliato)" e messa per prima, mai domande di riempimento. Se il
+  giro ha meno di 4 decisioni vere, le restanti si usano per scelte di
+  prodotto che prima o poi andranno prese comunque.
+  L'unica volta in cui si può non farlo è quando Valerio scrive
+  esplicitamente di non fare il popup.
 - **Se il mio messaggio contiene più di una richiesta, consulta la skill
   copertura-prompt prima di iniziare.** (regola sua, 9/08)
 - **Consegna a pezzi, non in blocco.** Se la richiesta contiene più cose, fai la
