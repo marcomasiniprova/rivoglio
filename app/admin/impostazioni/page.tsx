@@ -169,11 +169,17 @@ export default async function PaginaImpostazioni() {
      account. Vedi lib/admin/guardia.ts. */
   await soloAdmin();
   const voci = stato();
-  /* Il riquadro del chat id si mostra solo quando serve: gettone messo,
-     destinatario ancora no. */
-  const telegram = process.env.TELEGRAM_BOT_TOKEN
-    ? { chat: process.env.TELEGRAM_ADMIN_CHAT ? null : await chatIdDaScoprire() }
-    : null;
+  /* Il riquadro del chat id si mostra SOLO quando serve davvero: gettone
+     messo, destinatario ancora no.
+     🔴 Prima era scritto in modo che il riquadro comparisse anche col
+     chat id già a posto, e allora diceva "Manca il tuo chat id" tre
+     righe sopra la riga che dice "c'è". Due frasi contraddittorie sulla
+     stessa pagina fanno dubitare di tutto il resto, ed è quello che è
+     successo (visto da Valerio, 11/08). */
+  const chatDaTrovare =
+    process.env.TELEGRAM_BOT_TOKEN && !process.env.TELEGRAM_ADMIN_CHAT
+      ? await chatIdDaScoprire()
+      : null;
   const mancanti = voci.filter((v) => !v.ceSta && v.peso !== "facoltativa");
 
   return (
@@ -219,20 +225,25 @@ export default async function PaginaImpostazioni() {
           somigliano, e chi li vede per la prima volta passa il primo
           credendo di passare il secondo (successo l'11/08). Qui il numero
           si scopre da soli: si scrive al bot e si ricarica la pagina. */}
-      {telegram && (
+      {/* ⚠️ IL PEZZO CHE BLOCCA TUTTI: il gettone del bot e il chat id si
+          somigliano, e chi li vede per la prima volta passa il primo
+          credendo di passare il secondo (successo l'11/08). Qui il numero
+          si scopre da soli: si scrive al bot e si ricarica la pagina.
+          Compare SOLO se il chat id manca davvero. */}
+      {chatDaTrovare !== null || (process.env.TELEGRAM_BOT_TOKEN && !process.env.TELEGRAM_ADMIN_CHAT) ? (
         <div className="mt-6 rounded-2xl border border-bordo bg-white p-5">
           <p className="font-display text-[1.15rem] tracking-[-0.02em]">
-            {telegram.chat ? "Il tuo chat id è questo" : "Manca il tuo chat id"}
+            {chatDaTrovare ? "Il tuo chat id è questo" : "Manca il tuo chat id"}
           </p>
-          {telegram.chat ? (
+          {chatDaTrovare ? (
             <>
               <p className="mt-2 text-[14px] leading-relaxed text-fumo">
                 Copialo su Netlify in <code className="text-inchiostro">TELEGRAM_ADMIN_CHAT</code>,
                 poi <em>Trigger deploy</em>. È il numero di{" "}
-                {telegram.chat.nome || "chi ha scritto al bot"}.
+                {chatDaTrovare.nome || "chi ha scritto al bot"}.
               </p>
               <p className="mt-3 font-mono text-[1.5rem] font-medium text-verde">
-                {telegram.chat.id}
+                {chatDaTrovare.id}
               </p>
             </>
           ) : (
@@ -243,7 +254,7 @@ export default async function PaginaImpostazioni() {
             </p>
           )}
         </div>
-      )}
+      ) : null}
 
       <div className="mt-8 space-y-3">
         {voci.map((v) => (
