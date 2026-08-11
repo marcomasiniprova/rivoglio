@@ -132,6 +132,15 @@ export async function POST(req: Request) {
           esito: verdetto.esito,
           importo: verdetto.esito === "idoneo" ? verdetto.importo : null,
           motivo: verdetto.motivo,
+          /* 🔴 IL RITARDO VA RISCRITTO, e prima non lo era. La riga
+             conservava quello del check di partenza (155 minuti per
+             FR4001), e la pagina del verdetto e la LETTERA lo
+             rileggevano da lì: uscivano 400 euro accanto a «2 h e 35
+             min di ritardo». Per questi casi il ritardo del volo non
+             c'entra niente col diritto, quindi si azzera invece di
+             lasciare in giro un numero che verrà letto come una prova.
+             Trovato l'11/08 da Valerio. */
+          ritardo_minuti: verdetto.esito === "idoneo" ? 0 : null,
           caso_dichiarato: dichiarazione.caso,
           dichiarazione,
           dichiarato_il: new Date().toISOString(),

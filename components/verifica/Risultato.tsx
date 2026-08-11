@@ -47,6 +47,8 @@ export type DatiVerifica = {
   dataVolo: string;
   importo: number | null;
   ritardoMinuti: number | null;
+  /** "negato" o "coincidenza" quando il verdetto viene da una dichiarazione. */
+  casoDichiarato?: string | null;
   motivo: string | null;
   /** Vero se il dato viene dal fornitore dimostrativo: il badge è obbligatorio. */
   demo: boolean;
@@ -294,7 +296,20 @@ function Card({ children, className = "" }: { children: ReactNode; className?: s
 
 function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
   const t = COPY.risultato.idoneo;
-  const ritardo = dati.ritardoMinuti !== null ? ritardoUmano(dati.ritardoMinuti) : null;
+  /* Il ritardo si mostra SOLO quando è lui a decidere. Su negato
+     imbarco e coincidenza persa il verdetto nasce da quello che ha
+     dichiarato il passeggero, e stampare qui il ritardo del volo
+     sarebbe mettere accanto alla cifra un numero che la smentisce. */
+  const dichiarato = dati.casoDichiarato ?? null;
+  const ritardo =
+    !dichiarato && dati.ritardoMinuti !== null ? ritardoUmano(dati.ritardoMinuti) : null;
+  const titolo = dichiarato
+    ? dichiarato === "negato"
+      ? t.titoloNegato
+      : t.titoloCoincidenza
+    : ritardo
+      ? riempi(t.titoloTemplate, { ritardo })
+      : null;
   const avviso = dati.avvisoCheckout;
   const compraSingola = dati.demo || dati.checkout.singola;
 
@@ -313,10 +328,10 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
     <div className="flex flex-col gap-6">
       <Anima>
         <Occhiello testo={t.occhiello} demo={dati.demo} />
-        {ritardo && (
+        {titolo && (
           /* Il fatto oggettivo bene in vista: è il titolo, non una nota. */
           <h1 className="luce-testo mt-4 font-display text-[clamp(1.9rem,6.4vw,2.9rem)] leading-[1.04] tracking-[-0.04em]">
-            {riempi(t.titoloTemplate, { ritardo })}
+            {titolo}
           </h1>
         )}
       </Anima>

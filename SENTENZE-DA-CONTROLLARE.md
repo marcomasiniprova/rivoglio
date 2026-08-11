@@ -24,6 +24,7 @@ riga per riga** invece di far finta.
 | **Wallentin-Hermann**, C-549/07 | un problema tecnico **non è** di per sé circostanza eccezionale | 🟡 da rileggere |
 | **van der Lans**, C-257/14 | vale anche per un **guasto improvviso** non causato da eventi esterni | 🟡 da rileggere |
 | **Airhelp contro SAS**, C-28/20 | lo sciopero del **personale della compagnia** non è, in linea di principio, circostanza eccezionale | 🟡 da rileggere |
+| **Folkerts**, C-11/11 | chi perde una coincidenza su **un'unica prenotazione** e arriva alla destinazione finale con 3 ore o più ha diritto alla compensazione | 🟡 **NUOVA dell'11/08**, da rileggere |
 
 ---
 
@@ -108,7 +109,20 @@ vettore e sfuggono al suo effettivo controllo.
 **Deve dire** che lo stesso vale per un **guasto improvviso** non
 causato da eventi esterni all'attività del vettore.
 
-### 4. Airhelp contro SAS, C-28/20
+### 4. Folkerts, C-11/11 · *nuova, entrata nelle lettere l'11/08*
+`https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:62011CJ0011`
+
+**Deve dire** che il passeggero di un volo con coincidenza, compreso in
+un'**unica prenotazione**, che giunge alla destinazione finale con un
+ritardo pari o superiore a tre ore ha diritto alla compensazione
+dell'articolo 7, **anche se il volo iniziale era in ritardo di meno**.
+
+⚠️ Nella lettera **non ho scritto la data della sentenza**, solo il
+numero di causa: la data non l'ho verificata e inventarla sarebbe
+esattamente l'errore appena corretto su Sturgeon. Quando la apri,
+segnati anche quella e me la fai aggiungere.
+
+### 5. Airhelp contro SAS, C-28/20
 `https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:62020CJ0028`
 Oppure, e forse è più comoda, la pagina che l'ENAC le dedica:
 `https://www.enac.gov.it/la-normativa/normativa-internazionale/normativa-europea/sentenze/sentenza-della-corte-di-giustizia-europea-del-23-marzo-2021-c-2820/`

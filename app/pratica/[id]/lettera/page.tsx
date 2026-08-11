@@ -96,7 +96,22 @@ type RigaVerifica = {
   importo: number | null;
   ritardo_minuti: number | null;
   versione_regole: string;
+  /* Negato imbarco e coincidenza persa: il caso lo dichiara il
+     passeggero e cambia la NORMA della lettera, non solo il testo. */
+  caso_dichiarato: string | null;
+  dichiarazione: unknown;
 };
+
+/**
+ * Un campo della dichiarazione, letto senza fidarsi della forma.
+ * Arriva da una colonna JSON: se un domani cambia struttura, qui si
+ * torna null e la lettera perde una frase, invece di rompersi.
+ */
+function leggiDichiarazione(d: unknown, campo: string): string | null {
+  if (!d || typeof d !== "object") return null;
+  const v = (d as Record<string, unknown>)[campo];
+  return typeof v === "string" && v ? v : null;
+}
 
 const dataIt = (iso: string) =>
   new Date(`${iso}T12:00:00Z`).toLocaleDateString("it-IT", {
@@ -210,7 +225,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   const { data: verifica } = pratica.verifica_id
     ? ((await db
         .from("verifiche")
-        .select("esito, importo, ritardo_minuti, versione_regole")
+        .select("esito, importo, ritardo_minuti, versione_regole, caso_dichiarato, dichiarazione")
         .eq("id", pratica.verifica_id)
         .maybeSingle()) as { data: RigaVerifica | null })
     : { data: null };
@@ -218,7 +233,31 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   const importo =
     verifica && ([250, 300, 400, 600] as const).find((i) => i === verifica.importo);
 
-  if (!volo || !verifica || verifica.esito !== "idoneo" || !importo || verifica.ritardo_minuti === null) {
+  /* 🔴 IL CASO DICHIARATO CAMBIA LA LETTERA, e non è un dettaglio.
+     Negato imbarco e coincidenza persa hanno una norma diversa da quella
+     del ritardo: fino all'11/08 finivano tutti nella lettera del ritardo
+     e uscivano così, chiedendo 400 euro accanto a «ritardo 2 h e 35» e
+     citando la regola delle TRE ore. Una lettera che si contraddice da
+     sola, pagata 14,90. */
+  const dichiarato =
+    verifica?.caso_dichiarato === "negato" || verifica?.caso_dichiarato === "coincidenza"
+      ? {
+          caso: verifica.caso_dichiarato as "negato" | "coincidenza",
+          ritardoFinale: leggiDichiarazione(verifica.dichiarazione, "ritardoFinale"),
+          destinazioneFinale: leggiDichiarazione(verifica.dichiarazione, "destinazioneFinale"),
+        }
+      : null;
+
+  /* Il ritardo serve SOLO alla lettera del ritardo: per un negato
+     imbarco non esiste un arrivo da confrontare, e pretenderlo qui
+     bloccava la lettera di un caso perfettamente valido. */
+  if (
+    !volo ||
+    !verifica ||
+    verifica.esito !== "idoneo" ||
+    !importo ||
+    (!dichiarato && verifica.ritardo_minuti === null)
+  ) {
     return (
       <Cornice>
         <Avviso titolo="Qui manca un pezzo">
@@ -253,7 +292,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   const verdetto: Verdetto = {
     esito: "idoneo",
     importo,
-    ritardoMinuti: verifica.ritardo_minuti,
+    ritardoMinuti: verifica.ritardo_minuti ?? 0,
     motivo: "",
     versioneRegole: verifica.versione_regole,
   };
@@ -281,7 +320,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
     { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo },
     fatto,
     verdetto,
-    { meteo },
+    { meteo, dichiarato },
   );
 
   if (!lettera) {

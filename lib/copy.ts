@@ -206,7 +206,12 @@ export const COPY = {
       /** Errori di validazione lato campo, prima ancora di chiamare l'API. */
       errori: {
         voloMancante: "Scrivi il numero del volo, per esempio FR 8321.",
-        dataMancante: "Scrivi la data del volo: è il giorno della partenza.",
+        /* Prima diceva «Scrivi la data del volo: è il giorno della
+           partenza», e quel «è» non lega niente con niente: sembra un
+           pezzo di frase rimasto a metà (segnalato da Valerio, 11/08).
+           Adesso dice la cosa e basta, e il chiarimento è una frase
+           sua. */
+        dataMancante: "Manca la data. Scrivi il giorno in cui il volo è partito.",
       },
     },
     puntiFiducia: [
@@ -792,7 +797,7 @@ export const COPY = {
           ],
         },
       },
-      bottone: "Vedi il verdetto",
+      bottone: "Scopri il verdetto",
       nota: seSiPaga(
         "Le risposte restano sulla tua verifica come dichiarazione. Rispondere non costa niente.",
         "Le risposte restano sulla tua verifica come dichiarazione. Il check resta gratuito.",
@@ -835,7 +840,7 @@ export const COPY = {
           { valore: "nonRicordo", testo: "Non me lo ricordo" },
         ],
       },
-      bottone: "Vedi il verdetto",
+      bottone: "Scopri il verdetto",
       nota: seSiPaga(
         "Le risposte restano sulla tua verifica. Rispondere non costa niente.",
         "Le risposte restano sulla tua verifica. Il check resta gratuito.",
@@ -863,7 +868,7 @@ export const COPY = {
       etichetta: "La compagnia che ha fatto il volo",
       segnaposto: "Scrivi il nome, per esempio Delta",
       nessuna: "Nessuna compagnia con questo nome fra quelle che conosciamo.",
-      bottone: "Vedi il verdetto",
+      bottone: "Scopri il verdetto",
       nota: seSiPaga(
         "La tua risposta resta sulla verifica. Rispondere non costa niente.",
         "La tua risposta resta sulla verifica. Il check resta gratuito.",
@@ -878,6 +883,18 @@ export const COPY = {
     idoneo: {
       occhiello: "Verifica completata",
       titoloTemplate: "Il tuo volo è atterrato con {ritardo} di ritardo.",
+      /* 🔴 NEGATO IMBARCO E COINCIDENZA PERSA HANNO UN TITOLO LORO.
+         Fino all'11/08 usavano quello del ritardo, e uscivano 400 euro
+         accanto a «atterrato con 2 h e 35 min di ritardo»: il ritardo
+         di quel volo, che per questi casi non decide niente. Chi legge
+         pensa che sotto le tre ore si prenda la compensazione, e se
+         manda quella lettera si fa rispondere male. */
+      titoloNegato: "Ti hanno lasciato a terra contro la tua volontà.",
+      titoloCoincidenza: "Hai perso la coincidenza e sei arrivato con almeno tre ore di ritardo.",
+      fattoNegato:
+        "Volo {volo} del {data}. Qui il ritardo non conta: la compensazione per negato imbarco è dovuta subito (art. 4, comma 3).",
+      fattoCoincidenza:
+        "Volo {volo} del {data}. Conta il ritardo con cui sei arrivato alla destinazione finale, non quello di questo volo.",
       fattoTemplate:
         "Volo {volo} del {data}: atterrato alle {oraEffettiva} invece delle {oraPrevista}.",
       /** Quando gli orari archiviati non ci sono più: il ritardo verificato resta. */

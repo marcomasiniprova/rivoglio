@@ -110,6 +110,10 @@ type RigaVerifica = {
   esito: "idoneo" | "incerto" | "non_idoneo";
   importo: number | null;
   ritardo_minuti: number | null;
+  /* Il caso lo dichiara il passeggero e cambia il titolo del verdetto:
+     su negato imbarco e coincidenza persa il ritardo di QUESTO volo non
+     decide niente, e stamparlo accanto alla cifra la smentisce. */
+  caso_dichiarato?: string | null;
   motivo: string | null;
   conferma: "automatica" | "in_attesa" | "confermata" | "corretta";
   voli: {
@@ -240,7 +244,7 @@ export default async function PaginaVerifica({
     const { data, error } = (await db
       .from("verifiche")
       .select(
-        "id, volo_iata, data_locale, esito, importo, ritardo_minuti, motivo, conferma, voli(arrivo_previsto_utc, arrivo_effettivo_utc, km_ortodromica, vettore_operativo, fonte)",
+        "id, volo_iata, data_locale, esito, importo, ritardo_minuti, motivo, conferma, caso_dichiarato, voli(arrivo_previsto_utc, arrivo_effettivo_utc, km_ortodromica, vettore_operativo, fonte)",
       )
       .eq("id", id)
       .maybeSingle()) as { data: RigaVerifica | null; error: { message: string } | null };
@@ -283,6 +287,7 @@ export default async function PaginaVerifica({
     dataVolo: riga.data_locale,
     importo: riga.importo,
     ritardoMinuti: riga.ritardo_minuti,
+    casoDichiarato: riga.caso_dichiarato ?? null,
     motivo: riga.motivo,
     // Il marchio demo viaggia con la fonte del volo: se il dato viene
     // dal fornitore dimostrativo, l'interfaccia DEVE dirlo (regola 3).

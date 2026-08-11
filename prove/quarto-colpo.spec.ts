@@ -349,3 +349,75 @@ test.describe("Ogni sentenza citata per quello che dice", () => {
     }
   });
 });
+
+/* ── LA LETTERA DEI CASI DICHIARATI ────────────────────────────────────
+   🔴 Il difetto piu' grave trovato finora, segnalato da Valerio l'11/08
+   con uno screenshot: dopo aver dichiarato negato imbarco o coincidenza
+   persa usciva 400 euro accanto a «atterrato con 2 h e 35 min di
+   ritardo», e la LETTERA chiedeva quei 400 euro citando Sturgeon, cioe'
+   la regola che dice che sotto le tre ore non spettano. Una richiesta
+   che si contraddice da sola, pagata 14,90.
+   Causa: la rotta /dichiara aggiornava esito e importo sulla riga della
+   verifica ma non il ritardo, e la lettera ricostruiva il verdetto da
+   quella riga. */
+test.describe("Ogni caso ha la lettera della SUA norma", () => {
+  const IDONEO_400 = { ...IDONEO, importo: 400 as const, ritardoMinuti: 0 };
+
+  test("negato imbarco: art. 4, e nessuna traccia della regola delle tre ore", () => {
+    const l = generaReclamo(PRATICA, FATTO, IDONEO_400, { dichiarato: { caso: "negato" } });
+    expect(l, "la lettera del negato imbarco non si genera").not.toBeNull();
+    const testo = `${l!.oggetto}\n${l!.corpo}`;
+    expect(testo).toContain("articolo 4");
+    expect(testo).toContain("400");
+    /* Le due cose che rendevano la vecchia lettera indifendibile. */
+    expect(testo, "cita Sturgeon su un caso che non la riguarda").not.toContain("C-402/07");
+    expect(testo, "parla di tre ore su un negato imbarco").not.toContain("tre ore");
+    /* Non si vieta la PAROLA "ritardo": la lettera giusta dice proprio
+       che la compensazione «non è subordinata ad alcuna condizione sul
+       ritardo all'arrivo», ed è la frase che vince. Si vieta il NUMERO,
+       cioè la riga dei fatti che stampava «ritardo all'arrivo: 2 h e 35
+       min» accanto a una richiesta di 400 euro. */
+    expect(testo, "stampa un ritardo fra i fatti").not.toMatch(/- ritardo all'arrivo:/);
+    expect(testo, "stampa un minutaggio che non c'entra").not.toMatch(/\d+\s*min\b/);
+  });
+
+  test("coincidenza persa: art. 7 letto da Folkerts, non da Sturgeon", () => {
+    const l = generaReclamo(PRATICA, FATTO, IDONEO_400, {
+      dichiarato: { caso: "coincidenza", ritardoFinale: "oltre4", destinazioneFinale: "JFK" },
+    });
+    expect(l).not.toBeNull();
+    const testo = `${l!.oggetto}\n${l!.corpo}`;
+    expect(testo).toContain("C-11/11");
+    expect(testo).toContain("destinazione finale");
+    expect(testo, "cita la sentenza del ritardo semplice").not.toContain("C-402/07");
+  });
+
+  test("il ritardo finale si scrive a fasce, mai al minuto", () => {
+    /* Il passeggero dichiara "fra 3 e 4 ore", non 197 minuti: scrivere
+       un minutaggio preciso sarebbe inventarlo, ed e' la cosa che fa
+       cadere una richiesta per intero. */
+    const l = generaReclamo(PRATICA, FATTO, IDONEO_400, {
+      dichiarato: { caso: "coincidenza", ritardoFinale: "fra3e4" },
+    });
+    expect(l!.corpo).toContain("fra tre e quattro ore");
+    expect(l!.corpo).not.toMatch(/\d+\s*min/);
+  });
+
+  test("la lettera del ritardo semplice non e' cambiata", () => {
+    /* Il caso normale deve restare identico: la correzione non doveva
+       toccarlo. */
+    const l = generaReclamo(PRATICA, FATTO, IDONEO);
+    expect(l!.corpo).toContain("C-402/07");
+    expect(l!.corpo).toContain("ritardo all'arrivo");
+  });
+
+  test("la rotta dichiara riscrive il ritardo invece di lasciare il vecchio", () => {
+    const codice = readFileSync(
+      join(process.cwd(), "app/api/verifica/dichiara/route.ts"),
+      "utf8",
+    );
+    expect(codice, "senza questo, la riga conserva il ritardo del check di partenza").toContain(
+      "ritardo_minuti",
+    );
+  });
+});

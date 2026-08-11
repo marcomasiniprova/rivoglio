@@ -5,6 +5,11 @@ import { paeseDiScalo } from "@/lib/regole/territorio";
 import { ELENCO_UFFICIALE_NEB, nebPerPaese, nomeBreveNeb } from "./neb";
 import { type MotivoRifiuto, schedaRifiuto } from "@/lib/pratiche/rifiuto";
 
+import {
+  corpoDichiarato,
+  oggettoDichiarato,
+  type DatiDichiarazione,
+} from "./dichiarati";
 /**
  * Il generatore di documenti (strato 5, SPEC §4). In v1 è un modello
  * RIGIDO e deterministico: stesso input, stessa lettera, per sempre.
@@ -151,11 +156,19 @@ export function generaReclamo(
   fatto: FattoVolo,
   verdetto: Verdetto,
   /* Righe opzionali già pronte (es. il meteo all'arrivo da lib/meteo):
-     il chiamante le procura, qui restano input deterministici. */
-  extra?: { meteo?: string | null },
+     il chiamante le procura, qui restano input deterministici.
+     `dichiarato` c'è SOLO per negato imbarco e coincidenza persa: quei
+     casi hanno una norma diversa e una lettera diversa (vedi
+     lib/lettera/dichiarati.ts). Senza questo ramo la lettera chiedeva
+     400 euro citando la regola delle tre ore accanto a un ritardo di
+     due e mezza: si contraddiceva da sola. */
+  extra?: { meteo?: string | null; dichiarato?: DatiDichiarazione | null },
 ): Lettera | null {
   if (verdetto.esito !== "idoneo") return null;
-  if (!fatto.arrivoPrevistoUtc || !fatto.arrivoEffettivoUtc) return null;
+  /* Il negato imbarco non ha un orario d'arrivo da confrontare: chi non
+     è salito non è mai arrivato. Solo il ritardo ne ha bisogno. */
+  const caso = extra?.dichiarato?.caso ?? null;
+  if (!caso && (!fatto.arrivoPrevistoUtc || !fatto.arrivoEffettivoUtc)) return null;
 
   const compagnia = compagniaPerVettore(fatto.vettoreOperativo) ?? compagniaPerVettore(fatto.voloIata);
   const passeggeri = elencoPasseggeri(pratica.passeggeri, pratica.tipo);
@@ -163,7 +176,9 @@ export function generaReclamo(
   const totale = verdetto.importo * n;
   const giornoVolo = dataLunga(fatto.dataLocale);
 
-  const oggetto = `Richiesta di compensazione pecuniaria ex artt. 5 e 7 Reg. (CE) 261/2004, volo ${fatto.voloIata} del ${giornoVolo}`;
+  const oggetto = caso
+    ? oggettoDichiarato(caso, fatto.voloIata, giornoVolo)
+    : `Richiesta di compensazione pecuniaria ex artt. 5 e 7 Reg. (CE) 261/2004, volo ${fatto.voloIata} del ${giornoVolo}`;
 
   const vettoreMarketing =
     fatto.vettoreMarketing &&
@@ -172,18 +187,27 @@ export function generaReclamo(
       ? `\nIl biglietto è stato venduto con il codice di ${fatto.vettoreMarketing}; la presente è indirizzata a voi in quanto vettore operativo effettivo, come previsto dall'articolo 3, paragrafo 5, del Regolamento.`
       : "";
 
-  const corpo = `${intestazione(fatto, compagnia)},
-
-${n === 1 ? "scrivo in qualità di passeggero" : "scrivo a nome dei passeggeri sotto elencati"} del volo ${fatto.voloIata} del ${giornoVolo}, operato dalla vostra compagnia.${vettoreMarketing}
-
-I fatti, come risultano dai dati di volo (fonte: ${fatto.fonte}):
-- arrivo previsto: ${oraUtc(fatto.arrivoPrevistoUtc)};
-- arrivo effettivo: ${oraUtc(fatto.arrivoEffettivoUtc)};
+  /* IL BLOCCO CENTRALE: i fatti e la norma. È l'unico pezzo che cambia
+     fra i tre casi, e va costruito PRIMA del corpo: dentro un template
+     TypeScript non riesce a capire che gli orari, nel ramo del ritardo,
+     ci sono per forza (li ha già garantiti il controllo in cima). */
+  const fattiENorma =
+    caso && extra?.dichiarato
+      ? corpoDichiarato(caso, fatto, verdetto, extra.dichiarato, km, euro)
+      : `I fatti, come risultano dai dati di volo (fonte: ${fatto.fonte}):
+- arrivo previsto: ${oraUtc(fatto.arrivoPrevistoUtc as string)};
+- arrivo effettivo: ${oraUtc(fatto.arrivoEffettivoUtc as string)};
 - ritardo all'arrivo: ${durata(verdetto.ritardoMinuti)}${fatto.kmOrtodromica ? `;\n- distanza della tratta: ${km(fatto.kmOrtodromica)}` : ""}.
 ${extra?.meteo ? `\n${extra.meteo}\n` : ""}
 Ai sensi degli articoli 5 e 7 del Regolamento (CE) n. 261/2004, come interpretati dalla Corte di giustizia dell'Unione europea nella sentenza del 19 novembre 2009, cause riunite C-402/07 e C-432/07 (Sturgeon), un ritardo all'arrivo pari o superiore a tre ore dà diritto alla stessa compensazione pecuniaria prevista per la cancellazione del volo, salvo circostanze eccezionali che spetta al vettore provare.
 
-${percheFascia(verdetto.importo, verdetto.ritardoMinuti, fatto.kmOrtodromica)}
+${percheFascia(verdetto.importo, verdetto.ritardoMinuti, fatto.kmOrtodromica)}`;
+
+  const corpo = `${intestazione(fatto, compagnia)},
+
+${n === 1 ? "scrivo in qualità di passeggero" : "scrivo a nome dei passeggeri sotto elencati"} del volo ${fatto.voloIata} del ${giornoVolo}, operato dalla vostra compagnia.${vettoreMarketing}
+
+${fattiENorma}
 
 ${
   n === 1

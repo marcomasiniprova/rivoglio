@@ -339,7 +339,7 @@ export const TESTI = {
           segnaposto: "Città o aeroporto",
         },
       },
-      bottone: "Vedi il verdetto",
+      bottone: "Scopri il verdetto",
       nota: seSiPaga(
         "Le risposte restano sulla tua verifica.",
         "Le risposte restano sulla tua verifica. Il check resta gratuito.",
