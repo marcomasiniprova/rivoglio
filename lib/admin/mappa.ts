@@ -221,7 +221,7 @@ export const NODI: Nodo[] = [
       "Primo dei due punti in cui entrano soldi. Non è un rincaro: i 1,99 si scalano dalla pratica, quindi il totale del percorso resta 14,90. Un verdetto incerto non consuma il credito, perché chi paga per sapere e si sente rispondere «non lo so» non ha comprato una risposta. Si accende con una variabile su Netlify.",
     stato: "spento",
     icona: "muro",
-    x: 50,
+    x: 74,
     y: 44,
   },
   {
@@ -233,7 +233,7 @@ export const NODI: Nodo[] = [
       "Secondo punto di incasso, e quello che vale davvero. I portali a percentuale trattengono il 35-50% della compensazione: su 600 euro sono 210. Qui paghi una cifra fissa e tieni il 100%. Prima di pagare si spunta la rinuncia al recesso, perché il prodotto si consuma nell'istante in cui viene consegnato.",
     stato: "spento",
     icona: "carta",
-    x: 74,
+    x: 100,
     y: 44,
   },
   {
@@ -245,7 +245,7 @@ export const NODI: Nodo[] = [
       "Serve qualcuno che incassi al posto nostro, perché senza partita IVA non si può emettere fattura: un «merchant of record» compra da noi e rivende al cliente, occupandosi lui di IVA e documenti. Polar ha detto no col controllo automatico (categoria, non forma). Dodo ha detto sì per iscritto ma ha 3,0 su 5 di recensioni e segnalazioni di fondi bloccati. È la decisione aperta più importante di tutto il progetto.",
     stato: "manca",
     icona: "cassa",
-    x: 98,
+    x: 126,
     y: 44,
   },
 
@@ -259,7 +259,7 @@ export const NODI: Nodo[] = [
       "Primo colpo. Venti compagnie con canale di reclamo verificato a mano, uno per uno. La manda l'utente dalla propria email, e non è un ripiego: Ryanair, easyJet, Wizz Air e altre dichiarano per iscritto che lavorano solo i reclami inviati dal passeggero. È anche il motivo per cui la compensazione arriva intera.",
     stato: "fatto",
     icona: "lettera",
-    x: 124,
+    x: 170,
     y: 6,
   },
   {
@@ -271,7 +271,7 @@ export const NODI: Nodo[] = [
       "Secondo colpo. Le compagnie rispondono in 8-14 settimane, quindi un sollecito al giorno 15 arriverebbe prima che qualcuno abbia aperto la pratica. Se il no è già arrivato, il calendario si scavalca: la replica cambia secondo il motivo del rifiuto, otto motivi a scelta chiusa, ognuno con la sua risposta.",
     stato: "fatto",
     icona: "orologio",
-    x: 124,
+    x: 170,
     y: 20,
   },
   {
@@ -283,7 +283,7 @@ export const NODI: Nodo[] = [
       "Terzo colpo. L'ente competente lo decide il paese di PARTENZA, non la compagnia: 29 paesi in tabella, presi dal documento ufficiale della Commissione. ⚠️ Non promettiamo che l'ente paghi, perché non paga: accerta la violazione e può sanzionare. Dirlo diversamente sarebbe la bugia più facile da raccontare.",
     stato: "fatto",
     icona: "istituzione",
-    x: 124,
+    x: 170,
     y: 34,
   },
   {
@@ -295,7 +295,7 @@ export const NODI: Nodo[] = [
       "Quarto colpo, ed è quello che paga davvero. In Italia la gestisce l'Autorità di regolazione dei trasporti: è gratuita, si fa con SPID, e le compagnie ci si siedono perché è un passaggio previsto prima della causa. Si apre dopo 30 giorni di silenzio, quindi PRIMA del nostro sollecito. ⚠️ La domanda va presentata entro un anno dal reclamo.",
     stato: "fatto",
     icona: "bilancia",
-    x: 124,
+    x: 170,
     y: 48,
   },
   {
@@ -307,7 +307,7 @@ export const NODI: Nodo[] = [
       "È legata all'ESITO, non a un calendario. Prima erano 90 giorni, ma quel giorno cadeva dentro l'attesa normale della compagnia e un cliente onesto avrebbe chiesto il rimborso a pratica ancora viva: al 50% di richieste il guadagno per pratica si sarebbe dimezzato.",
     stato: "fatto",
     icona: "scudo",
-    x: 152,
+    x: 198,
     y: 27,
   },
 
@@ -333,7 +333,7 @@ export const NODI: Nodo[] = [
       "Senza questo, per sapere come va il sito bisogna indovinare. Con questo si vede quante persone arrivano, quante fanno un'analisi, quante sbattono sul muro e quante pagano. Le uniche due informazioni di contorno sono il dominio di provenienza e il paese, che lo dice già Netlify.",
     stato: "fatto",
     icona: "registro",
-    x: 24,
+    x: 26,
     y: 68,
     dove: "/admin/registro",
   },
@@ -346,7 +346,7 @@ export const NODI: Nodo[] = [
       "Più il riepilogo della sera alle 21. Un avviso a ogni analisi sarebbe bello il primo giorno e insopportabile il secondo: dopo due ore si silenzia il canale, e allora si perdono anche gli avvisi che contano. Il guasto ha un silenziatore da un quarto d'ora, quindi mille errori di fila restano un messaggio.",
     stato: "fatto",
     icona: "campana",
-    x: 48,
+    x: 52,
     y: 68,
   },
   {
@@ -358,7 +358,7 @@ export const NODI: Nodo[] = [
       "Servono per la conferma dell'Osservatorio, per l'accesso senza password e per le tappe della pratica. ⚠️ Finché il dominio non è verificato partono SOLO verso valerio@artecai.it: lo decide Resend, non il nostro codice. E finché non c'è il gancio di Supabase, le email di accesso hanno un tetto di 2 all'ora per tutto il progetto.",
     stato: "spento",
     icona: "busta",
-    x: 72,
+    x: 78,
     y: 68,
   },
   {
@@ -370,7 +370,7 @@ export const NODI: Nodo[] = [
       "Costruita e completa, ma gira solo in un browser: per stare su App Store e Play Store servono gli account sviluppatore e la revisione. Il pagamento resta sul sito e non dentro l'app, perché Apple e Google trattengono dal 15 al 30%.",
     stato: "spento",
     icona: "telefono",
-    x: 96,
+    x: 104,
     y: 68,
     dove: "/anteprima-app",
   },

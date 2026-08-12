@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { inCollaudo } from "@/lib/check/cancello";
 import { linkCheckout } from "@/lib/polar";
 import { COOKIE_PREZZO, TEST_DUE_PREZZI, varianteValida } from "@/lib/prezzi";
 import { traccia } from "@/lib/eventi/registra";
@@ -85,7 +86,21 @@ export async function GET(req: NextRequest) {
     const variante =
       (TEST_DUE_PREZZI ? varianteValida(req.cookies.get(COOKIE_PREZZO)?.value) : null) ?? "a";
     const link = linkCheckout(tipo, verifica.id, verifica.email, variante);
-    if (!link) return paginaRisultato("non-attivo");
+    /* ⚠️ SENZA VENDITORE, IL COLLAUDATORE PASSA DALLA CASSA DI PROVA.
+       Finche' non c'e' Polar (o chi per lui) questo bottone finisce in un
+       vicolo cieco, e tutto quello che viene DOPO il pagamento (i quattro
+       fogli, il no della compagnia, la replica, la conciliazione) non lo
+       puo' vedere nessuno: e' meta' del prodotto che vale i soldi.
+       Solo per il browser che porta la chiave del collaudatore, e solo
+       sui voli dimostrativi: il controllo vero sta dentro la rotta. */
+    if (!link) {
+      if (inCollaudo(req)) {
+        return NextResponse.redirect(
+          new URL(`/api/pratiche/prova?verifica=${verifica.id}&tipo=${tipo}`, url.origin),
+        );
+      }
+      return paginaRisultato("non-attivo");
+    }
 
     /* «Ha aperto la pratica»: da qui in poi la persona è alla cassa. La
        distanza fra questo numero e quello dei pagamenti è la cosa più

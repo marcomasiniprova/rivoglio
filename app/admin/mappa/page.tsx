@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Maximize2 } from "lucide-react";
 import Mappa from "@/components/admin/Mappa";
 import { soloAdmin } from "@/lib/admin/guardia";
 import { conto } from "@/lib/admin/mappa";
@@ -32,6 +33,18 @@ export default async function PaginaMappa() {
         </strong>{" "}
         Le strade tratteggiate sono quelle che oggi si interrompono.
       </p>
+      <div className="mb-3">
+        <a
+          href="/admin/mappa/piena"
+          target="_blank"
+          rel="noopener"
+          className="inline-flex items-center gap-2 rounded-[10px] border border-verde/35 bg-menta-tenue px-4 py-2 text-[13.5px] font-medium text-verde-scuro transition-colors hover:border-verde"
+        >
+          <Maximize2 className="size-4" aria-hidden="true" />
+          Apri a schermo intero
+          <span className="text-[12px] text-verde-scuro/70">in una scheda nuova</span>
+        </a>
+      </div>
       <Mappa />
     </div>
   );

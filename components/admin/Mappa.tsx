@@ -109,35 +109,77 @@ const centroDi = (n: Nodo) => ({
   y: MARGINE + n.y * U + CARD_H / 2,
 });
 
-export default function Mappa() {
-  const [vista, setVista] = useState({ x: 0, y: 0, z: 0.62 });
+export default function Mappa({ piena = false }: { piena?: boolean }) {
+  const [vista, setVista] = useState({ x: 0, y: 0, z: 0.5 });
   const [aperto, setAperto] = useState<Nodo | null>(null);
   const [zonaSola, setZonaSola] = useState<ChiaveZona | null>(null);
   const telaio = useRef<HTMLDivElement>(null);
   const trascino = useRef<{ x: number; y: number; vx: number; vy: number } | null>(null);
 
-  /* I fili si calcolano una volta: sono venti segmenti fissi. */
-  const fili = useMemo(
-    () =>
-      FILI.map((f) => {
-        const da = NODI.find((n) => n.id === f.da);
-        const a = NODI.find((n) => n.id === f.a);
-        if (!da || !a) return null;
-        const p = centroDi(da);
-        const q = centroDi(a);
-        /* Curva morbida: due maniglie orizzontali. Una linea dritta fra
-           due box sfalsati taglia in diagonale e sembra un errore. */
-        const dx = Math.max(40, Math.abs(q.x - p.x) * 0.45);
-        return {
-          ...f,
-          d: `M ${p.x} ${p.y} C ${p.x + dx} ${p.y}, ${q.x - dx} ${q.y}, ${q.x} ${q.y}`,
-          mx: (p.x + q.x) / 2,
-          my: (p.y + q.y) / 2,
-          zone: [da.zona, a.zona] as ChiaveZona[],
-        };
-      }).filter((f): f is NonNullable<typeof f> => f !== null),
-    [],
-  );
+  /**
+   * I FILI, AD ANGOLO RETTO.
+   *
+   * 🔴 Prima erano curve fra i CENTRI delle card: Valerio, 12/08, «troppo
+   * caos, storta». Aveva ragione, e il difetto era doppio. Primo: una
+   * curva che parte dal centro esce da sotto la card e ci passa sopra,
+   * quindi il filo taglia il testo. Secondo: le curve diagonali fra box
+   * sfalsati si incrociano tutte in mezzo alla tela e diventano una
+   * matassa.
+   *
+   * Adesso i fili escono dal BORDO DESTRO ed entrano nel BORDO SINISTRO,
+   * e girano ad angolo retto con lo spigolo arrotondato: è come si
+   * disegnano gli schemi dei circuiti e le mappe della metropolitana, e
+   * il motivo è lo stesso. Due linee parallele non si confondono; due
+   * diagonali sì.
+   *
+   * ⚠️ E c'è un caso a parte: quando due card stanno una SOPRA l'altra
+   * (il verdetto e il muro), il filo scende dritto dal bordo di sotto a
+   * quello di sopra. Farlo uscire di lato per rientrare subito
+   * disegnerebbe una virgola inutile intorno alla card.
+   */
+  const fili = useMemo(() => {
+    const R = 12; // il raggio degli spigoli
+    return FILI.map((f) => {
+      const da = NODI.find((n) => n.id === f.da);
+      const a = NODI.find((n) => n.id === f.a);
+      if (!da || !a) return null;
+
+      const sx = MARGINE + da.x * U;
+      const sy = MARGINE + da.y * U;
+      const tx = MARGINE + a.x * U;
+      const ty = MARGINE + a.y * U;
+      const zone = [da.zona, a.zona] as ChiaveZona[];
+
+      /* uno sopra l'altro: si scende dritti */
+      if (da.x === a.x) {
+        const x = sx + CARD_W / 2;
+        const y0 = sy + CARD_H;
+        const y1 = ty;
+        return { ...f, d: `M ${x} ${y0} L ${x} ${y1}`, mx: x, my: (y0 + y1) / 2, zone };
+      }
+
+      const p = { x: sx + CARD_W, y: sy + CARD_H / 2 };
+      const q = { x: tx, y: ty + CARD_H / 2 };
+
+      /* stessa riga: una linea sola, dritta */
+      if (Math.abs(p.y - q.y) < 2) {
+        return { ...f, d: `M ${p.x} ${p.y} L ${q.x} ${q.y}`, mx: (p.x + q.x) / 2, my: p.y, zone };
+      }
+
+      /* altrimenti: destra, giù (o su), destra. Lo spigolo si arrotonda
+         con due archi, così il filo non ha angoli taglienti. */
+      const mx = (p.x + q.x) / 2;
+      const giu = q.y > p.y ? 1 : -1;
+      const r = Math.min(R, Math.abs(q.y - p.y) / 2, Math.abs(mx - p.x), Math.abs(q.x - mx));
+      const d =
+        `M ${p.x} ${p.y} L ${mx - r} ${p.y}` +
+        ` Q ${mx} ${p.y} ${mx} ${p.y + r * giu}` +
+        ` L ${mx} ${q.y - r * giu}` +
+        ` Q ${mx} ${q.y} ${mx + r} ${q.y}` +
+        ` L ${q.x} ${q.y}`;
+      return { ...f, d, mx, my: (p.y + q.y) / 2, zone };
+    }).filter((f): f is NonNullable<typeof f> => f !== null);
+  }, []);
 
   const iniziaTrascino = useCallback(
     (e: React.PointerEvent) => {
@@ -204,7 +246,7 @@ export default function Mappa() {
   const spento = (z: ChiaveZona) => zonaSola !== null && zonaSola !== z;
 
   return (
-    <div className="flex h-[calc(100dvh-142px)] min-h-[520px] flex-col gap-3">
+    <div className={`flex min-h-[520px] flex-col gap-3 ${piena ? "flex-1" : "h-[calc(100dvh-190px)]"}`}>
       {/* ---------------- i comandi ---------------- */}
       <div className="flex flex-wrap items-center gap-2">
         <button

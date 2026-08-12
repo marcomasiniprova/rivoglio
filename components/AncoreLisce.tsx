@@ -58,9 +58,20 @@ export default function AncoreLisce() {
       const brusco = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const comportamento = brusco ? ("auto" as const) : ("smooth" as const);
 
-      /* Senza cancelletto e stessa pagina = il marchio: si torna in cima
-         scorrendo, invece di ricaricare la pagina che stai già guardando. */
-      if (!destinazione.hash || destinazione.hash === "#") {
+      /* 🔴 UN LINK CON UN PARAMETRO NON È IL MARCHIO, ED È UN BUG CHE HO
+         FATTO IO. Valerio, 12/08: «nel registro tutti quei tab non si
+         riescono ad aprire e cliccare». Aveva ragione, e non era il
+         registro: le sue linguette sono link a `/admin/registro?tipo=...`,
+         cioè STESSA pagina con una domanda diversa. Qui sotto bastava
+         "stessa pagina e nessun cancelletto" per decidere che era il
+         marchio, quindi il clic veniva annullato e sostituito con uno
+         scorrimento in cima. Effetto: ogni filtro del sito smetteva di
+         funzionare, non solo quelli del registro.
+         Adesso deve essere identica anche la parte dopo il punto
+         interrogativo: se cambia, è una navigazione vera e non si
+         tocca. */
+      const stessaDomanda = destinazione.search === location.search;
+      if (stessaDomanda && (!destinazione.hash || destinazione.hash === "#")) {
         fermaIlClic(e);
         window.scrollTo({ top: 0, behavior: comportamento });
         pulisciIndirizzo();
