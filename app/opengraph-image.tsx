@@ -19,9 +19,30 @@ const E = COPY.datoOggettivo.esempio;
 /* Il segno nuovo (la lente): letto da disco al momento, Next impacchetta
    l'asset. Dentro la funzione e con ripiego: una promessa a livello di
    modulo restava appesa nei contesti doppi del dev server. */
+/**
+ * 🔴 I BYTE SI CONTROLLANO PRIMA DI USARLI.
+ *
+ * L'immagine social rispondeva 500 con «Input buffer contains
+ * unsupported image format», ma solo quando il server è sotto carico
+ * (visto il 12/08 nella suite piena; da fermo va 200 su 200). `readFile`
+ * non lancia se il file si legge a metà: torna dei byte, solo che non
+ * sono più un PNG. Il guasto salta fuori dopo, dentro il disegno, e a
+ * quel punto è tardi: esce un 500 al posto della cartolina.
+ *
+ * Un PNG comincia SEMPRE con la stessa firma di otto byte. Se non c'è,
+ * si fa finta che il marchio non ci sia: l'immagine esce senza la lente,
+ * un po' più povera ma valida. Una cartolina senza logo è infinitamente
+ * meglio di un link che su WhatsApp non mostra niente.
+ */
+const FIRMA_PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
 async function leggiMarchio(): Promise<string | null> {
   try {
     const dati = await readFile(new URL("./marchio-og.png", import.meta.url));
+    if (dati.length < 1024 || !dati.subarray(0, 8).equals(FIRMA_PNG)) {
+      console.warn("[og] il marchio non è un PNG valido: cartolina senza logo");
+      return null;
+    }
     return `data:image/png;base64,${dati.toString("base64")}`;
   } catch {
     return null;

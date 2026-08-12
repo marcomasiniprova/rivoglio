@@ -18,7 +18,7 @@ const titoloCorsivo = stacco > 0 ? SEZIONE.titolo.slice(stacco + 1) : "";
 
 export default function Retroattivo() {
   return (
-    <section id="retroattivo" className="scroll-mt-24 px-5 py-16 sm:px-8 sm:py-20">
+    <section id="retroattivo" className="scroll-mt-24 px-5 py-13 sm:px-8 sm:py-16">
       <div className="mx-auto grid max-w-[1200px] items-center gap-12 lg:grid-cols-[minmax(0,460px)_1fr] lg:gap-20">
         <Anima>
           <p className="text-[13px] font-medium uppercase tracking-[0.16em] text-verde">

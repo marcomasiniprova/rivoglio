@@ -31,7 +31,7 @@ export default function StrisciaArgomenti({ escluso }: { escluso?: string }) {
             <Link
               key={t.chiave}
               href={`${RADICE}/argomento/${t.chiave}`}
-              className="group inline-flex shrink-0 items-center gap-2 rounded-pillola border border-verde-notte/18 bg-white px-4 py-2 text-[14.5px] font-medium text-verde-notte/80 transition-all duration-300 hover:-translate-y-0.5 hover:border-verde/50 hover:text-verde-notte"
+              className="tocco-comodo group inline-flex shrink-0 items-center gap-2 rounded-pillola border border-verde-notte/18 bg-white px-4 py-2 text-[14.5px] font-medium text-verde-notte/80 transition-all duration-300 hover:-translate-y-0.5 hover:border-verde/50 hover:text-verde-notte"
             >
               {t.nome}
               <span className="numeri text-[12.5px] text-verde-notte/35 transition-colors group-hover:text-verde">

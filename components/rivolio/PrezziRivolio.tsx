@@ -2,6 +2,8 @@ import { Check } from "lucide-react";
 import { Anima, AnimaLista, Figlio } from "@/components/Anima";
 import ConfrontoBanconote from "./ConfrontoBanconote";
 import { COPY } from "@/lib/copy";
+import { cassaDiProvaAperta } from "@/lib/check/cancello";
+import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { listinoCorrente } from "@/lib/prezzi-server";
 
 /**
@@ -56,10 +58,12 @@ export default async function PrezziRivolio() {
      questa persona sta vedendo, non da COPY. Se il cookie manca è il
      listino di sempre, quindi la pagina non cambia. */
   const { listino } = await listinoCorrente();
+  /* Dove porta il bottone di sblocco, o null se non c'è dove andare. */
+  const cassaDiretta = CHECK_A_PAGAMENTO && cassaDiProvaAperta() ? "/cassa-prova" : null;
   const prezzoDi = (nome: string) =>
     nome === COPY.prezzi.piani.famiglia.nome ? listino.famigliaTesto : listino.singolaTesto;
   return (
-    <section id="prezzi" className="scroll-mt-24 px-5 py-16 sm:px-8 sm:py-20">
+    <section id="prezzi" className="scroll-mt-24 px-5 py-13 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-[1200px]">
         <Anima className="mx-auto max-w-2xl text-center">
           {/* L'occhiello a pillola col puntino, come nel riferimento. */}
@@ -125,13 +129,38 @@ export default async function PrezziRivolio() {
                   ))}
                 </ul>
 
-                <a
-                  href="#controllo"
-                  className="riflesso mt-6 inline-flex h-13 w-full items-center justify-center gap-2 rounded-bottone bg-verde px-8 text-[16px] font-semibold text-white shadow-[0_16px_34px_-14px_rgba(10,157,92,.7)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro active:scale-[0.99] sm:w-auto"
-                >
-                  {CHECK.bottone}
-                  <span aria-hidden="true">→</span>
-                </a>
+                {/* ⚠️ DA QUI SI PUÒ ANCHE PAGARE (richiesta di Valerio,
+                    12/08: «se uno va nel pricing e clicca paga viene
+                    scrollato all'analisi, fai che possa pagare da
+                    entrambi»). Aveva ragione: quando il check si paga,
+                    questa card È un prodotto in vendita, e un bottone
+                    che invece di vendere ti sposta la pagina più in su
+                    fa perdere la persona che aveva già deciso.
+                    Il secondo bottone compare solo se ci sono TUTTE E
+                    DUE le cose: il muro acceso e una cassa vera dove
+                    andare. Se manca una delle due resta il solo invito
+                    al check, che è il percorso normale. */}
+                <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                  <a
+                    href="#controllo"
+                    className={`riflesso inline-flex h-13 w-full items-center justify-center gap-2 rounded-bottone px-8 text-[16px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.99] sm:w-auto ${
+                      cassaDiretta
+                        ? "border border-verde/35 bg-white text-verde-scuro hover:border-verde"
+                        : "bg-verde text-white shadow-[0_16px_34px_-14px_rgba(10,157,92,.7)] hover:bg-verde-scuro"
+                    }`}
+                  >
+                    {CHECK.bottone}
+                    <span aria-hidden="true">→</span>
+                  </a>
+                  {cassaDiretta && (
+                    <a
+                      href={cassaDiretta}
+                      className="riflesso inline-flex h-13 w-full items-center justify-center gap-2 rounded-bottone bg-verde px-8 text-[16px] font-semibold text-white shadow-[0_16px_34px_-14px_rgba(10,157,92,.7)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro active:scale-[0.99] sm:w-auto"
+                    >
+                      Sblocca ora · {CHECK.prezzo}
+                    </a>
+                  )}
+                </div>
                 <p className="mt-3 text-[13px] text-fumo-2">{CHECK.rassicurazione}</p>
               </div>
             </div>
@@ -255,7 +284,7 @@ export default async function PrezziRivolio() {
           <div className="rounded-2xl border border-bordo/70 bg-white p-5 sm:p-6">
             <ConfrontoBanconote prezzoNostro={listino.singola} />
             <details className="group mt-5 border-t border-bordo/60 pt-4">
-              <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 text-[13px] font-medium text-fumo underline decoration-dotted underline-offset-4 transition-colors marker:hidden hover:text-verde">
+              <summary className="tocco-comodo inline-flex cursor-pointer list-none items-center gap-1.5 text-[13px] font-medium text-fumo underline decoration-dotted underline-offset-4 transition-colors marker:hidden hover:text-verde">
                 {COPY.comune.apriIlConto}
                 <span
                   aria-hidden="true"
@@ -271,8 +300,21 @@ export default async function PrezziRivolio() {
           </div>
         </Anima>
 
+        {/* ⚠️ QUESTA RIGA NON È UNA NOTA A PIÈ DI PAGINA (richiesta di
+            Valerio, 12/08: «enfatizzala, coloriscila, centrala,
+            ingrandiscila di pochissimo»). Ha ragione: è la risposta
+            all'obiezione che uno si fa da solo guardando un prezzo su
+            internet, cioè «e poi cosa mi arriva dopo». Era grigia a 14
+            punti sotto due card enormi, quindi non la leggeva nessuno.
+            Adesso è una pillola verde chiaro, centrata, a 15,5 punti:
+            un filo più grande e un colore, non un titolo. */}
         <Anima ritardo={0.1}>
-          <p className="mt-9 text-center text-[14px] text-fumo">{SEZIONE.promemoria}</p>
+          <p className="mt-9 flex justify-center">
+            <span className="inline-flex items-center gap-2.5 rounded-pillola border border-verde/20 bg-menta-tenue px-5 py-2.5 text-center text-[15.5px] font-medium text-verde-scuro">
+              <Check className="size-4 shrink-0" aria-hidden="true" />
+              {SEZIONE.promemoria}
+            </span>
+          </p>
         </Anima>
       </div>
     </section>

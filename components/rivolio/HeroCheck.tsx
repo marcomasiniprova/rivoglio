@@ -109,7 +109,7 @@ export default function HeroCheck() {
                 type="button"
                 aria-expanded={notaAperta === chiave}
                 onClick={() => setNotaAperta(notaAperta === chiave ? null : chiave)}
-                className={`rounded-pillola px-2 py-0.5 font-medium underline decoration-dotted underline-offset-4 transition-colors ${
+                className={`tocco-comodo rounded-pillola px-2 py-0.5 font-medium underline decoration-dotted underline-offset-4 transition-colors ${
                   notaAperta === chiave ? "text-verde-scuro" : "text-fumo hover:text-verde-scuro"
                 }`}
               >

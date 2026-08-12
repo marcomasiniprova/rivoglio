@@ -724,6 +724,38 @@ a:focus-visible .cornice-sfalsata::after {
   border-bottom-color: color-mix(in srgb, var(--color-verde-notte) 30%, transparent);
 }
 
+/* ---------- L'AREA CHE PRENDE IL DITO ----------
+   Valerio, 12/08: «sistema anche gli altri bersagli sotto 44, la vista
+   mobile da OGNI dispositivo deve essere perfetta».
+
+   Il problema: un comando alto 25 punti si prende male col pollice, e
+   quando lo manchi non succede niente e pensi che il sito sia rotto.
+   Apple indica 44 punti come minimo, Google 48.
+
+   ⚠️ MA INGRANDIRLI DAVVERO CAMBIA IL DISEGNO, e nello stesso messaggio
+   c'era la richiesta opposta: avvicinare le sezioni. Quindi non si
+   ingrandisce niente. Si mette SOTTO il comando un rettangolo invisibile
+   di almeno 44x44, centrato su di lui: il dito prende, l'occhio non vede
+   niente cambiare, e da 768 punti in su la regola non esiste proprio.
+
+   ⚠️ Due comandi piccoli e vicinissimi finirebbero con le aree
+   sovrapposte, e allora vince quello scritto dopo nel documento. Per
+   questo si mette a mano dove serve, e non a tappeto su ogni link. */
+@media (max-width: 767px) {
+  .tocco-comodo {
+    position: relative;
+  }
+  .tocco-comodo::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+  }
+}
+
 /* ---------- SUL TELEFONO IL VERDE DEVE RESTARE VERDE ----------
    Valerio, 12/08: «da desktop il Tabellone è verde scuro, che va bene,
    ma dalla vista telefono il colore del font diventa completamente

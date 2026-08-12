@@ -49,6 +49,37 @@ export async function proxy(request: NextRequest) {
   // Senza .env.local il sito deve comunque funzionare: la landing è pubblica.
   if (!SUPABASE_CONFIGURATO) return conPrezzo(risposta);
 
+  /* 🔴 CHI NON HA MAI FATTO LOGIN NON SI CHIEDE A SUPABASE.
+     Trovato misurando il sito vero il 12/08, cercando perché «ogni volta
+     che clicco un bottone ci mette secondi». Questo proxy gira su OGNI
+     richiesta che non sia un file statico (landing, blog, prezzi,
+     articoli: tutto), e sotto faceva `getUser()`, che è una chiamata di
+     rete a Supabase. Per un visitatore che non ha mai fatto login quella
+     chiamata non può che rispondere "nessuno", quindi era un viaggio
+     andata e ritorno buttato via PRIMA di ogni singola pagina, per il
+     100% del traffico di oggi.
+     Il cookie di sessione lo scrive Supabase e si chiama
+     `sb-<progetto>-auth-token` (a volte spezzato in `.0`, `.1`). Se non
+     c'è, la persona è anonima per definizione.
+     ⚠️ E NON SI ABBASSA NESSUNA GUARDIA, anzi: senza cookie si prende il
+     ramo `user = null`, che è quello severo, lo stesso che sbatte fuori
+     dalle pagine riservate. Chi il cookie ce l'ha continua a passare da
+     `getUser()` come prima, perché lì il token va davvero verificato e
+     rinnovato: un cookie si falsifica, una sessione no. */
+  const haUnaSessione = request.cookies
+    .getAll()
+    .some((c) => /^sb-.*-auth-token(\.\d+)?$/.test(c.name));
+  if (!haUnaSessione) {
+    const percorsoAnonimo = request.nextUrl.pathname;
+    if (RISERVATE.some((r) => percorsoAnonimo === r || percorsoAnonimo.startsWith(r + "/"))) {
+      const entra = request.nextUrl.clone();
+      entra.pathname = "/entra";
+      entra.searchParams.set("poi", percorsoAnonimo);
+      return conPrezzo(NextResponse.redirect(entra));
+    }
+    return conPrezzo(risposta);
+  }
+
   const supabase = createServerClient(URL_SUPABASE, CHIAVE_PUBBLICA, {
     cookies: {
       getAll() {

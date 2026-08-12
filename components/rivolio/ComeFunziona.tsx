@@ -17,7 +17,7 @@ const titoloCorsivo = SEZIONE.titolo.slice(stacco);
 
 export default function ComeFunziona() {
   return (
-    <section id="come-funziona" className="scroll-mt-24 px-5 py-16 sm:px-8 sm:py-20">
+    <section id="come-funziona" className="scroll-mt-24 px-5 py-13 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-[1200px]">
         <Anima className="mx-auto max-w-2xl text-center">
           <h2 className="luce-testo text-[clamp(2.25rem,5.2vw,3.5rem)] leading-[1.02]">

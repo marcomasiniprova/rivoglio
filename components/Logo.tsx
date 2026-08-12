@@ -25,7 +25,7 @@ export default function Logo({ scuro = false }: { scuro?: boolean }) {
   return (
     <Link
       href="/"
-      className="group flex shrink-0 items-center gap-2.5"
+      className="tocco-comodo group flex shrink-0 items-center gap-2.5"
       aria-label="Rivolio, lo scanner dei rimborsi"
     >
       <Marchio className="h-9 w-9 shrink-0 transition-transform duration-500 group-hover:-rotate-6" />

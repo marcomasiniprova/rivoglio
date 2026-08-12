@@ -16,7 +16,7 @@ const titoloCorsivo = SEZIONE.titolo.slice(stacco + 1);
 
 export default function FaqRivolio() {
   return (
-    <section id="domande" className="scroll-mt-24 px-5 py-16 sm:px-8 sm:py-20">
+    <section id="domande" className="scroll-mt-24 px-5 py-13 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-[760px]">
         <Anima>
           <h2 className="luce-testo text-center text-[clamp(2.1rem,4.6vw,3.05rem)] leading-[1.06]">

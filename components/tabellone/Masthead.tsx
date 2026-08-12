@@ -32,7 +32,7 @@ export default function Masthead() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-verde-notte/10 bg-carta/92 backdrop-blur-xl">
-      <div className="mx-auto flex h-[62px] max-w-[1216px] items-center justify-between gap-4 px-5 sm:px-8">
+      <div className="relative mx-auto flex h-[62px] max-w-[1216px] items-center justify-between gap-4 px-5 sm:px-8">
         {/* ⚠️ IL RITORNO STA A SINISTRA, PRIMA DEL MARCHIO, e non in
             mezzo ai bottoni di destra dov'era finito l'11/08: là
             affollava la barra e competeva con "Controlla il tuo volo".
@@ -44,7 +44,7 @@ export default function Masthead() {
           <Link
             href="/"
             aria-label="Torna al sito Rivolio"
-            className="hidden shrink-0 items-center gap-1 rounded-[8px] py-1.5 pl-1 pr-2 text-[13.5px] font-medium text-verde-notte/55 transition-colors hover:text-verde-notte sm:inline-flex"
+            className="tocco-comodo hidden shrink-0 items-center gap-1 rounded-[8px] py-1.5 pl-1 pr-2 text-[13.5px] font-medium text-verde-notte/55 transition-colors hover:text-verde-notte sm:inline-flex"
           >
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <path
@@ -72,10 +72,10 @@ export default function Masthead() {
             il passo fra le voci scende a 5 e torna a 7 solo quando c'è
             spazio davvero (xl). Sotto i 1024 punti questa nav non
             esiste, quindi sul telefono non cambia niente. */}
-        <nav className="hidden items-center gap-5 lg:flex xl:gap-7">
+        <nav className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 items-center gap-5 lg:flex xl:gap-7">
           <Link
             href={RADICE}
-            className="whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
+            className="pointer-events-auto whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
           >
             Tutti gli articoli
           </Link>
@@ -83,13 +83,13 @@ export default function Masthead() {
           <div className="group relative">
             <button
               type="button"
-              className="flex items-center gap-1.5 whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
+              className="pointer-events-auto flex items-center gap-1.5 whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
               aria-haspopup="true"
             >
               Argomenti
               <Piu />
             </button>
-            <div className="invisible absolute left-1/2 top-full z-10 w-[240px] -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+            <div className="pointer-events-auto invisible absolute left-1/2 top-full z-10 w-[240px] -translate-x-1/2 pt-3 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
               <div className="rounded-[12px] border border-verde-notte/12 bg-white p-2 shadow-[0_20px_44px_-24px_rgba(5,46,31,.4)]">
                 {argomenti.map((t) => (
                   <Link
@@ -107,13 +107,13 @@ export default function Masthead() {
 
           <Link
             href="/#osservatorio"
-            className="whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
+            className="pointer-events-auto whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
           >
             Osservatorio
           </Link>
           <Link
             href="/#prezzi"
-            className="whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
+            className="pointer-events-auto whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
           >
             Prezzi
           </Link>

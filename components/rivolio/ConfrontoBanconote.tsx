@@ -29,6 +29,26 @@ const C = COPY.prezzi.confronto;
 const QUANTE = 6;
 const CURVA = [0.16, 1, 0.3, 1] as const;
 
+/**
+ * LA LINEA DELLO STRAPPO, scritta una volta sola.
+ *
+ * Sono gli stessi punti percorsi nei due versi: `RESTA` è la banconota
+ * che rimane col morso, `ANGOLO` è il pezzo che vola. Definirle
+ * separatamente vorrebbe dire che al primo ritocco una delle due resta
+ * indietro, e allora fra il buco e il pezzo comparirebbe una fessura o
+ * una sovrapposizione: cioè si vedrebbe che sono due oggetti diversi, ed
+ * è esattamente quello che NON deve sembrare.
+ *
+ * I punti non stanno in riga apposta: un taglio dritto si legge come
+ * "ritagliato con le forbici", una linea a denti si legge come strappato.
+ * L'angolo tolto è quello in alto a destra, largo circa un quarto della
+ * banconota: la quota vera (14,90 su 600) sarebbe invisibile, quindi qui
+ * il pezzo è simbolico e la cifra esatta sta scritta accanto.
+ */
+const TAGLIO = "74% 0%, 78% 8%, 72% 16%, 80% 23%, 75% 31%, 100% 31%";
+const RESTA = `polygon(0% 0%, ${TAGLIO}, 100% 100%, 0% 100%)`;
+const ANGOLO = `polygon(74% 0%, 100% 0%, 100% 31%, 75% 31%, 80% 23%, 72% 16%, 78% 8%)`;
+
 const euro = (n: number) =>
   n.toLocaleString("it-IT", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }) +
   "€";
@@ -135,11 +155,17 @@ function Ventaglio({
 }) {
   const fermo = useReducedMotion();
   /* Due tempi: prima il ventaglio si apre, POI le banconote volano via.
-     Il volo aspetta che le carte siano in posizione, così si legge la scena. */
+     Il volo aspetta che le carte siano in posizione, così si legge la scena.
+     ⚠️ 1,4 SECONDI E NON 0,95: l'ultima carta del ventaglio parte a
+     `ritardo + 0,55` e ci mette 0,7, quindi si posa a `ritardo + 1,25`.
+     Con la partenza a 0,95 il volo cominciava mentre il ventaglio si
+     stava ancora aprendo: due movimenti sovrapposti che l'occhio legge
+     come confusione. Adesso il ventaglio finisce, c'è un attimo di
+     stacco, e poi parte il volo. */
   const [vola, setVola] = useState(false);
   useEffect(() => {
     if (!parti || fermo) return;
-    const id = setTimeout(() => setVola(true), 950 + ritardo * 1000);
+    const id = setTimeout(() => setVola(true), 1400 + ritardo * 1000);
     return () => clearTimeout(id);
   }, [parti, fermo, ritardo]);
 
@@ -177,6 +203,11 @@ function Ventaglio({
           transition = { duration: 0.7, ease: CURVA, delay: ritardo + 0.1 + i * 0.09 };
         }
 
+        /* L'angolino si strappa dalla carta IN CIMA, ed è l'unica che
+           lo può fare: è quella che si vede tutta intera. */
+        const strappaQui = parziale && i === QUANTE - 1;
+        const strappato = strappaQui && (vola || fermo);
+
         return (
           <motion.div
             key={i}
@@ -186,35 +217,53 @@ function Ventaglio({
             animate={animate}
             transition={transition}
           >
-            <NotaEuro className="h-auto w-full" />
+            {/* La banconota. Quando l'angolo se ne va, qui resta il
+                buco: stessa linea frastagliata del pezzo che vola, così
+                i due combaciano finché sono attaccati. */}
+            <div style={{ clipPath: strappato ? RESTA : undefined }}>
+              <NotaEuro className="h-auto w-full" />
+            </div>
+
+            {strappaQui && (
+              <motion.div
+                aria-hidden="true"
+                className="absolute inset-0"
+                style={{ clipPath: ANGOLO }}
+                /* ⚠️ PARTE DA FERMO E DA INVISIBILE, e sono due cose
+                   diverse. Prima l'angolino compariva a `ritardo + 0,2`,
+                   cioè mentre il ventaglio si stava ancora aprendo, e
+                   restava lì appoggiato in un angolo del riquadro:
+                   Valerio l'ha visto e ha ragione, non si strappava,
+                   appariva (12/08). Adesso vive DENTRO la banconota,
+                   quindi ne segue posizione e rotazione senza calcoli, e
+                   nel primo fotogramma del volo sta esattamente sopra il
+                   buco che lascia: al tempo zero non si vede niente
+                   cambiare, poi si stacca. È lo strappo. */
+                initial={{ opacity: 0 }}
+                animate={
+                  fermo
+                    ? { opacity: 0 }
+                    : vola
+                      ? {
+                          opacity: [1, 1, 1, 0],
+                          x: [0, -2, 34, 62],
+                          y: [0, 4, -26, -74],
+                          rotate: [0, -3, 22, 52],
+                        }
+                      : { opacity: 0 }
+                }
+                transition={
+                  vola
+                    ? { duration: 1.35, ease: CURVA, times: [0, 0.12, 0.55, 1] }
+                    : { duration: 0 }
+                }
+              >
+                <NotaEuro className="h-auto w-full" />
+              </motion.div>
+            )}
           </motion.div>
         );
       })}
-
-      {/* l'angolino che si stacca da Rivolio: la quota vera, 14,90 su 600 */}
-      {parziale && (
-        <motion.span
-          aria-hidden="true"
-          className="absolute right-[10px] top-[8px] z-20 h-[30px] w-[40px] overflow-hidden rounded-[4px] shadow-[0_2px_8px_rgba(5,46,31,0.3)]"
-          initial={{ opacity: 0, x: 0, y: 0, rotate: 0 }}
-          animate={
-            fermo
-              ? { opacity: 0 }
-              : !parti
-                ? { opacity: 0 }
-                : vola
-                  ? { x: [0, -3, 40], y: [0, 5, -40], rotate: [0, -4, 40], opacity: [1, 1, 0] }
-                  : { opacity: 1, x: 0, y: 0, rotate: 0 }
-          }
-          transition={
-            vola
-              ? { duration: 1.4, ease: CURVA, times: [0, 0.16, 1] }
-              : { duration: 0.6, ease: CURVA, delay: ritardo + 0.2 }
-          }
-        >
-          <NotaEuro className="h-auto w-[128px] max-w-none -translate-x-[90px] -translate-y-[2px]" />
-        </motion.span>
-      )}
     </div>
   );
 }

@@ -17,7 +17,7 @@ const titoloCorsivo = SEZIONE.titolo.slice(virgola + 1);
 
 export default function Garanzia() {
   return (
-    <section id="garanzia" className="scroll-mt-24 px-5 py-10 sm:px-8 sm:py-14">
+    <section id="garanzia" className="scroll-mt-24 px-5 py-8 sm:px-8 sm:py-11">
       <div className="relative mx-auto max-w-[1200px] overflow-hidden rounded-[2rem] bg-verde-notte px-6 py-16 text-white sm:px-14 sm:py-20">
         <div
           aria-hidden="true"

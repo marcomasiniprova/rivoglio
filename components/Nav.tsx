@@ -10,16 +10,30 @@ import { apreAParte } from "@/lib/link";
 export default function Nav() {
   return (
     <div className="sticky top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
-      <header className="mx-auto flex h-[60px] max-w-[1200px] items-center justify-between gap-3 rounded-pillola border border-white/60 bg-white/60 pl-3 pr-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] sm:pl-6">
+      {/* ⚠️ LE VOCI SONO CENTRATE SULLA PAGINA, non "in mezzo a quello
+          che avanza" (richiesta di Valerio, 12/08: allineale col titolo
+          della hero). Con `justify-between` il gruppo si posava dove
+          capitava, cioè spostato verso destra perché il marchio a
+          sinistra è più stretto dei due bottoni a destra: appena sotto,
+          il titolo della hero è centrato davvero, e i due assi non
+          combaciavano di una trentina di punti. Si vede senza saperlo
+          nominare.
+          Il trucco è togliere le voci dal flusso e ancorarle a metà
+          larghezza: marchio e bottoni continuano a stare agli estremi
+          come prima. `pointer-events-none` sul contenitore e `auto` sui
+          link, se no la striscia invisibile in mezzo si mangerebbe i
+          clic sul marchio. Sotto i 1024 punti le voci non ci sono e non
+          cambia niente. */}
+      <header className="relative mx-auto flex h-[60px] max-w-[1200px] items-center justify-between gap-3 rounded-pillola border border-white/60 bg-white/60 pl-3 pr-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] sm:pl-6">
         <Logo />
 
-        <nav className="hidden items-center gap-8 lg:flex">
+        <nav className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 lg:flex">
           {COPY.nav.voci.map((v) => (
             <a
               key={v.ancora}
               href={v.ancora}
               {...apreAParte(v.ancora)}
-              className="text-[15px] text-fumo transition-colors hover:text-inchiostro"
+              className="pointer-events-auto whitespace-nowrap text-[15px] text-fumo transition-colors hover:text-inchiostro"
             >
               {v.testo}
             </a>

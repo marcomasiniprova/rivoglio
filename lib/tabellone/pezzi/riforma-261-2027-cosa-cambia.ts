@@ -32,6 +32,7 @@ export const ARTICOLO: Articolo = {
   tipo: "situazione",
   tag: ["diritti", "rimborsi", "guida"],
   copertina: "stelle-riforma",
+  foto: "/assets/tabellone/riforma-2027.webp",
   minuti: 8,
   inEvidenza: true,
   correlati: [
