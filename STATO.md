@@ -69,6 +69,69 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #61 (12/08): IL DESTINATARIO C'È SEMPRE.** Cinque punti alzati da
+  Valerio aprendo una pratica vera, tutti chiusi.
+  - 🔴 **«IL DESTINATARIO NON C'È PERCHÉ?»** Non era pigrizia:
+    **Ryanair, easyJet e Wizz un'email per i reclami non la pubblicano.**
+    Obbligano al loro modulo e nelle condizioni scrivono che processano
+    solo il reclamo mandato dal passeggero. Il bottone apriva un'email col
+    campo «A:» vuoto. Adesso su quelle compagnie **copia la lettera negli
+    appunti e apre il modulo ufficiale**, un gesto solo.
+    ⚠️ La copia parte PRIMA di aprire la scheda nuova: il browser concede
+    gli appunti solo dentro il gesto dell'utente, e su Safari chiederli
+    dopo non funziona.
+    ⚠️ **La PEC non è mai la prima scelta**: una casella PEC di solito
+    rifiuta la posta che non arriva da un'altra PEC. Si mostra a parte.
+  - 🔴 **«CERCA "RECLAMI" SUL SITO UFFICIALE» È SPARITO.** Era il prodotto
+    che scaricava sull'utente il pezzo più difficile. **Archivio da 20 a
+    39 compagnie**, ognuna trovata con una ricerca **filtrata sul dominio
+    ufficiale**: gli indirizzi non sono dedotti, sono comparsi
+    nell'indice su quel dominio e su nessun altro. Dentro ci sono adesso
+    Aer Lingus, Eurowings, Brussels, TAP, Aegean, LOT, SAS, Finnair,
+    Croatia, TAROM, KM Malta, Neos, Pegasus, Air Serbia, Tunisair, Royal
+    Air Maroc, Delta, United, American. Più gli **alias dei gruppi**
+    (W4/W9 di Wizz, AL/RR di Ryanair) che prima uscivano fuori archivio
+    pur essendo lo stesso ufficio.
+    ⚠️ Per una compagnia ancora sconosciuta non si dice più «cerca»: si
+    dice **dove sta**, cioè in fondo all'email di conferma della
+    prenotazione, che ce l'ha chiunque abbia volato.
+  - 🔴 **L'EMAIL LASCIATA AL VERDETTO NON FACEVA ARRIVARE NIENTE.**
+    «Se metto una email e controllo la posta non vedo nulla»: vero, e la
+    landing prometteva il contrario. Adesso parte subito, **solo sugli
+    idonei** (su un incerto scriveremmo per dire «non lo so»), col link
+    che riapre il risultato **anche da un altro telefono**: senza, chi
+    chiude la pagina ha perso tutto, perché il check non ha account.
+    Nel titolo c'è la tratta, non il numero del volo.
+    E la riga accanto al campo adesso dice i **tre usi veri**
+    dell'indirizzo, invece di «la usiamo solo per la tua pratica».
+  - 🔴 **DOPO IL PAGAMENTO SI FINIVA SUL LOGIN**, ed era il momento
+    peggiore possibile. L'account **esiste già** (lo apriamo noi con la
+    sua email quando nasce la pratica): adesso si entra da soli, nessun
+    login in mezzo.
+    ⚠️ **E LO STESSO DIFETTO STAVA NEL BOTTONE DELL'EMAIL DI BENVENUTO
+    DOPO UN PAGAMENTO VERO**, cioè sul primo cliente pagante. Puntava
+    dritto a `/pratica/<id>`, ma Supabase consegna la sessione **nel
+    frammento** dell'indirizzo e solo `/auth/conferma` lo sa leggere:
+    quel bottone avrebbe sbattuto sul login esattamente come la cassa di
+    prova. Ora passano tutti e due da `lib/pratiche/ingresso.ts`.
+  - 🔴 **LA LETTERA AVEVA I SEGNI DELL'AUTOMATISMO** («c'è sporco, non
+    sembra un'email umana e professionale»): la riga di tre trattini
+    prima della nota finale, i fatti in elenco puntato, cinque campi fra
+    parentesi quadre. Adesso **i fatti sono in prosa** (nessun numero
+    perso: una prova li conta uno per uno), il separatore non esiste più
+    e i campi da compilare sono **uno solo, l'IBAN**, che non sappiamo e
+    non vogliamo sapere. Firma e data li mettiamo noi: l'indirizzo è
+    quello con cui è stata aperta la pratica.
+    ⚠️ Il foglio stampato taglia il piede **sulla nota**, che è una
+    costante nostra, non più su un separatore: quello che si copia è
+    identico a quello che si stampa.
+  - **`pratica_di_prova` non compare più in chiaro nella cronologia.** Una
+    prova raccoglie i tipi di evento che il codice scrive DAVVERO e
+    pretende che ognuno abbia la sua frase in italiano: il render ripiega
+    sul nome grezzo quando l'etichetta manca, quindi il difetto non rompe
+    niente e non lo trova nessuno, finché non lo trova un cliente.
+  - Prove: **1084 verdi**, 6 saltate, zero rosse. Le 26 nuove stanno in
+    `prove/destinatario.spec.ts`.
 - **GIRO #58 (11/08 notte): IL RETROBOTTEGA DIVENTA UN GESTIONALE.**
   «La parte admin è inguardabile, sviluppala come un software
   gestionale, sezioni a LATO non sopra» (richiesta di Valerio, con
