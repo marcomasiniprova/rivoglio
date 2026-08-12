@@ -12,6 +12,7 @@
  */
 
 export type ChiaveSezione =
+  | "mappa"
   | "panoramica"
   | "verdetti"
   | "pratiche"
@@ -31,6 +32,15 @@ export type Sezione = {
 };
 
 export const SEZIONI: Sezione[] = [
+  {
+    /* La mappa sta PER PRIMA perche' risponde alla domanda che viene
+       prima di tutte: come funziona questo posto. I numeri vengono dopo,
+       e senza la mappa non si sa nemmeno cosa stanno misurando. */
+    chiave: "mappa",
+    href: "/admin/mappa",
+    nome: "La mappa",
+    sotto: "Tutto Rivolio in una schermata: il prodotto, i canali, dove entrano i soldi.",
+  },
   {
     chiave: "panoramica",
     href: "/admin",

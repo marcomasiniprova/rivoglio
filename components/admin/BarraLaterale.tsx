@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
+import { Map,
   Activity,
   ExternalLink,
   FolderOpen,
@@ -36,6 +36,7 @@ import { SEZIONI, type ChiaveSezione } from "@/lib/admin/sezioni";
  */
 
 const ICONE: Record<ChiaveSezione, typeof LayoutDashboard> = {
+  mappa: Map,
   panoramica: LayoutDashboard,
   verdetti: Gavel,
   pratiche: FolderOpen,
