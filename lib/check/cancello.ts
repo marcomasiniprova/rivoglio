@@ -65,11 +65,43 @@ export function passDi(req: Request): Pass | null {
  * funzione a guardare il cookie invece della sola variabile.
  */
 export function cassaDiProvaAperta(): boolean {
-  return Boolean(process.env.CASSA_PROVA_SEGRETO);
+  /* Col portone aperto la cassa c'e' anche senza parola segreta: e'
+     esattamente il punto della richiesta di Valerio, cioe' non dover
+     piu' prendere nessuna chiave per provare il prodotto. */
+  return collaudoAperto() || Boolean(process.env.CASSA_PROVA_SEGRETO);
+}
+
+/**
+ * IL PORTONE APERTO (decisione di Valerio, 12/08: «adesso nessuno
+ * visiterà Rivolio, sono solo io: fai tutto libero per me, poi quando
+ * lancio togliamo e barriamo come di default»).
+ *
+ * Ha ragione sul fatto suo: oggi il sito non lo conosce nessuno, e ogni
+ * chiave da prendere è un giro in più fra lui e la cosa che vuole
+ * provare. Con `COLLAUDO_APERTO=1` su Netlify chiunque passi di qui è
+ * trattato come il collaudatore: le due casse di prova si aprono, i voli
+ * dimostrativi camminano fino in fondo, e non serve più nessun cookie.
+ *
+ * ⚠️ NASCE SPENTO E SI SPEGNE TOGLIENDO UNA RIGA. È la parte che conta:
+ * il giorno del lancio non c'è niente da ricordarsi di rimettere a
+ * posto nel codice, si cancella la variabile su Netlify e tutto torna
+ * chiuso a chiave nello stesso istante. Se la variabile non c'è (per
+ * esempio in una copia del sito, o in locale) il portone è chiuso: è la
+ * direzione prudente per dimenticanza, non il contrario.
+ *
+ * ⚠️ COSA NON APRE, mai, nemmeno con la variabile accesa: il retrobottega
+ * (`/admin` continua a volere il ruolo admin) e il bollo sui voli
+ * dimostrativi. Il primo perché lì ci sono gli incassi e i dati; il
+ * secondo perché un volo inventato deve restare riconoscibile a
+ * chiunque lo guardi, e quella è la regola 3 del progetto.
+ */
+export function collaudoAperto(): boolean {
+  return process.env.COLLAUDO_APERTO === "1";
 }
 
 /** Vero se questo browser porta la chiave del collaudatore. */
 export function inCollaudo(req: Request): boolean {
+  if (collaudoAperto()) return true;
   const segreto = process.env.CASSA_PROVA_SEGRETO ?? "";
   if (!segreto) return false;
   return chiaveDiProvaValida(cookieDi(req, COOKIE_PROVA), segreto);

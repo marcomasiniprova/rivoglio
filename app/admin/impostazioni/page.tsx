@@ -116,6 +116,15 @@ function stato(): Voce[] {
       ceSta: c(process.env.CASSA_PROVA_SEGRETO),
     },
     {
+      nome: "COLLAUDO_APERTO",
+      serve:
+        'Il portone del collaudo. Vale "1" per far entrare CHIUNQUE nelle due casse finte e far camminare i voli dimostrativi (ZZ*) fino in fondo al percorso, senza nessuna chiave da prendere. Serve a te, adesso, per provare il prodotto da qualsiasi telefono.',
+      seManca:
+        "Torna tutto chiuso: le casse finte vogliono il cookie del collaudatore e i voli ZZ si fermano al verdetto. 🔴 È la riga da cancellare il giorno del lancio, insieme a CASSA_PROVA_SEGRETO. Il retrobottega NON si apre mai, nemmeno con questa accesa: /admin vuole comunque il ruolo admin.",
+      peso: "facoltativa",
+      ceSta: process.env.COLLAUDO_APERTO === "1",
+    },
+    {
       nome: "TELEGRAM_BOT_TOKEN",
       serve:
         "Il gettone del bot che ti manda le notifiche (te lo dà @BotFather). Identifica il BOT, non te.",
