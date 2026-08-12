@@ -237,7 +237,11 @@ test.describe("Il muro copre tutte le porte", () => {
   test("la ricerca per tratta non regala l'orario di atterraggio", () => {
     const codice = codiceDi("app/api/voli-tratta/route.ts");
     expect(codice).toContain("arrivoEffettivoOra");
-    expect(codice).toContain("passDi");
+    /* 🔴 Qui c'era scritto `passDi`, che guarda il solo cookie: e il
+       cookie si copia. Dal 12/08 questa porta chiede al registro se il
+       credito è ancora vivo, ed è `passUsabile` a farlo. Rimettere
+       `passDi` qui riaprirebbe il buco. */
+    expect(codice).toContain("passUsabile");
   });
 });
 
@@ -264,7 +268,17 @@ test.describe("Nessuna porta di servizio sul muro", () => {
   ];
 
   /** Chi nomina il cancello, in una qualsiasi delle sue forme. */
-  const CANCELLO = ["cancelloDelSeguito", "passDi", "rispostaMuro", "leggiPass"];
+  /* ⚠️ `passUsabile` è entrato in elenco il 12/08: è `passDi` che in più
+     chiede al REGISTRO se quel credito è ancora vivo, e le due porte
+     laterali adesso usano quello. `passDi` resta buono dove il credito
+     non c'entra (la pagina del verdetto, che legge solo per lo sconto). */
+  const CANCELLO = [
+    "cancelloDelSeguito",
+    "passUsabile",
+    "passDi",
+    "rispostaMuro",
+    "leggiPass",
+  ];
 
   /**
    * Le rotte care che NON hanno il cancello, e perché è giusto così.

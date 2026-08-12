@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
-import { passDi } from "@/lib/check/cancello";
+import { passUsabile } from "@/lib/check/cancello";
 import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { aeroportoPerIata } from "@/lib/voli/aeroporti";
 import { normalizzaData } from "@/lib/voli/normalizza";
@@ -90,7 +90,10 @@ export async function GET(req: Request) {
      far riconoscere all'utente il proprio volo: senza, la lista di undici
      voli identici non si distingue e la ricerca per tratta smette di
      funzionare. */
-  const haPagato = !CHECK_A_PAGAMENTO || Boolean(passDi(req));
+  /* 🔴 Stesso difetto di /api/leggi-carta: il cookie da solo non basta,
+     perché si copia. Qui in ballo c'è l'orario di atterraggio VERO, che
+     è esattamente la cosa che il muro esiste per far pagare. */
+  const haPagato = !CHECK_A_PAGAMENTO || Boolean(await passUsabile(req));
   const voli = haPagato
     ? esito.voli
     : esito.voli.map((v) => ({ ...v, arrivoEffettivoOra: "" }));

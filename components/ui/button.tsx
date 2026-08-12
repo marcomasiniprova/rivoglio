@@ -13,7 +13,13 @@ const varianti = cva(
     variants: {
       variant: {
         pieno:
-          "bg-verde text-white shadow-[0_10px_24px_-10px_rgba(6,122,70,0.7),0_1px_0_0_rgba(255,255,255,0.22)_inset] hover:bg-verde-scuro hover:shadow-[0_16px_34px_-12px_rgba(6,122,70,0.8),0_1px_0_0_rgba(255,255,255,0.22)_inset] active:scale-[0.985]",
+          /* 🔴 IL BIANCO SUL VERDE CHIARO STAVA A 3,5 DI CONTRASTO, sotto il
+             minimo di legge (4,5). Su uno schermo al sole il testo del
+             bottone si perde, ed è il bottone che porta i soldi. Adesso il
+             fondo è il verde scuro che usavamo già al passaggio del mouse
+             (#067a46): stesso verde di famiglia, 4,7 di contrasto.
+             Trovato dall'ispezione del 12/08. */
+          "bg-verde-scuro text-white shadow-[0_10px_24px_-10px_rgba(6,122,70,0.7),0_1px_0_0_rgba(255,255,255,0.22)_inset] hover:bg-verde-notte hover:shadow-[0_16px_34px_-12px_rgba(6,122,70,0.8),0_1px_0_0_rgba(255,255,255,0.22)_inset] active:scale-[0.985]",
         scuro:
           "bg-inchiostro text-white hover:bg-inchiostro/85 active:scale-[0.985]",
         /* Vetro: la via secondaria. Sul principale non si mette, perché su

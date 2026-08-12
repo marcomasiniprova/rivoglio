@@ -64,7 +64,7 @@ export default function PaginaPrivacy() {
           del check, dove puoi correggerli prima di procedere.
         </li>
         <li>
-          <strong>Pagamenti</strong>: sono gestiti dal fornitore di pagamento (Polar, in
+          <strong>Pagamenti</strong>: sono gestiti da un fornitore di pagamento esterno che opera come venditore (in
           qualità di merchant of record). Noi non vediamo e non conserviamo i dati della tua
           carta.
         </li>

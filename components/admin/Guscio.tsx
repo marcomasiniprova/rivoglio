@@ -172,12 +172,23 @@ export default function Guscio({
               {/* Il pallino verde è l'unico posto del pannello dove qualcosa
                   pulsa: dice che i numeri si muovono da soli. ⚠️ Sta FUORI
                   dal testo, se no sul telefono spariva insieme all'ora e il
-                  bottone sembrava un semplice "ricarica". */}
-              <span
-                aria-hidden="true"
-                className="inline-block size-1.5 animate-pulse rounded-full bg-verde"
-              />
-              <span className="hidden sm:inline">aggiornato alle {ora}</span>
+                  bottone sembrava un semplice "ricarica".
+                  🔴 E PULSAVA ANCHE DOVE NON SI AGGIORNA NIENTE: su
+                  Impostazioni, Mappa e Prodotto i numeri non si muovono da
+                  soli, ma il pallino e l'ora dicevano di sì. Un segnale di
+                  "in diretta" su una schermata ferma insegna a non
+                  fidarsi del pallino, che è l'unica cosa che dovrebbe dire
+                  se stai guardando dati freschi.
+                  Trovato dall'ispezione del 12/08. */}
+              {sezioneViva && (
+                <span
+                  aria-hidden="true"
+                  className="inline-block size-1.5 animate-pulse rounded-full bg-verde"
+                />
+              )}
+              <span className="hidden sm:inline">
+                {sezioneViva ? `aggiornato alle ${ora}` : "aggiorna"}
+              </span>
               <span className="sr-only">Aggiorna adesso</span>
             </button>
 

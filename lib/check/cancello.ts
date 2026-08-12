@@ -43,6 +43,32 @@ export function passDi(req: Request): Pass | null {
 }
 
 /**
+ * LA RICEVUTA, CONTROLLATA SUL REGISTRO E NON SUL COOKIE.
+ *
+ * 🔴 IL COOKIE SI COPIA. `passDi` guarda solo che la ricevuta sia firmata
+ * e non scaduta: il credito residuo lo porta il cookie stesso, e il
+ * cookie sta nel browser dell'utente. Bastava copiarne il valore PRIMA
+ * di usarlo e rimetterlo dopo per tornare al credito pieno, e da lì in
+ * poi avere trenta giorni di letture della carta d'imbarco (che paghiamo
+ * a chiamata) e di orari di atterraggio veri, cioè la cosa che il muro
+ * esiste per far pagare.
+ * Il registro che chiude proprio questo buco c'era già (`creditoFinito`,
+ * scritto per il giro #54) ma lo consultava soltanto `/api/verifica`: le
+ * due porte laterali guardavano il solo cookie.
+ * Trovato dall'ispezione del 12/08.
+ *
+ * ⚠️ Torna `null` anche quando il credito è finito: chi chiama non deve
+ * distinguere "non ha mai pagato" da "ha già speso", perché la risposta
+ * è la stessa e distinguerle vorrebbe dire spiegare a un estraneo come
+ * funziona la serratura.
+ */
+export async function passUsabile(req: Request): Promise<Pass | null> {
+  const pass = passDi(req);
+  if (!pass) return null;
+  return (await creditoFinito(pass)) ? null : pass;
+}
+
+/**
  * LA CASSA DI PROVA È APERTA (decisione di Valerio, 11/08).
  *
  * Finché non esiste un venditore vero, il bottone del muro porta alla
@@ -219,9 +245,19 @@ export async function rispostaMuro(req: Request) {
 export async function cancelloDelSeguito(
   req: Request,
   verificaId: unknown,
+  /* 🔴 IL VOLO SERVE, E PRIMA NON ARRIVAVA. Senza, questo cancello
+     controllava soltanto che quella riga esistesse da qualche parte nel
+     database: non di chi fosse, non di che volo parlasse. Un
+     identificativo qualsiasi (anche di un altro, visto che le pagine del
+     verdetto sono pubbliche e fatte per essere condivise) diventava una
+     chiave universale per avere verdetti a pagamento su QUALUNQUE volo,
+     all'infinito, e ogni verdetto ci costa una chiamata al fornitore.
+     Adesso la verifica deve parlare dello stesso volo e dello stesso
+     giorno che si sta chiedendo. Trovato dall'ispezione del 12/08. */
+  volo?: { voloIata: string; dataLocale: string },
 ): Promise<Response | null> {
   if (!CHECK_A_PAGAMENTO) return null;
-  if (passDi(req)) return null;
+  if (await passUsabile(req)) return null;
 
   /* ⚠️ SI CHIUDE, NON SI APRE, QUANDO QUALCOSA VA STORTO.
      Senza database non si può dimostrare che quella verifica esiste, e
@@ -231,12 +267,14 @@ export async function cancelloDelSeguito(
      sbagliare dall'altra parte vuol dire regalare il prodotto. */
   if (typeof verificaId === "string" && verificaId && SERVIZIO_ATTIVO) {
     try {
-      const { data } = await supabaseServizio()
-        .from("verifiche")
-        .select("id")
-        .eq("id", verificaId)
-        .maybeSingle();
-      if (data) return null;
+      if (volo) {
+        if (await verificaCoerente(verificaId, volo.voloIata, volo.dataLocale)) return null;
+      } else {
+        /* Senza il volo non si può dimostrare che parlano della stessa
+           cosa: si resta chiusi. Sbagliare dall'altra parte vuol dire
+           regalare il prodotto. */
+        console.warn("[cancello] chiamata senza volo: resta chiuso");
+      }
     } catch (e) {
       console.warn("[cancello] verifica non controllabile, resta chiuso:", e);
     }

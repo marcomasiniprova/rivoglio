@@ -137,6 +137,17 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
     }
 
     const righe = data as RigaGrezza[];
+    /* 🔴 IL TETTO TAGLIAVA I NUMERI IN SILENZIO. Superate le 20.000 righe
+       nella settimana, questa lettura ne riporta ventimila e i totali
+       della Panoramica e del Traffico si accorciano da soli, con la
+       stessa faccia di prima. Il grafico per giorno lo dice già (vedi
+       `leggiSerie`): qui non lo diceva nessuno.
+       Trovato dall'ispezione del 12/08. */
+    if (righe.length >= 20_000) {
+      console.warn(
+        "[cruscotto] tetto di 20.000 righe raggiunto: i numeri della settimana sono PARZIALI.",
+      );
+    }
     /* 🔴 LA MAPPA DEVE NASCERE COMPLETA, E QUI NASCEVA A META'.
        `{} as Record<TipoEvento, number>` mente al compilatore: dichiara
        che ogni tipo di fatto ha un numero, ma dentro ci finiscono solo i

@@ -42,6 +42,19 @@ function variazione(
   const prima = serie.slice(0, -1);
   const media = prima.reduce((s, g) => s + quanto(g), 0) / prima.length;
   if (media < 1) return null; // senza storico non è un confronto, è rumore
+  /* 🔴 CONFRONTAVA MEZZA GIORNATA CON GIORNATE INTERE, quindi la mattina
+     era sempre in rosso: alle nove hai un quinto della giornata contro la
+     media di giornate finite, e il pannello ti dice "meno 80%" mentre non
+     è successo niente di male. Un allarme che suona ogni mattina è un
+     allarme che si smette di guardare.
+     Adesso il confronto si mostra solo a giornata finita; prima di
+     allora si dice quanto manca invece di inventare una percentuale.
+     Trovato dall'ispezione del 12/08. */
+  const oraRoma = Number(
+    new Intl.DateTimeFormat("it-IT", { hour: "numeric", hour12: false, timeZone: "Europe/Rome" })
+      .format(new Date()),
+  );
+  if (oraRoma < 20) return null;
   const oggi = quanto(serie[serie.length - 1]);
   return {
     pct: Math.round(((oggi - media) / media) * 100),

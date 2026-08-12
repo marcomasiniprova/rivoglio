@@ -70,7 +70,8 @@ export default function PaginaCondizioni() {
       </ul>
       <p>
         Sono prezzi una tantum: nessun abbonamento, nessuna percentuale sulla compensazione.
-        I pagamenti sono gestiti da Polar (merchant of record), che emette anche la ricevuta.
+        I pagamenti sono gestiti da un fornitore esterno che opera come venditore
+        (merchant of record) e che emette anche la ricevuta.
       </p>
 
       <h2>Consegna immediata e diritto di recesso</h2>

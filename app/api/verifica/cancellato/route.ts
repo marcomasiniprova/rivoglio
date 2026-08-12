@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normalizzaData, normalizzaVolo } from "@/lib/voli/normalizza";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
 import { verificaCoerente, cancelloDelSeguito } from "@/lib/check/cancello";
 import { rispostaValida, valutaCancellato } from "@/lib/regole/cancellato";
@@ -75,7 +76,13 @@ export async function POST(req: Request) {
      non può restare aperta: chi ne conosceva l'indirizzo saltava il
      pagamento. Passa chi ha la ricevuta o chi porta l'identificativo di
      una verifica che esiste, cioè chi ha già pagato quel volo. */
-  const chiuso = await cancelloDelSeguito(req, verificaId);
+  const chiuso = await cancelloDelSeguito(req, verificaId, {
+    /* Si normalizzano come li normalizza il verificatore: se no
+       "fr 4001" e "FR4001" sembrerebbero due voli diversi e il cancello
+       si chiuderebbe in faccia a chi ha pagato. */
+    voloIata: (() => { const n = normalizzaVolo(volo); return n.ok ? n.valore : volo; })(),
+    dataLocale: (() => { const n = normalizzaData(data); return n.ok ? n.valore : data; })(),
+  });
   if (chiuso) return chiuso;
 
   /* Si ripassa dal verificatore invece di fidarsi di quello che arriva dal

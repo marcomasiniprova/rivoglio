@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
-import { passDi, rispostaMuro } from "@/lib/check/cancello";
+import { passUsabile, rispostaMuro } from "@/lib/check/cancello";
 import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { estraiCampi, testoDaDocumento } from "@/lib/ocr/carta-imbarco";
 
@@ -52,7 +52,12 @@ export async function POST(req: Request) {
      gratuito per chiunque, e il conto arriva a noi. Il tetto per IP non
      basta: vive nella memoria della singola funzione Netlify, quindi con
      dieci istanze in parallelo sono dieci tetti diversi. */
-  if (CHECK_A_PAGAMENTO && !passDi(req)) return rispostaMuro(req);
+  /* 🔴 QUI SI GUARDAVA IL SOLO COOKIE, e il cookie si copia: bastava
+     salvarne il valore prima di usare l'analisi e rimetterlo dopo per
+     avere trenta giorni di letture illimitate, che paghiamo a chiamata.
+     `passUsabile` chiede al REGISTRO se quel credito è ancora vivo.
+     Trovato dall'ispezione del 12/08. */
+  if (CHECK_A_PAGAMENTO && !(await passUsabile(req))) return rispostaMuro(req);
 
   let corpo: unknown;
   try {

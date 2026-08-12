@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normalizzaData, normalizzaVolo } from "@/lib/voli/normalizza";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
 import { verificaCoerente, cancelloDelSeguito } from "@/lib/check/cancello";
 import { cercaVettore, valutaOperativo, vettoreValido } from "@/lib/regole/operativo";
@@ -67,7 +68,13 @@ export async function POST(req: Request) {
 
   /* IL CANCELLO: vedi lib/check/cancello.ts. Questa rotta richiude un
      verdetto, e col muro acceso il verdetto si paga. */
-  const chiuso = await cancelloDelSeguito(req, verificaId);
+  const chiuso = await cancelloDelSeguito(req, verificaId, {
+    /* Si normalizzano come li normalizza il verificatore: se no
+       "fr 4001" e "FR4001" sembrerebbero due voli diversi e il cancello
+       si chiuderebbe in faccia a chi ha pagato. */
+    voloIata: (() => { const n = normalizzaVolo(volo); return n.ok ? n.valore : volo; })(),
+    dataLocale: (() => { const n = normalizzaData(data); return n.ok ? n.valore : data; })(),
+  });
   if (chiuso) return chiuso;
 
   /* Si ripassa dal verificatore invece di fidarsi del browser: gli orari

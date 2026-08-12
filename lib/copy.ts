@@ -146,7 +146,12 @@ export const COPY = {
       profilo: {
         titolo: "Non sei entrato.",
         testo:
-          "Il check funziona lo stesso. Con l'account trovi le pratiche, gli avvisi e la classifica.",
+          /* 🔴 PROMETTEVA AVVISI E CLASSIFICA, che nella web app non
+             esistono: gli avvisi sono le notifiche dell'app sul telefono,
+             e la classifica è spenta finché non ci sono vincite vere. Chi
+             entrava da browser cercava due cose che non ci sono.
+             Trovato dall'ispezione del 12/08. */
+          "Il check funziona lo stesso. Con l'account ritrovi le tue pratiche e riprendi da dove eri, anche da un altro dispositivo.",
         azione: "Entra",
       },
     },
@@ -475,7 +480,20 @@ export const COPY = {
       {
         compagnie: "ITA Airways, Aeroitalia",
         finestra: "2 anni",
-        nota: "termine di legge italiano (art. 949 cod. nav.)",
+        /* 🔴 QUI E NEL BLOG C'ERANO DUE RISPOSTE DIVERSE ALLA STESSA
+           DOMANDA. Il Tabellone spiega, correttamente, che in Italia il
+           termine è CONTESTATO fra sei mesi e un anno e che conviene
+           trattarlo come sei mesi; questa card diceva "2 anni" come se
+           fosse un fatto pacifico. Non lo è, e la nota citava anche
+           l'articolo sbagliato. Adesso la card dice che è una stima e
+           manda al pezzo che la spiega: le due pagine non si smentiscono
+           più. Trovato dall'ispezione del 12/08.
+           ⚠️ Le finestre NON si accorciano a sei mesi: farlo butterebbe
+           via il bacino dei voli vecchi, e la richiesta si può presentare
+           lo stesso oltre quel termine (è la compagnia che deve
+           eccepirlo). Si dice come stanno le cose, non si sceglie il
+           numero che fa più comodo in nessuna delle due direzioni. */
+        nota: "stima: in Italia il termine è discusso, vedi la guida",
         /* Servono al cielo della card: scala 0-6 anni e bandierina. */
         anniStimati: 2,
         paese: "it" as const,
@@ -505,7 +523,7 @@ export const COPY = {
         "Numero e data sono lì dentro, nell'email che ti hanno mandato quando hai prenotato. Non serve altro: il check parte da questi due dati.",
     },
     avvertenza:
-      "La scadenza è una finestra stimata, dipende dalla compagnia: la dichiariamo caso per caso dentro la tua verifica. Il check online oggi copre i voli degli ultimi 12 mesi.",
+      "La scadenza è una finestra stimata, dipende dalla compagnia e dal paese: la dichiariamo caso per caso dentro la tua verifica. In Italia il termine è discusso fra sei mesi e un anno, quindi prima chiedi e meglio è. Il check online oggi copre i voli degli ultimi 12 mesi.",
     suggerimento:
       "Non ricordi i dettagli? Cerca \"conferma volo\" nella tua casella email: numero e data saltano fuori in un minuto.",
     cta: "Controlla un volo passato",
