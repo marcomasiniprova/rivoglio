@@ -1,4 +1,11 @@
-import { VERSIONE_REGOLE, type FattoVolo, type Verdetto } from "./eu261";
+import { ambitoCE261, vettoreConLicenzaUE } from "./territorio";
+import {
+  VERSIONE_REGOLE,
+  dentroLoSpazioEuropeo,
+  fasciaArt7,
+  type FattoVolo,
+  type Verdetto,
+} from "./eu261";
 
 import { seSiPaga } from "@/lib/check/ingresso";
 /**
@@ -66,15 +73,33 @@ const nonIdoneo = (motivo: string): Verdetto => ({
   versioneRegole: VERSIONE_REGOLE,
 });
 
-/** Le fasce dell'art. 7: decide la distanza. */
-function fascia(km: number): 250 | 400 | 600 {
-  if (km <= 1500) return 250;
-  if (km <= 3500) return 400;
-  return 600;
-}
+/* 🔴 STESSA COPIA SBAGLIATA DI cancellato.ts: le fasce senza l'eccezione
+   della lettera b). Vedi il commento là e `fasciaArt7` in eu261.ts. */
+const fascia = (f: FattoVolo, km: number) => fasciaArt7(km, dentroLoSpazioEuropeo(f));
 
-/** I paletti comuni ai casi che spettano: sciopero, codeshare, distanza. */
+/** I paletti comuni ai casi che spettano: ambito, sciopero, codeshare, distanza. */
 function paletti(f: FattoVolo, km: number | null): Verdetto | null {
+  /* 🔴 IL CANCELLO TERRITORIALE NON C'ERA, E QUESTA PORTA ERA APERTA.
+     L'art. 3 par. 1 decide PRIMA di tutto il resto se il Regolamento si
+     applica, e `valuta()` in eu261.ts lo chiede da sempre. Ma negato
+     imbarco e coincidenza persa non passano da lì: arrivano da
+     /api/verifica/dichiara e chiamavano direttamente queste funzioni.
+     Effetto: un New York → Toronto, che il check dichiara giustamente
+     fuori ambito, bastava riaprirlo con «mi hanno lasciato a terra» per
+     vedersi rispondere «idoneo, 250€». Lo stesso identico falso positivo
+     chiuso nel giro #37 sul ritardo, rimasto aperto sulla porta accanto.
+     Trovato dall'ispezione del 12/08. */
+  const ambito = ambitoCE261(
+    { iata: f.partenzaIata, paese: f.partenzaPaese, icao: f.partenzaIcao },
+    { iata: f.arrivoIata, paese: f.arrivoPaese, icao: f.arrivoIcao },
+    f.vettoreUE ?? vettoreConLicenzaUE(f.vettoreOperativo),
+  );
+  if (!ambito.dentro) {
+    return ambito.certo
+      ? nonIdoneo(ambito.motivo)
+      : incerto(ambito.motivo);
+  }
+
   if (f.scioperoNoto === true) {
     return incerto(
       "In base alle tue risposte la compensazione spetterebbe, ma nel giorno di questo volo risulta uno sciopero del trasporto aereo: l'esito dipende da chi scioperava e lo verifichiamo a mano. Non ti facciamo pagare niente finché non è chiaro.",
@@ -116,7 +141,7 @@ export function valutaNegato(f: FattoVolo, r: RisposteNegato): Verdetto {
   const blocco = paletti(f, f.kmOrtodromica);
   if (blocco) return blocco;
   const km = f.kmOrtodromica as number;
-  const importo = fascia(km);
+  const importo = fascia(f, km);
 
   return {
     esito: "idoneo",
@@ -184,14 +209,12 @@ export function valutaCoincidenza(
 
   /* Le fasce sull'intero viaggio, con la riduzione del lungo raggio:
      oltre 3.500 km e arrivo fra 3 e 4 ore → 300€ (art. 7.2). */
-  const importo =
-    km <= 1500
-      ? (250 as const)
-      : km <= 3500
-        ? (400 as const)
-        : r.ritardoFinale === "fra3e4"
-          ? (300 as const)
-          : (600 as const);
+  /* ⚠️ La riduzione dell'art. 7 par. 2 vale SOLO sulla fascia da 600.
+     Prima, su un viaggio tutto dentro l'Unione più lungo di 3.500 km,
+     con arrivo fra 3 e 4 ore uscivano 300€: ma lì la fascia giusta è 400
+     piena, e dimezzare una fascia già tenuta bassa dalla lettera b)
+     vuol dire applicare due volte lo stesso sconto. */
+  const importo = fasciaArt7(km, dentroLoSpazioEuropeo(f), r.ritardoFinale === "fra3e4");
 
   return {
     esito: "idoneo",

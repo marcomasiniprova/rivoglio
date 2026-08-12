@@ -277,15 +277,7 @@ export function valuta(f: FattoVolo): Verdetto {
      sull'IMPORTO, e la regola numero uno del progetto lo vieta come vieta
      quelli sull'esito. */
   const km = f.kmOrtodromica;
-  const intraUe = zonaDiScalo(partenza) === "ue" && zonaDiScalo(arrivo) === "ue";
-  const importo =
-    km <= SOGLIA_CORTO_RAGGIO_KM
-      ? (250 as const)
-      : intraUe || km <= SOGLIA_LUNGO_RAGGIO_KM
-        ? (400 as const)
-        : ritardo < SOGLIA_RIDUZIONE_MINUTI
-          ? (300 as const)
-          : (600 as const);
+  const importo = fasciaArt7(km, dentroLoSpazioEuropeo(f), ritardo < SOGLIA_RIDUZIONE_MINUTI);
 
   return {
     esito: "idoneo",
@@ -318,4 +310,52 @@ export function scadenzaStimata(dataVolo: string, vettoreOperativo: string): {
     avvertenza:
       "Stima prudente: i termini dipendono dal paese della compagnia e dal giudice competente. Non è un parere legale.",
   };
+}
+
+/**
+ * LE FASCE DELL'ART. 7, IN UN POSTO SOLO.
+ *
+ * 🔴 QUESTA REGOLA ESISTEVA IN TRE COPIE, e due erano sbagliate.
+ * Qui dentro l'eccezione della lettera b) c'era ed era provata; ma
+ * `lib/regole/cancellato.ts` e `lib/regole/dichiarati.ts` avevano ognuno
+ * la propria `fascia(km)` che guardava i soli chilometri. Risultato: lo
+ * STESSO volo Parigi → Riunione (9.370 km, Francia con Francia) usciva
+ * 400€ se in ritardo e 600€ se cancellato o con negato imbarco. Cioè al
+ * passeggero si prometteva la metà in più di quanto la norma gli
+ * riconosce, e la differenza la scopre la compagnia quando risponde no.
+ * Trovato dall'ispezione del 12/08, tre difetti separati con la stessa
+ * radice.
+ *
+ * Una regola scritta in tre punti diventa tre regole diverse al primo
+ * cambio: da qui in avanti è una, e la chiamano tutti.
+ *
+ * @param km distanza della tratta (o dell'intero viaggio, sulla
+ *   coincidenza persa: la compensazione si calcola sul viaggio).
+ * @param intraUe partenza E arrivo dentro lo spazio europeo: allora
+ *   l'art. 7 lett. b) tiene la fascia a 400 per quanto sia lunga.
+ * @param riduzione l'art. 7 par. 2 dimezza la fascia quando il ritardo
+ *   all'arrivo resta sotto le quattro ore. ⚠️ Vale SOLO sulla fascia da
+ *   600: dimezzare una fascia già ridotta a 400 dalla lettera b) sarebbe
+ *   applicare due volte lo stesso sconto.
+ */
+export function fasciaArt7(km: number, intraUe: boolean, riduzione = false): 250 | 300 | 400 | 600 {
+  if (km <= SOGLIA_CORTO_RAGGIO_KM) return 250;
+  if (intraUe || km <= SOGLIA_LUNGO_RAGGIO_KM) return 400;
+  return riduzione ? 300 : 600;
+}
+
+/**
+ * Il volo sta tutto dentro lo spazio europeo?
+ *
+ * Serve alla lettera b). Se di uno dei due scali non sappiamo dire la
+ * zona, si risponde `false`: dire "no" qui alza la fascia da 400 a 600,
+ * quindi la prudenza andrebbe nella direzione opposta... e infatti chi
+ * chiama deve avere già passato il cancello territoriale, che senza
+ * scali riconosciuti non lascia mai uscire un "idoneo".
+ */
+export function dentroLoSpazioEuropeo(f: FattoVolo): boolean {
+  return (
+    zonaDiScalo({ iata: f.partenzaIata, paese: f.partenzaPaese, icao: f.partenzaIcao }) === "ue" &&
+    zonaDiScalo({ iata: f.arrivoIata, paese: f.arrivoPaese, icao: f.arrivoIcao }) === "ue"
+  );
 }

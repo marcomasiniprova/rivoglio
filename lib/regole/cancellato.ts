@@ -1,6 +1,8 @@
 import { seSiPaga } from "@/lib/check/ingresso";
 import {
   VERSIONE_REGOLE,
+  dentroLoSpazioEuropeo,
+  fasciaArt7,
   type FattoVolo,
   type Verdetto,
 } from "./eu261";
@@ -99,11 +101,13 @@ const nonIdoneo = (motivo: string): Verdetto => ({
 });
 
 /** Le stesse fasce del ritardo: è la distanza a decidere, non il caso. */
-function fascia(km: number): 250 | 400 | 600 {
-  if (km <= 1500) return 250;
-  if (km <= 3500) return 400;
-  return 600;
-}
+/* 🔴 QUI C'ERA UNA COPIA DELLE FASCE, E NON CONOSCEVA L'ART. 7 LETT. b).
+   Guardava i soli chilometri, quindi lo STESSO volo Parigi → Riunione
+   (9.370 km, Francia con Francia) usciva 400€ se in ritardo e 600€ se
+   cancellato: al passeggero si prometteva la metà in più di quanto la
+   norma gli riconosce. Adesso la regola è una sola e sta in eu261.ts.
+   Trovato dall'ispezione del 12/08. */
+const fascia = (f: FattoVolo, km: number) => fasciaArt7(km, dentroLoSpazioEuropeo(f));
 
 /**
  * Il verdetto su un volo cancellato, viste le risposte dell'utente.
@@ -185,7 +189,7 @@ export function valutaCancellato(f: FattoVolo, r: RisposteCancellato): Verdetto 
     );
   }
 
-  const importo = fascia(f.kmOrtodromica);
+  const importo = fascia(f, f.kmOrtodromica);
   const quando =
     r.preavviso === "nessuno"
       ? "Il volo è stato cancellato senza preavviso"
