@@ -42,6 +42,13 @@ export async function POST(req: Request) {
       })
       .eq("id", id)
       .eq("esito", "idoneo")
+      /* ⚠️ Il `.is(null)` non e' un dettaglio: e' quello che rende
+         questa firma IRRIPETIBILE. Una rinuncia al recesso e' il
+         documento che dimostra il consenso dell'utente (art. 59 Cod.
+         Consumo); se si potesse riscrivere, la data della firma
+         diventerebbe l'ultima volta che qualcuno ha premuto il bottone
+         invece del momento in cui la persona ha davvero acconsentito, e
+         in una contestazione varrebbe zero. */
       .is("rinuncia_recesso_il", null);
     if (error) throw new Error(error.message);
     return NextResponse.json({ ok: true });

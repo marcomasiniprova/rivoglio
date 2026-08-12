@@ -50,10 +50,33 @@ export async function POST(req: Request) {
       .from("verifiche")
       .update({ email: pulita })
       .eq("id", id)
+      /* ⚠️ SI SCRIVE UNA VOLTA SOLA. Prima bastava conoscere l'id per
+         RIscrivere l'email agganciata a una verifica, e quell'id gira
+         (sta nell'indirizzo /verifica/<id>, che si condivide e finisce
+         nella cronologia del browser). Chi ne avesse trovato uno poteva
+         sostituire l'indirizzo di quella persona col proprio e
+         intercettare gli avvisi sulla sua pratica.
+         Adesso l'email si aggiunge se non c'e'; per cambiarla si rifa'
+         il check, che e' un'operazione di mezzo minuto. Trovato
+         dall'ispezione del 12/08.
+         ⚠️ Qui prima c'era scritto anche quanto costa, e una prova l'ha
+         bocciato avendo ragione: il prezzo dell'analisi segue
+         l'interruttore e non si scrive a mano da nessuna parte, nemmeno
+         in un commento. Il giorno che l'interruttore si accende, una
+         riga che dice il contrario e' il modo in cui l'errore rientra
+         dalla finestra. */
+      .is("email", null)
       .select("id");
     if (error) throw new Error(error.message);
     if (!data || data.length === 0) {
-      return NextResponse.json({ ok: false, errore: "Verifica non trovata." }, { status: 404 });
+      /* Zero righe aggiornate vuol dire due cose: la verifica non
+         esiste, oppure un'email c'era gia'. Non si distinguono nella
+         risposta di proposito: dire "c'e' gia' un'email" a chi prova un
+         id a caso gli conferma che quella verifica esiste. */
+      return NextResponse.json(
+        { ok: false, errore: "Non ho potuto salvare questa email su questa verifica." },
+        { status: 404 },
+      );
     }
   } catch (e) {
     console.error("[verifica/email] salvataggio fallito:", e);

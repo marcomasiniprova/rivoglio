@@ -791,3 +791,66 @@ a:focus-visible .cornice-sfalsata::after {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* ============================================================
+   IL FOGLIO: il documento che il cliente ha comprato.
+
+   Richiesta di Valerio (12/08): «il ricorso generato deve essere ultra
+   professionale». Il pezzo che fa la differenza è UNO: il carattere con
+   le grazie. Un reclamo scritto nello stesso font della landing sembra
+   una schermata; lo stesso identico testo con le grazie sembra un atto.
+
+   ⚠️ SERIF DI SISTEMA, non un font scaricato. Georgia e Times ci sono su
+   ogni macchina da trent'anni, e sono i caratteri con cui è scritto il
+   99% dei documenti che quell'ufficio reclami riceve: è esattamente
+   l'effetto che serve. Un font nuovo da Google costerebbe un download in
+   più su OGNI pagina del sito (i font si dichiarano nel layout, non
+   nella pagina) per una schermata che apre solo chi ha già pagato.
+
+   `--font-corsivo` NON si può usare qui: è Instrument Serif, che
+   esiste solo in corsivo. Un reclamo tutto in corsivo non lo legge
+   nessuno.
+   ============================================================ */
+.foglio-testo {
+  font-family: Georgia, "Times New Roman", Times, ui-serif, serif;
+  /* Georgia ha i numeri "all'antica" (il 3 e il 9 scendono sotto la
+     riga): dentro un importo o un IBAN sembrano un errore di stampa. */
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* In stampa resta il foglio e basta: carta bianca, niente interfaccia,
+   niente fascia colorata (su una stampante in bianco e nero il verde
+   pieno diventa una barra grigia che si mangia il titolo). */
+@media print {
+  @page {
+    margin: 2cm;
+  }
+  .foglio {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    break-inside: auto;
+  }
+  .foglio-fascia {
+    background: #fff !important;
+    border-bottom: 1.5px solid #111 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .foglio-fascia p {
+    color: #111 !important;
+  }
+  .foglio-corpo {
+    padding: 1.2rem 0 0 !important;
+  }
+  .foglio-piede {
+    background: #fff !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  /* Un paragrafo spezzato fra due pagine, in un documento che qualcuno
+     leggerà per decidere se pagarti, si legge come una sciatteria. */
+  .foglio-testo {
+    break-inside: avoid;
+  }
+}

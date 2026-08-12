@@ -24,6 +24,8 @@
  *   TELEGRAM_ADMIN_CHAT  il tuo identificativo di chat
  */
 
+import { registra } from "@/lib/eventi/registra";
+
 const API = "https://api.telegram.org";
 
 export const TELEGRAM_ATTIVO = Boolean(
@@ -122,5 +124,19 @@ export async function tinGuasto(chiave: string, testo: string): Promise<void> {
   const prima = ultimoAllarme.get(chiave) ?? 0;
   if (adesso - prima < SILENZIO_MS) return;
   ultimoAllarme.set(chiave, adesso);
-  await tin(`🔴 <b>Qualcosa non va</b>\n${testo}`);
+
+  /* 🔴 IL REGISTRO AVEVA UNA LINGUETTA "GUASTI" CHE NON SI SAREBBE MAI
+     RIEMPITA. Il tipo `guasto` esisteva nell'elenco dei fatti, la
+     linguetta lo filtrava, il cruscotto lo contava: solo che nessuno lo
+     scriveva mai. Gli allarmi finivano tutti e soli su Telegram, cioè in
+     un posto dove scorrono via: fra una settimana "quante volte è caduto
+     il fornitore dei voli?" non aveva risposta, e la linguetta vuota si
+     leggeva come "non è mai successo niente".
+     Adesso il guasto va in tutti e due i posti: Telegram per svegliare,
+     il registro per ricordare. La chiave finisce in `extra` così i guasti
+     si contano per famiglia. Trovato dall'ispezione del 12/08. */
+  await Promise.all([
+    tin(`🔴 <b>Qualcosa non va</b>\n${testo}`),
+    registra({ tipo: "guasto", extra: { chiave, testo: testo.slice(0, 400) } }),
+  ]);
 }

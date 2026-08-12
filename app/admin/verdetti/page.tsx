@@ -82,12 +82,24 @@ export default async function PaginaVerdetti() {
 
   const db = supabaseServizio();
   const oggi = inizioOggiRoma();
+  /* 🔴 QUESTA PAGINA BUTTAVA VIA L'ERRORE, ed era l'unica del pannello a
+     farlo. `supabase-js` senza `.throwOnError()` NON lancia mai: su
+     guasto torna `{ count: null, error }`. Destrutturando solo `count` e
+     scrivendo `nCheck ?? 0`, un errore diventava uno zero mostrato come
+     numero vero. Peggio, la coda: `codaGrezza ?? []` faceva comparire il
+     bollo VERDE «coda pulita» e la scritta «Niente in attesa» su una
+     lettura fallita, cioe' una rassicurazione inventata sull'unica coda
+     che blocca un incasso (finche' non confermi, quel cliente non puo'
+     pagare). Trovato dall'ispezione del 12/08.
+     La regola di casa e' scritta in lib/admin/dati.ts e la applicano gia'
+     Pratiche e Iscritti: quando un numero non si legge, si scrive che non
+     si e' letto. Mai zero. */
   const [
-    { data: codaGrezza },
-    { count: nCheck },
-    { count: nIdonei },
-    { count: nIncerti },
-    { count: nNonIdonei },
+    { data: codaGrezza, error: erroreCoda },
+    { count: nCheck, error: e1 },
+    { count: nIdonei, error: e2 },
+    { count: nIncerti, error: e3 },
+    { count: nNonIdonei, error: e4 },
   ] = await Promise.all([
     db
       .from("verifiche")
@@ -116,12 +128,20 @@ export default async function PaginaVerdetti() {
       .gte("creata_il", oggi),
   ]);
 
+  for (const e of [erroreCoda, e1, e2, e3, e4]) {
+    if (e) console.error("[verdetti] lettura fallita:", e.message);
+  }
+  /* ⚠️ La coda non letta NON e' una coda vuota: si dice, e il bollo
+     verde non compare. */
+  const codaNonLetta = Boolean(erroreCoda);
   const coda = (codaGrezza ?? []) as unknown as RigaVerifica[];
+  /** null = non letto. Lo stampa `n()`, che scrive "non letto". */
+  const n = (v: number | null, err: { message: string } | null) => (err ? null : (v ?? 0));
   const oggiContatori = [
-    { nome: "Analisi oggi", valore: nCheck ?? 0 },
-    { nome: "Idonei", valore: nIdonei ?? 0, tono: "verde" as const },
-    { nome: "Incerti", valore: nIncerti ?? 0, tono: "attesa" as const },
-    { nome: "Non idonei", valore: nNonIdonei ?? 0 },
+    { nome: "Analisi oggi", valore: n(nCheck, e1) },
+    { nome: "Idonei", valore: n(nIdonei, e2), tono: "verde" as const },
+    { nome: "Incerti", valore: n(nIncerti, e3), tono: "attesa" as const },
+    { nome: "Non idonei", valore: n(nNonIdonei, e4) },
   ];
 
   return (
@@ -132,11 +152,14 @@ export default async function PaginaVerdetti() {
         {oggiContatori.map((k) => (
           <div key={k.nome} className="flex items-baseline gap-2">
             <span
-              className={`numeri font-display text-[22px] leading-none tracking-[-0.03em] ${
-                k.tono === "verde" ? "text-verde" : ""
-              }`}
+              className={`numeri font-display leading-none tracking-[-0.03em] ${
+                k.valore === null ? "text-[15px] text-fumo-2" : "text-[22px]"
+              } ${k.tono === "verde" && k.valore !== null ? "text-verde" : ""}`}
             >
-              {k.valore}
+              {/* ⚠️ "non letto" e' scritto in parole, non con un trattino
+                  o uno zero: deve leggersi come una risposta, non come
+                  un numero. */}
+              {k.valore === null ? "non letto" : k.valore}
             </span>
             <span className="text-[12.5px] text-fumo">{k.nome}</span>
           </div>
@@ -148,14 +171,24 @@ export default async function PaginaVerdetti() {
         titolo="Da confermare"
         sotto="Dalla più vecchia. Controlla gli orari del fatto contro la fonte: se il verdetto regge, conferma. Se il motore ha sbagliato, correggi e scrivi perché."
         destra={
-          coda.length > 0 ? (
+          codaNonLetta ? (
+            /* ⚠️ Niente bollo verde su una lettura fallita: sarebbe una
+               rassicurazione inventata proprio sull'unica coda che
+               blocca un incasso. */
+            <Bollo tono="attesa">coda non letta</Bollo>
+          ) : coda.length > 0 ? (
             <Bollo tono="attesa">{coda.length} in coda</Bollo>
           ) : (
             <Bollo tono="verde">coda pulita</Bollo>
           )
         }
       >
-        {coda.length === 0 ? (
+        {codaNonLetta ? (
+          <Vuoto
+            titolo="Non sono riuscito a leggere la coda."
+            spiega="Non vuol dire che è vuota: vuol dire che non lo so. Il database non ha risposto. Riprova fra poco; se continua, guarda la sezione Impostazioni."
+          />
+        ) : coda.length === 0 ? (
           <Vuoto
             titolo="Niente in attesa."
             spiega="Ogni analisi che esce idonea, con lo shadow mode acceso, compare qui e aspetta la tua conferma prima che quel cliente possa pagare."
@@ -222,7 +255,11 @@ export default async function PaginaVerdetti() {
                 </div>
 
                 <details className="mt-3 border-t border-bordo pt-3">
-                  <summary className="cursor-pointer text-[13px] font-medium text-fumo transition-colors hover:text-inchiostro">
+                  {/* ⚠️ Sul telefono la riga da toccare era alta 19 punti,
+                      cioè meno della metà del dito di chiunque: si
+                      sbagliava mira e non si apriva. `py-2` la porta a 35
+                      e non sposta niente sul computer. */}
+                  <summary className="-my-1 cursor-pointer py-2 text-[13px] font-medium text-fumo transition-colors hover:text-inchiostro sm:my-0 sm:py-0">
                     Correggi il verdetto
                   </summary>
                   <form
@@ -239,7 +276,11 @@ export default async function PaginaVerdetti() {
                     <select
                       name="esito"
                       defaultValue="non_idoneo"
-                      className="h-9 rounded-bottone border border-bordo bg-white px-3 text-sm"
+                      /* ⚠️ 16px, non 14: sotto i 16 iOS ingrandisce la
+                         pagina da solo appena tocchi il campo, e da lì in
+                         poi il pannello resta zoomato e storto. È lo
+                         stesso difetto trovato sul login. */
+                      className="h-9 rounded-bottone border border-bordo bg-white px-3 text-[16px] sm:text-sm"
                     >
                       <option value="non_idoneo">Non idoneo</option>
                       <option value="incerto">Incerto</option>
@@ -248,7 +289,7 @@ export default async function PaginaVerdetti() {
                       name="nota"
                       required
                       placeholder="Perché il motore ha sbagliato"
-                      className="h-9 min-w-56 flex-1 rounded-bottone border border-bordo bg-white px-3 text-sm placeholder:text-fumo-2"
+                      className="h-9 min-w-56 flex-1 rounded-bottone border border-bordo bg-white px-3 text-[16px] placeholder:text-fumo-2 sm:text-sm"
                     />
                     <Button type="submit" variant="scuro" size="sm">
                       Registra la correzione

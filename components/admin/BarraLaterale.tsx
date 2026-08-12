@@ -149,7 +149,11 @@ function Contenuto({ attiva, email, onChiudi }: Omit<Props, "aperta">) {
           name="cerca"
           placeholder="Cerca un volo"
           aria-label="Cerca nel registro"
-          className="h-10 w-full rounded-[10px] border border-bordo bg-nebbia pl-9 pr-3 text-[13.5px] text-inchiostro outline-none transition-colors placeholder:text-fumo-2 focus:border-verde/45 focus:bg-white"
+          /* ⚠️ 16px sul telefono: sotto quella misura iOS ingrandisce da
+             solo appena si tocca il campo, e il cassetto della barra resta
+             zoomato. Sul computer torna a 13,5, che è la misura giusta per
+             una barra laterale stretta. */
+          className="h-10 w-full rounded-[10px] border border-bordo bg-nebbia pl-9 pr-3 text-[16px] text-inchiostro outline-none transition-colors placeholder:text-fumo-2 focus:border-verde/45 focus:bg-white sm:text-[13.5px]"
         />
       </form>
 

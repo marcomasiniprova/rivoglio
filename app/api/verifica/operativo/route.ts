@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
-import { cancelloDelSeguito } from "@/lib/check/cancello";
+import { verificaCoerente, cancelloDelSeguito } from "@/lib/check/cancello";
 import { cercaVettore, valutaOperativo, vettoreValido } from "@/lib/regole/operativo";
 import { verificaVolo } from "@/lib/voli/verifica";
 import { inItaliano } from "@/lib/voli/aeroporti";
@@ -90,7 +90,19 @@ export async function POST(req: Request) {
      compagnia contesta, la dichiarazione deve esistere per iscritto.
      Le colonne sono quelle della migrazione 2026-08-14. */
   let salvato = false;
-  const id = typeof verificaId === "string" && verificaId ? verificaId : esito.verificaId;
+  /* 🔴 L'id che arriva dal CORPO si accetta solo se quella riga parla
+     dello stesso volo e della stessa data che abbiamo appena verificato.
+     Senza questo controllo bastava conoscere l'id di un'altra persona
+     (sta nell'indirizzo /verifica/<id>, che si condivide) per scriverle
+     addosso il verdetto di un volo che non era il suo. Trovato
+     dall'ispezione del 12/08 su tre rotte identiche. */
+  const dalCorpo =
+    typeof verificaId === "string" && verificaId
+      ? (await verificaCoerente(verificaId, esito.fatto.voloIata, esito.fatto.dataLocale))
+        ? verificaId
+        : null
+      : null;
+  const id = dalCorpo ?? esito.verificaId;
   if (id && SERVIZIO_ATTIVO) {
     try {
       const { error } = await supabaseServizio()

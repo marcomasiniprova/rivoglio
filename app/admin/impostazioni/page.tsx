@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { soloAdmin } from "@/lib/admin/guardia";
 import QuandoArrivaIlDominio from "@/components/admin/QuandoArrivaIlDominio";
 import { chatIdDaScoprire } from "@/lib/eventi/telegram";
@@ -179,23 +180,67 @@ const COLORE = {
   facoltativa: "text-fumo",
 } as const;
 
+/**
+ * Il riquadro del chat id, in un confine suo.
+ *
+ * Si mostra SOLO quando serve davvero: gettone messo, destinatario
+ * ancora no.
+ * 🔴 Prima era scritto in modo che il riquadro comparisse anche col chat
+ * id già a posto, e allora diceva "Manca il tuo chat id" tre righe sopra
+ * la riga che dice "c'è". Due frasi contraddittorie sulla stessa pagina
+ * fanno dubitare di tutto il resto, ed è quello che è successo (visto da
+ * Valerio, 11/08).
+ */
+async function RiquadroChatId() {
+  const chatDaTrovare = await chatIdDaScoprire();
+  return (
+    <div className="mt-6 rounded-[14px] border border-bordo bg-white p-5">
+      <p className="font-display text-[1.15rem] tracking-[-0.02em]">
+        {chatDaTrovare ? "Il tuo chat id è questo" : "Manca il tuo chat id"}
+      </p>
+      {chatDaTrovare ? (
+        <>
+          <p className="mt-2 text-[14px] leading-relaxed text-fumo">
+            Copialo su Netlify in <code className="text-inchiostro">TELEGRAM_ADMIN_CHAT</code>, poi{" "}
+            <em>Trigger deploy</em>. È il numero di {chatDaTrovare.nome || "chi ha scritto al bot"}.
+          </p>
+          <p className="mt-3 font-mono text-[1.5rem] font-medium text-verde">{chatDaTrovare.id}</p>
+        </>
+      ) : (
+        <p className="mt-2 text-[14px] leading-relaxed text-fumo">
+          Il gettone del bot c&apos;è, ma Telegram non sa ancora a chi scrivere. Apri Telegram,
+          manda una parola qualsiasi al bot, e <strong>ricarica questa pagina</strong>: il numero
+          comparirà qui, da copiare.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ChatIdSeManca() {
+  if (!process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_ADMIN_CHAT) return null;
+  return (
+    <Suspense
+      fallback={
+        <div className="mt-6 rounded-[14px] border border-bordo bg-white p-5">
+          <p className="font-display text-[1.15rem] tracking-[-0.02em]">Manca il tuo chat id</p>
+          <p className="mt-2 text-[14px] leading-relaxed text-fumo">
+            Sto chiedendo a Telegram se qualcuno ha scritto al bot…
+          </p>
+        </div>
+      }
+    >
+      <RiquadroChatId />
+    </Suspense>
+  );
+}
+
 export default async function PaginaImpostazioni() {
   /* ⚠️ Prima riga, sempre: questa pagina dice QUALI segreti sono
      configurati, e non è un elenco da lasciare a chiunque abbia un
      account. Vedi lib/admin/guardia.ts. */
   await soloAdmin();
   const voci = stato();
-  /* Il riquadro del chat id si mostra SOLO quando serve davvero: gettone
-     messo, destinatario ancora no.
-     🔴 Prima era scritto in modo che il riquadro comparisse anche col
-     chat id già a posto, e allora diceva "Manca il tuo chat id" tre
-     righe sopra la riga che dice "c'è". Due frasi contraddittorie sulla
-     stessa pagina fanno dubitare di tutto il resto, ed è quello che è
-     successo (visto da Valerio, 11/08). */
-  const chatDaTrovare =
-    process.env.TELEGRAM_BOT_TOKEN && !process.env.TELEGRAM_ADMIN_CHAT
-      ? await chatIdDaScoprire()
-      : null;
   const mancanti = voci.filter((v) => !v.ceSta && v.peso !== "facoltativa");
 
   return (
@@ -234,31 +279,14 @@ export default async function PaginaImpostazioni() {
           credendo di passare il secondo (successo l'11/08). Qui il numero
           si scopre da soli: si scrive al bot e si ricarica la pagina.
           Compare SOLO se il chat id manca davvero. */}
-      {chatDaTrovare !== null || (process.env.TELEGRAM_BOT_TOKEN && !process.env.TELEGRAM_ADMIN_CHAT) ? (
-        <div className="mt-6 rounded-[14px] border border-bordo bg-white p-5">
-          <p className="font-display text-[1.15rem] tracking-[-0.02em]">
-            {chatDaTrovare ? "Il tuo chat id è questo" : "Manca il tuo chat id"}
-          </p>
-          {chatDaTrovare ? (
-            <>
-              <p className="mt-2 text-[14px] leading-relaxed text-fumo">
-                Copialo su Netlify in <code className="text-inchiostro">TELEGRAM_ADMIN_CHAT</code>,
-                poi <em>Trigger deploy</em>. È il numero di{" "}
-                {chatDaTrovare.nome || "chi ha scritto al bot"}.
-              </p>
-              <p className="mt-3 font-mono text-[1.5rem] font-medium text-verde">
-                {chatDaTrovare.id}
-              </p>
-            </>
-          ) : (
-            <p className="mt-2 text-[14px] leading-relaxed text-fumo">
-              Il gettone del bot c&apos;è, ma Telegram non sa ancora a chi scrivere. Apri
-              Telegram, manda una parola qualsiasi al bot, e <strong>ricarica questa
-              pagina</strong>: il numero comparirà qui, da copiare.
-            </p>
-          )}
-        </div>
-      ) : null}
+      <ChatIdSeManca />
+      {/* 🔴 E PRIMA QUESTO PEZZO TENEVA FERMA TUTTA LA PAGINA. La chiamata
+          a Telegram sta dentro il suo confine con `Suspense`: se Telegram
+          non risponde, l'attesa è di sei secondi, e finché era in linea col
+          resto nessuno vedeva NIENTE per sei secondi, nemmeno l'elenco
+          delle variabili, che è la ragione per cui si apre questa pagina.
+          Adesso il resto compare subito e questo riquadro arriva dopo.
+          Trovato dall'ispezione del 12/08. */}
 
       <div className="mt-8 space-y-3">
         {voci.map((v) => (

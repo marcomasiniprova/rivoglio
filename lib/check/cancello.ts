@@ -244,3 +244,45 @@ export async function cancelloDelSeguito(
 
   return rispostaMuro(req);
 }
+
+/**
+ * 🔴 L'ID DELLA VERIFICA NON BASTA A DIMOSTRARE CHE È LA TUA.
+ *
+ * Trovato dall'ispezione del 12/08 su tre rotte identiche
+ * (`/api/verifica/cancellato`, `/dichiara`, `/operativo`): il
+ * `verificaId` arrivava dal CORPO della richiesta e finiva dritto in una
+ * `.update().eq("id", id)` che riscrive esito, importo e motivo.
+ *
+ * Il verdetto lo calcola sempre il motore, quindi nessuno può farsi
+ * scrivere "idoneo 600€" a piacere. Ma l'id di una verifica gira: sta
+ * nell'indirizzo `/verifica/<id>`, e quell'indirizzo si condivide.
+ * Chiunque ne avesse uno poteva mandare **il proprio** volo con **l'id
+ * di un altro**, e la riga di quella persona si ritrovava addosso il
+ * verdetto di un volo che non era il suo.
+ *
+ * Il controllo è semplice e non costa niente: la riga che stai per
+ * riscrivere deve parlare dello STESSO volo e della STESSA data che hai
+ * appena verificato. Se non combaciano, l'id non è tuo e non si tocca.
+ */
+export async function verificaCoerente(
+  id: string | null | undefined,
+  voloIata: string,
+  dataLocale: string,
+): Promise<boolean> {
+  if (!id || !SERVIZIO_ATTIVO) return false;
+  try {
+    const { data, error } = await supabaseServizio()
+      .from("verifiche")
+      .select("volo_iata, data_locale")
+      .eq("id", id)
+      .maybeSingle<{ volo_iata: string | null; data_locale: string | null }>();
+    if (error || !data) return false;
+    return (
+      (data.volo_iata ?? "").toUpperCase() === voloIata.toUpperCase() &&
+      data.data_locale === dataLocale
+    );
+  } catch (e) {
+    console.error("[cancello] coerenza verifica non controllabile:", e);
+    return false;
+  }
+}

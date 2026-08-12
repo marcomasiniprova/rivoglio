@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
-import { cancelloDelSeguito } from "@/lib/check/cancello";
+import { verificaCoerente, cancelloDelSeguito } from "@/lib/check/cancello";
 import {
   rispostaCoincidenzaValida,
   rispostaNegatoValida,
@@ -123,7 +123,19 @@ export async function POST(req: Request) {
 
   /* La prova: dichiarazione ed esito sulla riga della verifica. */
   let salvato = false;
-  const id = typeof c.verificaId === "string" && c.verificaId ? c.verificaId : esito.verificaId;
+  /* 🔴 L'id che arriva dal CORPO si accetta solo se quella riga parla
+     dello stesso volo e della stessa data che abbiamo appena verificato.
+     Senza questo controllo bastava conoscere l'id di un'altra persona
+     (sta nell'indirizzo /verifica/<id>, che si condivide) per scriverle
+     addosso il verdetto di un volo che non era il suo. Trovato
+     dall'ispezione del 12/08 su tre rotte identiche. */
+  const dalCorpo =
+    typeof c.verificaId === "string" && c.verificaId
+      ? (await verificaCoerente(c.verificaId, esito.fatto.voloIata, esito.fatto.dataLocale))
+        ? c.verificaId
+        : null
+      : null;
+  const id = dalCorpo ?? esito.verificaId;
   if (id && SERVIZIO_ATTIVO) {
     try {
       const { error } = await supabaseServizio()

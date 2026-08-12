@@ -59,6 +59,8 @@ type RigaGrezza = {
   importo: number | null;
   provenienza: string | null;
   paese: string | null;
+  /** Il contorno del fatto. Serve a riconoscere le righe di collaudo. */
+  extra?: Record<string, unknown> | null;
 };
 
 const VUOTO: Cruscotto = {
@@ -104,8 +106,16 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
   try {
     const db = supabaseServizio();
     const adesso = new Date();
-    const inizioOggi = new Date(adesso);
-    inizioOggi.setHours(0, 0, 0, 0);
+    /* 🔴 "OGGI" VOLEVA DIRE DUE COSE DIVERSE NELLA STESSA SCHERMATA.
+       Qui il giorno cominciava a mezzanotte dell'OROLOGIO DEL SERVER, che
+       su Netlify è a Londra; nel grafico qui sotto comincia a mezzanotte
+       ITALIANA. Fra l'una e le due di notte italiane i due numeri
+       parlavano di giornate diverse: la casella diceva "oggi 0" mentre la
+       colonna di oggi ne mostrava tre. Adesso il giorno è quello italiano
+       in tutte e due, e si confronta la data scritta invece di sommare
+       ore: così l'ora legale non sposta niente.
+       Trovato dall'ispezione del 12/08. */
+    const oggiIt = GIORNO_ROMA.format(adesso);
     const settimanaFa = new Date(adesso.getTime() - 7 * 86_400_000);
 
     /* Una lettura sola per la settimana, poi si conta in memoria: sette
@@ -113,7 +123,7 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
        fare otto interrogazioni separate costerebbe di più. */
     const { data, error } = await db
       .from("eventi")
-      .select("creato_il, tipo, volo, esito, importo, provenienza, paese")
+      .select("creato_il, tipo, volo, esito, importo, provenienza, paese, extra")
       .gte("creato_il", settimanaFa.toISOString())
       .order("creato_il", { ascending: false })
       .limit(20_000);
@@ -127,12 +137,38 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
     }
 
     const righe = data as RigaGrezza[];
-    const conta = (dentro: RigaGrezza[]) => {
-      const m = {} as Record<TipoEvento, number>;
-      for (const r of dentro) m[r.tipo as TipoEvento] = (m[r.tipo as TipoEvento] ?? 0) + 1;
+    /* 🔴 LA MAPPA DEVE NASCERE COMPLETA, E QUI NASCEVA A META'.
+       `{} as Record<TipoEvento, number>` mente al compilatore: dichiara
+       che ogni tipo di fatto ha un numero, ma dentro ci finiscono solo i
+       tipi INCONTRATI. Se oggi nessuno ha lanciato un'analisi, la chiave
+       "check" semplicemente non c'e', e chi legge `oggi.check` riceve
+       `undefined`. A quel punto ogni `?? null` a valle diventa "non
+       letto" per uno ZERO VERO.
+       E' il difetto che questo progetto ha gia' rincorso due volte, ed
+       e' la causa comune di quattro schermate del pannello che dicevano
+       "non letto" dove il dato era letto e valeva zero (ispezione del
+       12/08). Il compilatore non poteva accorgersene: il cast glielo
+       impediva.
+       Adesso si parte da zero su TUTTI i tipi, e il cast sparisce. */
+    const conta = (dentro: RigaGrezza[]): Record<TipoEvento, number> => {
+      const m: Record<TipoEvento, number> = {
+        visita: 0,
+        check: 0,
+        muro: 0,
+        sbloccato: 0,
+        verdetto: 0,
+        pratica: 0,
+        pagato: 0,
+        iscritto: 0,
+        guasto: 0,
+      };
+      for (const r of dentro) {
+        const t = r.tipo as TipoEvento;
+        if (t in m) m[t] += 1;
+      }
       return m;
     };
-    const diOggi = righe.filter((r) => new Date(r.creato_il) >= inizioOggi);
+    const diOggi = righe.filter((r) => GIORNO_ROMA.format(new Date(r.creato_il)) === oggiIt);
     const somma = (dentro: RigaGrezza[]) =>
       dentro.reduce((s, r) => s + (r.tipo === "pagato" ? Number(r.importo ?? 0) : 0), 0);
 
@@ -148,8 +184,18 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
         .map(([nome, quanti]) => ({ nome, quanti }));
     };
 
-    const muri = righe.filter((r) => r.tipo === "muro").length;
-    const sbloccati = righe.filter((r) => r.tipo === "sbloccato").length;
+    /* 🔴 LE PROVE DI COLLAUDO CONTAVANO COME VENDITE. Oggi l'unico posto
+       che scrive "analisi pagata" è la cassa di collaudo, cioè Valerio
+       che percorre il prodotto: un venditore vero non c'è ancora. Senza
+       questo filtro, il giorno che ne fa dieci il pannello direbbe
+       "conversione del muro: 100%", che è il numero su cui si decide se
+       il prezzo del check funziona. Le righe di prova restano nel
+       registro (sono successe), ma fuori dai numeri che si guardano per
+       decidere. Trovato dall'ispezione del 12/08. */
+    const diProva = (r: RigaGrezza) =>
+      Boolean((r.extra as { prova?: unknown } | null | undefined)?.prova);
+    const muri = righe.filter((r) => r.tipo === "muro" && !diProva(r)).length;
+    const sbloccati = righe.filter((r) => r.tipo === "sbloccato" && !diProva(r)).length;
 
     return {
       oggi: conta(diOggi),
@@ -329,11 +375,24 @@ export async function leggiSerie(giorni = 14): Promise<GiornoSerie[] | null> {
     /* Due ore di margine: la finestra è in giorni italiani, la colonna
        nel database è in UTC, e in estate l'Italia è due ore avanti. */
     const da = new Date(ancora - (giorni - 1) * 86_400_000 - 14 * 3_600_000);
+    /* 🔴 IL TETTO C'ERA MA SENZA UN ORDINE, e un tetto senza ordine è la
+       peggiore delle due cose. Postgres, quando non gli si dice come
+       ordinare, restituisce le righe nell'ordine che gli fa comodo:
+       superate le 20.000 righe nella finestra, tornavano ventimila righe
+       QUALSIASI, sparse a caso fra i quattordici giorni. Il grafico non
+       si sarebbe accorto di niente: avrebbe disegnato quattordici colonne
+       tutte più basse del vero, con la stessa faccia di sempre.
+       Adesso l'ordine c'è (dalla più recente), quindi le righe che
+       mancano sono sempre quelle dei giorni PIÙ VECCHI, e quei giorni si
+       tolgono invece di disegnarli sbagliati: meglio un grafico corto che
+       un grafico falso. Trovato dall'ispezione del 12/08. */
+    const TETTO = 20_000;
     const { data, error } = await db
       .from("eventi")
       .select("creato_il, tipo, esito, importo")
       .gte("creato_il", da.toISOString())
-      .limit(20_000);
+      .order("creato_il", { ascending: false })
+      .limit(TETTO);
 
     if (error || !data) {
       if (error && !/does not exist|schema cache/i.test(error.message)) {
@@ -343,13 +402,29 @@ export async function leggiSerie(giorni = 14): Promise<GiornoSerie[] | null> {
     }
 
     const perGiorno = new Map(scheletro.map((g) => [g.giorno, g]));
-    for (const r of data as Pick<RigaGrezza, "creato_il" | "tipo" | "esito" | "importo">[]) {
+    const righe = data as Pick<RigaGrezza, "creato_il" | "tipo" | "esito" | "importo">[];
+    for (const r of righe) {
       const g = perGiorno.get(GIORNO_ROMA.format(new Date(r.creato_il)));
       if (!g) continue; // fuori finestra: è il margine delle due ore
       const t = r.tipo as TipoEvento;
       g.per[t] = (g.per[t] ?? 0) + 1;
       if (t === "verdetto" && r.esito === "idoneo") g.idonei += 1;
       if (t === "pagato") g.euro += Number(r.importo ?? 0);
+    }
+
+    /* Tetto raggiunto: dei giorni più vecchi abbiamo letto solo un pezzo,
+       e disegnarli sarebbe dire una cosa falsa con l'aria di un dato.
+       Si tiene dal giorno della riga più vecchia che è arrivata in poi. */
+    if (righe.length >= TETTO) {
+      const piuVecchia = righe[righe.length - 1];
+      const daQui = GIORNO_ROMA.format(new Date(piuVecchia.creato_il));
+      console.warn(
+        `[serie] tetto di ${TETTO} righe raggiunto: il grafico parte dal ${daQui} invece che dal ${scheletro[0].giorno}.`,
+      );
+      /* Il giorno della riga più vecchia è a sua volta tagliato a metà:
+         si parte dal successivo. */
+      const primoIntero = scheletro.findIndex((g) => g.giorno > daQui);
+      if (primoIntero > 0) return scheletro.slice(primoIntero);
     }
 
     return scheletro;

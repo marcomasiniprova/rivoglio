@@ -104,11 +104,6 @@ const MARGINE = 70;
 const larghezzaTela = Math.max(...NODI.map((n) => n.x)) * U + CARD_W + MARGINE * 2;
 const altezzaTela = Math.max(...NODI.map((n) => n.y)) * U + CARD_H + MARGINE * 2;
 
-const centroDi = (n: Nodo) => ({
-  x: MARGINE + n.x * U + CARD_W / 2,
-  y: MARGINE + n.y * U + CARD_H / 2,
-});
-
 export default function Mappa({ piena = false }: { piena?: boolean }) {
   const [vista, setVista] = useState({ x: 0, y: 0, z: 0.5 });
   const [aperto, setAperto] = useState<Nodo | null>(null);
@@ -305,7 +300,19 @@ export default function Mappa({ piena = false }: { piena?: boolean }) {
         </span>
       </div>
 
-      {/* ---------------- la tela ---------------- */}
+      {/* ---------------- la tela ----------------
+          🔴 SUL TELEFONO LA MAPPA SI MANGIAVA LO SCORRIMENTO DELLA
+          PAGINA. `touch-none` dice al browser "di questo dito mi occupo
+          io", ed è giusto sul computer e a schermo pieno, dove non c'è
+          nient'altro da scorrere. Ma nella sezione normale la mappa è
+          alta quanto lo schermo: appoggiando il dito sopra (cioè quasi
+          ovunque) la pagina restava incollata e non si arrivava più né
+          alla barra in alto né a quello che c'è sotto.
+          Adesso, sul telefono e fuori dallo schermo pieno, il dito in
+          verticale scorre la pagina e in orizzontale sposta la mappa; e
+          per andare in un punto preciso c'è "Vai a", che sul telefono è
+          comunque più comodo del trascinamento.
+          Trovato dall'ispezione del 12/08. */}
       <div
         ref={telaio}
         onPointerDown={iniziaTrascino}
@@ -313,7 +320,9 @@ export default function Mappa({ piena = false }: { piena?: boolean }) {
         onPointerUp={fermaTrascino}
         onPointerCancel={fermaTrascino}
         onWheel={conLaRotella}
-        className="relative flex-1 cursor-grab touch-none overflow-hidden rounded-[16px] border border-bordo bg-white active:cursor-grabbing"
+        className={`relative flex-1 cursor-grab overflow-hidden rounded-[16px] border border-bordo bg-white active:cursor-grabbing ${
+          piena ? "touch-none" : "touch-pan-y sm:touch-none"
+        }`}
         style={{
           backgroundImage:
             "radial-gradient(circle, rgba(5,46,31,.10) 1px, transparent 1px)",
@@ -477,8 +486,12 @@ export default function Mappa({ piena = false }: { piena?: boolean }) {
           })}
         </div>
 
-        {/* la legenda, ferma in basso a sinistra */}
-        <div className="pointer-events-none absolute right-3 top-3 rounded-[11px] border border-bordo bg-white/92 px-3 py-2.5 backdrop-blur">
+        {/* La legenda, ferma in alto a destra.
+            ⚠️ SUL TELEFONO NON C'È: misurata a 390 punti copriva quasi
+            metà della tela, cioè della cosa che dovrebbe spiegare. I
+            colori li spiega comunque la card quando la si apre, che sul
+            telefono è il modo in cui si legge la mappa. */}
+        <div className="pointer-events-none absolute right-3 top-3 hidden rounded-[11px] border border-bordo bg-white/92 px-3 py-2.5 backdrop-blur sm:block">
           <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-fumo-2">
             Come si legge
           </p>
@@ -499,8 +512,15 @@ export default function Mappa({ piena = false }: { piena?: boolean }) {
           </ul>
         </div>
 
-        <p className="pointer-events-none absolute bottom-3 right-3 text-[11.5px] text-fumo-2">
+        {/* ⚠️ Due righe diverse, e non è pignoleria: sul telefono la
+            rotella non esiste e il trascinamento verticale adesso scorre
+            la pagina. Dire "trascina e usa la rotella" a chi ha un dito
+            solo è un'istruzione che non funziona. */}
+        <p className="pointer-events-none absolute bottom-3 right-3 hidden text-[11.5px] text-fumo-2 sm:block">
           Trascina per spostarti · rotella per lo zoom · clicca una card
+        </p>
+        <p className="pointer-events-none absolute bottom-2.5 right-3 text-[11.5px] text-fumo-2 sm:hidden">
+          Tocca una card · &ldquo;Vai a&rdquo; per spostarti
         </p>
       </div>
 

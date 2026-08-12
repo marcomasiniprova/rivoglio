@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Copy, ExternalLink, Paperclip, Printer, ShieldCheck } from "lucide-react";
 import Logo from "@/components/Logo";
+import Foglio from "@/components/pratica/Foglio";
 import { Button } from "@/components/ui/button";
 import { colonnaMancante } from "@/lib/supabase/colonne";
 import { utenteCollegato } from "@/lib/supabase/server";
@@ -385,6 +386,13 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   const organismo = istruzioniOrganismo(volo.partenza_iata);
   const passeggeriDaCompilare = (pratica.passeggeri ?? []).length === 0;
 
+  /* Il riferimento in cima al foglio, al posto del numero di protocollo.
+     ⚠️ NON è un numero inventato da noi: è il volo e la sua data, cioè
+     le due cose che l'ufficio reclami usa per ritrovare il caso. Un
+     "Prot. 2026/0001" darebbe l'aria di un ufficio che non esiste, e al
+     primo cliente si vedrebbe pure che è il numero uno. */
+  const protocollo = `${volo.volo_iata} · ${dataIt(volo.data_locale)}`;
+
   return (
     <Cornice>
       {/* ------------------------------------------------ la testata */}
@@ -447,29 +455,23 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
       </section>
 
       {/* ------------------------------------------------ il foglio */}
-      <section id="foglio" className="rounded-2xl border border-bordo bg-white px-6 py-7 sm:px-9 sm:py-9">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <p className="text-[0.95rem] leading-relaxed">
-            <span className="font-medium">Oggetto:</span> {lettera.oggetto}
-          </p>
-          <button
-            type="button"
-            data-copia="#t-oggetto"
-            className="no-stampa inline-flex shrink-0 items-center gap-1.5 rounded-pillola border border-bordo bg-nebbia px-3 py-1.5 text-xs font-medium text-fumo transition-colors hover:border-verde/40 hover:text-inchiostro"
-          >
-            <Copy className="size-3.5" aria-hidden="true" />
-            <span data-etichetta>Copia l&apos;oggetto</span>
-          </button>
-        </div>
-        <hr className="my-5 border-bordo" />
-        <div className="whitespace-pre-wrap text-[0.95rem] leading-[1.75]">{lettera.corpo}</div>
-      </section>
+      <Foglio
+        id="foglio"
+        atto="Reclamo · Reg. (CE) 261/2004"
+        riferimento={protocollo}
+        oggetto={lettera.oggetto}
+        corpo={lettera.corpo}
+      />
 
       {/* ------------------------------------------------ le azioni */}
       <div className="no-stampa flex flex-wrap items-center gap-3">
         <Button type="button" data-copia="#t-corpo">
           <Copy className="size-4" aria-hidden="true" />
           <span data-etichetta>Copia il testo email</span>
+        </Button>
+        <Button type="button" variant="contorno" data-copia="#t-oggetto">
+          <Copy className="size-4" aria-hidden="true" />
+          <span data-etichetta>Copia l&apos;oggetto</span>
         </Button>
         <Button type="button" variant="contorno" data-stampa>
           <Printer className="size-4" aria-hidden="true" />
@@ -563,33 +565,26 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
             )}
           </section>
 
-          <section
+          <Foglio
             id="foglio-2"
-            className="rounded-2xl border border-bordo bg-white px-6 py-7 sm:px-9 sm:py-9"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <p className="text-[0.95rem] leading-relaxed">
-                <span className="font-medium">Oggetto:</span> {sollecito.oggetto}
-              </p>
-              <button
-                type="button"
-                data-copia="#t-oggetto-2"
-                className="no-stampa inline-flex shrink-0 items-center gap-1.5 rounded-pillola border border-bordo bg-nebbia px-3 py-1.5 text-xs font-medium text-fumo transition-colors hover:border-verde/40 hover:text-inchiostro"
-              >
-                <Copy className="size-3.5" aria-hidden="true" />
-                <span data-etichetta>Copia l&apos;oggetto</span>
-              </button>
-            </div>
-            <hr className="my-5 border-bordo" />
-            <div className="whitespace-pre-wrap text-[0.95rem] leading-[1.75]">
-              {sollecito.corpo}
-            </div>
-          </section>
+            atto={
+              scheda && scheda.motivo !== "silenzio"
+                ? "Replica al diniego · Reg. (CE) 261/2004"
+                : "Sollecito · Reg. (CE) 261/2004"
+            }
+            riferimento={protocollo}
+            oggetto={sollecito.oggetto}
+            corpo={sollecito.corpo}
+          />
 
           <div className="no-stampa flex flex-wrap items-center gap-3">
             <Button type="button" data-copia="#t-corpo-2">
               <Copy className="size-4" aria-hidden="true" />
               <span data-etichetta>Copia il sollecito</span>
+            </Button>
+            <Button type="button" variant="contorno" data-copia="#t-oggetto-2">
+              <Copy className="size-4" aria-hidden="true" />
+              <span data-etichetta>Copia l&apos;oggetto</span>
             </Button>
           </div>
 
@@ -616,33 +611,22 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
             </p>
           </section>
 
-          <section
+          <Foglio
             id="foglio-3"
-            className="rounded-2xl border border-bordo bg-white px-6 py-7 sm:px-9 sm:py-9"
-          >
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <p className="text-[0.95rem] leading-relaxed">
-                <span className="font-medium">Oggetto:</span> {segnalazione.oggetto}
-              </p>
-              <button
-                type="button"
-                data-copia="#t-oggetto-3"
-                className="no-stampa inline-flex shrink-0 items-center gap-1.5 rounded-pillola border border-bordo bg-nebbia px-3 py-1.5 text-xs font-medium text-fumo transition-colors hover:border-verde/40 hover:text-inchiostro"
-              >
-                <Copy className="size-3.5" aria-hidden="true" />
-                <span data-etichetta>Copia l&apos;oggetto</span>
-              </button>
-            </div>
-            <hr className="my-5 border-bordo" />
-            <div className="whitespace-pre-wrap text-[0.95rem] leading-[1.75]">
-              {segnalazione.corpo}
-            </div>
-          </section>
+            atto="Segnalazione all'organismo nazionale · art. 16 Reg. (CE) 261/2004"
+            riferimento={protocollo}
+            oggetto={segnalazione.oggetto}
+            corpo={segnalazione.corpo}
+          />
 
           <div className="no-stampa flex flex-wrap items-center gap-3">
             <Button type="button" data-copia="#t-corpo-3">
               <Copy className="size-4" aria-hidden="true" />
               <span data-etichetta>Copia la segnalazione</span>
+            </Button>
+            <Button type="button" variant="contorno" data-copia="#t-oggetto-3">
+              <Copy className="size-4" aria-hidden="true" />
+              <span data-etichetta>Copia l&apos;oggetto</span>
             </Button>
             <Button asChild variant="contorno">
               <Link href="/giudice-di-pace">Se anche l&apos;ente non basta</Link>
@@ -732,18 +716,18 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   );
 }
 
-/** In stampa resta solo il foglio: carta bianca, niente interfaccia. */
+/**
+ * In stampa resta solo il foglio: carta bianca, niente interfaccia.
+ *
+ * ⚠️ Il vestito del foglio (fascia, piede, margini di pagina) sta in
+ * `globals.css` sotto `.foglio`, perché è del componente e vale ovunque
+ * lo si monti. Qui resta solo quello che riguarda QUESTA pagina: cosa
+ * sparisce e come si dispone il contenitore.
+ */
 const CSS_STAMPA = `
-@page { margin: 2cm; }
 @media print {
   .no-stampa { display: none !important; }
   body { background: #fff !important; }
-  #foglio {
-    border: 0 !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    background: #fff !important;
-  }
   main { max-width: none !important; padding: 0 !important; gap: 0 !important; }
   header { display: none !important; }
 }

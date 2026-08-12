@@ -33,9 +33,19 @@ export async function POST(
   if (!utente) {
     return NextResponse.json({ errore: "Entra per caricare i documenti." }, { status: 401 });
   }
-  // La RLS fa il resto: caricaPratica legge con la sessione dell'utente.
+  /* 🔴 QUI C'ERA SCRITTO «la RLS fa il resto», ED ERA FALSO.
+     `caricaPratica` legge con la chiave di SERVIZIO, che salta le regole
+     di riga per definizione: è il suo mestiere. Quindi il controllo
+     "questa pratica è tua" non lo faceva nessuno, e bastava essere
+     collegati (anche come cliente qualsiasi) più conoscere l'id di una
+     pratica per caricarci dentro un documento. Trovato dall'ispezione
+     del 12/08.
+     Le rotte sorelle (`/rifiuto`, `/conferma-invio`) il confronto lo
+     fanno da sempre: questa se l'era perso.
+     ⚠️ 404 e non 403: dire "non è tua" conferma che quella pratica
+     esiste, e a chi non è suo non serve saperlo. */
   const pratica = await caricaPratica(id);
-  if (!pratica) {
+  if (!pratica || pratica.utente_id !== utente.id) {
     return NextResponse.json({ errore: "Pratica non trovata." }, { status: 404 });
   }
 

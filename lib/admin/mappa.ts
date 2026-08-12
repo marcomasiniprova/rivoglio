@@ -180,7 +180,16 @@ export const NODI: Nodo[] = [
     titolo: "Il motore",
     riga: "Decide lui. L'intelligenza artificiale non decide MAI.",
     dentro:
-      "Regole scritte del Regolamento CE 261/2004, versione 2026.08.8, provate su 58 casi etichettati a mano con zero falsi positivi. Tre risposte possibili: idoneo, incerto, non idoneo. Un caso incerto non si vende mai: è la regola che tiene in piedi tutto, perché vendere una lettera per un diritto che non esiste vuol dire rimborsare e prendersi una stella.",
+      /* 🔴 QUI C'ERA SCRITTO «58 casi», E I CASI SONO 53. Il numero era
+         copiato a mano dal diario di un giro precedente e nessuno lo
+         ricontrollava: una mappa che dichiara una prova più larga di
+         quella che c'è è esattamente il genere di numero gonfiato che
+         questo progetto non si può permettere.
+         Adesso `prove/mappa.spec.ts` confronta questa riga con
+         `CASI_ORO.length` e con `VERSIONE_REGOLE`: se il motore cresce e
+         la riga resta indietro, la suite si ferma. Trovato
+         dall'ispezione del 12/08. */
+      "Regole scritte del Regolamento CE 261/2004, versione 2026.08.8, provate su 53 casi etichettati a mano con zero falsi positivi. Tre risposte possibili: idoneo, incerto, non idoneo. Un caso incerto non si vende mai: è la regola che tiene in piedi tutto, perché vendere una lettera per un diritto che non esiste vuol dire rimborsare e prendersi una stella.",
     stato: "fatto",
     icona: "ingranaggio",
     x: 50,

@@ -60,16 +60,43 @@ export default async function PaginaPratiche() {
 
   let pratiche: RigaPratica[] = [];
   let nonLetto = !SERVIZIO_ATTIVO;
+  /** null = non letto. Sono i totali VERI, contati dal database. */
+  let quanteInTutto: number | null = null;
+  let incassatoInTutto: number | null = null;
 
   if (SERVIZIO_ATTIVO) {
-    const { data, error } = await supabaseServizio()
-      .from("pratiche")
-      .select(
-        "id, stato, tipo, email, importo_fascia, prezzo_pagato, creata_il, inviata_il, voli(volo_iata, data_locale)",
-      )
-      .order("creata_il", { ascending: false })
-      .limit(60);
-    if (error) console.error("[pannello] pratiche non lette:", error.message);
+    /* 🔴 «IN TUTTO» DEVE ESSERE IN TUTTO. Prima i due riquadri qui sotto
+       si calcolavano sulle sole 60 righe lette per l'elenco: alla 61esima
+       pratica «Pratiche in tutto» sarebbe rimasto a 60 per sempre, e
+       l'incasso mostrato sarebbe stato quello delle ultime 60. Peggio:
+       essendo ordinate dalla piu' recente, il totale poteva anche
+       CALARE, se usciva dalla finestra una pratica famiglia da 24,90 e
+       ne entrava una singola da 14,90. Trovato dall'ispezione del 12/08;
+       oggi le pratiche sono zero, quindi era un difetto che aspettava.
+       Adesso il conteggio e la somma li fa il DATABASE su tutte le
+       righe, e l'elenco resta alle ultime 60 perche' e' un elenco. */
+    const [{ data, error }, { count: quante, error: erroreConto }, { data: soldi, error: erroreSoldi }] =
+      await Promise.all([
+        supabaseServizio()
+          .from("pratiche")
+          .select(
+            "id, stato, tipo, email, importo_fascia, prezzo_pagato, creata_il, inviata_il, voli(volo_iata, data_locale)",
+          )
+          .order("creata_il", { ascending: false })
+          .limit(60),
+        supabaseServizio().from("pratiche").select("id", { count: "exact", head: true }),
+        supabaseServizio().from("pratiche").select("prezzo_pagato"),
+      ]);
+    for (const e of [error, erroreConto, erroreSoldi]) {
+      if (e) console.error("[pannello] pratiche non lette:", e.message);
+    }
+    quanteInTutto = erroreConto ? null : (quante ?? 0);
+    incassatoInTutto = erroreSoldi
+      ? null
+      : ((soldi ?? []) as { prezzo_pagato: number | null }[]).reduce(
+          (t, r) => t + Number(r.prezzo_pagato ?? 0),
+          0,
+        );
     /* `nonLetto` distingue "non ci sono pratiche" da "non sono riuscito a
        guardare": senza, una pagina di errore direbbe zero pratiche, che è
        la cosa peggiore che possa leggere chi aspetta il primo cliente. */
@@ -77,12 +104,10 @@ export default async function PaginaPratiche() {
     pratiche = (data ?? []) as unknown as RigaPratica[];
   }
 
-  const incassato = pratiche.reduce((s, p) => s + Number(p.prezzo_pagato ?? 0), 0);
   const perStato = STATI.map((s) => ({
     ...s,
     quante: pratiche.filter((p) => p.stato === s.chiave).length,
   })).filter((s) => s.quante > 0);
-  const n = (v: number) => (nonLetto ? "non letto" : String(v));
 
   return (
     <div className="flex flex-col gap-5">
@@ -101,12 +126,15 @@ export default async function PaginaPratiche() {
       )}
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <Riquadro etichetta="Pratiche in tutto" valore={n(pratiche.length)} />
+        <Riquadro
+          etichetta="Pratiche in tutto"
+          valore={quanteInTutto === null ? "non letto" : String(quanteInTutto)}
+        />
         <Riquadro
           etichetta="Incassato in tutto"
-          valore={nonLetto ? "non letto" : euro(incassato)}
+          valore={incassatoInTutto === null ? "non letto" : euro(incassatoInTutto)}
           verde
-          nota="Somma di quanto è stato pagato davvero."
+          nota="Somma di quanto è stato pagato davvero, su tutte le pratiche."
         />
         <div className="rounded-[14px] border border-bordo bg-white p-4 shadow-[0_1px_2px_rgba(5,46,31,0.04)] sm:p-5">
           <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-fumo-2">

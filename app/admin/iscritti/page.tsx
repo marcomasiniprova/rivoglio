@@ -36,21 +36,47 @@ export default async function PaginaIscritti() {
      riquadro rosso non fa capire cosa ci sarà quando funzionerà. */
   let righe: RigaIscritto[] = [];
   let nonLetto = !SERVIZIO_ATTIVO;
+  let nVivi: number | null = null;
+  let nAttesa: number | null = null;
+  let nUsciti: number | null = null;
 
   if (SERVIZIO_ATTIVO) {
-    const { data, error } = await supabaseServizio()
-      .from("iscritti")
-      .select("id, email, comune, creato_il, confermato_il, disdetto_il")
-      .order("creato_il", { ascending: false })
-      .limit(200);
-    if (error) console.error("[pannello] iscritti non letti:", error.message);
+    /* 🔴 I TRE NUMERI IN CIMA SI CONTAVANO SULLE SOLE 200 RIGHE LETTE per
+       l'elenco, ma erano etichettati come i numeri della lista intera:
+       al 201esimo iscritto avrebbero smesso di crescere senza dirlo, e
+       "Iscritti veri" e' il numero su cui si decide se una newsletter
+       vale la pena. Adesso li conta il DATABASE su tutte le righe;
+       l'elenco resta alle ultime 200 perche' e' un elenco.
+       Trovato dall'ispezione del 12/08. */
+    const partenza = () =>
+      supabaseServizio().from("iscritti").select("id", { count: "exact", head: true });
+    const [
+      { data, error },
+      { count: cVivi, error: eVivi },
+      { count: cAttesa, error: eAttesa },
+      { count: cUsciti, error: eUsciti },
+    ] = await Promise.all([
+      supabaseServizio()
+        .from("iscritti")
+        .select("id, email, comune, creato_il, confermato_il, disdetto_il")
+        .order("creato_il", { ascending: false })
+        .limit(200),
+      partenza().not("confermato_il", "is", null).is("disdetto_il", null),
+      partenza().is("confermato_il", null).is("disdetto_il", null),
+      partenza().not("disdetto_il", "is", null),
+    ]);
+    for (const e of [error, eVivi, eAttesa, eUsciti]) {
+      if (e) console.error("[pannello] iscritti non letti:", e.message);
+    }
     nonLetto = Boolean(error);
     righe = (data ?? []) as RigaIscritto[];
+    nVivi = eVivi ? null : (cVivi ?? 0);
+    nAttesa = eAttesa ? null : (cAttesa ?? 0);
+    nUsciti = eUsciti ? null : (cUsciti ?? 0);
   }
 
-  const vivi = righe.filter((r) => r.confermato_il && !r.disdetto_il);
-  const inAttesa = righe.filter((r) => !r.confermato_il && !r.disdetto_il);
-  const usciti = righe.filter((r) => r.disdetto_il);
+  /** I numeri VERI, contati dal database. null = non letto. */
+  const q = (v: number | null) => (v === null ? "non letto" : String(v));
   const n = (v: number) => (nonLetto ? "non letto" : String(v));
 
   return (
@@ -72,15 +98,15 @@ export default async function PaginaIscritti() {
         <Kpi
           forte
           etichetta="Iscritti veri"
-          valore={n(vivi.length)}
+          valore={q(nVivi)}
           nota="Hanno confermato e non hanno disdetto: sono gli unici a cui si può scrivere."
         />
         <Kpi
           etichetta="In attesa di conferma"
-          valore={n(inAttesa.length)}
+          valore={q(nAttesa)}
           nota="Hanno lasciato l'email ma non hanno cliccato il link. Non ricevono niente."
         />
-        <Kpi etichetta="Disdette" valore={n(usciti.length)} nota="La riga resta come prova del consenso." />
+        <Kpi etichetta="Disdette" valore={q(nUsciti)} nota="La riga resta come prova del consenso." />
         <Kpi
           etichetta="Righe in tutto"
           valore={n(righe.length)}
