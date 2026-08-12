@@ -1,4 +1,5 @@
 import { casa, spedisci, type Esito } from "./posta";
+import { dataConGiorno, dataIt as dataItRoma } from "@/lib/tempo";
 import { nebPerPaese, nomeBreveNeb } from "@/lib/lettera/neb";
 import {
   GIORNI_PRIMA_DELL_ENTE,
@@ -87,13 +88,11 @@ const euro = (n: number) => n.toLocaleString("it-IT", { maximumFractionDigits: 0
 const prezzoIt = (n: number) =>
   n.toLocaleString("it-IT", { style: "currency", currency: "EUR" });
 
-const dataIt = (iso: string) =>
-  new Date(iso).toLocaleDateString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+/* ⚠️ Le date delle email passano da lib/tempo: erano scritte in UTC, e
+   un'email spedita a mezzanotte e mezza diceva il giorno prima. Su una
+   riga tipo "sono passate sei settimane dal tuo invio" un giorno di
+   scarto si nota. */
+const dataIt = (iso: string) => dataItRoma(iso);
 
 const CODA = "Ricevi questa email perché hai una pratica aperta su Rivolio.";
 
@@ -208,7 +207,7 @@ export function invioConfermato(
         scatola(
           `<strong>Cosa succede adesso</strong><br>
            Le compagnie rispondono in otto-quattordici settimane: il silenzio delle prime settimane è normale, non è un brutto segno.<br>
-           Se il <strong>${dataIt(d.giornoSollecito)}</strong> non avranno ancora risposto, ti scrivo io con il sollecito già pronto.<br>
+           Se <strong>${dataConGiorno(d.giornoSollecito)}</strong> non avranno ancora risposto, ti scrivo io con il sollecito già pronto.<br>
            Se invece rispondono <strong>no</strong> prima di allora, aprila e dimmi che motivo hanno dato: la replica parte subito, senza aspettare.`,
         ) +
         bottone("Apri la tua pratica", d.link) +
@@ -223,7 +222,7 @@ Hai segnato l'invio del reclamo per il volo ${d.volo} il ${dataIt(d.dataInvio)}.
 
 Cosa succede adesso:
 Le compagnie rispondono in otto-quattordici settimane, quindi il silenzio delle prime settimane è normale.
-Se il ${dataIt(d.giornoSollecito)} non avranno risposto, ti scrivo io col sollecito già pronto.
+Se ${dataConGiorno(d.giornoSollecito)} non avranno risposto, ti scrivo io col sollecito già pronto.
 Se rispondono no prima, aprila e dimmi che motivo hanno dato: la replica parte subito.
 
 La tua pratica: ${d.link}`,

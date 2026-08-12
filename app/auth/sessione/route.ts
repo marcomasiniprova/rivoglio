@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { percorsoInterno } from "@/lib/api/percorso";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
+import { versoCasa } from "@/lib/sito";
 
 /**
  * L'ultimo pezzo del rimbalzo vecchio stile.
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
   const poi = percorsoInterno(grezzo) ? grezzo : "/app";
 
   if (!SUPABASE_CONFIGURATO || !access_token || !refresh_token) {
-    const u = new URL("/entra", request.url);
+    const u = versoCasa("/entra", request);
     u.searchParams.set("errore", "link");
     return NextResponse.redirect(u);
   }
@@ -42,10 +43,10 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     console.error("[sessione] setSession:", error.message);
-    const u = new URL("/entra", request.url);
+    const u = versoCasa("/entra", request);
     u.searchParams.set("errore", /expired/i.test(error.message) ? "scaduto" : "link");
     return NextResponse.redirect(u);
   }
 
-  return NextResponse.redirect(new URL(poi, request.url));
+  return NextResponse.redirect(versoCasa(poi, request));
 }

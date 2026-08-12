@@ -14,6 +14,9 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { caricaPratica, eventiPratica, type StatoPratica } from "@/lib/pratiche/pratiche";
 import { letteraSbloccata } from "@/lib/pratiche/documenti";
 import { GIORNI_PRIMA_DEL_SOLLECITO } from "@/lib/pratiche/rifiuto";
+/* Il tempo viene tutto da un posto solo: fusi, giorni di calendario e
+   giorni della settimana. Vedi lib/tempo.ts. */
+import { adesso, dataConGiorno, dataIt, dataOraIt, fraQuanto, giorniFra, giornoPiu } from "@/lib/tempo";
 import { COPY } from "@/lib/copy";
 
 /**
@@ -56,24 +59,6 @@ const CON_LETTERA: StatoPratica[] = [
   "rimborsata",
 ];
 
-const dataIt = (iso: string) =>
-  new Date(iso.length === 10 ? `${iso}T12:00:00Z` : iso).toLocaleDateString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "Europe/Rome",
-  });
-
-const dataOraIt = (iso: string) =>
-  new Date(iso).toLocaleString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Europe/Rome",
-  });
-
 /**
  * «Inviato il 12 agosto. Se non rispondono, il sollecito è pronto il 23
  * settembre.» La riga che mancava dopo aver premuto il bottone.
@@ -89,15 +74,25 @@ const dataOraIt = (iso: string) =>
  */
 function attesaDopoInvio(inviataIl: string | null, stato: StatoPratica): string | null {
   if (!inviataIl || stato !== "inviata") return null;
-  const partenza = Date.parse(inviataIl);
-  if (!Number.isFinite(partenza)) return null;
-  const giorno = new Date(partenza + GIORNI_PRIMA_DEL_SOLLECITO * 86_400_000);
-  const passati = Math.floor((Date.now() - partenza) / 86_400_000);
-  const mancano = GIORNI_PRIMA_DEL_SOLLECITO - passati;
+  if (!Number.isFinite(Date.parse(inviataIl))) return null;
+
+  /* ⚠️ GIORNI DI CALENDARIO, non blocchi di 24 ore. Chi manda il reclamo
+     alle 23:50 e riguarda la pagina venti minuti dopo è al giorno DOPO:
+     dividere i millisecondi direbbe che è ancora al giorno zero, e il
+     conto alla rovescia mostrerebbe un giorno in più di quelli veri.
+     Su una data promessa a un cliente pagante si vede. Vedi lib/tempo.ts. */
+  const giorno = giornoPiu(GIORNI_PRIMA_DEL_SOLLECITO, inviataIl);
+  const mancano = giorniFra(adesso(), `${giorno}T12:00:00Z`);
   if (mancano <= 0) return null;
-  return `Inviato il ${dataIt(inviataIl)}. Se restano in silenzio, il sollecito è pronto il ${dataIt(
-    giorno.toISOString(),
-  )}: mancano ${mancano} giorni.`;
+
+  /* Il giorno della settimana lo calcola la data, sempre: è esattamente
+     la cosa che Valerio ha chiesto di non sbagliare mai. Sotto la
+     settimana si dice anche in parole, perché "fra 3 giorni" si colloca
+     senza pensarci. */
+  const parole = fraQuanto(mancano);
+  return `Inviato il ${dataIt(inviataIl)}. Se restano in silenzio, il sollecito è pronto ${dataConGiorno(
+    giorno,
+  )}: ${parole ?? `mancano ${mancano} giorni`}.`;
 }
 
 const riempi = (template: string, valori: Record<string, string>) =>
@@ -173,6 +168,11 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
   const documentiFatti = letteraSbloccata(eventi);
   const letteraApribile = conLettera && documentiFatti;
   const attesa = attesaDopoInvio(pratica.inviata_il, pratica.stato);
+  /* Da qui in poi il reclamo è per strada: le istruzioni per mandarlo e
+     la scadenza per decidere non servono più a niente (richiesta di
+     Valerio, 12/08). `confermabile` non basta come test: copre solo i
+     due stati prima dell'invio, e ci serve il contrario. */
+  const reclamoPartito = !CONFERMABILE.includes(pratica.stato);
 
   return (
     <Cornice>
@@ -380,8 +380,12 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
       {/* La garanzia non è più un riquadro qui: è diventata una riga in
           cima, sotto lo stato. Vedi il commento lassù. */}
 
-      {/* ------------------------------------------------ la scadenza stimata */}
-      {pratica.scadenza_stimata && (
+      {/* ------------------------------------------------ la scadenza stimata.
+          ⚠️ Sparisce appena il reclamo è partito (richiesta di Valerio,
+          12/08). Serviva a decidere di non rimandare; dopo l'invio la
+          decisione è presa, e resterebbe solo una data in più da leggere
+          in una pagina che deve dire una cosa sola: a che punto siamo. */}
+      {pratica.scadenza_stimata && !reclamoPartito && (
         <section className="rounded-2xl border border-bordo bg-white px-6 py-5">
           <h2 className="font-display text-lg tracking-[-0.03em]">{C.scadenza.titolo}</h2>
           <p className="numeri mt-2 text-[0.95rem] leading-relaxed">
