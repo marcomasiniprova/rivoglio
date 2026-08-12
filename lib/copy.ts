@@ -853,10 +853,15 @@ export const COPY = {
         "Il resto lo prepariamo noi",
       ],
       controlloUmano:
-        "Prima del pagamento una persona ricontrolla i dati del volo. Se qualcosa non torna, non paghi.",
-      /** Shadow mode (SPEC §4): al posto dei bottoni finché l'umano non conferma. */
-      shadow:
-        "Un controllo umano conferma il verdetto entro poche ore: lascia l'email e ti scriviamo noi.",
+        "Riguardando i dati del volo abbiamo trovato qualcosa che non torna con questo verdetto, quindi non lo vendiamo. Rifai il check fra qualche ora: se nel frattempo l'archivio si è aggiornato, il risultato cambia.",
+      /* Compare SOLO quando una persona ha guardato il verdetto e l'ha
+         dichiarato sbagliato.
+         🔴 Prima diceva "un controllo umano conferma entro poche ore:
+         lascia l'email e ti scriviamo noi", e compariva su OGNI verdetto,
+         perché in produzione lo shadow mode è acceso da solo. Era il muro
+         che ha rotto il collaudo del 12/08: al posto del bottone per
+         comprare, un'attesa che nessuno aspetta. */
+      shadow: "Questo verdetto non è vendibile.",
       /* {prezzo} e {prezzoFamiglia} li riempie Risultato col listino che
          quella persona sta vedendo (test dei due prezzi, 9/08). */
       cta: "Prepara la pratica a {prezzo}",
@@ -956,6 +961,9 @@ export const COPY = {
     },
     bottone: "Salva e continua",
     rassicurazione: "La usiamo solo per la tua pratica. Niente pubblicità.",
+    /* Quando l'indirizzo non sta in piedi. Si dice cosa controllare, non
+       "email non valida": chi ha sbagliato una lettera non sa quale. */
+    errore: "Controlla l'indirizzo: manca la chiocciola o il punto finale.",
     conferma: "Fatto. Riepilogo in casella: ora prepariamo il reclamo.",
     /** Sugli esempi dimostrativi non c'è niente da salvare, e lo si dice. */
     demoNota: "Questo è un esempio dimostrativo: non c'è una pratica da salvare.",

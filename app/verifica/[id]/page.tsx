@@ -21,8 +21,9 @@ import { normalizzaData, normalizzaVolo } from "@/lib/voli/normalizza";
  * reveal). Regge perché:
  * - l'id è un UUID casuale: lo conosce solo chi ha fatto il check
  *   (o chi riceve il link, ed è il punto: si condivide);
- * - la pagina non mostra MAI dati personali: l'email della verifica
- *   non viene nemmeno letta dalla query.
+ * - la pagina non mostra MAI dati personali: l'email della verifica si
+ *   legge soltanto per sapere SE c'è (e non chiederla due volte), e al
+ *   browser arriva un sì/no, mai l'indirizzo.
  *
  * Due forme di id:
  * - UUID → riga vera in `verifiche`, letta col client di servizio;
@@ -111,7 +112,7 @@ function Pannello({
 
 /* ------------------------------------------------------------ i dati */
 
-/** La riga di `verifiche` col volo agganciato. L'email NON si legge. */
+/** La riga di `verifiche` col volo agganciato. */
 type RigaVerifica = {
   id: string;
   volo_iata: string;
@@ -125,6 +126,11 @@ type RigaVerifica = {
   caso_dichiarato?: string | null;
   motivo: string | null;
   conferma: "automatica" | "in_attesa" | "confermata" | "corretta";
+  /* ⚠️ SI LEGGE, MA NON ESCE DA QUESTA FUNZIONE. Serve solo a sapere se
+     l'email c'è: al componente arriva un sì/no. La pagina è pubblica per
+     chi ha il link, e stampare lì l'indirizzo di qualcuno sarebbe un
+     regalo a chiunque riceva quel link inoltrato. */
+  email?: string | null;
   voli: {
     arrivo_previsto_utc: string | null;
     arrivo_effettivo_utc: string | null;
@@ -253,7 +259,7 @@ export default async function PaginaVerifica({
     const { data, error } = (await db
       .from("verifiche")
       .select(
-        "id, volo_iata, data_locale, esito, importo, ritardo_minuti, motivo, conferma, caso_dichiarato, voli(arrivo_previsto_utc, arrivo_effettivo_utc, km_ortodromica, vettore_operativo, fonte)",
+        "id, volo_iata, data_locale, esito, importo, ritardo_minuti, motivo, conferma, caso_dichiarato, email, voli(arrivo_previsto_utc, arrivo_effettivo_utc, km_ortodromica, vettore_operativo, fonte)",
       )
       .eq("id", id)
       .maybeSingle()) as { data: RigaVerifica | null; error: { message: string } | null };
@@ -309,6 +315,14 @@ export default async function PaginaVerifica({
        prodotto prima del lancio. */
     collaudo: inCollaudo(await richiesta()),
     inAttesa: riga.conferma === "in_attesa",
+    /* L'unico stato che ferma la vendita: un umano ha guardato il
+       verdetto e l'ha dichiarato sbagliato. "In attesa" non basta più
+       (decisione di Valerio, 12/08): vedi il commento su `inAttesa` in
+       components/verifica/Risultato.tsx. */
+    corretto: riga.conferma === "corretta",
+    /* Il SÌ/NO, mai l'indirizzo: serve solo a non chiedere l'email due
+       volte, che è quello che faceva prima. */
+    emailGiaData: Boolean(riga.email),
     arrivoPrevistoUtc: riga.voli?.arrivo_previsto_utc ?? null,
     arrivoEffettivoUtc: riga.voli?.arrivo_effettivo_utc ?? null,
     km: riga.voli?.km_ortodromica ?? null,

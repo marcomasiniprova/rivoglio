@@ -144,7 +144,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, gestito: false, motivo: "Verifica inesistente, loggato." });
   }
 
-  if (verifica.esito !== "idoneo" || verifica.conferma === "in_attesa") {
+  /* 🔴 E QUI ERA PEGGIO CHE ALTROVE. C'era anche `conferma ===
+     "in_attesa"`, ma in produzione lo shadow mode è acceso da solo e
+     OGNI verdetto nasce in attesa: appena arriva un venditore vero, il
+     primo pagamento incassato non avrebbe creato nessuna pratica. Il
+     cliente paga, non riceve niente, e la riga finisce in un log che
+     nessuno guarda. Trovato mentre chiudevo lo stesso difetto sulla
+     cassa, il 12/08.
+     Resta il caso giusto: un verdetto che una persona ha guardato e
+     dichiarato SBAGLIATO. Su quello la pratica non si crea, e serve un
+     rimborso. */
+  if (verifica.esito !== "idoneo" || verifica.conferma === "corretta") {
     console.error(
       `[polar] PAGAMENTO SU CASO NON VENDIBILE: ordine ${ordineId ?? "?"}, verifica ${verificaId}, esito "${verifica.esito}", conferma "${verifica.conferma}". Pratica NON creata: serve un rimborso a mano.`,
     );

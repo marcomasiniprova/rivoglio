@@ -56,8 +56,35 @@ export type DatiVerifica = {
   collaudo?: boolean;
   /** Il listino che questa persona vede: test dei due prezzi (9/08). */
   listino?: { singolaTesto: string; famigliaTesto: string };
-  /** Shadow mode: verdetto in attesa della conferma umana, niente vendita. */
+  /**
+   * Shadow mode: il verdetto aspetta ancora l'occhio umano nel pannello.
+   *
+   * 🔴 FINO AL 12/08 QUESTO NASCONDEVA I BOTTONI, ed era il difetto che
+   * ha rotto il collaudo di Valerio: dopo il verdetto restava un campo
+   * email e nient'altro, senza nessun modo di andare avanti. Lui ha
+   * dovuto entrare nel pannello e confermare a mano; un cliente vero
+   * chiude la pagina, e non sa nemmeno perché.
+   *
+   * Adesso è solo un'informazione: si vende comunque, e il controllo
+   * umano avviene DOPO (decisione di Valerio, 12/08). Il conto che la
+   * regge: il motore è provato su 53 casi con zero falsi positivi, e la
+   * garanzia copre l'errore, quindi il rischio residuo lo paghiamo noi
+   * 14,90 e non il cliente. A fermare la vendita resta un caso solo, ed
+   * è quello giusto: un verdetto che una persona ha guardato e
+   * **corretto**.
+   */
   inAttesa: boolean;
+  /** Un umano ha guardato il verdetto e l'ha dichiarato sbagliato. */
+  corretto?: boolean;
+  /**
+   * L'email è già agganciata a questa verifica.
+   *
+   * ⚠️ Arriva il SÌ/NO, mai l'indirizzo: la pagina è pubblica per chi ha
+   * il link, e stampare lì dentro l'email di qualcuno sarebbe un regalo a
+   * chiunque riceva quel link inoltrato. Serve a non chiederla due volte,
+   * che è esattamente quello che faceva prima.
+   */
+  emailGiaData?: boolean;
   arrivoPrevistoUtc: string | null;
   arrivoEffettivoUtc: string | null;
   km: number | null;
@@ -437,26 +464,20 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
         </Card>
       </Anima>
 
-      {/* --------------------------- passo 4 del funnel: l'email ORA */}
-      <Anima ritardo={0.2}>
-        <CatturaEmail
-          idVerifica={dati.idVerifica}
-          demo={dati.demo}
-          collaudo={dati.collaudo}
-          titolo={COPY.catturaEmail.titolo}
-          testo={COPY.catturaEmail.testo}
-          etichetta={COPY.catturaEmail.campo.etichetta}
-          segnaposto={COPY.catturaEmail.campo.segnaposto}
-          bottone={COPY.catturaEmail.bottone}
-          conferma={COPY.catturaEmail.conferma}
-          rassicurazione={COPY.catturaEmail.rassicurazione}
-        />
-      </Anima>
-
-      {/* ------------------------------- passo 5: il pagamento (o no) */}
-      <Anima ritardo={0.24}>
-        {dati.inAttesa ? (
-          /* Shadow mode: niente bottoni finché l'umano non conferma. */
+      {/* ---------------------------------- passo 4: aprire la pratica
+          🔴 QUI C'ERANO DUE PEZZI, E FACEVANO A PUGNI.
+          Prima veniva un riquadro che chiedeva l'email, e SOTTO il
+          pagamento. Due moduli uno sopra l'altro per la stessa cosa:
+          Valerio ha lasciato l'email in cima, poi la cassa gliel'ha
+          richiesta, e nel mezzo (col controllo umano acceso) di bottoni
+          per andare avanti non ce n'era nessuno.
+          Adesso è un modulo solo: la spunta, l'email SE manca, e il
+          bottone. Si chiede una cosa una volta sola, nel punto in cui
+          serve davvero. */}
+      <Anima ritardo={0.22}>
+        {dati.corretto ? (
+          /* L'unico caso in cui non si vende: una persona ha guardato
+             questo verdetto e l'ha dichiarato sbagliato. */
           <Card className="border-verde/30 bg-menta-tenue">
             <p className="flex items-start gap-2.5 text-[0.95rem] leading-relaxed text-verde-notte">
               <SpuntaVerde />
@@ -522,10 +543,15 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
 
   const t = COPY.risultato.idoneo;
   const idSpunta = useId();
+  const idEmail = useId();
   const [accettato, setAccettato] = useState(false);
   const [richiamo, setRichiamo] = useState(false);
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  /* L'email si chiede QUI e solo se non c'è già. Su un esempio puro
+     (senza riga nel database) non c'è niente a cui agganciarla. */
+  const serveEmail = Boolean(dati.idVerifica) && !dati.emailGiaData;
 
   const compraFamiglia = dati.demo || dati.checkout.famiglia;
 
@@ -535,16 +561,46 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
       setRichiamo(true);
       return;
     }
+    if (serveEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) {
+      setErrore(COPY.catturaEmail.errore);
+      return;
+    }
     const destinazione = `/api/pratiche/checkout?verifica=${dati.idPagina}&tipo=${tipo}`;
-    // Demo: non si vende e non c'è niente da firmare; il rimbalzo onesto
-    // lo dà la rotta di checkout.
-    if (dati.demo) {
+
+    /* 🔴 QUI STAVA LA SCORCIATOIA CHE HA ROTTO IL COLLAUDO DI VALERIO.
+       C'era scritto: se il volo è dimostrativo, salta la registrazione
+       del consenso e vai dritto alla cassa. Aveva senso quando gli
+       esempi rimbalzavano sempre con "questo è un esempio". Ma un volo
+       ZZ analizzato per davvero ha una riga vera nel database e percorre
+       la strada vera: saltando la registrazione, la cassa non trovava il
+       consenso e rispondeva **«manca la spunta»** a chi la spunta
+       l'aveva appena messa. Poi rimandava alla pagina, che ripartiva
+       dall'analisi. Loop.
+       La distinzione giusta non è "il volo è finto" ma "esiste una riga
+       su cui scrivere". */
+    if (!dati.idVerifica) {
       window.location.assign(destinazione);
       return;
     }
+
     setInCorso(true);
     setErrore(null);
     try {
+      /* L'email prima del consenso: se la si scrive dopo, un guasto a
+         metà lascia una verifica firmata e senza destinatario, cioè una
+         pratica che non si può consegnare a nessuno. */
+      if (serveEmail) {
+        const r = await fetch("/api/verifica/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: dati.idVerifica, email: email.trim() }),
+        });
+        /* ⚠️ Un 404 qui vuol dire "un'email c'era già" (la rotta scrive
+           una volta sola, di proposito), e non è un guasto: si tira
+           dritto. Fermarsi direbbe a chi torna indietro che qualcosa non
+           va, quando invece è tutto a posto. */
+        if (!r.ok && r.status !== 404) throw new Error("email non salvata");
+      }
       const risposta = await fetch("/api/pratiche/recesso", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -584,6 +640,36 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
         <span>{t.recesso.etichetta}</span>
       </label>
       <p className="px-1 text-[13px] leading-relaxed text-fumo">{t.recesso.nota}</p>
+
+      {/* L'email, una volta sola e proprio qui: prima del pagamento
+          serve, dopo il verdetto era solo un ostacolo fra la persona e
+          il suo risultato. Se c'è già, questo pezzo non compare. */}
+      {serveEmail && (
+        <div className="rounded-xl border border-bordo bg-white px-4 py-3.5">
+          <label htmlFor={idEmail} className="block text-sm font-medium">
+            {COPY.catturaEmail.campo.etichetta}
+          </label>
+          <input
+            id={idEmail}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errore) setErrore(null);
+            }}
+            placeholder={COPY.catturaEmail.campo.segnaposto}
+            /* ⚠️ 16px: sotto quella misura iOS ingrandisce la pagina da
+               solo appena si tocca il campo, e da lì in poi resta storta.
+               È lo stesso difetto già trovato sul login. */
+            className="mt-2 h-12 w-full rounded-bottone border border-bordo bg-nebbia px-3.5 text-[16px] outline-none transition-colors placeholder:text-fumo-2 focus:border-verde/45 focus:bg-white"
+          />
+          <p className="mt-2 text-[13px] leading-relaxed text-fumo-2">
+            {COPY.catturaEmail.rassicurazione}
+          </p>
+        </div>
+      )}
       {richiamo && !accettato && (
         <p role="status" className="rounded-xl bg-sole/15 px-4 py-3 text-sm leading-relaxed">
           {t.recesso.blocco}
@@ -831,14 +917,40 @@ export default function Risultato({ dati }: { dati: DatiVerifica }) {
     const dalCheck = sessionStorage.getItem("rivolio-scan-fatto") === "1";
     sessionStorage.removeItem("rivolio-scan-fatto");
     const fermo = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (dalCheck || fermo) return;
+
+    /* 🔴 LA SCENA DELL'ANALISI RIPARTIVA A OGNI RITORNO SULLA PAGINA.
+       Valerio, 12/08: «premo fai la pratica e mi rifà un'altra analisi,
+       poi mi riporta nella stessa pagina, è un loop continuo». Aveva
+       ragione: la cassa, quando qualcosa non torna, rimanda qui, e qui
+       ripartiva il teatro dei quindici secondi. Vedere due volte
+       l'analisi dello stesso volo non è un'animazione di troppo: fa
+       credere che il sito abbia buttato via quello che avevi fatto.
+       Adesso la scena si fa UNA volta per verifica e poi non più, e non
+       si fa mai quando si torna da un rimbalzo della cassa. */
+    const gia = `rivolio-visto-${dati.idPagina}`;
+    const giaVista = sessionStorage.getItem(gia) === "1";
+    if (dalCheck || fermo || giaVista || dati.avvisoCheckout) return;
     // la decisione vive SOLO nel browser (sessionStorage): partire spenti
     // e accendersi dopo l'idratazione è il comportamento voluto, non un tic
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setScansione(true);
-    const t = setTimeout(() => setScansione(false), 1350);
+    /* 🔴 IL SEGNO "GIÀ VISTA" SI SCRIVE QUANDO LA SCENA FINISCE, NON
+       QUANDO PARTE, e la differenza l'ho pagata subito: scrivendolo
+       all'inizio, in sviluppo React esegue gli effetti due volte (è il
+       suo modo di scovare i lavori lasciati a metà). Al primo giro la
+       scena partiva e il segno veniva scritto; il ripulisci annullava il
+       cronometro; al secondo giro il segno c'era già, quindi si usciva
+       subito **senza far ripartire il cronometro**. Il velo restava lì
+       per sempre, sopra il verdetto: esattamente la schermata che
+       Valerio mi ha mandato, ma stavolta l'avevo fatta io.
+       Scrivendolo alla fine, un giro interrotto non lascia traccia: la
+       scena riparte e si chiude come deve. */
+    const t = setTimeout(() => {
+      setScansione(false);
+      sessionStorage.setItem(gia, "1");
+    }, 1350);
     return () => clearTimeout(t);
-  }, []);
+  }, [dati.idPagina, dati.avvisoCheckout]);
 
   // Un "idoneo" senza importo non deve mai vendere: si tratta da incerto.
   const verdetto =

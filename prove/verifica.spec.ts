@@ -109,13 +109,19 @@ test.describe("La pagina del risultato (id demo, senza chiavi)", () => {
     ).toBeVisible();
   });
 
-  test("IDONEO demo: la cattura email dice onestamente che non c'è niente da salvare", async ({
+  /* 🔴 QUESTA PROVA CONTROLLAVA UN DIFETTO, non una funzione: sotto il
+     verdetto c'era un riquadro che chiedeva l'email, e SOTTO ancora il
+     pagamento che la richiedeva un'altra volta. Valerio l'ha scoperto
+     percorrendo il giro il 12/08: l'ha data in cima, e la cassa gliel'ha
+     richiesta. Adesso si chiede in un punto solo, dentro il modulo
+     d'acquisto, e su un esempio puro non si chiede affatto: non c'è
+     nessuna riga a cui agganciarla. */
+  test("IDONEO demo: l'email non si chiede due volte, e sull'esempio nemmeno una", async ({
     page,
   }) => {
     await page.goto(urlDemo(idoneo250.voloIata));
-    await page.getByLabel(COPY.catturaEmail.campo.etichetta).first().fill("prova@esempio.it");
-    await page.getByRole("button", { name: COPY.catturaEmail.bottone }).first().click();
-    await expect(page.getByText(COPY.catturaEmail.demoNota).first()).toBeVisible();
+    await expect(page.getByText(COPY.risultato.idoneo.recesso.etichetta).first()).toBeVisible();
+    expect(await page.locator('input[type="email"]').count()).toBe(0);
   });
 
   test("IDONEO demo: il bottone d'acquisto torna alla pagina con l'avviso, non a Polar", async ({

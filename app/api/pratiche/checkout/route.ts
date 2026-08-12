@@ -65,9 +65,20 @@ export async function GET(req: NextRequest) {
     // Verifica inesistente: la pagina del risultato sa dirlo meglio di noi.
     if (!verifica) return paginaRisultato();
 
-    // Si vende SOLO un idoneo confermato (o fuori shadow). Tutto il resto
-    // torna alla pagina, che mostra lo stato giusto senza bottoni.
-    if (verifica.esito !== "idoneo" || verifica.conferma === "in_attesa") {
+    /* Si vende solo un idoneo.
+       🔴 QUI C'ERA ANCHE `conferma === "in_attesa"`, ED È IL DIFETTO CHE
+       HA ROTTO IL COLLAUDO DI VALERIO. In produzione lo shadow mode è
+       acceso da solo, quindi OGNI verdetto nasce "in attesa": il bottone
+       non compariva e la cassa non si apriva finché una persona non
+       confermava a mano dal pannello. Lui ha dovuto farlo davvero per
+       andare avanti; un cliente vero non può, e se ne va senza sapere
+       perché.
+       Il controllo umano non sparisce, si sposta DOPO la vendita
+       (decisione di Valerio, 12/08). A fermare la cassa resta un caso
+       solo, ed è quello giusto: un verdetto che una persona ha guardato
+       e **corretto**, cioè dichiarato sbagliato. Su quello non si vende
+       niente, mai. */
+    if (verifica.esito !== "idoneo" || verifica.conferma === "corretta") {
       return paginaRisultato();
     }
 

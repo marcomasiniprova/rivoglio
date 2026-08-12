@@ -68,16 +68,24 @@ test.describe("Landing page", () => {
     ]);
     await page.goto("/#prezzi");
     const prezzi = page.locator("#prezzi");
-    const testo = await prezzi.innerText();
 
+    /* ⚠️ SI ASPETTA, NON SI LEGGE E BASTA. Questa prova falliva a caso, e
+       solo quando la suite gira intera: i numeri del confronto arrivano
+       da un contatore che sale mentre la sezione entra in scena, quindi
+       leggendo subito si prende un fotogramma di mezzo (con la macchina
+       carica, il primo). Una prova che passa o fallisce secondo quanto è
+       occupato il computer non dice più niente su quello che doveva
+       controllare, ed è peggio di una prova che non c'è.
+       `toContainText` riprova finché non trova, entro il suo tempo. */
     // i due prezzi chiusi in SPEC §5
-    expect(testo).toContain("14,90€");
-    expect(testo).toContain("24,90€");
+    await expect(prezzi).toContainText("14,90€");
+    await expect(prezzi).toContainText("24,90€");
 
     // il conto del confronto coi portali a percentuale: la somma regge
-    expect(testo).toContain("210€");
-    expect(testo).toContain("390€");
-    expect(testo).toContain("585,10€");
+    await expect(prezzi).toContainText("210€");
+    await expect(prezzi).toContainText("390€");
+    await expect(prezzi).toContainText("585,10€");
+    const testo = await prezzi.innerText();
 
     /* E la cifra si apre: il dettaglio dichiara da dove viene il 35-50%.
        ⚠️ Si punta al dettaglio che CONTIENE la nota, non a `.first()`.
