@@ -132,6 +132,32 @@ social rifatta (era rimasta al prodotto viaggi).
     niente e non lo trova nessuno, finché non lo trova un cliente.
   - Prove: **1084 verdi**, 6 saltate, zero rosse. Le 26 nuove stanno in
     `prove/destinatario.spec.ts`.
+  - **SECONDA ONDATA, la pagina della pratica riordinata** (quattro
+    scelte di Valerio col popup):
+    - **I DOCUMENTI SONO IL PASSO 1**: la lettera si apre dopo aver
+      caricato la carta d'imbarco. Il muro sta **anche sul server**, non
+      solo sul bottone: quell'indirizzo si digita e sta nei segnalibri.
+      ⚠️ **Con una porta di servizio**, e non è un modo di aggirare la
+      scelta: a quel punto il cliente **ha già pagato**, e un muro che
+      non riesce a superare è un prodotto venduto e non consegnato. Chi
+      dichiara di non avere i documenti passa con un clic in più, e
+      resta scritto in cronologia. Una prova la difende per sempre.
+    - **La garanzia è una riga in cima**, sotto lo stato, invece di un
+      riquadro verde scuro a metà pagina.
+    - **Dopo «Ho inviato il reclamo» si sa cosa succede**: in pagina il
+      conto alla rovescia col giorno vero del sollecito, e un'email che
+      mette per iscritto le due strade (silenzio fino a quella data,
+      oppure un no che apre subito la replica).
+      ⚠️ Il giorno non è scritto a mano da nessuna parte: si conta da
+      `GIORNI_PRIMA_DEL_SOLLECITO`. Una prova vieta di scriverlo a mano.
+    - Il bottone della lettera **si spegne, non sparisce**: uno che
+      sparisce fa pensare di aver comprato una cosa che non c'è.
+    - ⚠️ **La pagina vera non l'ha vista nessuno**: sta dietro il login e
+      qui Supabase non risponde. I pezzi nuovi sono stati guardati a
+      390, 768 e 1440 con una pagina di prova **temporanea, poi
+      cancellata** (controllato che non resti traccia). Zero errori in
+      console, nessuno scorrimento orizzontale.
+    - Prove: **1100 verdi**, 6 saltate, zero rosse.
 - **GIRO #58 (11/08 notte): IL RETROBOTTEGA DIVENTA UN GESTIONALE.**
   «La parte admin è inguardabile, sviluppala come un software
   gestionale, sezioni a LATO non sopra» (richiesta di Valerio, con
