@@ -1254,6 +1254,11 @@ export const COPY = {
         titolo: "Note legali",
         voci: [
           { testo: "Condizioni d'uso", ancora: "/condizioni" },
+          /* ⚠️ "Rimborsi" nel footer NON e' un di piu': Dodo Payments lo
+             pretende per far passare la verifica dell'account (email di
+             Siva, 12/08), insieme a Condizioni, Privacy, prezzi chiari e
+             l'avviso che non diamo pareri legali. */
+          { testo: "Rimborsi", ancora: "/rimborsi" },
           { testo: "Privacy", ancora: "/privacy" },
           { testo: "Cookie", ancora: "/cookie" },
         ],

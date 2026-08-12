@@ -34,6 +34,22 @@ import { sezioneDi } from "@/lib/admin/sezioni";
 /** Venti secondi: abbastanza da sembrare in diretta, abbastanza da non pesare. */
 const OGNI_MS = 20_000;
 
+/**
+ * 🔴 IL RINFRESCO GIRAVA SU TUTTE LE SEZIONI, ANCHE SU QUELLE FERME.
+ *
+ * Valerio, 12/08: «clicco una sezione e se va bene ci mette 3 secondi,
+ * altrimenti non funziona proprio». Non era solo lentezza: era una gara.
+ * Ogni venti secondi partiva una rilettura completa del pannello, anche
+ * mentre lui stava aprendo un'altra sezione, e le due richieste si
+ * accavallavano. Su Impostazioni e Prodotto poi non c'era proprio niente
+ * da aggiornare: sono elenchi di come è configurato il sito, non numeri
+ * che cambiano.
+ *
+ * Adesso si rinfrescano da sole SOLO le sezioni dove i numeri si muovono
+ * davvero. Sulle altre il bottone "aggiorna" resta, e lo premi tu.
+ */
+const SEZIONI_VIVE = ["/admin", "/admin/cruscotto", "/admin/traffico", "/admin/registro"];
+
 export default function Guscio({
   email,
   ora,
@@ -59,12 +75,20 @@ export default function Guscio({
 
   const aggiorna = () => avvia(() => router.refresh());
 
+  const sezioneViva = SEZIONI_VIVE.includes(percorso);
+
   useEffect(() => {
+    if (!sezioneViva) return;
     let orologio: ReturnType<typeof setInterval> | null = null;
 
     const parti = () => {
       if (orologio) return;
-      orologio = setInterval(() => router.refresh(), OGNI_MS);
+      /* ⚠️ Non si rinfresca se c'è già qualcosa in volo: due letture
+         sovrapposte non arrivano prima, arrivano tutte e due dopo. */
+      orologio = setInterval(() => {
+        if (document.hidden) return;
+        router.refresh();
+      }, OGNI_MS);
     };
     const fermati = () => {
       if (!orologio) return;
@@ -80,7 +104,7 @@ export default function Guscio({
       fermati();
       document.removeEventListener("visibilitychange", suVisibilita);
     };
-  }, [router]);
+  }, [router, sezioneViva]);
 
   return (
     <div className="min-h-dvh bg-nebbia">

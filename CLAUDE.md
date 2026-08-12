@@ -66,6 +66,21 @@ operativo" in fondo: lì una volta sola, qui niente doppioni.*
 3. **Niente dati finti che sembrano veri.** Un'offerta non verificata va marcata
    `demo` nel DB e nell'interfaccia. Mai in produzione.
 4. **Modifica solo il pezzo richiesto.** Zero refactoring non chiesti.
+4-bis. **UN FIX NON PUÒ ROTTOMARE ALTRO** (regola sua, 12/08: «ma non
+   puoi fixare senza effetti collaterali e provocare altri casini?»).
+   Aveva ragione: avevo centrato le voci della barra togliendole dal
+   flusso, e a schermi più stretti finivano sotto i bottoni.
+   Quindi, prima di consegnare una modifica visiva:
+   - **la si guarda ad ALMENO tre larghezze** (375, 768, 1440), non solo
+     a quella dove si stava lavorando. Un fix provato a una misura sola
+     non è provato;
+   - **si preferisce la disposizione vera al posizionamento assoluto.**
+     `absolute` toglie l'elemento dal flusso, quindi il browser smette
+     di garantire che non si sovrapponga a niente: la sovrapposizione
+     non compare dove guardi, compare altrove;
+   - **se una cosa funzionava, deve continuare a funzionare.** Prima del
+     commit si controlla che il pezzo ACCANTO a quello toccato sia
+     ancora a posto.
 5. **Segreti solo in `.env.local`.** Mai in un file tracciato.
 6. **Fine sessione:** aggiorna `STATO.md`, `PIANO.md` e `ARRETRATI.md`, verify,
    committa.

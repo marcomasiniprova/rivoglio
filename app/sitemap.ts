@@ -83,7 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     })),
     // le pagine legali: contenuto stabile, priorità bassa
-    ...["/condizioni", "/privacy", "/cookie"].map((percorso) => ({
+    ...["/condizioni", "/rimborsi", "/privacy", "/cookie"].map((percorso) => ({
       url: `${casa}${percorso}`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,

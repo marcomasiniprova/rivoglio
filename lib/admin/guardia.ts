@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 
@@ -20,7 +21,15 @@ import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
  * finisce nell'app e **non deve nemmeno sapere che questa pagina
  * esiste**: per questo è un rimando, non un "non hai i permessi".
  */
-export async function soloAdmin() {
+/**
+ * ⚠️ `cache()`: il layout e la pagina lo chiamano tutti e due, ed è
+ * voluto (ogni pagina si difende da sola). Ma senza questo, "tutti e
+ * due" significava anche due domande a Supabase e due letture del ruolo
+ * per ogni singolo clic: quattro attese in fila prima di disegnare
+ * qualsiasi cosa, ed è il motivo per cui il pannello sembrava rotto
+ * (Valerio, 12/08). Adesso i controlli restano due, la risposta è una.
+ */
+export const soloAdmin = cache(async () => {
   const utente = await utenteCollegato();
   if (!utente) redirect("/entra");
 
@@ -33,4 +42,4 @@ export async function soloAdmin() {
 
   if (profilo?.ruolo !== "admin") redirect("/app");
   return utente;
-}
+});

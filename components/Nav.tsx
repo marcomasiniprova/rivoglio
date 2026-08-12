@@ -16,31 +16,41 @@ export default function Nav() {
           capitava, cioè spostato verso destra perché il marchio a
           sinistra è più stretto dei due bottoni a destra: appena sotto,
           il titolo della hero è centrato davvero, e i due assi non
-          combaciavano di una trentina di punti. Si vede senza saperlo
-          nominare.
-          Il trucco è togliere le voci dal flusso e ancorarle a metà
-          larghezza: marchio e bottoni continuano a stare agli estremi
-          come prima. `pointer-events-none` sul contenitore e `auto` sui
-          link, se no la striscia invisibile in mezzo si mangerebbe i
-          clic sul marchio. Sotto i 1024 punti le voci non ci sono e non
-          cambia niente. */}
-      <header className="relative mx-auto flex h-[60px] max-w-[1200px] items-center justify-between gap-3 rounded-pillola border border-white/60 bg-white/60 pl-3 pr-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] sm:pl-6">
-        <Logo />
+          combaciavano di una trentina di punti.
 
-        <nav className="pointer-events-none absolute left-1/2 hidden -translate-x-1/2 items-center gap-8 lg:flex">
+          🔴 IL PRIMO TENTATIVO ERA `absolute left-1/2`, ED È DURATO
+          MEZZ'ORA: a 1440 il centro combaciava, ma un elemento assoluto
+          esce dal flusso, quindi il browser smette di garantire che non
+          si sovrapponga a niente, e su schermi più stretti "Il
+          Tabellone" finiva sotto il bottone "Entra" (visto da Valerio,
+          12/08). Il centraggio si era spostato: il problema pure.
+
+          Adesso è una griglia a TRE COLONNE, `1fr auto 1fr`: le due
+          colonne laterali sono uguali per definizione, quindi la colonna
+          di mezzo cade esattamente a metà della barra, e siccome è
+          disposizione vera e non posizionamento, la sovrapposizione non
+          può avvenire: se lo spazio manca, le colonne si stringono.
+          Sotto i 1024 punti le voci non ci sono e la griglia diventa due
+          colonne, marchio e bottoni, come prima. */}
+      <header className="mx-auto grid h-[60px] max-w-[1200px] grid-cols-[auto_1fr] items-center gap-3 rounded-pillola border border-white/60 bg-white/60 px-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] lg:grid-cols-[1fr_auto_1fr]">
+        <div className="pl-1 sm:pl-4 xl:min-w-0">
+          <Logo />
+        </div>
+
+        <nav className="hidden items-center justify-center gap-5 lg:flex xl:gap-8">
           {COPY.nav.voci.map((v) => (
             <a
               key={v.ancora}
               href={v.ancora}
               {...apreAParte(v.ancora)}
-              className="pointer-events-auto whitespace-nowrap text-[15px] text-fumo transition-colors hover:text-inchiostro"
+              className="whitespace-nowrap text-[15px] text-fumo transition-colors hover:text-inchiostro"
             >
               {v.testo}
             </a>
           ))}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+        <div className="flex items-center justify-end gap-2 sm:gap-3 xl:min-w-0">
           {/* la porta della web app: dall'8/08 è di nuovo linkata dal sito.
               Pillola di vetro, non testo nudo: ogni bottone è un bottone. */}
           <a
