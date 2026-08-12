@@ -85,7 +85,21 @@ export default async function PaginaPratiche() {
           .order("creata_il", { ascending: false })
           .limit(60),
         supabaseServizio().from("pratiche").select("id", { count: "exact", head: true }),
-        supabaseServizio().from("pratiche").select("prezzo_pagato"),
+        /* 🔴 QUESTA LETTURA NON AVEVA UN TETTO SCRITTO, quindi ce l'aveva
+           quello del database (mille righe di serie). Oltre quel numero la
+           somma smetteva di crescere senza dirlo: "Incassato in tutto"
+           sarebbe rimasto fermo mentre gli incassi salivano.
+           Il tetto adesso è scritto, e se lo si tocca ci si accorge.
+           ⚠️ La somma vera la farebbe il database, ma PostgREST non
+           espone un `sum()` senza una funzione dedicata: si legge la
+           colonna e si somma qui, dichiarando il limite.
+           Trovato dall'ispezione del 12/08. */
+        supabaseServizio()
+          .from("pratiche")
+          .select("prezzo_pagato")
+          .not("prezzo_pagato", "is", null)
+          .order("creata_il", { ascending: false })
+          .limit(50_000),
       ]);
     for (const e of [error, erroreConto, erroreSoldi]) {
       if (e) console.error("[pannello] pratiche non lette:", e.message);

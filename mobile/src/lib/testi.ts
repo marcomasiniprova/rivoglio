@@ -854,7 +854,12 @@ export const TESTI = {
       pronta: "Pronta da inviare",
       inviata: "Inviata",
       sollecito: "Sollecito",
-      enac: "ENAC",
+      /* 🔴 Diceva "ENAC" a tutti, ma la competenza è dello Stato
+         dell'aeroporto di PARTENZA (art. 16 par. 1) e la lettera nomina
+         l'ente giusto paese per paese: chi parte da Barcellona leggeva
+         due cose opposte nello stesso giro. Stesso difetto chiuso sul
+         sito il 12/08. */
+      enac: "Segnalazione all'ente",
       esito_pagata: "Pagata dalla compagnia",
       esito_rifiutata: "Rifiutata",
       rimborsata: "Rimborsata",
@@ -992,7 +997,7 @@ export const TESTI = {
       pronta: "La lettera è pronta",
       inviata: "Reclamo inviato da te",
       sollecito: "Sollecito alla compagnia",
-      enac: "Reclamo all'ENAC",
+      enac: "Segnalazione all'ente pronta",
       esito: "Risposta della compagnia",
     },
     esitiFinali: {

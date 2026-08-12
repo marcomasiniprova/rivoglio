@@ -49,6 +49,14 @@ export type Cruscotto = {
   ultimi: Riga[] | null;
   /** Quanti di quelli che hanno visto il muro hanno poi pagato. */
   conversioneMuro: number | null;
+  /**
+   * La lettura ha toccato il tetto: i numeri della settimana sono un
+   * PEZZO, non il totale.
+   * ⚠️ Un avviso nei log lo leggo io, non Valerio. Se un numero è
+   * parziale lo deve dire la schermata, come già fa il grafico per
+   * giorno: se no si accorcia da solo con la stessa faccia di prima.
+   */
+  parziale: boolean;
 };
 
 type RigaGrezza = {
@@ -72,6 +80,7 @@ const VUOTO: Cruscotto = {
   paesi: null,
   ultimi: null,
   conversioneMuro: null,
+  parziale: false,
 };
 
 /** Il fatto, raccontato in una riga leggibile. */
@@ -225,6 +234,7 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
          percentuale su zero visite non è un dato, è una divisione per
          zero travestita. */
       conversioneMuro: muri > 0 ? Math.round((sbloccati / muri) * 1000) / 10 : null,
+      parziale: righe.length >= 20_000,
     };
   } catch (e) {
     console.error("[cruscotto] lettura fallita:", e);

@@ -93,7 +93,15 @@ export default function AppRivolio({
               type="button"
               onClick={() => setPannello(chiave)}
               aria-current={attivo ? "page" : undefined}
-              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-pillola px-3 py-2 text-sm font-medium transition-colors sm:min-h-0 sm:px-4 ${
+              /* 🔴 LA TERZA LINGUETTA ERA TAGLIATA SU OGNI TELEFONO fino a
+                414 punti: tre pillole con icona, testo e margini non ci
+                stavano, e "Profilo" restava mezzo fuori. La barra
+                scorreva, ma una linguetta che si vede a metà non sembra
+                una cosa da far scorrere: sembra rotta.
+                Adesso sotto i 480 punti le tre si dividono lo spazio in
+                parti uguali e il testo si stringe: nessuna scorre e
+                nessuna esce. Trovato dall'ispezione del 12/08. */
+              className={`inline-flex min-h-11 flex-1 shrink items-center justify-center gap-1.5 whitespace-nowrap rounded-pillola px-2 py-2 text-[13px] font-medium transition-colors sm:min-h-0 sm:flex-none sm:px-4 sm:text-sm ${
                 attivo ? "bg-menta-tenue text-verde-notte" : "text-fumo hover:text-inchiostro"
               }`}
             >

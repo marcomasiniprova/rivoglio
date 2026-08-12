@@ -112,6 +112,17 @@ export default async function PaginaPanoramica() {
           esistono. Vedi <Link href="/admin/impostazioni" className="underline">Impostazioni</Link>.
         </Avviso>
       )}
+      {/* 🔴 Il tetto della lettura tagliava i numeri IN SILENZIO: sopra
+          le 20.000 righe nella settimana i totali si accorciano da soli,
+          con la stessa faccia di prima. Un avviso nei log lo leggo io,
+          non Valerio: qui lo dice la schermata. */}
+      {c.parziale && (
+        <Avviso titolo="Questi numeri sono un pezzo, non il totale.">
+          Nella settimana ci sono più fatti di quanti se ne leggano in un colpo (il tetto è
+          20.000). I conteggi qui sotto contano le righe lette, non tutte: sono un minimo
+          garantito, mai un totale.
+        </Avviso>
+      )}
       {SERVIZIO_ATTIVO && c.ultimi === null && (
         <Avviso titolo="Il registro dei fatti non ha risposto.">
           O la tabella degli eventi non c&apos;è ancora, o il database non si è aperto. Non
