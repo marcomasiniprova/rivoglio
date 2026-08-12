@@ -87,11 +87,21 @@ function stato(): Voce[] {
     },
     {
       nome: "RESEND_MITTENTE",
-      serve: 'Da chi arrivano le email. Va messa così: Valerio di Rivolio <valerio@iltuodominio>.',
+      serve:
+        'Da chi arrivano le email. Il valore esatto è: Valerio di Rivolio <valerio@send.rivolio.it>. ⚠️ SEND.rivolio.it, col "send" davanti: è quello il dominio che Resend ha verificato, e da un altro non spedisce.',
       seManca:
-        "Le email partono da un indirizzo di prova di Resend, e SOLO verso l'indirizzo con cui ti sei registrato. ⚠️ Va messa solo DOPO che Resend ha verificato il dominio: prima, le email si fermano del tutto.",
+        "Le email partono da un indirizzo di prova di Resend, e SOLO verso l'indirizzo con cui ti sei registrato. ⚠️ E se ci scrivi il dominio nudo (valerio@rivolio.it) è peggio che non metterla: Resend rifiuta ogni invio e non riceve più nessuno, in silenzio.",
       peso: "importante",
       ceSta: c(process.env.RESEND_MITTENTE),
+    },
+    {
+      nome: "RESEND_RISPOSTA_A",
+      serve:
+        "L'indirizzo dove arriva la risposta di chi preme «Rispondi» su un'email di Rivolio. Mettici una casella che leggi davvero (per esempio valerio@artecai.it).",
+      seManca:
+        "🔴 Le risposte dei clienti tornano indietro. Il sottodominio da cui spediamo NON riceve posta, e la pagina della lettera dice testualmente «scrivici rispondendo a una qualsiasi email della pratica»: senza questa, quel canale non esiste.",
+      peso: "importante",
+      ceSta: c(process.env.RESEND_RISPOSTA_A),
     },
     {
       nome: "MISTRAL_API_KEY",

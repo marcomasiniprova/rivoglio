@@ -29,12 +29,40 @@ export const POSTA_ATTIVA = Boolean(CHIAVE);
  *
  * L'INDIRIZZO invece resta quello di prova di Resend finché il dominio
  * non è verificato: da lì si può spedire solo al proprietario
- * dell'account. Appena `rivolio.it` è verificato, su Netlify si mette
- * RESEND_MITTENTE = "Valerio di Rivolio <valerio@rivolio.it>" e parte
- * tutto, senza toccare una riga di codice.
+ * dell'account.
+ *
+ * 🔴 E IL DOMINIO VERIFICATO NON È `rivolio.it`, È `send.rivolio.it`.
+ * Qui sopra c'era scritto di mettere `valerio@rivolio.it`, e sarebbe
+ * stato il modo più veloce di fermare TUTTE le email del progetto:
+ * Resend spedisce solo da un dominio che ha verificato, e quello
+ * verificato il 12/08 è il sottodominio. Un mittente sul dominio
+ * principale si becca un rifiuto secco a ogni invio, e siccome
+ * `spedisci` non lancia mai, il rifiuto finirebbe solo nei log: nessuno
+ * riceve niente e nessuno se ne accorge.
+ *
+ * Su Netlify va quindi:
+ *   RESEND_MITTENTE = "Valerio di Rivolio <valerio@send.rivolio.it>"
  */
 export const MITTENTE =
   process.env.RESEND_MITTENTE ?? "Valerio di Rivolio <onboarding@resend.dev>";
+
+/**
+ * DOVE ARRIVA LA RISPOSTA, che è una cosa diversa da chi manda.
+ *
+ * ⚠️ Il sottodominio da cui spediamo non riceve posta (su Resend
+ * "Receiving" è spento, ed è la condizione normale). Quindi chi preme
+ * "Rispondi" su un'email di Rivolio scriverebbe a una casella che non
+ * esiste, e la sua risposta tornerebbe indietro. Non è un dettaglio: la
+ * pagina della lettera dice testualmente «scrivici rispondendo a una
+ * qualsiasi email della pratica», quindi quella casella è il nostro
+ * unico canale di assistenza.
+ *
+ * `RESEND_RISPOSTA_A` è l'indirizzo VERO che Valerio legge. Se manca non
+ * si inventa niente: l'email parte senza e la risposta va al mittente,
+ * che è il comportamento di prima. Meglio un limite noto di un indirizzo
+ * di fantasia.
+ */
+export const RISPOSTA_A = process.env.RESEND_RISPOSTA_A?.trim() || null;
 
 /** Dove torna la gente che clicca. */
 export function casa() {
@@ -72,6 +100,7 @@ export async function spedisci({
     const { data, error } = await resend.emails.send({
       from: MITTENTE,
       to: a,
+      ...(RISPOSTA_A ? { replyTo: RISPOSTA_A } : {}),
       subject: oggetto,
       html,
       // La versione solo testo non è un di più: senza, i filtri antispam
