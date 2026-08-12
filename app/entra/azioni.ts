@@ -58,7 +58,15 @@ function inItaliano(messaggio: string): string {
     return "Quella password è troppo comune. Cambiane qualche pezzo.";
   }
   if (m.includes("rate limit") || m.includes("too many") || m.includes("security purposes")) {
-    return "Troppi tentativi di fila. Aspetta un minuto e riprova.";
+    /* 🔴 IL MESSAGGIO LASCIAVA LA PERSONA FERMA (Valerio, 12/08: «come
+       vedi da errore sempre con troppe richieste, non so perché»).
+       Non era un guasto: è il freno di Supabase, che fra due richieste
+       dello stesso link vuole un minuto. Ma il messaggio diceva solo
+       "aspetta", e non diceva la cosa che sblocca davvero: il link
+       mandato PRIMA è ancora valido e sta già in casella. Chi non lo sa
+       ripreme, il freno riparte, e si resta fuori più a lungo di quanto
+       serviva. */
+    return "Il link te l'ho già mandato: cercalo in posta, funziona ancora (guarda anche nello spam). Se proprio non arriva, riprova fra un minuto.";
   }
   if (m.includes("signups not allowed") || m.includes("disabled")) {
     return "Le registrazioni sono chiuse in questo momento.";

@@ -107,8 +107,15 @@ export async function GET(req: NextRequest) {
        sui voli dimostrativi: il controllo vero sta dentro la rotta. */
     if (!link) {
       if (inCollaudo(req)) {
+        /* 🔴 QUI SI SALTAVA LA CASSA, e Valerio l'ha chiesto esplicito il
+           12/08: «anche quando paga i 14,90, SEMPRE checkout finto, il
+           muro c'è sempre anche se finto». Prima questo rimando apriva la
+           pratica da solo, quindi il passaggio che nel prodotto vero
+           decide se incassi o no non lo vedeva nessuno: un percorso
+           provato saltando il pezzo dei soldi non è provato.
+           Adesso si passa dalla cassa, che poi chiama la stessa rotta. */
         return NextResponse.redirect(
-          versoCasa(`/api/pratiche/prova?verifica=${verifica.id}&tipo=${tipo}`, req),
+          versoCasa(`/cassa-prova?pratica=${verifica.id}&tipo=${tipo}`, req),
         );
       }
       return paginaRisultato("non-attivo");

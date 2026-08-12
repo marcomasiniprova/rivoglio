@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Copy, ExternalLink, Paperclip, Printer, ShieldCheck } from "lucide-react";
 import Logo from "@/components/Logo";
+import ApriEmail from "@/components/pratica/ApriEmail";
 import Foglio from "@/components/pratica/Foglio";
 import { Button } from "@/components/ui/button";
 import { colonnaMancante } from "@/lib/supabase/colonne";
@@ -401,15 +402,40 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           La tua lettera è pronta.
         </h1>
         <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
-          La invii tu, dalla tua email. È un tuo diritto e non serve nessun intermediario: le
-          compagnie, Ryanair per prima, trattano meglio i passeggeri che scrivono in proprio.
-          Quello che recuperi resta tuo al 100%.
+          Premi il bottone: si apre la tua email con tutto già scritto. Tu premi Invia.
         </p>
       </div>
 
+      {/* ---------------------------------- IL BOTTONE, prima di tutto.
+          🔴 Valerio, 12/08: «nella parte in cui apro le pratiche non si
+          capisce un cazzo, è un ammasso di regole, di indicazioni, di
+          testo lungo chilometri». Aveva ragione: prima del documento
+          c'erano due riquadri di spiegazioni, e l'unica cosa da fare
+          (mandare la lettera) stava in fondo dietro "copia il testo".
+          Adesso in cima c'è il gesto, e le spiegazioni stanno sotto,
+          chiuse: chi le vuole le apre. */}
+      <section className="no-stampa rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-6">
+        <ApriEmail
+          destinatario={compagnia?.email ?? null}
+          oggetto={lettera.oggetto}
+          corpo={lettera.corpo}
+          etichetta="Apri l'email già scritta"
+          nota={
+            compagnia?.email
+              ? `Va a ${compagnia.nome}.`
+              : "Il destinatario resta da mettere: qui sotto c'è dove."
+          }
+        />
+      </section>
+
       {/* ------------------------------------------------ a chi va */}
-      <section className="no-stampa rounded-2xl border border-bordo bg-white px-6 py-5">
-        <h2 className="font-display text-lg tracking-[-0.03em]">A chi la mandi</h2>
+      <details className="no-stampa group rounded-2xl border border-bordo bg-white px-6 py-4">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-display text-lg tracking-[-0.03em] marker:hidden">
+          A chi la mandi
+          <span aria-hidden="true" className="text-fumo-2 transition-transform group-open:rotate-45">
+            +
+          </span>
+        </summary>
         {compagnia ? (
           <div className="mt-3 flex flex-col gap-2 text-[0.95rem] leading-relaxed">
             <p>
@@ -452,7 +478,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
             </span>
           </p>
         )}
-      </section>
+      </details>
 
       {/* ------------------------------------------------ il foglio */}
       <Foglio
@@ -465,10 +491,6 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
 
       {/* ------------------------------------------------ le azioni */}
       <div className="no-stampa flex flex-wrap items-center gap-3">
-        <Button type="button" data-copia="#t-corpo">
-          <Copy className="size-4" aria-hidden="true" />
-          <span data-etichetta>Copia il testo email</span>
-        </Button>
         <Button type="button" variant="contorno" data-copia="#t-oggetto">
           <Copy className="size-4" aria-hidden="true" />
           <span data-etichetta>Copia l&apos;oggetto</span>
@@ -480,16 +502,21 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
       </div>
 
       <p className="no-stampa rounded-xl bg-menta-tenue px-4 py-3 text-sm leading-relaxed text-verde-notte">
-        Prima di inviare, sostituisci i campi tra parentesi quadre: le coordinate per il
-        pagamento{passeggeriDaCompilare ? ", i nomi dei passeggeri" : ""} e la data.
+        Una cosa sola prima di premere Invia: al posto di [da compilare] metti il tuo IBAN
+        {passeggeriDaCompilare ? " e il tuo nome" : ""}.
       </p>
 
       {/* ------------------------------------------------ gli allegati */}
-      <section className="no-stampa rounded-2xl border border-bordo bg-white px-6 py-5">
-        <h2 className="flex items-center gap-2 font-display text-lg tracking-[-0.03em]">
-          <Paperclip className="size-4.5 text-verde" aria-hidden="true" />
-          Nella tua email allega
-        </h2>
+      <details className="no-stampa group rounded-2xl border border-bordo bg-white px-6 py-4">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-display text-lg tracking-[-0.03em] marker:hidden">
+          <span className="flex items-center gap-2">
+            <Paperclip className="size-4.5 text-verde" aria-hidden="true" />
+            Cosa allegare
+          </span>
+          <span aria-hidden="true" className="text-fumo-2 transition-transform group-open:rotate-45">
+            +
+          </span>
+        </summary>
         <ul className="mt-3 flex flex-col gap-2 text-[0.95rem] leading-relaxed text-fumo">
           {ALLEGATI.map((a) => (
             <li key={a} className="flex gap-2.5">
@@ -498,11 +525,16 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
             </li>
           ))}
         </ul>
-      </section>
+      </details>
 
       {/* ------------------------------------------------ se tacciono */}
-      <section className="no-stampa rounded-2xl border border-bordo bg-white px-6 py-5">
-        <h2 className="font-display text-lg tracking-[-0.03em]">{organismo.titolo}</h2>
+      <details className="no-stampa group rounded-2xl border border-bordo bg-white px-6 py-4">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-display text-lg tracking-[-0.03em] marker:hidden">
+          {organismo.titolo}
+          <span aria-hidden="true" className="text-fumo-2 transition-transform group-open:rotate-45">
+            +
+          </span>
+        </summary>
         <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{organismo.premessa}</p>
         <ol className="mt-3 flex list-none flex-col gap-2 text-[0.95rem] leading-relaxed text-fumo">
           {organismo.passi.map((passo, i) => (
@@ -533,7 +565,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           </a>
         </div>
         <p className="mt-4 text-sm leading-relaxed text-fumo-2">{organismo.avvertenza}</p>
-      </section>
+      </details>
 
       {/* ------------------------------------------- il secondo colpo */}
       {sollecito && (

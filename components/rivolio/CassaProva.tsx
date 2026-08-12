@@ -25,7 +25,40 @@ import Logo from "@/components/Logo";
  * Il bollo che dice cos'è resta, più piccolo di prima ma sempre sopra
  * il totale, cioè nel punto che si guarda per forza.
  */
-export default function CassaProva({ prezzoTesto }: { prezzoTesto: string }) {
+/**
+ * DUE PRODOTTI, UNA CASSA SOLA (richiesta di Valerio, 12/08: «anche
+ * quando paga i 14,90 per la pratica, SEMPRE checkout finto: il muro c'è
+ * sempre anche se finto per adesso»).
+ *
+ * Aveva ragione, e non è una pignoleria: prima il pagamento della pratica
+ * saltava ogni schermata e la pratica si apriva da sola, quindi il
+ * passaggio che nel prodotto vero decide se incassi o no non lo vedeva
+ * nessuno. Un percorso che si prova saltando il pezzo dei soldi non è
+ * provato.
+ */
+type Cosa = {
+  /** "analisi" o "pratica": cambia il riepilogo e dove si va dopo. */
+  chiave: "analisi" | "pratica";
+  titolo: string;
+  sotto: string;
+  voci: string[];
+  rigaTotale: string;
+  vale: string;
+  dopo: string;
+};
+
+export default function CassaProva({
+  prezzoTesto,
+  cosa,
+  verifica,
+  tipo,
+}: {
+  prezzoTesto: string;
+  cosa: Cosa;
+  /** Solo per la pratica: su quale verifica si apre. */
+  verifica?: string;
+  tipo?: "singola" | "famiglia";
+}) {
   const router = useRouter();
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
@@ -34,6 +67,14 @@ export default function CassaProva({ prezzoTesto }: { prezzoTesto: string }) {
     setErrore(null);
     setInCorso(true);
     try {
+      if (cosa.chiave === "pratica") {
+        /* La pratica la apre la stessa rotta che userebbe il webhook del
+           venditore: quello che vedi è il percorso vero, non una copia. */
+        window.location.assign(
+          `/api/pratiche/prova?verifica=${encodeURIComponent(verifica ?? "")}&tipo=${tipo ?? "singola"}`,
+        );
+        return;
+      }
       const r = await fetch("/api/check/prova", { method: "POST" });
       const dati = await r.json().catch(() => null);
       if (!r.ok || !dati?.ok) {
@@ -67,20 +108,12 @@ export default function CassaProva({ prezzoTesto }: { prezzoTesto: string }) {
               </p>
 
               <h1 className="mt-4 font-display text-[1.75rem] leading-[1.15] tracking-[-0.03em] sm:text-[2rem]">
-                L&apos;analisi del tuo volo
+                {cosa.titolo}
               </h1>
-              <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">
-                Gli orari certificati di partenza e atterraggio, i minuti di
-                ritardo e la fascia del Regolamento CE 261/2004.
-              </p>
+              <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{cosa.sotto}</p>
 
               <ul className="mt-6 space-y-3">
-                {[
-                  "Un'analisi completa del volo che scegli",
-                  "La prova archiviata, se un giorno la compagnia contesta",
-                  "Se il verdetto esce incerto, il credito resta",
-                  "Se poi apri la pratica, questi euro si scalano",
-                ].map((v) => (
+                {cosa.voci.map((v) => (
                   <li key={v} className="flex gap-2.5 text-[14px] leading-relaxed text-fumo">
                     <Check className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
                     {v}
@@ -89,12 +122,12 @@ export default function CassaProva({ prezzoTesto }: { prezzoTesto: string }) {
               </ul>
 
               <div className="mt-7 flex items-baseline justify-between border-t border-bordo pt-5">
-                <span className="text-[0.95rem] text-fumo">Analisi, una volta</span>
+                <span className="text-[0.95rem] text-fumo">{cosa.rigaTotale}</span>
                 <span className="text-[0.95rem] text-inchiostro">{prezzoTesto}</span>
               </div>
               <div className="mt-2 flex items-baseline justify-between">
                 <span className="text-[0.95rem] text-fumo">Vale</span>
-                <span className="text-[0.95rem] text-inchiostro">30 giorni</span>
+                <span className="text-[0.95rem] text-inchiostro">{cosa.vale}</span>
               </div>
             </div>
 
@@ -125,7 +158,9 @@ export default function CassaProva({ prezzoTesto }: { prezzoTesto: string }) {
               </p>
 
               {errore && (
-                <p className="mt-5 text-[14px] text-errore" role="alert">
+                <p /* text-errore non esiste fra i colori: la riga usciva del colore
+                     del testo intorno, cioe' rossa solo nelle intenzioni. */
+                  className="mt-5 text-[14px] text-red-600" role="alert">
                   {errore}
                 </p>
               )}
@@ -141,7 +176,7 @@ export default function CassaProva({ prezzoTesto }: { prezzoTesto: string }) {
                 </Button>
 
                 <p className="mt-3 text-center text-[12.5px] leading-relaxed text-fumo-2">
-                  Poi torni al check e l&apos;analisi parte da sola.
+                  {cosa.dopo}
                 </p>
               </div>
             </div>

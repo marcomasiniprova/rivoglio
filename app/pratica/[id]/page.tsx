@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, ArrowRight, FileText, Send, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileText, ShieldCheck } from "lucide-react";
 import Logo from "@/components/Logo";
 import CaricaDocumento from "@/components/pratica/CaricaDocumento";
 import DichiaraRifiuto from "@/components/pratica/DichiaraRifiuto";
+import HoInviato from "@/components/pratica/HoInviato";
 import { Button } from "@/components/ui/button";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
@@ -211,24 +212,20 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
               </Button>
             )}
             {confermabile && (
-              <Button type="button" variant="contorno" data-conferma={pratica.id}>
-                <Send className="size-4" aria-hidden="true" />
-                <span data-etichetta>{C.azioni.confermaInvio}</span>
-              </Button>
+              <HoInviato
+                praticaId={pratica.id}
+                etichetta={C.azioni.confermaInvio}
+                inCorso={C.azioni.confermaInvioInCorso}
+                fatta={C.azioni.confermaInvioFatta}
+                errore={C.azioni.confermaInvioErrore}
+              />
             )}
           </div>
         )}
         {confermabile && (
-          <>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
-              {C.azioni.confermaInvioNota}
-            </p>
-            <p
-              data-conferma-esito
-              hidden
-              className="mt-2 rounded-xl bg-sole/15 px-3.5 py-2.5 text-sm leading-relaxed text-inchiostro"
-            />
-          </>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
+            {C.azioni.confermaInvioNota}
+          </p>
         )}
       </section>
 
@@ -334,70 +331,7 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
         <ArrowRight className="size-4" aria-hidden="true" />
       </Link>
 
-      {/* Il bottone di conferma: niente framework, un listener e una fetch.
-          I testi arrivano da COPY, iniettati qui sotto già serializzati. */}
-      {confermabile && (
-        <script
-          dangerouslySetInnerHTML={{
-            __html: copioneConferma(
-              C.azioni.confermaInvioInCorso,
-              C.azioni.confermaInvioFatta,
-              C.azioni.confermaInvioErrore,
-            ),
-          }}
-        />
-      )}
+
     </Cornice>
   );
-}
-
-/**
- * "Ho inviato il reclamo" → POST /api/pratiche/conferma-invio.
- * Stati gestiti: in corso (bottone spento), riuscito (ricarica: lo stato
- * nuovo e l'evento in cronologia arrivano dal server), fallito (messaggio
- * visibile e bottone di nuovo attivo). L'errore dell'API è già in italiano.
- */
-function copioneConferma(inCorso: string, fatta: string, errore: string): string {
-  const TESTI = JSON.stringify({ inCorso, fatta, errore });
-  return `
-(function () {
-  var TESTI = ${TESTI};
-  var bottone = document.querySelector("[data-conferma]");
-  if (!bottone) return;
-  var etichetta = bottone.querySelector("[data-etichetta]") || bottone;
-  var esito = document.querySelector("[data-conferma-esito]");
-  bottone.addEventListener("click", function () {
-    var prima = etichetta.textContent;
-    bottone.disabled = true;
-    etichetta.textContent = TESTI.inCorso;
-    if (esito) { esito.hidden = true; esito.textContent = ""; }
-    fetch("/api/pratiche/conferma-invio", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pratica_id: bottone.getAttribute("data-conferma") }),
-    })
-      .then(function (r) {
-        return r.json().catch(function () { return {}; }).then(function (corpo) {
-          return { ok: r.ok, corpo: corpo };
-        });
-      })
-      .then(function (r) {
-        if (!r.ok) {
-          var msg = r.corpo && typeof r.corpo.errore === "string" ? r.corpo.errore : TESTI.errore;
-          throw new Error(msg);
-        }
-        etichetta.textContent = TESTI.fatta;
-        window.location.reload();
-      })
-      .catch(function (e) {
-        bottone.disabled = false;
-        etichetta.textContent = prima;
-        if (esito) {
-          esito.textContent = (e && e.message) || TESTI.errore;
-          esito.hidden = false;
-        }
-      });
-  });
-})();
-`;
 }
