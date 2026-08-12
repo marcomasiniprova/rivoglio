@@ -12,6 +12,8 @@ import { utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { caricaPratica, eventiPratica, type StatoPratica } from "@/lib/pratiche/pratiche";
+import { letteraSbloccata } from "@/lib/pratiche/documenti";
+import { GIORNI_PRIMA_DEL_SOLLECITO } from "@/lib/pratiche/rifiuto";
 import { COPY } from "@/lib/copy";
 
 /**
@@ -71,6 +73,32 @@ const dataOraIt = (iso: string) =>
     minute: "2-digit",
     timeZone: "Europe/Rome",
   });
+
+/**
+ * «Inviato il 12 agosto. Se non rispondono, il sollecito è pronto il 23
+ * settembre.» La riga che mancava dopo aver premuto il bottone.
+ *
+ * ⚠️ Il giorno non è scritto a mano: si conta da
+ * `GIORNI_PRIMA_DEL_SOLLECITO`, cioè dalla stessa costante che decide
+ * quando il sollecito compare davvero. Due numeri scritti in due posti
+ * divergono al primo cambio, e qui divergerebbero verso una promessa
+ * fatta a un cliente pagante.
+ *
+ * Torna `null` quando non c'è niente da aspettare: prima dell'invio, o
+ * quando la pratica è già andata avanti da sola.
+ */
+function attesaDopoInvio(inviataIl: string | null, stato: StatoPratica): string | null {
+  if (!inviataIl || stato !== "inviata") return null;
+  const partenza = Date.parse(inviataIl);
+  if (!Number.isFinite(partenza)) return null;
+  const giorno = new Date(partenza + GIORNI_PRIMA_DEL_SOLLECITO * 86_400_000);
+  const passati = Math.floor((Date.now() - partenza) / 86_400_000);
+  const mancano = GIORNI_PRIMA_DEL_SOLLECITO - passati;
+  if (mancano <= 0) return null;
+  return `Inviato il ${dataIt(inviataIl)}. Se restano in silenzio, il sollecito è pronto il ${dataIt(
+    giorno.toISOString(),
+  )}: mancano ${mancano} giorni.`;
+}
 
 const riempi = (template: string, valori: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (tutto, chiave) => valori[chiave] ?? tutto);
@@ -138,6 +166,13 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
   const confermabile = CONFERMABILE.includes(pratica.stato);
   const conLettera = CON_LETTERA.includes(pratica.stato);
   const dichiarabile = DICHIARABILE.includes(pratica.stato);
+  /* Il passo 1: finché non c'è un documento (o la dichiarazione di non
+     averlo), la lettera resta chiusa. Scelta di Valerio col popup del
+     12/08; il perché e la porta di servizio stanno in
+     lib/pratiche/documenti.ts. */
+  const documentiFatti = letteraSbloccata(eventi);
+  const letteraApribile = conLettera && documentiFatti;
+  const attesa = attesaDopoInvio(pratica.inviata_il, pratica.stato);
 
   return (
     <Cornice>
@@ -198,19 +233,41 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
               {C.prossimoPassoEtichetta}
             </p>
             <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed">{stato.prossimoPasso}</p>
+            {/* IL CONTO ALLA ROVESCIA (scelta di Valerio col popup, 12/08).
+                Premi "Ho inviato il reclamo" e sullo schermo non cambiava
+                quasi niente: restava il dubbio "e adesso?". Qui c'è la
+                data vera del prossimo passo, calcolata dal giorno
+                dell'invio con la stessa costante che decide quando parte
+                davvero il sollecito. Se un domani si sposta la tappa, si
+                sposta anche questa riga. */}
+            {attesa && (
+              <p className="numeri mt-3 inline-flex items-center rounded-pillola bg-menta-tenue px-3.5 py-1.5 text-sm font-medium text-verde-notte">
+                {attesa}
+              </p>
+            )}
           </div>
         )}
 
         {(confermabile || conLettera) && (
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {conLettera && (
-              <Button asChild variant={confermabile ? "pieno" : "contorno"}>
-                <Link href={`/pratica/${pratica.id}/lettera`}>
+            {conLettera &&
+              (letteraApribile ? (
+                <Button asChild variant={confermabile ? "pieno" : "contorno"}>
+                  <Link href={`/pratica/${pratica.id}/lettera`}>
+                    <FileText className="size-4" aria-hidden="true" />
+                    {C.azioni.apriLettera}
+                  </Link>
+                </Button>
+              ) : (
+                /* Spento, non nascosto: chi ha appena pagato deve vedere
+                   che la lettera c'è, e capire cosa manca per aprirla.
+                   Un bottone che sparisce fa pensare di aver comprato
+                   una cosa che non esiste. */
+                <Button disabled variant="contorno" className="pointer-events-none opacity-55">
                   <FileText className="size-4" aria-hidden="true" />
                   {C.azioni.apriLettera}
-                </Link>
-              </Button>
-            )}
+                </Button>
+              ))}
             {confermabile && (
               <HoInviato
                 praticaId={pratica.id}
@@ -222,12 +279,38 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
             )}
           </div>
         )}
+        {conLettera && !letteraApribile && (
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
+            {C.azioni.letteraChiusa}
+          </p>
+        )}
         {confermabile && (
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
             {C.azioni.confermaInvioNota}
           </p>
         )}
+
+        {/* LA GARANZIA, UNA RIGA E IN CIMA (scelta di Valerio col popup,
+            12/08). Prima era un riquadro verde scuro a metà pagina: si
+            notava, ma arrivava dopo la cronologia, cioè dopo che uno
+            aveva già finito di preoccuparsi. Qui sta nel punto in cui
+            guardi a che punto sei, che è quando la domanda "e se non
+            pagano?" te la fai davvero. */}
+        <p className="mt-5 flex items-start gap-2 border-t border-bordo pt-4 text-sm leading-relaxed text-fumo">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
+          <span>
+            {pratica.garanzia_fino_al
+              ? riempi(C.garanzia.template, { data: dataIt(pratica.garanzia_fino_al) })
+              : C.garanzia.senzaData}
+          </span>
+        </p>
       </section>
+
+      {/* ------------------------------------------------ i documenti.
+          Sta QUI, prima delle istruzioni d'invio, perché dal 12/08 è il
+          passo 1: la lettera si apre dopo. Quando è già fatto resta
+          nello stesso posto, ma torna un riquadro bianco qualsiasi. */}
+      {conLettera && <CaricaDocumento praticaId={pratica.id} bloccante={!documentiFatti} />}
 
       {/* ---------------------------- il no della compagnia, dichiarato */}
       {dichiarabile && (
@@ -249,9 +332,6 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           <p className="mt-4 text-sm leading-relaxed text-fumo-2">{C.istruzioniInvio.perche}</p>
         </section>
       )}
-
-      {/* ------------------------------------------------ i documenti */}
-      {conLettera && <CaricaDocumento praticaId={pratica.id} />}
 
       {/* ------------------------------------------------ la cronologia */}
       <section className="rounded-2xl border border-bordo bg-white px-6 py-6">
@@ -297,18 +377,8 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
         )}
       </section>
 
-      {/* ------------------------------------------------ la garanzia */}
-      <section className="rounded-2xl bg-verde-notte px-6 py-6 text-white">
-        <h2 className="flex items-center gap-2 font-display text-lg tracking-[-0.03em]">
-          <ShieldCheck className="size-5 text-menta" aria-hidden="true" />
-          {C.garanzia.titolo}
-        </h2>
-        <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-white/85">
-          {pratica.garanzia_fino_al
-            ? riempi(C.garanzia.template, { data: dataIt(pratica.garanzia_fino_al) })
-            : C.garanzia.senzaData}
-        </p>
-      </section>
+      {/* La garanzia non è più un riquadro qui: è diventata una riga in
+          cima, sotto lo stato. Vedi il commento lassù. */}
 
       {/* ------------------------------------------------ la scadenza stimata */}
       {pratica.scadenza_stimata && (
