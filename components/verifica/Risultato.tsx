@@ -52,6 +52,8 @@ export type DatiVerifica = {
   motivo: string | null;
   /** Vero se il dato viene dal fornitore dimostrativo: il badge è obbligatorio. */
   demo: boolean;
+  /** Vero solo per il browser del collaudatore: apre il percorso sui voli ZZ. */
+  collaudo?: boolean;
   /** Il listino che questa persona vede: test dei due prezzi (9/08). */
   listino?: { singolaTesto: string; famigliaTesto: string };
   /** Shadow mode: verdetto in attesa della conferma umana, niente vendita. */
@@ -161,6 +163,7 @@ function ContatoreReveal({ importo }: { importo: number }) {
 function CatturaEmail({
   idVerifica,
   demo,
+  collaudo = false,
   titolo,
   testo,
   etichetta,
@@ -171,6 +174,7 @@ function CatturaEmail({
 }: {
   idVerifica: string | null;
   demo: boolean;
+  collaudo?: boolean;
   titolo?: string;
   testo: string;
   etichetta: string;
@@ -186,7 +190,16 @@ function CatturaEmail({
 
   async function invia(evento: FormEvent) {
     evento.preventDefault();
-    if (demo || !idVerifica) {
+    /* ⚠️ IL COLLAUDATORE PASSA. Su un volo dimostrativo l'email non si
+       salva, ed è giusto: non c'è niente da avvisare, e chi ci capita per
+       caso non deve lasciare un indirizzo per un volo che non esiste. Ma
+       per chi sta collaudando il prodotto quello sbarramento è la fine
+       del percorso: senza email la pratica non si lega a un account,
+       quindi i quattro fogli, il no della compagnia e la conciliazione
+       non li vede nessuno (visto da Valerio il 12/08 provando ZZ600 sul
+       sito vero). Il permesso vive in un cookie firmato e vale solo per
+       il suo browser. */
+    if ((demo && !collaudo) || !idVerifica) {
       setStato("demo");
       return;
     }
@@ -429,6 +442,7 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
         <CatturaEmail
           idVerifica={dati.idVerifica}
           demo={dati.demo}
+          collaudo={dati.collaudo}
           titolo={COPY.catturaEmail.titolo}
           testo={COPY.catturaEmail.testo}
           etichetta={COPY.catturaEmail.campo.etichetta}
@@ -704,6 +718,7 @@ function Incerto({ dati }: { dati: DatiVerifica }) {
         <CatturaEmail
           idVerifica={dati.idVerifica}
           demo={dati.demo}
+          collaudo={dati.collaudo}
           testo={t.avviso.testo}
           etichetta={t.avviso.campoEmail.etichetta}
           segnaposto={t.avviso.campoEmail.segnaposto}

@@ -3,7 +3,9 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { headers } from "next/headers";
 import Risultato, { type DatiVerifica } from "@/components/verifica/Risultato";
+import { inCollaudo } from "@/lib/check/cancello";
 import { COPY } from "@/lib/copy";
 import { listinoCorrente } from "@/lib/prezzi-server";
 import { scadenzaStimata, valuta } from "@/lib/regole/eu261";
@@ -39,6 +41,13 @@ export const metadata: Metadata = {
 };
 
 const UUID_OK = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/* `inCollaudo` vuole una Request per leggere il cookie: qui siamo in un
+   Server Component, quindi la si ricostruisce dalle intestazioni. */
+async function richiesta(): Promise<Request> {
+  const h = await headers();
+  return new Request("https://rivolio.it/", { headers: { cookie: h.get("cookie") ?? "" } });
+}
+
 const DEMO_OK = /^demo-([a-z0-9]{2,8})-([0-9]{4}-[0-9]{2}-[0-9]{2})$/i;
 
 /** Gli unici valori ammessi per ?checkout=: tutto il resto si ignora. */
@@ -292,6 +301,13 @@ export default async function PaginaVerifica({
     // Il marchio demo viaggia con la fonte del volo: se il dato viene
     // dal fornitore dimostrativo, l'interfaccia DEVE dirlo (regola 3).
     demo: riga.voli?.fonte === "demo",
+    /* ⚠️ IL PERMESSO DEL COLLAUDATORE, letto sul SERVER dal cookie
+       firmato. Non e' un parametro nell'indirizzo e non e' una cosa che
+       il browser puo' dichiarare da solo: chi non ha la chiave non puo'
+       fingere di averla. Serve a una cosa sola: far camminare i voli
+       dimostrativi (ZZ*) fino in fondo al percorso, per provare il
+       prodotto prima del lancio. */
+    collaudo: inCollaudo(await richiesta()),
     inAttesa: riga.conferma === "in_attesa",
     arrivoPrevistoUtc: riga.voli?.arrivo_previsto_utc ?? null,
     arrivoEffettivoUtc: riga.voli?.arrivo_effettivo_utc ?? null,
