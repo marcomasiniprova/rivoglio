@@ -64,14 +64,10 @@ export const MITTENTE =
  */
 export const RISPOSTA_A = process.env.RESEND_RISPOSTA_A?.trim() || null;
 
-/** Dove torna la gente che clicca. */
-export function casa() {
-  return (
-    process.env.NEXT_PUBLIC_SITO ??
-    process.env.URL ??
-    "http://localhost:3000"
-  ).replace(/\/$/, "");
-}
+/* Dove torna la gente che clicca. Vive in lib/sito.ts: lo stesso
+   indirizzo serve alle email E ai rimandi delle rotte, e tenerne due
+   copie vuol dire che un giorno diranno due cose diverse. */
+export { casa } from "@/lib/sito";
 
 export type Esito = { ok: true; id?: string } | { ok: false; motivo: string };
 

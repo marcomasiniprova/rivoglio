@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { versoCasa } from "@/lib/sito";
 import { benvenutoLista, type ScaloOggi } from "@/lib/email/messaggi";
 import { leggiGettone } from "@/lib/iscritti/gettone";
 import { confermaIscritto } from "@/lib/iscritti/stato";
@@ -19,7 +20,8 @@ import { ritardiAeroporti } from "@/lib/osservatorio/ritardi";
 const QUANTI = 4;
 
 export async function GET(req: Request) {
-  const sito = new URL(req.url).origin;
+  /* L'indirizzo pubblico, non quello interno del deploy: vedi lib/sito.ts. */
+  const sito = versoCasa("/", req).origin;
   const gettone = new URL(req.url).searchParams.get("g") ?? "";
   const letto = leggiGettone(gettone, "conferma");
 

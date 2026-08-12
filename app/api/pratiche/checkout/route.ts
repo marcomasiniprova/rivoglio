@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { versoCasa } from "@/lib/sito";
 import { inCollaudo } from "@/lib/check/cancello";
 import { linkCheckout } from "@/lib/polar";
 import { COOKIE_PREZZO, TEST_DUE_PREZZI, varianteValida } from "@/lib/prezzi";
@@ -38,11 +39,11 @@ export async function GET(req: NextRequest) {
   // il formato è riconosciuto (UUID o demo), mai da testo libero.
   const paginaRisultato = (coda?: "demo" | "non-attivo" | "errore" | "recesso") =>
     NextResponse.redirect(
-      new URL(`/verifica/${id}${coda ? `?checkout=${coda}` : ""}`, url.origin),
+      versoCasa(`/verifica/${id}${coda ? `?checkout=${coda}` : ""}`, req),
     );
 
   if (DEMO_OK.test(id)) return paginaRisultato("demo");
-  if (!UUID_OK.test(id)) return NextResponse.redirect(new URL("/", url.origin));
+  if (!UUID_OK.test(id)) return NextResponse.redirect(versoCasa("/", req));
 
   if (!SERVIZIO_ATTIVO) return paginaRisultato("non-attivo");
 
@@ -96,7 +97,7 @@ export async function GET(req: NextRequest) {
     if (!link) {
       if (inCollaudo(req)) {
         return NextResponse.redirect(
-          new URL(`/api/pratiche/prova?verifica=${verifica.id}&tipo=${tipo}`, url.origin),
+          versoCasa(`/api/pratiche/prova?verifica=${verifica.id}&tipo=${tipo}`, req),
         );
       }
       return paginaRisultato("non-attivo");

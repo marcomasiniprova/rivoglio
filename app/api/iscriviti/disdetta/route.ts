@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { versoCasa } from "@/lib/sito";
 import { leggiGettone } from "@/lib/iscritti/gettone";
 import { disdiciIscritto } from "@/lib/iscritti/stato";
 
@@ -14,7 +15,8 @@ import { disdiciIscritto } from "@/lib/iscritti/stato";
  * la prova del consenso e riscrivere alla stessa persona il mese dopo.
  */
 export async function GET(req: Request) {
-  const sito = new URL(req.url).origin;
+  /* L'indirizzo pubblico, non quello interno del deploy: vedi lib/sito.ts. */
+  const sito = versoCasa("/", req).origin;
   const gettone = new URL(req.url).searchParams.get("g") ?? "";
   const letto = leggiGettone(gettone, "disdetta");
 

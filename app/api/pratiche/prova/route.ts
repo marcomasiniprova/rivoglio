@@ -3,6 +3,7 @@ import { inCollaudo } from "@/lib/check/cancello";
 import { creaPratica, praticaPerVerifica, registraEvento, transizionePratica } from "@/lib/pratiche/pratiche";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { traccia } from "@/lib/eventi/registra";
+import { versoCasa } from "@/lib/sito";
 
 /**
  * LA CASSA DI PROVA DELLA PRATICA (richiesta di Valerio, 12/08: «voglio
@@ -136,5 +137,12 @@ export async function GET(req: NextRequest) {
      i soldi devono restare a zero finché non ne entrano davvero. */
   traccia(req, { tipo: "pratica", volo: verifica.volo_iata, extra: { prova: true, tipo } });
 
-  return NextResponse.redirect(new URL(`/pratica/${pratica.id}`, url.origin));
+  /* 🔴 QUI IL RIMANDO ANDAVA SULL'INDIRIZZO INTERNO DELLA COPIA
+     PUBBLICATA (`6a7c...--rivolio.netlify.app`), non su rivolio.it:
+     `req.url`, dietro il proxy di Netlify, e' la macchina che serve la
+     richiesta, non quello che ha digitato la persona. E cambiare dominio
+     vuol dire perdere i cookie, quindi la ricevuta dell'analisi restava
+     di la'. Vedi lib/sito.ts. Trovato percorrendo il giro sul sito vero
+     il 12/08. */
+  return NextResponse.redirect(versoCasa(`/pratica/${pratica.id}`, req));
 }

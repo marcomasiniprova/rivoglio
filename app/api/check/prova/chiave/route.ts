@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { versoCasa } from "@/lib/sito";
 import { COOKIE_PROVA, segnaturaProva } from "@/lib/check/pass";
 
 /**
@@ -43,7 +44,8 @@ export async function GET(req: Request) {
     );
   }
 
-  const risposta = NextResponse.redirect(new URL("/cassa-prova", req.url));
+  /* Stesso motivo di app/api/pratiche/prova: vedi lib/sito.ts. */
+  const risposta = NextResponse.redirect(versoCasa("/cassa-prova", req));
   risposta.cookies.set(COOKIE_PROVA, chiave, {
     httpOnly: true,
     sameSite: "lax",
