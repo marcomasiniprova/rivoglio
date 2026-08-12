@@ -87,6 +87,17 @@ test.describe("A chi va la lettera", () => {
     }
   });
 
+  test("i tempi di risposta dichiarati sono numeri credibili", () => {
+    /* È una promessa della compagnia, non un termine di legge: se un
+       domani ci finisce dentro un numero assurdo, la lettera concederebbe
+       un termine che nessun ufficio reclami riconosce. */
+    for (const c of COMPAGNIE) {
+      if (c.giorniRisposta === undefined) continue;
+      expect(c.giorniRisposta, `${c.nome} dichiara un termine impossibile`).toBeGreaterThan(6);
+      expect(c.giorniRisposta, `${c.nome} dichiara un termine impossibile`).toBeLessThanOrEqual(90);
+    }
+  });
+
   test("i gruppi con più licenze si agganciano allo stesso ufficio", () => {
     /* Un Bergamo → Catania può avere un numero W4 (Wizz Air Malta) o W6
        (Wizz Air Hungary): è lo stesso modulo. Senza gli alias, metà dei
@@ -105,6 +116,9 @@ test.describe("A chi va la lettera", () => {
       "FR", "U2", "W6", "AZ", "VY", "EI", "EW", "SN", "TP", "A3",
       "LO", "SK", "AY", "LH", "AF", "KL", "BA", "IB", "LX", "OS",
       "NO", "OU", "RO", "KM", "TK", "PC", "JU", "DL", "UA", "AA",
+      /* Terzo giro, 12/08: dalla classifica delle cento messa insieme
+         da Valerio, quelle che volano da o per l'Europa. */
+      "EN", "DE", "LS", "LG", "BT", "FI", "QS", "X3", "XQ", "EY", "ET",
     ];
     const presenti = new Set(COMPAGNIE.map((c) => c.iata));
     const mancanti = ATTESI.filter((i) => !presenti.has(i));
