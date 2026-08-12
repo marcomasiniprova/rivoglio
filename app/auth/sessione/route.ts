@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { percorsoInterno } from "@/lib/api/percorso";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 
@@ -21,7 +22,14 @@ export async function GET(request: NextRequest) {
   const refresh_token = p.get("refresh_token");
 
   const grezzo = p.get("poi") ?? "/app";
-  const poi = grezzo.startsWith("/") && !grezzo.startsWith("//") ? grezzo : "/app";
+  /* 🔴 QUESTA PORTA AVEVA IL FILTRO VECCHIO. "Inizia con / e non con //"
+     buca col backslash: `/\sito-cattivo.it` passa il controllo e il
+     browser lo gira in `//sito-cattivo.it`, cioè un indirizzo rivolio.it
+     che rimbalza altrove subito dopo il login. Le altre tre porte
+     (auth/conferma, entra, posta-auth) passano da `percorsoInterno`, che
+     accetta solo i caratteri di un percorso vero; questa se l'era persa.
+     Trovato dall'ispezione del 12/08. */
+  const poi = percorsoInterno(grezzo) ? grezzo : "/app";
 
   if (!SUPABASE_CONFIGURATO || !access_token || !refresh_token) {
     const u = new URL("/entra", request.url);

@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import CassaProva from "@/components/rivolio/CassaProva";
 import { cassaDiProvaAperta } from "@/lib/check/cancello";
 import { conteggioCheck } from "@/lib/check/conteggio";
-import { prezzoCheck } from "@/lib/check/ingresso";
+import { prezzoCheck, prezzoPagatoPerIlCheck, scontoDaCheck } from "@/lib/check/ingresso";
+import { passDi } from "@/lib/check/cancello";
+import { headers } from "next/headers";
 import { listinoCorrente } from "@/lib/prezzi-server";
 
 /**
@@ -45,7 +47,14 @@ export default async function PaginaCassaProva({
   const tipo = q.tipo === "famiglia" ? "famiglia" : "singola";
 
   if (pratica) {
-    const { listino } = await listinoCorrente();
+    const { listino: pieno } = await listinoCorrente();
+    /* ⚠️ LO STESSO SCONTO DEL VERDETTO, letto dalla stessa ricevuta. Se
+       qui si mostrasse il prezzo pieno, il numero cambierebbe fra il
+       bottone e la cassa: è il motivo per cui uno chiude la pagina. */
+    const h = await headers();
+    const req = new Request("https://rivolio.it/", { headers: { cookie: h.get("cookie") ?? "" } });
+    const scontato = passDi(req) ? scontoDaCheck(pieno, prezzoPagatoPerIlCheck()) : null;
+    const listino = scontato ?? pieno;
     const prezzoTesto = tipo === "famiglia" ? listino.famigliaTesto : listino.singolaTesto;
     return (
       <CassaProva
@@ -65,7 +74,11 @@ export default async function PaginaCassaProva({
             "La segnalazione all'ente e la conciliazione, già scritte",
             "Se la compagnia non paga, ti rimborsiamo per intero",
           ],
-          rigaTotale: tipo === "famiglia" ? "Pratica famiglia" : "Pratica, una volta",
+          rigaTotale: scontato
+            ? `Pratica meno l'analisi che hai già pagato (${prezzoCheck(null).prezzoTesto})`
+            : tipo === "famiglia"
+              ? "Pratica famiglia"
+              : "Pratica, una volta",
           vale: "Fino alla fine della pratica",
           dopo: "Poi si apre la pratica con la lettera pronta.",
         }}

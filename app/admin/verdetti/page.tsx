@@ -177,7 +177,11 @@ export default async function PaginaVerdetti() {
                blocca un incasso. */
             <Bollo tono="attesa">coda non letta</Bollo>
           ) : coda.length > 0 ? (
-            <Bollo tono="attesa">{coda.length} in coda</Bollo>
+            /* ⚠️ La lettura si ferma a 30: scrivere "30 in coda" quando ce ne
+               sono di più è un numero che si legge come un totale e non lo è. */
+            <Bollo tono="attesa">
+              {coda.length >= 30 ? "30+ in coda" : `${coda.length} in coda`}
+            </Bollo>
           ) : (
             <Bollo tono="verde">coda pulita</Bollo>
           )

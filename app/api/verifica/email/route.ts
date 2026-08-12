@@ -74,7 +74,15 @@ export async function POST(req: Request) {
          risposta di proposito: dire "c'e' gia' un'email" a chi prova un
          id a caso gli conferma che quella verifica esiste. */
       return NextResponse.json(
-        { ok: false, errore: "Non ho potuto salvare questa email su questa verifica." },
+        {
+          ok: false,
+          /* ⚠️ Prima diceva solo "non ho potuto": chi aveva sbagliato una
+             lettera restava fermo senza sapere cosa fare. Adesso dice la
+             mossa. La rotta scrive una volta sola di proposito (vedi
+             sopra), quindi la strada è rifare il check. */
+          errore:
+            "Su questa analisi c'è già un'email, oppure il link non è più valido. Se hai sbagliato a scriverla, rifai il check: ci vogliono trenta secondi.",
+        },
         { status: 404 },
       );
     }

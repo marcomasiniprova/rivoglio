@@ -73,6 +73,8 @@ export type EventoPratica = {
 /** La pratica col suo volo agganciato: serve al cron per scrivere le email. */
 export type PraticaConVolo = Pratica & {
   voli: {
+    /** Lo scalo di partenza: le email di seguito lo usano per l'ente. */
+    partenza_iata?: string | null;
     volo_iata: string;
     data_locale: string;
     vettore_operativo: string | null;
@@ -351,7 +353,10 @@ export async function praticheDaSeguire(limite = 100): Promise<PraticaConVolo[]>
     const db = supabaseServizio();
     const { data, error } = await db
       .from("pratiche")
-      .select("*, voli(volo_iata, data_locale, vettore_operativo)")
+      /* `partenza_iata` serve alle email di seguito: l'ente nazionale
+         lo decide lo Stato dell'aeroporto di PARTENZA (art. 16 par. 1), e
+         senza questo campo l'email scriveva ENAC a tutti. */
+      .select("*, voli(volo_iata, data_locale, vettore_operativo, partenza_iata)")
       .in("stato", STATI_APERTI)
       .order("creata_il", { ascending: true })
       .limit(limite);

@@ -228,6 +228,14 @@ export const GIORNI_PRIMA_DEL_SOLLECITO = 42;
 export const GIORNI_PRIMA_DELL_ENTE = 14;
 
 /**
+ * Quando si chiede al cliente com'è andata, e si ricorda la garanzia.
+ * ⚠️ Era 90 scritto a mano dentro la rotta del seguito, e l'email
+ * accanto diceva "due mesi": due numeri diversi per lo stesso momento.
+ * Sta qui perché lo leggano tutti e due.
+ */
+export const GIORNI_PRIMA_DELL_ESITO = 90;
+
+/**
  * Il caso è pronto per il sollecito?
  * `rifiuto` è il motivo già dichiarato dall'utente, se c'è.
  */

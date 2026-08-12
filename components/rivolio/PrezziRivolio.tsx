@@ -238,7 +238,7 @@ export default async function PrezziRivolio() {
                   {/* Il "1.000€" della famiglia si apre: la trasparenza è il prodotto. */}
                   {p.nota && p.apriNota && (
                     <details className="group mt-4">
-                      <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 text-[12.5px] font-medium text-fumo underline decoration-dotted underline-offset-4 transition-colors marker:hidden hover:text-verde">
+                      <summary className="tocco-comodo inline-flex cursor-pointer list-none items-center gap-1.5 text-[13px] font-medium text-fumo underline decoration-dotted underline-offset-4 transition-colors marker:hidden hover:text-verde">
                         {p.apriNota}
                         <span
                           aria-hidden="true"

@@ -564,7 +564,7 @@ export const COPY = {
       {
         domanda: "E se la compagnia dice che era maltempo o sciopero?",
         risposta:
-          "Alcune circostanze eccezionali escludono davvero la compensazione, ed è giusto dirlo. Per questo il verdetto ti indica la fascia e le cause escludenti da verificare, mai una promessa. Se il tuo caso è incerto, non ti facciamo pagare. E se la compagnia rifiuta con una motivazione debole, al giorno 30 trovi contro-risposta e reclamo ENAC già pronti.",
+          "Alcune circostanze eccezionali escludono davvero la compensazione, ed è giusto dirlo. Per questo il verdetto ti indica la fascia e le cause escludenti da verificare, mai una promessa. Se il tuo caso è incerto, non ti facciamo pagare. E se la compagnia rifiuta con una motivazione debole, la contro-risposta te la prepariamo subito; se invece tacciono, alla sesta settimana trovi il sollecito, e due settimane dopo la segnalazione all'ente nazionale, già scritti.",
       },
       {
         domanda: "Siete un'agenzia di reclami? Devo cedervi il credito?",
@@ -1086,11 +1086,20 @@ export const COPY = {
         prossimoPasso:
           "Invia il sollecito che ti abbiamo mandato via email, sempre dalla tua casella.",
       },
+      /* 🔴 QUESTO STATO SI CHIAMAVA "ENAC" E LO DICEVA A TUTTI. Ma la
+         competenza è dello Stato dell'aeroporto di PARTENZA (art. 16 par.
+         1), e la lettera dal giro #38 nomina l'ente giusto paese per
+         paese: chi parte da Barcellona leggeva "ENAC" nella pratica e
+         "non l'ENAC" nella propria lettera, nello stesso giro.
+         Adesso il nome è neutro e l'ente vero lo dice la lettera, che è
+         l'unico posto che sa da dove sei partito.
+         Trovato dall'ispezione del 12/08. */
       enac: {
-        nome: "ENAC",
-        descrizione: "La compagnia rifiuta o tace: contro-risposta e reclamo ENAC sono pronti.",
+        nome: "Segnalazione all'ente",
+        descrizione:
+          "La compagnia rifiuta o tace: la contro-risposta e la segnalazione all'ente nazionale sono pronte.",
         prossimoPasso:
-          "Presenta il reclamo ENAC seguendo i passi nell'email che ti abbiamo mandato. È gratuito.",
+          "Apri la lettera: dentro trovi la segnalazione già scritta, con l'ente del paese da cui sei partito. È gratuita.",
       },
       esito_pagata: {
         nome: "Pagata dalla compagnia",
@@ -1125,7 +1134,7 @@ export const COPY = {
         pronta: "Lettera pronta",
         inviata: "Reclamo inviato alla compagnia",
         sollecito: "Sollecito pronto",
-        enac: "Reclamo ENAC pronto",
+        enac: "Segnalazione all'ente pronta",
         esito_pagata: "La compagnia ha pagato",
         esito_rifiutata: "La compagnia ha rifiutato",
         rimborsata: "Pratica rimborsata",

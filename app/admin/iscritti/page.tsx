@@ -108,9 +108,9 @@ export default async function PaginaIscritti() {
         />
         <Kpi etichetta="Disdette" valore={q(nUsciti)} nota="La riga resta come prova del consenso." />
         <Kpi
-          etichetta="Righe in tutto"
+          etichetta="Righe mostrate"
           valore={n(righe.length)}
-          nota="Le ultime 200, dalla più recente."
+          nota="Le ultime 200, dalla più recente. I tre numeri qui accanto invece li conta il database su tutta la lista."
         />
       </div>
 

@@ -4,6 +4,7 @@ import { Area, Barre, Imbuto, Legenda, Scheda } from "@/components/admin/Grafici
 import { Avviso, Kpi, euro, oNonLetto } from "@/components/admin/Pezzi";
 import { contaInAttesa } from "@/lib/admin/dati";
 import { soloAdmin } from "@/lib/admin/guardia";
+import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { leggiCruscotto, leggiSerie, type GiornoSerie } from "@/lib/eventi/lettura";
 import { TELEGRAM_ATTIVO } from "@/lib/eventi/telegram";
 import { SERVIZIO_ATTIVO } from "@/lib/supabase/servizio";
@@ -65,11 +66,23 @@ export default async function PaginaPanoramica() {
 
   /* L'imbuto vive sui sette giorni e non su oggi: alle nove del mattino
      un imbuto di giornata è fatto di due righe e non dice niente. */
+  /* 🔴 L'IMBUTO ACCUSAVA IL MURO DI FAR PERDERE TUTTI, E IL MURO ERA
+     SPENTO. Col prezzo del check non attivo, "Vedono il muro" e "Pagano
+     l'analisi" non possono che essere zero: l'imbuto disegnava due gradini
+     a zero con accanto "meno 100%", e poi il gradino dopo tornava a un
+     numero maggiore di zero. Un imbuto che si riallarga scendendo è un
+     numero impossibile, e fa dubitare di tutti gli altri.
+     I due passi adesso compaiono solo quando esistono davvero.
+     Trovato dall'ispezione del 12/08. */
   const passi = [
     { nome: "Arrivano sul sito", chiave: "visita" },
     { nome: "Lanciano un'analisi", chiave: "check" },
-    { nome: "Vedono il muro", chiave: "muro" },
-    { nome: "Pagano l'analisi", chiave: "sbloccato" },
+    ...(CHECK_A_PAGAMENTO
+      ? [
+          { nome: "Vedono il muro", chiave: "muro" },
+          { nome: "Pagano l'analisi", chiave: "sbloccato" },
+        ]
+      : []),
     { nome: "Aprono la pratica", chiave: "pratica" },
     { nome: "Pagano la pratica", chiave: "pagato" },
   ].map((p) => ({

@@ -1,5 +1,52 @@
 import { casa, spedisci, type Esito } from "./posta";
+import { nebPerPaese, nomeBreveNeb } from "@/lib/lettera/neb";
+import {
+  GIORNI_PRIMA_DELL_ENTE,
+  GIORNI_PRIMA_DELL_ESITO,
+  GIORNI_PRIMA_DEL_SOLLECITO,
+} from "@/lib/pratiche/rifiuto";
+import { paeseDiScalo } from "@/lib/regole/territorio";
 import { bottone, COLORI as C, FONT, riga, vestito } from "./modello";
+
+/* ────────────────────── i giorni, presi dal motore ──────────────────────
+   🔴 QUESTE EMAIL DICEVANO GIORNI CHE NON SONO PIU' QUELLI VERI: 15, 30 e
+   "due mesi", cioe' il calendario di prima del giro #45. Dal 9/08 il
+   sollecito parte al giorno 42 e la segnalazione al 56, perche' le
+   compagnie rispondono in 8-14 settimane e un sollecito mandato al giorno
+   15 arriva prima che qualcuno abbia aperto la pratica.
+   Il cliente riceveva un'email che diceva "sono passati 30 giorni" quando
+   ne erano passati 56, e contava i giorni sbagliati per capire a che
+   punto era. Trovato dall'ispezione del 12/08.
+
+   ⚠️ ADESSO I NUMERI NON SI SCRIVONO PIU' A MANO: si contano dalle
+   costanti che decidono QUANDO l'email parte davvero. Se un domani si
+   sposta la tappa, il testo si sposta con lei. Ed e' in settimane, non in
+   giorni: "sei settimane" si legge, "42 giorni" si conta. */
+const SETTIMANE_SOLLECITO = Math.round(GIORNI_PRIMA_DEL_SOLLECITO / 7);
+const SETTIMANE_ENTE = Math.round((GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE) / 7);
+const SETTIMANE_ESITO = Math.round(GIORNI_PRIMA_DELL_ESITO / 7);
+
+/**
+ * L'ente a cui si scrive, deciso dallo scalo di PARTENZA (art. 16 par. 1).
+ * Senza lo scalo non si inventa un ufficio: si dice quello che sappiamo e
+ * si rimanda alla lettera, che l'ente giusto ce l'ha scritto dentro.
+ */
+function enteDiPartenza(partenzaIata?: string | null): { nome: string; dove: string } {
+  const paese = paeseDiScalo(partenzaIata);
+  const neb = paese ? nebPerPaese(paese) : null;
+  if (!neb) {
+    return {
+      nome: "l'ente nazionale del paese da cui sei partito",
+      dove: "Trovi quale è, e come contattarlo, dentro la tua pratica.",
+    };
+  }
+  return {
+    nome: nomeBreveNeb(neb),
+    dove: neb.url
+      ? `Il modulo è su <a href="${neb.url}" style="color:${C.verde};">${neb.url.replace(/^https?:\/\/(www\.)?/, "")}</a>.`
+      : "Trovi come contattarlo dentro la tua pratica.",
+  };
+}
 
 /**
  * La sequenza email della pratica (SPEC §6). È il prodotto vero: il dato
@@ -173,20 +220,23 @@ export function sollecitoPronto(
     dataInvio: string;
     importo: number | null;
     link: string;
+    /** Lo scalo di partenza: decide l'ente da nominare (art. 16 par. 1). */
+    partenzaIata?: string | null;
   },
 ): Promise<Esito> {
   const compagnia = d.compagnia || "[Compagnia]";
+  const ente = enteDiPartenza(d.partenzaIata).nome;
   const quando = d.dataVolo ? dataIt(d.dataVolo) : "[data del volo]";
   const testoSollecito =
     `<strong>Oggetto:</strong> Sollecito richiesta di compensazione, volo ${d.volo} del ${quando}<br><br>` +
     `Spett.le ${compagnia},<br><br>` +
     `in data ${dataIt(d.dataInvio)} vi ho inviato una richiesta di compensazione pecuniaria ai sensi degli articoli 5 e 7 del Regolamento CE 261/2004, relativa al volo ${d.volo} del ${quando}.<br><br>` +
-    `Non ho ricevuto alcun riscontro. Vi chiedo una risposta entro 14 giorni. In mancanza, presenterò reclamo all'ENAC e valuterò ogni ulteriore azione prevista dalla legge.<br><br>` +
+    `Non ho ricevuto alcun riscontro. Vi chiedo una risposta entro 14 giorni. In mancanza, presenterò reclamo a ${ente} e valuterò ogni ulteriore azione prevista dalla legge.<br><br>` +
     `[Nome e cognome]`;
 
   return spedisci({
     a,
-    oggetto: "15 giorni di silenzio. Il sollecito è pronto.",
+    oggetto: `${SETTIMANE_SOLLECITO} settimane di silenzio. Il sollecito è pronto.`,
     html: vestito({
       titolo: "Il sollecito è pronto",
       corpo:
@@ -205,29 +255,43 @@ export function sollecitoPronto(
         p("Nella pratica trovi i dati del volo, se vuoi ricontrollarli prima di inviare."),
       coda: CODA,
     }),
-    testo: `Nessuna risposta? Si insiste.\n\nHai inviato il reclamo il ${dataIt(d.dataInvio)} e la compagnia non ha risposto. Il sollecito è pronto: copia e invia questo testo dalla stessa email del primo reclamo.\n\n---\nOggetto: Sollecito richiesta di compensazione, volo ${d.volo} del ${quando}\n\nSpett.le ${compagnia},\n\nin data ${dataIt(d.dataInvio)} vi ho inviato una richiesta di compensazione pecuniaria ai sensi degli articoli 5 e 7 del Regolamento CE 261/2004, relativa al volo ${d.volo} del ${quando}.\n\nNon ho ricevuto alcun riscontro. Vi chiedo una risposta entro 14 giorni. In mancanza, presenterò reclamo all'ENAC e valuterò ogni ulteriore azione prevista dalla legge.\n\n[Nome e cognome]\n---\n\nLa tua pratica: ${d.link}`,
+    testo: `Nessuna risposta? Si insiste.\n\nHai inviato il reclamo il ${dataIt(d.dataInvio)} e la compagnia non ha risposto. Il sollecito è pronto: copia e invia questo testo dalla stessa email del primo reclamo.\n\n---\nOggetto: Sollecito richiesta di compensazione, volo ${d.volo} del ${quando}\n\nSpett.le ${compagnia},\n\nin data ${dataIt(d.dataInvio)} vi ho inviato una richiesta di compensazione pecuniaria ai sensi degli articoli 5 e 7 del Regolamento CE 261/2004, relativa al volo ${d.volo} del ${quando}.\n\nNon ho ricevuto alcun riscontro. Vi chiedo una risposta entro 14 giorni. In mancanza, presenterò reclamo a ${ente} e valuterò ogni ulteriore azione prevista dalla legge.\n\n[Nome e cognome]\n---\n\nLa tua pratica: ${d.link}`,
   });
 }
 
-/* ------------------------------------------------------------ T+30 */
-/** Un mese senza esito: si passa all'autorità. Il reclamo ENAC è gratuito. */
+/* ------------------------------------------------------------ T+56 */
+/**
+ * Otto settimane senza esito: si passa all'autorità. È gratuito.
+ *
+ * 🔴 QUESTA EMAIL MANDAVA TUTTI ALL'ENAC. Ma la competenza è dello Stato
+ * dell'aeroporto di PARTENZA (art. 16 par. 1), e la lettera dal giro #38
+ * nomina l'ente giusto paese per paese: chi parte da Barcellona veniva
+ * mandato all'ufficio sbagliato e perdeva settimane, mentre la sua
+ * lettera gli diceva il contrario. La funzione non riceveva nemmeno il
+ * paese, quindi non poteva fare altro. Adesso lo riceve.
+ * ⚠️ Se lo scalo di partenza non lo sappiamo, non si inventa un ufficio:
+ * si dice "l'ente nazionale del paese da cui sei partito" e si rimanda
+ * alla lettera, che quell'ente ce l'ha scritto dentro.
+ * Trovato dall'ispezione del 12/08.
+ */
 export function reclamoEnac(
   a: string,
-  d: { volo: string; dataVolo: string | null; link: string },
+  d: { volo: string; dataVolo: string | null; link: string; partenzaIata?: string | null },
 ): Promise<Esito> {
   const quando = d.dataVolo ? ` del ${dataIt(d.dataVolo)}` : "";
+  const e = enteDiPartenza(d.partenzaIata);
   return spedisci({
     a,
-    oggetto: "30 giorni senza esito: è il momento dell'ENAC.",
+    oggetto: `${SETTIMANE_ENTE} settimane senza esito: è il momento dell'ente nazionale.`,
     html: vestito({
-      titolo: "Il reclamo ENAC",
+      titolo: "La segnalazione all'ente",
       corpo:
         h("Ora rispondono all'autorità.") +
         p(
-          `Sono passati 30 giorni dal tuo reclamo per il volo ${d.volo}${quando}, senza un esito. Il passo successivo è il reclamo all'ENAC, l'ente nazionale che vigila sul Regolamento CE 261/2004. È gratuito e si presenta online.`,
+          `Sono passate ${SETTIMANE_ENTE} settimane dal tuo reclamo per il volo ${d.volo}${quando}, senza un esito. Il passo successivo è la segnalazione a ${e.nome}, l'ente che vigila sul Regolamento CE 261/2004 per il paese da cui sei partito. È gratuita e si presenta online.`,
         ) +
         p(
-          "Cambia il peso: con il reclamo ENAC la compagnia non risponde più solo a te, risponde a chi può sanzionarla.",
+          "Cambia il peso: con la segnalazione la compagnia non risponde più solo a te, risponde a chi può sanzionarla.",
         ) +
         scatola(
           `<strong>Cosa serve per compilarlo</strong><br>
@@ -238,11 +302,11 @@ export function reclamoEnac(
         ) +
         bottone("Apri la tua pratica", d.link) +
         p(
-          `Il modulo è sul sito dell'ENAC: <a href="https://www.enac.gov.it" style="color:${C.verde};">enac.gov.it</a>. Se qualcosa non torna, rispondi a questa email.`,
+          `${e.dove} Il testo della segnalazione è già scritto dentro la tua pratica. Se qualcosa non torna, rispondi a questa email.`,
         ),
       coda: CODA,
     }),
-    testo: `Ora rispondono all'autorità.\n\n30 giorni dal tuo reclamo per il volo ${d.volo}${quando}, senza esito. Il passo successivo è il reclamo all'ENAC: gratuito, online, e la compagnia risponde a chi può sanzionarla.\n\nCosa serve: numero e data del volo, il reclamo già inviato, l'eventuale risposta della compagnia. È tutto nella tua pratica: ${d.link}\n\nIl modulo: https://www.enac.gov.it`,
+    testo: `Ora rispondono all'autorità.\n\n${SETTIMANE_ENTE} settimane dal tuo reclamo per il volo ${d.volo}${quando}, senza esito. Il passo successivo è la segnalazione a ${e.nome}: gratuita, online, e la compagnia risponde a chi può sanzionarla.\n\nCosa serve: numero e data del volo, il reclamo già inviato, l'eventuale risposta della compagnia. È tutto nella tua pratica, insieme al testo già scritto: ${d.link}`,
   });
 }
 
@@ -260,7 +324,7 @@ export function comeVa(
       corpo:
         h("A che punto sei?") +
         p(
-          "Sono passati due mesi dall'invio del reclamo. Dimmi come sta andando, qualunque cosa sia successa:",
+          `Sono passate ${SETTIMANE_ESITO} settimane dall'invio del reclamo. Dimmi come sta andando, qualunque cosa sia successa:`,
         ) +
         scatola(
           `<strong>Se la compagnia ha pagato:</strong> segnalo nella pratica e chiudiamo.<br>
@@ -273,7 +337,7 @@ export function comeVa(
         ),
       coda: CODA,
     }),
-    testo: `A che punto sei?\n\nSono passati due mesi dall'invio del reclamo.\n- Se la compagnia ha pagato: segnalo nella pratica e chiudiamo.\n- Se ha rifiutato: segnalo, il rifiuto scritto serve per i passi successivi.\n- Se non si è fatta viva: dillo lo stesso, così la garanzia parte da sola.\n\nAggiorna la pratica: ${d.link}\n${
+    testo: `A che punto sei?\n\nSono passate ${SETTIMANE_ESITO} settimane dall'invio del reclamo.\n- Se la compagnia ha pagato: segnalo nella pratica e chiudiamo.\n- Se ha rifiutato: segnalo, il rifiuto scritto serve per i passi successivi.\n- Se non si è fatta viva: dillo lo stesso, così la garanzia parte da sola.\n\nAggiorna la pratica: ${d.link}\n${
       "\nGaranzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, rimborso integrale del prezzo pagato."
     }`,
   });

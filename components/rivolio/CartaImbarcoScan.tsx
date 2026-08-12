@@ -45,7 +45,7 @@ function CampoLetto({
 }) {
   return (
     <div className="min-w-0">
-      <p className="text-[9px] font-medium uppercase tracking-[0.18em] text-fumo-2">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-fumo">
         {etichetta}
       </p>
       {valore ? (
@@ -110,7 +110,7 @@ export default function CartaImbarcoScan({
       {/* i campi del documento */}
       <div className="relative grid grid-cols-[1.2fr_1fr_1fr] gap-x-4 gap-y-3 px-4 pb-3 pt-3.5 sm:px-5">
         <div className="min-w-0">
-          <p className="text-[9px] font-medium uppercase tracking-[0.18em] text-fumo-2">Volo</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-fumo">Volo</p>
           <p className="numeri mt-0.5 flex items-center gap-1.5 font-display text-[19px] font-medium tracking-[-0.02em] text-inchiostro">
             {volo}
             {passo >= 1 && (
@@ -156,7 +156,7 @@ export default function CartaImbarcoScan({
           largo="w-12"
         />
         <div className="relative min-w-0">
-          <p className="text-[9px] font-medium uppercase tracking-[0.18em] text-fumo-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-fumo">
             Verifica
           </p>
           {passo >= 3 ? (

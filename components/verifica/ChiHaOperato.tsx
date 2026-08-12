@@ -174,7 +174,7 @@ export default function ChiHaOperato({
                 setTesto(e.target.value);
               }}
               placeholder={T.segnaposto}
-              className="h-13 w-full rounded-xl border border-bordo bg-white px-4 text-[15.5px] text-inchiostro outline-none transition-colors focus:border-verde"
+              className="h-13 w-full rounded-xl border border-bordo bg-white px-4 text-[16px] sm:text-[15px] text-inchiostro outline-none transition-colors focus:border-verde"
             />
 
             {suggerimenti.length > 0 && (

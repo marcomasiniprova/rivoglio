@@ -194,7 +194,10 @@ export default function Footer() {
 
         <div className="mt-16 flex flex-col gap-4 border-t border-white/10 pt-7 text-[13.5px] text-white/60 sm:flex-row sm:items-center sm:justify-between">
           <p>{F.copyright} · Fatto in Italia</p>
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
+          {/* ⚠️ gap-y-3 e i link col loro spazio verticale: qui i bersagli
+              erano alti 20 punti e distanti 8, cioè si sbagliava mira fra
+              Privacy e Cookie. Trovato dall'ispezione del 12/08. */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 [&_a]:tocco-comodo [&_a]:py-1">
             <a
               href={`mailto:${F.supporto.email}`}
               className="transition-colors hover:text-menta"

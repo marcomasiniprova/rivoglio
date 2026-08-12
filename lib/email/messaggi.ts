@@ -170,7 +170,7 @@ export function conferma(a: string, link: string): Promise<Esito> {
         p(
           `Se non hai chiesto tu questa registrazione, ignora questa email: senza il clic non succede niente.`,
         ),
-      coda: "Ricevi questa email perché qualcuno ha usato questo indirizzo per registrarsi su rivolio.it.",
+      coda: `Ricevi questa email perché qualcuno ha usato questo indirizzo per registrarsi su ${casa().replace(/^https?:\/\//, "")}.`,
     }),
     testo: `Un clic e sei dentro.\n\nConferma il tuo indirizzo: ${link}\n\nSe non hai chiesto tu questa registrazione, ignora questa email.`,
   });

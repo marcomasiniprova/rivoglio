@@ -10,7 +10,11 @@ import {
 } from "@/lib/pratiche/pratiche";
 import { comeVa, promemoriaInvio, reclamoEnac, sollecitoPronto } from "@/lib/email/pratiche";
 import { casa } from "@/lib/email/posta";
-import { GIORNI_PRIMA_DELL_ENTE, GIORNI_PRIMA_DEL_SOLLECITO } from "@/lib/pratiche/rifiuto";
+import {
+  GIORNI_PRIMA_DELL_ENTE,
+  GIORNI_PRIMA_DELL_ESITO,
+  GIORNI_PRIMA_DEL_SOLLECITO,
+} from "@/lib/pratiche/rifiuto";
 
 /**
  * Il cron dei follow-up (SPEC §6): una volta al giorno scorre le pratiche
@@ -96,7 +100,7 @@ function passoDovuto(pr: PraticaConVolo, fatti: Set<string>): Passo | null {
   // Inviata: si guarda dal traguardo più lontano. Se una tappa più avanti
   // è già stata mandata, quelle prima sono superate e non si mandano più.
   const g = giorniDa(pr.inviata_il);
-  if (g >= 90) return fatto("email_esito") ? null : "email_esito";
+  if (g >= GIORNI_PRIMA_DELL_ESITO) return fatto("email_esito") ? null : "email_esito";
   if (g >= GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE) {
     return fatto("email_ente") ? null : "email_ente";
   }
@@ -120,12 +124,18 @@ async function mandaPasso(pr: PraticaConVolo, passo: Passo): Promise<boolean> {
       volo,
       dataVolo,
       compagnia: pr.voli?.vettore_operativo ?? null,
+      partenzaIata: pr.voli?.partenza_iata ?? null,
       dataInvio: pr.inviata_il ?? pr.creata_il,
       importo: pr.importo_fascia,
       link,
     });
   } else if (passo === "email_ente") {
-    esito = await reclamoEnac(pr.email, { volo, dataVolo, link });
+    esito = await reclamoEnac(pr.email, {
+      volo,
+      dataVolo,
+      link,
+      partenzaIata: pr.voli?.partenza_iata ?? null,
+    });
   } else {
     esito = await comeVa(pr.email, { garanziaFinoAl: pr.garanzia_fino_al, link });
   }

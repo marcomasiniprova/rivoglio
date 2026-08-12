@@ -395,7 +395,7 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
 
           {/* Ogni numero è apribile: la trasparenza è il prodotto. */}
           <details className="group relative mx-auto mt-6 max-w-md text-left">
-            <summary className="cursor-pointer list-none text-center text-sm font-medium text-menta underline decoration-menta/40 underline-offset-4 transition-colors hover:text-white">
+            <summary className="tocco-comodo cursor-pointer list-none text-center text-sm font-medium text-menta underline decoration-menta/40 underline-offset-4 transition-colors hover:text-white">
               {t.comeNasceLaCifra.titolo}
             </summary>
             <div className="mt-3 rounded-xl bg-white/8 px-4 py-3.5 text-sm leading-relaxed text-white/80">

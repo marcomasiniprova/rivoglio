@@ -134,7 +134,11 @@ function CampoDestinazione({
             value={testo}
             onChange={(e) => setTesto(e.target.value)}
             placeholder={T.coincidenza.destinazione.segnaposto}
-            className="h-12 w-full rounded-xl border border-bordo bg-white px-4 text-[15px] outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/10"
+            /* ⚠️ 16px sul telefono: sotto quella misura iOS ingrandisce la
+               pagina da solo appena si tocca il campo, e da lì in poi il
+               verdetto resta zoomato e storto. Stesso difetto già trovato
+               sul login e sul pannello. */
+            className="h-12 w-full rounded-xl border border-bordo bg-white px-4 text-[16px] outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/10 sm:text-[15px]"
           />
           {visibili.length > 0 && (
             <ul className="absolute inset-x-0 top-[52px] z-20 overflow-hidden rounded-xl border border-bordo bg-white shadow-[0_18px_44px_-20px_rgba(5,46,31,.35)]">

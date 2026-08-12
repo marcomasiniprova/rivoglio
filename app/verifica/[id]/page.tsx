@@ -5,7 +5,8 @@ import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { headers } from "next/headers";
 import Risultato, { type DatiVerifica } from "@/components/verifica/Risultato";
-import { inCollaudo } from "@/lib/check/cancello";
+import { inCollaudo, passDi } from "@/lib/check/cancello";
+import { prezzoPagatoPerIlCheck, scontoDaCheck } from "@/lib/check/ingresso";
 import { COPY } from "@/lib/copy";
 import { listinoCorrente } from "@/lib/prezzi-server";
 import { scadenzaStimata, valuta } from "@/lib/regole/eu261";
@@ -291,7 +292,18 @@ export default async function PaginaVerifica({
 
   /* Il listino che questa persona sta vedendo dall'inizio (test dei due
      prezzi): la cassa userà lo stesso, il cookie lo scrive il proxy. */
-  const { listino } = await listinoCorrente();
+  const { listino: listinoPieno } = await listinoCorrente();
+  /* 🔴 «I 1,99 SI SCALANO DALLA PRATICA» ERA SCRITTO IN QUATTRO PUNTI DEL
+     SITO E NON LO FACEVA NESSUNO. La funzione che calcola lo sconto
+     esisteva (`scontoDaCheck`) ma non la chiamava nessun pezzo del
+     prodotto: cercandola nel repository compariva solo dentro le prove.
+     Il cliente pagava 1,99 e poi 14,90 pieni, cioè 16,89 invece dei 14,90
+     promessi. Trovato dall'ispezione del 12/08; deciso di costruire lo
+     sconto invece di ritirare la promessa (Valerio, 12/08).
+     ⚠️ Lo sconto si applica solo a chi la ricevuta ce l'ha davvero: la
+     legge dal cookie firmato, non da un parametro nell'indirizzo. */
+  const pass = passDi(await richiesta());
+  const listino = pass ? scontoDaCheck(listinoPieno, prezzoPagatoPerIlCheck()) : listinoPieno;
 
   const dati: DatiVerifica = {
     idPagina: id,

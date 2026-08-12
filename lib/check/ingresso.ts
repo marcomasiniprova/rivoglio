@@ -129,6 +129,21 @@ export function postiRimasti(analisiGiaPagate: number | null): number | null {
  * Il totale del percorso resta quello del listino: i 1,99 sono un
  * anticipo, non un pedaggio in più.
  */
+/**
+ * Quanto vale l'anticipo già versato per l'analisi.
+ *
+ * ⚠️ La ricevuta nel cookie NON porta la cifra pagata, porta l'ordine e
+ * quante analisi dà. Qui si usa il prezzo DI LANCIO, che è quello che ha
+ * pagato chiunque abbia una ricevuta oggi. Il giorno che i 500 posti
+ * finiscono e il prezzo sale, questa cifra va letta dall'ordine vero: chi
+ * ha pagato 4,99 deve vedersene scalare 4,99, non 1,99.
+ * ⚠️ Sbaglia dalla parte giusta: scalare meno del dovuto è un cliente che
+ * protesta e ha ragione; scalare più del dovuto è un buco di cassa.
+ */
+export function prezzoPagatoPerIlCheck(): number {
+  return PREZZO_LANCIO;
+}
+
 export function scontoDaCheck(
   listino: Listino,
   giaPagato: number,

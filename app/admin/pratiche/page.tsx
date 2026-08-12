@@ -104,6 +104,10 @@ export default async function PaginaPratiche() {
     pratiche = (data ?? []) as unknown as RigaPratica[];
   }
 
+  /* ⚠️ QUESTI BOLLINI CONTANO LE RIGHE LETTE, NON TUTTE LE PRATICHE, e
+     stavano accanto a un totale che invece è vero: due numeri con la
+     stessa faccia e due significati diversi. Adesso il titolo lo dice.
+     Trovato dall'ispezione del 12/08. */
   const perStato = STATI.map((s) => ({
     ...s,
     quante: pratiche.filter((p) => p.stato === s.chiave).length,
@@ -138,7 +142,7 @@ export default async function PaginaPratiche() {
         />
         <div className="rounded-[14px] border border-bordo bg-white p-4 shadow-[0_1px_2px_rgba(5,46,31,0.04)] sm:p-5">
           <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-fumo-2">
-            A che punto sono
+            A che punto sono {pratiche.length > 0 ? `(ultime ${pratiche.length})` : ""}
           </p>
           {perStato.length === 0 ? (
             <p className="mt-2.5 text-[13px] text-fumo-2">

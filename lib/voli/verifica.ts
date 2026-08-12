@@ -312,6 +312,11 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
              volerlo. Adesso in produzione è acceso da solo e si spegne
              solo scrivendo esplicitamente SHADOW_MODE=0: dimenticarsene
              porta dalla parte prudente, non dall'altra. */
+          /* ⚠️ Dal 12/08 "in attesa" non ferma più la vendita (il
+             controllo umano avviene DOPO, vedi checkout/route.ts), quindi
+             questo campo dice solo se il verdetto è ancora da rivedere.
+             Resta acceso da solo in produzione: dimenticarsene porta
+             dalla parte prudente. */
           conferma:
             process.env.SHADOW_MODE === "0"
               ? "automatica"

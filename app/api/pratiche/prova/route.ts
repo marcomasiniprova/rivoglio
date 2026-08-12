@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { inCollaudo } from "@/lib/check/cancello";
+import { collaudoAperto, inCollaudo, passDi } from "@/lib/check/cancello";
 import { creaPratica, praticaPerVerifica, registraEvento, transizionePratica } from "@/lib/pratiche/pratiche";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { traccia } from "@/lib/eventi/registra";
@@ -39,6 +39,9 @@ import { versoCasa } from "@/lib/sito";
  */
 export const dynamic = "force-dynamic";
 
+/** Vero se questo browser porta la chiave del collaudatore (non il portone). */
+const collaudoDaCookie = (req: NextRequest) => !collaudoAperto() && inCollaudo(req);
+
 const UUID_OK = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function GET(req: NextRequest) {
@@ -58,9 +61,15 @@ export async function GET(req: NextRequest) {
   const db = supabaseServizio();
   const { data: verifica, error } = await db
     .from("verifiche")
-    .select("id, esito, email, volo_iata")
+    .select("id, esito, email, volo_iata, creata_il")
     .eq("id", verificaId)
-    .maybeSingle<{ id: string; esito: string; email: string | null; volo_iata: string | null }>();
+    .maybeSingle<{
+      id: string;
+      esito: string;
+      email: string | null;
+      volo_iata: string | null;
+      creata_il: string | null;
+    }>();
 
   if (error) return NextResponse.json({ errore: error.message }, { status: 500 });
   if (!verifica) return NextResponse.json({ errore: "Verifica inesistente." }, { status: 404 });
@@ -70,9 +79,16 @@ export async function GET(req: NextRequest) {
      il giorno che ne arriva una davvero non si distinguerebbero più.
      I voli demo cominciano per ZZ, ed è la stessa regola di sempre. */
   if (!(verifica.volo_iata ?? "").toUpperCase().startsWith("ZZ")) {
-    return NextResponse.json(
-      { errore: "La cassa di prova vale solo sui voli dimostrativi (ZZ*)." },
-      { status: 400 },
+    /* 🔴 QUI USCIVA UNA PAGINA BIANCA CON DENTRO DEL JSON. Niente
+       testata, niente marchio, nessun modo di tornare indietro: l'unica
+       via d'uscita era il tasto indietro del browser. E non capitava
+       solo a chi collauda: col portone aperto ci finisce chiunque
+       controlli un volo VERO e prema il bottone d'acquisto.
+       Adesso si torna sulla pagina del verdetto, che il messaggio
+       onesto («il pagamento non è ancora attivo») lo sa già dare.
+       Trovato dall'ispezione del 12/08. */
+    return NextResponse.redirect(
+      versoCasa(`/verifica/${verifica.id}?checkout=non-attivo`, req),
     );
   }
   if (verifica.esito !== "idoneo") {
@@ -82,10 +98,19 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  /* ⚠️ SERVE L'EMAIL, e non è un capriccio della funzione: la pratica si
+  /* 🔴 UN ESTRANEO POTEVA FAR NASCERE ACCOUNT RIVOLIO CON L'EMAIL DI
+     CHIUNQUE. Col portone del collaudo aperto questa rotta è pubblica, e
+     creava un account già confermato con l'email agganciata alla
+     verifica; bastava fare un check, scrivere l'indirizzo di un altro nel
+     campo email e premere. La persona vera, provando poi a registrarsi,
+     si sentiva rispondere che con quella email un account c'era già.
+     Non si chiude il portone (Valerio lo vuole aperto, e ha ragione: il
+     sito non lo conosce nessuno): si chiude QUESTO. Vedi sotto.
+     Trovato dall'ispezione del 12/08.
+
+     ⚠️ SERVE L'EMAIL, e non è un capriccio della funzione: la pratica si
      lega a un account, e l'account è l'email. Nel percorso vero la si
-     chiede sulla pagina del verdetto, subito dopo il risultato. Se manca
-     qui, manca anche là: si dice cosa fare invece di inventarne una. */
+     chiede sulla pagina del verdetto, subito dopo il risultato. */
   if (!verifica.email) {
     return NextResponse.json(
       {
@@ -93,6 +118,28 @@ export async function GET(req: NextRequest) {
           "Su questa verifica non c'è ancora un'email. Torna alla pagina del verdetto, lascia la tua email dove te la chiede, e poi riprova: è lo stesso passo che fa un cliente vero.",
       },
       { status: 400 },
+    );
+  }
+
+  /* ⚠️ E LA VERIFICA DEVE ESSERE APPENA STATA FATTA.
+     Il controllo naturale sarebbe la ricevuta dell'analisi, ma quella
+     esiste solo col muro acceso: legare la cassa a lei vorrebbe dire
+     rompere il collaudo il giorno che il muro si spegne. La condizione
+     che vale sempre è un'altra e chiude lo stesso lo scenario che fa
+     male: un'analisi di mezz'ora fa è di chi la sta guardando adesso,
+     un elenco di identificativi raccolti in giro no.
+     Non è una serratura, è una finestra che si chiude: un estraneo non
+     può più raccogliere identificativi e usarli quando gli pare per far
+     nascere account intestati ad altri. */
+  const eta = Date.now() - Date.parse(verifica.creata_il ?? "");
+  const FRESCA_MS = 30 * 60 * 1000;
+  if (!passDi(req) && !collaudoDaCookie(req) && !(eta >= 0 && eta < FRESCA_MS)) {
+    return NextResponse.json(
+      {
+        errore:
+          "Questa analisi è di troppo tempo fa per aprire una pratica da qui. Rifai il check: ci vogliono trenta secondi.",
+      },
+      { status: 403 },
     );
   }
 
