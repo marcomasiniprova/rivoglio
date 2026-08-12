@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
+import { POSTA_ATTIVA } from "@/lib/email/posta";
+import { verdettoIdoneo } from "@/lib/email/verdetto";
+import { formattaMinuti } from "@/lib/regole/eu261";
+import { aeroporto } from "@/lib/voli/distanza";
+import { inItaliano } from "@/lib/voli/aeroporti";
 
 /**
  * POST /api/verifica/email  {id, email}
@@ -13,6 +18,60 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 /** Controllo volutamente permissivo: meglio un'email strana che perderne una buona. */
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const UUID_OK = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+type RigaVerifica = {
+  id: string;
+  esito: string;
+  importo: number | null;
+  ritardo_minuti: number | null;
+  volo_iata: string;
+  volo_id: string | null;
+};
+
+/**
+ * Manda l'email del verdetto, se c'è qualcosa da dire.
+ *
+ * La tratta ("Bergamo → Lanzarote") si prende dalla riga del volo e si
+ * scrive in italiano: nel titolo dell'email il codice del volo non lo
+ * riconosce nessuno, la città sì.
+ * Non lancia mai: qualunque cosa vada storta resta nei log del server e
+ * l'utente non se ne accorge, perché il verdetto ce l'ha già davanti.
+ */
+async function inviaVerdetto(
+  sb: ReturnType<typeof supabaseServizio>,
+  riga: RigaVerifica,
+  a: string,
+): Promise<void> {
+  try {
+    if (!POSTA_ATTIVA) return;
+    if (riga.esito !== "idoneo" || !riga.importo) return;
+
+    let tratta: string | null = null;
+    if (riga.volo_id) {
+      const { data: volo } = await sb
+        .from("voli")
+        .select("partenza_iata, arrivo_iata")
+        .eq("id", riga.volo_id)
+        .maybeSingle();
+      const da = aeroporto((volo as { partenza_iata?: string | null } | null)?.partenza_iata);
+      const a2 = aeroporto((volo as { arrivo_iata?: string | null } | null)?.arrivo_iata);
+      if (da && a2) {
+        tratta = `${inItaliano(da.citta) ?? da.citta} → ${inItaliano(a2.citta) ?? a2.citta}`;
+      }
+    }
+
+    const esito = await verdettoIdoneo(a, {
+      idVerifica: riga.id,
+      volo: riga.volo_iata,
+      tratta,
+      importo: riga.importo,
+      ritardo: riga.ritardo_minuti ? formattaMinuti(riga.ritardo_minuti) : null,
+    });
+    if (!esito.ok) console.error("[verifica/email] email del verdetto non partita:", esito.motivo);
+  } catch (e) {
+    console.error("[verifica/email] email del verdetto fallita:", e);
+  }
+}
 
 export async function POST(req: Request) {
   let corpo: unknown;
@@ -66,8 +125,21 @@ export async function POST(req: Request) {
          riga che dice il contrario e' il modo in cui l'errore rientra
          dalla finestra. */
       .is("email", null)
-      .select("id");
+      .select("id, esito, importo, ritardo_minuti, volo_iata, volo_id");
     if (error) throw new Error(error.message);
+    if (data && data.length === 1) {
+      /* 🔴 QUI PRIMA NON SUCCEDEVA NIENTE. Si salvava l'indirizzo e si
+         rispondeva ok: chi apriva la posta non trovava nulla e pensava,
+         legittimamente, che il sito fosse finto (Valerio, 12/08).
+         Adesso l'email parte, ma SOLO sugli idonei: su un incerto
+         scriveremmo per dire "non lo so", e non è un'email che qualcuno
+         vuole ricevere.
+         ⚠️ Se la spedizione fallisce non fallisce la richiesta: il
+         verdetto è già sullo schermo dell'utente, e rispondere "errore"
+         per un'email non partita gli farebbe credere di aver perso il
+         risultato. */
+      void inviaVerdetto(sb, data[0] as RigaVerifica, pulita);
+    }
     if (!data || data.length === 0) {
       /* Zero righe aggiornate vuol dire due cose: la verifica non
          esiste, oppure un'email c'era gia'. Non si distinguono nella

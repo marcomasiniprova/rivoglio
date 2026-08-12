@@ -978,7 +978,13 @@ export const COPY = {
       segnaposto: "nome@esempio.it",
     },
     bottone: "Salva e continua",
-    rassicurazione: "La usiamo solo per la tua pratica. Niente pubblicità.",
+    /* 🔴 Valerio, 12/08: «quella esatta email perché serve, come viene
+       usata e dove viene usata?». Non era una domanda da curioso: la
+       riga di prima diceva "la usiamo solo per la tua pratica", che non
+       spiega niente a chi la sta scrivendo adesso. Qui ci stanno i tre
+       usi veri, in ordine di quando accadono, e nient'altro. */
+    rassicurazione:
+      "Tre cose, e basta: ti arriva subito il risultato col link per riprendere anche da un altro telefono; è l'indirizzo con cui entri nella pratica se la apri; ed è lì che ti scriviamo come procede. Niente pubblicità, niente liste.",
     /* Quando l'indirizzo non sta in piedi. Si dice cosa controllare, non
        "email non valida": chi ha sbagliato una lettera non sa quale. */
     errore: "Controlla l'indirizzo: manca la chiocciola o il punto finale.",
@@ -1164,6 +1170,15 @@ export const COPY = {
         email_ente: "Email con la segnalazione all'ente inviata",
         email_esito: "Email di controllo esito inviata",
         rifiuto: "La compagnia ha risposto no",
+        /* 🔴 Nella cronologia usciva la parola in codice "pratica_di_prova".
+           Si vede nello screenshot che Valerio ha mandato il 12/08: fra
+           due righe scritte in italiano ce n'era una scritta come la
+           chiama il database. Un nome tecnico in mezzo alle cose che
+           legge il cliente fa sembrare tutto un prototipo, ed è anche
+           l'unico posto dove si capisce che quella pratica non è vera:
+           merita una frase, non un identificatore. */
+        pratica_di_prova: "Pratica di collaudo, nessun pagamento",
+        documento_incrociato: "Documento confrontato con i dati del volo",
         // I nomi vecchi delle stesse tappe: le pratiche di prima li hanno
         // ancora scritti in cronologia e devono restare leggibili.
         email_t15: "Email col sollecito inviata",

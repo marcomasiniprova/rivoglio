@@ -54,7 +54,14 @@ export type Blocco =
 export function inBlocchi(corpo: string): Blocco[] {
   /* La nota di trasparenza vive in fondo, nel piede: qui si stacca
      perché nel documento non è un paragrafo, è la riga a piè di pagina. */
-  const senzaNota = corpo.split("\n---\n")[0].trimEnd();
+  /* ⚠️ Prima si tagliava su una riga di tre trattini, che il generatore
+     metteva prima della nota. Quella riga però finiva anche nell'EMAIL
+     che l'utente manda alla compagnia, ed è uno dei segni che Valerio ha
+     riconosciuto come "roba scritta da una macchina" (12/08). Adesso il
+     testo non ha più separatori e il taglio avviene sulla nota stessa,
+     che è una costante nostra: una sola verità, e quello che si copia è
+     identico a quello che si stampa. */
+  const senzaNota = corpo.split(NOTA_TRASPARENZA)[0].trimEnd();
   const pezzi = senzaNota.split(/\n{2,}/);
   const blocchi: Blocco[] = [];
   let saluto = false;

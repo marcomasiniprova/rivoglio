@@ -85,11 +85,12 @@ export function corpoDichiarato(
   euro: (n: number) => string,
 ): string {
   if (caso === "negato") {
-    return `I fatti:
-- mi sono presentato all'imbarco entro l'orario indicato, con prenotazione confermata;
-- l'imbarco mi è stato negato contro la mia volontà, senza che io abbia accettato alcun beneficio in cambio della rinuncia al posto${
-      fatto.kmOrtodromica ? `;\n- distanza della tratta: ${km(fatto.kmOrtodromica)}` : ""
-    }.
+    /* I fatti in prosa, non in elenco puntato: una lettera formale
+       italiana si scrive così, e i trattini a inizio riga sono la cosa
+       che Valerio ha riconosciuto come "automatismo" il 12/08. */
+    return `Mi sono presentato all'imbarco entro l'orario indicato, con prenotazione confermata, e l'imbarco mi è stato negato contro la mia volontà, senza che io abbia accettato alcun beneficio in cambio della rinuncia al posto.${
+      fatto.kmOrtodromica ? ` La tratta misura ${km(fatto.kmOrtodromica)}.` : ""
+    }
 
 Ai sensi dell'articolo 4, paragrafo 3, del Regolamento (CE) n. 261/2004, il vettore che nega l'imbarco a un passeggero contro la sua volontà è tenuto a corrispondere immediatamente la compensazione pecuniaria prevista dall'articolo 7. La compensazione non è subordinata ad alcuna condizione sul ritardo all'arrivo: è dovuta per il fatto stesso del negato imbarco.
 
@@ -97,10 +98,7 @@ Sulla base della distanza della tratta, l'articolo 7 fissa la compensazione in $
   }
 
   const dove = dati.destinazioneFinale ? ` (${dati.destinazioneFinale})` : "";
-  return `I fatti:
-- il volo indicato faceva parte di un'unica prenotazione con il volo successivo;
-- il ritardo del volo indicato mi ha fatto perdere la coincidenza;
-- sono giunto alla destinazione finale${dove} con un ritardo di ${ritardoFinaleInParole(dati.ritardoFinale)} rispetto all'orario originariamente previsto.
+  return `Il volo indicato faceva parte di un'unica prenotazione con il volo successivo, e il suo ritardo mi ha fatto perdere la coincidenza. Sono giunto alla destinazione finale${dove} con un ritardo di ${ritardoFinaleInParole(dati.ritardoFinale)} rispetto all'orario originariamente previsto.
 
 Ai sensi dell'articolo 7 del Regolamento (CE) n. 261/2004, come interpretato dalla Corte di giustizia dell'Unione europea nella causa C-11/11 (Folkerts), il passeggero che, a causa del ritardo di un volo con coincidenza compreso in un'unica prenotazione, giunge alla destinazione finale con un ritardo pari o superiore a tre ore ha diritto alla compensazione pecuniaria, salvo circostanze eccezionali che spetta al vettore provare.
 

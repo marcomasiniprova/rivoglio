@@ -59,9 +59,35 @@ export type CanaleCompagnia = {
   fonte: string;
   /** Stringhe (MAIUSCOLE) per agganciare `vettore_operativo` o il codice volo. */
   chiavi: string[];
+  /**
+   * Altri codici IATA che portano allo STESSO ufficio reclami.
+   *
+   * Serve ai gruppi che volano con più licenze: un Bergamo → Catania può
+   * avere un numero W4 (Wizz Air Malta) o W6 (Wizz Air Hungary), ed è lo
+   * stesso modulo. Senza questo, metà dei voli Wizz e una fetta di quelli
+   * Ryanair non trovavano il canale e finivano nel messaggio
+   * "compagnia non in archivio".
+   *
+   * ⚠️ Qui va solo un codice di cui si è sicuri. Un alias sbagliato manda
+   * il reclamo a una società che non ha operato il volo, ed è l'errore
+   * numero uno per cui li respingono.
+   */
+  iataAlias?: string[];
 };
 
 export const VERIFICATO_IL = "2026-08-08";
+
+/**
+ * Il secondo giro (12/08). Stesso metodo del primo, con una stretta in
+ * più: ogni ricerca è stata fatta **filtrando sul dominio ufficiale**
+ * della compagnia, quindi gli URL qui sotto non sono dedotti, sono
+ * comparsi nell'indice su quel dominio e su nessun altro.
+ *
+ * ⚠️ Il segmento di lingua/paese cambia da compagnia a compagnia
+ * (`/en-es/`, `/fr/en/`, `/us/en/`). Dove l'abbiamo trovato in italiano
+ * si è preso quello; dove no, resta quello indicizzato, che funziona.
+ */
+export const VERIFICATO_IL_2 = "2026-08-12";
 
 export const COMPAGNIE: CanaleCompagnia[] = [
   /* ------------------------------------------------ le low cost del mercato Italia */
@@ -85,6 +111,8 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     // Il gruppo Ryanair vola con numeri FR anche via Malta Air, Lauda e
     // Buzz: il canale reclami del gruppo è quello di Ryanair.
     chiavi: ["RYANAIR", "MALTA AIR", "LAUDA", "BUZZ"],
+    // Malta Air (AL) e Buzz (RR) volano rotte italiane con numeri propri.
+    iataAlias: ["AL", "RR"],
   },
   {
     iata: "U2",
@@ -124,6 +152,9 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     fonte:
       "Ricerca web 2026-08-08: pagina reclami e articolo 'EC261 regulation' sul dominio ufficiale wizzair.com. GCC art. 14.7.8/17.4.9: reclamo di terzi solo dopo reclamo diretto e con delega; portale separato per le claim companies (claim.wizzair.com).",
     chiavi: ["WIZZ"],
+    // Wizz Air Malta (W4) opera moltissime rotte italiane; Wizz Air UK
+    // (W9) i collegamenti col Regno Unito. Stesso modulo reclami.
+    iataAlias: ["W4", "W9"],
   },
   {
     iata: "AZ",
@@ -466,7 +497,441 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     // di nome, l'aggancio avviene solo per codice volo HV.
     chiavi: [],
   },
+
+  /* =================================================================
+     SECONDO GIRO (12/08). Diciannove compagnie in più.
+
+     🔴 Perché: Valerio ha aperto una pratica e ha letto «non abbiamo in
+     archivio il canale reclami di questa compagnia, cerca "reclami" sul
+     sito ufficiale». Con venti compagnie in tabella quel messaggio
+     usciva su un volo su tre. Un prodotto che vende "la lettera già
+     pronta" e poi ti manda a cercare il destinatario ha finito di
+     vendere lì.
+
+     Il criterio di scelta è uno solo: **chi vola davvero da e per
+     l'Italia.** Non c'è nessuna compagnia messa qui per fare numero.
+     ================================================================= */
+
+  /* ------------------------------------------------ Europa, linea */
+  {
+    iata: "EI",
+    icao: "EIN",
+    nome: "Aer Lingus",
+    nomeLegale: "Aer Lingus Limited",
+    paese: "IE",
+    canale:
+      "Modulo dedicato alla compensazione per volo interrotto (Flight Disruption Compensation Form). Va compilato col nome scritto esattamente come sulla prenotazione, se no lo respingono.",
+    url: "https://www.aerlingus.com/app/support/forms/flight-disruption-compensation-form",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio aerlingus.com: 'Flight Disruption Compensation Claim Form' e la pagina legale 'EU Regulation 261/2004'.",
+    chiavi: ["AER LINGUS"],
+  },
+  {
+    iata: "EW",
+    icao: "EWG",
+    nome: "Eurowings",
+    nomeLegale: "Eurowings GmbH",
+    paese: "DE",
+    canale:
+      "Pagina ufficiale sui diritti del passeggero, con lo strumento online per verificare e chiedere la compensazione secondo il Regolamento 261/2004.",
+    url: "https://www.eurowings.com/en/information/news-help/delays-cancellations-air-passenger-rights.html",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio eurowings.com: pagina 'Passenger rights' e FAQ 'Claims & compensation'.",
+    chiavi: ["EUROWINGS"],
+  },
+  {
+    iata: "SN",
+    icao: "BEL",
+    nome: "Brussels Airlines",
+    nomeLegale: "Brussels Airlines N.V./S.A.",
+    paese: "BE",
+    canale:
+      "Modulo di segnalazione ufficiale, sezione ritardi e cancellazioni. Il segmento di paese nell'indirizzo cambia (/fr/, /at/, /be/): la pagina è la stessa.",
+    url: "https://www.brusselsairlines.com/fr/en/contact/feedback/general/delays-and-cancellation",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio brusselsairlines.com: modulo 'Delays and cancellation' e pagina legale 'Your rights as a passenger'.",
+    chiavi: ["BRUSSELS AIRLINES"],
+  },
+  {
+    iata: "TP",
+    icao: "TAP",
+    nome: "TAP Air Portugal",
+    nomeLegale: "TAP - Transportes Aéreos Portugueses, S.A.",
+    paese: "PT",
+    canale:
+      "Sezione reclami del sito ufficiale (Requests & complaints). Dichiarano di rispondere entro un mese dalla presentazione.",
+    url: "https://www.flytap.com/en-es/help/requests-complaints/complaints",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio flytap.com: pagine 'Complaints' e 'Requests and complaints'.",
+    chiavi: ["TAP AIR PORTUGAL", "TAP PORTUGAL"],
+  },
+  {
+    iata: "A3",
+    icao: "AEE",
+    nome: "Aegean Airlines",
+    nomeLegale: "Aegean Airlines S.A.",
+    paese: "GR",
+    canale:
+      "Modulo di contatto ufficiale: scegli la voce che riguarda il volo, non quella dei bagagli.",
+    url: "https://en.aegeanair.com/contact/Form/",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    // Il modulo è quello generale: la pagina di un modulo dedicato ai soli
+    // casi 261 non è comparsa. Si dichiara, e l'interfaccia lo dice.
+    verificato: false,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio aegeanair.com: 'Help & Contact' (modulo) e 'Conditions & Notices'; policy reclami su about.aegeanair.com.",
+    chiavi: ["AEGEAN"],
+  },
+  {
+    iata: "LO",
+    icao: "LOT",
+    nome: "LOT Polish Airlines",
+    nomeLegale: "Polskie Linie Lotnicze LOT S.A.",
+    paese: "PL",
+    canale:
+      "Modulo ufficiale 'Claim after departure', cioè il reclamo dopo che il volo è avvenuto: è quello giusto per la compensazione.",
+    url: "https://www.lot.com/us/en/help-center/contact/forms/form-claim-after-departure",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio lot.com: modulo 'Claim after departure' e pagina 'Passenger rights due to irregularities'.",
+    chiavi: ["LOT POLISH", "POLSKIE LINIE"],
+  },
+  {
+    iata: "SK",
+    icao: "SAS",
+    nome: "SAS",
+    nomeLegale: "SAS AB",
+    paese: "SE",
+    canale:
+      "Modulo dedicato proprio al Regolamento 261/2004 (claim-eu261). È fra i più diretti che esistano: si compila e basta.",
+    url: "https://www.flysas.com/en/customer-service/contact/forms/claim-eu261",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio flysas.com: modulo 'claim-eu261' e pagina 'EU Passenger Rights'.",
+    chiavi: ["SCANDINAVIAN AIRLINES", "SAS AB"],
+  },
+  {
+    iata: "AY",
+    icao: "FIN",
+    nome: "Finnair",
+    nomeLegale: "Finnair Oyj",
+    paese: "FI",
+    canale:
+      "Modulo ufficiale 'Feedback and compensation'. ⚠️ Chiedono di presentare la richiesta entro due mesi dal volo: è un termine loro, non di legge, ma tanto vale rispettarlo.",
+    url: "https://www.finnair.com/it-en/customer-care-and-contact-information/contact-and-request-forms/feedback-and-compensation",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio finnair.com: modulo 'Feedback and compensation', versione italiana (/it-en/) presente nell'indice.",
+    chiavi: ["FINNAIR"],
+  },
+  {
+    iata: "OU",
+    icao: "CTN",
+    nome: "Croatia Airlines",
+    nomeLegale: "Croatia Airlines d.d.",
+    paese: "HR",
+    canale:
+      "Modulo ufficiale delle richieste (Request type). Il reclamo va presentato per iscritto: il modulo lo è.",
+    url: "https://www.croatiaairlines.com/en/customer/request-type",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio croatiaairlines.com: 'Request type' e pagina legale 'Passengers' rights'.",
+    chiavi: ["CROATIA AIRLINES"],
+  },
+  {
+    iata: "RO",
+    icao: "ROT",
+    nome: "TAROM",
+    nomeLegale: "Compania Națională de Transporturi Aeriene Române TAROM S.A.",
+    paese: "RO",
+    canale: "Pagina ufficiale dei reclami sui voli, con la sezione dedicata alla compensazione.",
+    url: "https://www.tarom.ro/en/complaints-related-flights/",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio tarom.ro: 'Complaints related to the flights' e 'Compensation for cancelled or delayed flights'.",
+    chiavi: ["TAROM"],
+  },
+  {
+    iata: "KM",
+    icao: "KMM",
+    nome: "KM Malta Airlines",
+    nomeLegale: "KM Malta Airlines Ltd",
+    paese: "MT",
+    canale:
+      "Sezione ufficiale dedicata a voli persi, in ritardo e cancellati, da cui parte la richiesta di compensazione.",
+    url: "https://airmalta.com/en/customer-support/missed-delayed-cancelled-flights",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sui domini airmalta.com e maltairlines.com: 'Missed, Delayed & Cancelled Flights' e 'Customer Support' (il sito della compagnia resta su airmalta.com dopo il passaggio da Air Malta a KM Malta Airlines).",
+    chiavi: ["MALTA AIRLINES", "AIR MALTA"],
+  },
+
+  /* ------------------------------------------- Italia, non di linea */
+  {
+    iata: "NO",
+    icao: "NOS",
+    nome: "Neos",
+    nomeLegale: "Neos S.p.A.",
+    paese: "IT",
+    canale:
+      "Area clienti del sito ufficiale: il reclamo si apre da lì, dopo essersi registrati, e lo stato si segue nella propria area. Dichiarano risposta entro 30 giorni dal ricevimento.",
+    url: "https://www.neosair.it/it/dopo_il_volo/customer_service",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio neosair.it: pagina 'customer_service' e Carta dei Servizi ufficiale.",
+    chiavi: ["NEOS"],
+  },
+
+  /* ------------------------------------- fuori UE, ma volano in Italia */
+  {
+    iata: "PC",
+    icao: "PGT",
+    nome: "Pegasus Airlines",
+    nomeLegale: "Pegasus Hava Taşımacılığı A.Ş.",
+    paese: "TR",
+    canale:
+      "Centro assistenza ufficiale: arrivato lì, scegli la voce del volo (ritardo, cancellazione, diritti del passeggero).",
+    url: "https://www.flypgs.com/en/help-center",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    // Il centro assistenza è ufficiale, ma un modulo dedicato ai soli casi
+    // 261 non è comparso nell'indice: si dichiara.
+    verificato: false,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio flypgs.com: 'Help Center' e 'Passenger Rights'.",
+    chiavi: ["PEGASUS"],
+  },
+  {
+    iata: "JU",
+    icao: "ASL",
+    nome: "Air Serbia",
+    nomeLegale: "Air Serbia a.d. Beograd",
+    paese: "RS",
+    canale: "Pagina ufficiale dei reclami (Claims), da cui si presenta la richiesta scritta.",
+    url: "https://www.airserbia.com/en/claims",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio airserbia.com: 'Claims' e pagina legale 'Passenger rights'.",
+    chiavi: ["AIR SERBIA"],
+  },
+  {
+    iata: "TU",
+    icao: "TAR",
+    nome: "Tunisair",
+    nomeLegale: "Société Tunisienne de l'Air - Tunisair",
+    paese: "TN",
+    canale:
+      "Modulo reclami ufficiale. ⚠️ È personale: una richiesta per ogni passeggero. Dichiarano risposta entro due mesi.",
+    url: "https://www.tunisair.com/en/reclamation?category_id=1",
+    email: null,
+    pec: null,
+    indirizzoPostale:
+      "Tunisair, Direction Relation Clientèle et Call Center, Charguia II, 2035 Tunis-Carthage, Tunisia",
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio tunisair.com: modulo 'reclamation' e pagine 'Relation clientèle'. L'indirizzo postale è quello indicato dalle stesse pagine.",
+    chiavi: ["TUNISAIR"],
+  },
+  {
+    iata: "AT",
+    icao: "RAM",
+    nome: "Royal Air Maroc",
+    nomeLegale: "Compagnie Nationale Royal Air Maroc S.A.",
+    paese: "MA",
+    canale:
+      "Modulo reclami ufficiale (Service Claims): dopo l'invio arriva un'email con il numero della pratica. Il segmento di paese nell'indirizzo cambia.",
+    url: "https://www.royalairmaroc.com/us-en/information/service-claims",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    // Scrivono espressamente che passare da un intermediario non accorcia
+    // i tempi e consigliano il contatto diretto: per noi è una conferma.
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio royalairmaroc.com: 'Service Claims' e 'Customer Service Plan'.",
+    chiavi: ["ROYAL AIR MAROC"],
+  },
+
+  /* --------------------------- Stati Uniti: contano sui voli DALL'Europa.
+     L'art. 3 par. 1 lett. a) copre qualsiasi compagnia che parta da uno
+     scalo europeo, quindi un Roma → Atlanta con Delta rientra in pieno.
+     Al ritorno no, e il motore lo sa già. */
+  {
+    iata: "DL",
+    icao: "DAL",
+    nome: "Delta Air Lines",
+    nomeLegale: "Delta Air Lines, Inc.",
+    paese: "US",
+    canale:
+      "Pagina dedicata alla richiesta di compensazione per i voli in partenza dall'Unione europea (EU Compensation Request).",
+    url: "https://www.delta.com/us/en/change-cancel/exit-eu-compensation",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio delta.com: 'Exit European Union (EU) Compensation Request'.",
+    chiavi: ["DELTA AIR"],
+  },
+  {
+    iata: "UA",
+    icao: "UAL",
+    nome: "United Airlines",
+    nomeLegale: "United Airlines, Inc.",
+    paese: "US",
+    canale:
+      "Modulo Customer Care ufficiale: è il canale con cui United raccoglie i reclami, compresi quelli sui voli in partenza dall'Unione europea.",
+    url: "https://www.united.com/en/us/customer-care",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio united.com: 'United Customer Care Form' e l'avviso ufficiale sui diritti per i voli in partenza dall'UE.",
+    chiavi: ["UNITED AIRLINES"],
+  },
+  {
+    iata: "AA",
+    icao: "AAL",
+    nome: "American Airlines",
+    nomeLegale: "American Airlines, Inc.",
+    paese: "US",
+    canale:
+      "Modulo Customer Relations ufficiale (argomento CR). Loro stessi dicono che il modulo online ha risposta più rapida della posta.",
+    url: "https://www.aa.com/contact/forms?topic=CR",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_2,
+    fonte:
+      "Ricerca web 12/08/2026 con filtro sul dominio aa.com: modulo 'Contact American' con argomento Customer Relations e pagina 'Passenger Rights European Union'.",
+    chiavi: ["AMERICAN AIRLINES"],
+  },
 ];
+
+/* ------------------------------------------------------ come si manda */
+
+/**
+ * COME SI SPEDISCE QUESTA LETTERA, in una risposta sola.
+ *
+ * 🔴 Valerio, 12/08: «il destinatario non c'è perché? Il destinatario
+ * dobbiamo sempre averlo, dobbiamo sempre fornirlo». Ha ragione sul
+ * risultato, e la causa vale la pena scriverla perché non è pigrizia
+ * nostra: **Ryanair, easyJet e Wizz Air un indirizzo email per i reclami
+ * non lo pubblicano.** Obbligano al modulo sul loro sito, e nelle
+ * condizioni di trasporto scrivono nero su bianco che lavorano solo il
+ * reclamo che arriva dal passeggero. Metterci un'email pescata in giro
+ * sarebbe la cosa peggiore: la lettera parte, non risponde nessuno, e il
+ * cliente scopre due mesi dopo di aver scritto a un indirizzo morto.
+ *
+ * Quindi il destinatario c'è sempre, ma non è sempre un'email: per
+ * quelle compagnie è il loro modulo, ed è l'unico canale che paga.
+ * L'interfaccia non deve MAI dire "cercatelo": deve portarcelo.
+ *
+ * Ordine di scelta, e il perché di ognuno:
+ * 1. `email` → `mailto:`. Un gesto solo, il testo viaggia intero.
+ * 2. `url` → il modulo. Si copia la lettera e si apre il modulo: due
+ *    gesti, ma è il canale dichiarato dalla compagnia.
+ * 3. niente → si dice cosa fare, non si manda a cercare.
+ *
+ * ⚠️ LA PEC NON È MAI LA PRIMA SCELTA, e non è una svista. Una casella
+ * PEC di solito **rifiuta la posta che non arriva da un'altra PEC**:
+ * mandarci un messaggio da Gmail significa vederselo respingere. Vale
+ * per chi la PEC ce l'ha, quindi si mostra a parte, come possibilità in
+ * più per chi sa cos'è.
+ */
+export type ModoInvio =
+  | { tipo: "email"; a: string; pec: string | null }
+  | { tipo: "modulo"; url: string; nome: string; pec: string | null }
+  | { tipo: "ignoto" };
+
+export function modoInvio(c: CanaleCompagnia | null): ModoInvio {
+  if (!c) return { tipo: "ignoto" };
+  if (c.email) return { tipo: "email", a: c.email, pec: c.pec };
+  if (c.url) return { tipo: "modulo", url: c.url, nome: c.nome, pec: c.pec };
+  return { tipo: "ignoto" };
+}
 
 /**
  * Trova la compagnia dal `vettore_operativo` della cache voli, o dal
@@ -489,7 +954,9 @@ export function compagniaPerVettore(
 
   // Codice IATA secco ("FR") o numero di volo ("FR8321").
   const codice = /^([A-Z0-9]{2})\d{1,4}[A-Z]?$/.exec(testo)?.[1] ?? testo;
-  const perIata = COMPAGNIE.find((c) => c.iata === codice);
+  const perIata = COMPAGNIE.find(
+    (c) => c.iata === codice || c.iataAlias?.includes(codice),
+  );
   if (perIata) return perIata;
 
   // Nome del vettore, per aggancio di sottostringa.

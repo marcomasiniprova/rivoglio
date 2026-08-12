@@ -53,8 +53,39 @@ export type Lettera = { oggetto: string; corpo: string };
 export const NOTA_TRASPARENZA =
   "Questa comunicazione è stata redatta a partire dalla normativa e dalla giurisprudenza pubbliche applicabili e dai dati di volo verificati. Non costituisce parere legale.";
 
-/** Ciò che la lettera legge dalla pratica. Il resto non le serve. */
-export type PraticaPerLettera = Pick<Pratica, "passeggeri" | "tipo">;
+/**
+ * Ciò che la lettera legge dalla pratica. Il resto non le serve.
+ *
+ * ⚠️ `email` è entrata il 12/08 e non è un vezzo: la lettera chiudeva con
+ * «[indirizzo email con cui è stata fatta la prenotazione]», cioè un
+ * campo da riempire a mano dentro un documento che vendiamo come
+ * "pronto". Quell'indirizzo è lo stesso con cui la pratica è stata
+ * aperta: lo sapevamo già e lo lasciavamo scrivere all'utente.
+ */
+export type PraticaPerLettera = Pick<Pratica, "passeggeri" | "tipo"> & {
+  email?: string | null;
+};
+
+/**
+ * COME SI CHIUDE OGNI LETTERA, e perché non c'è più nessun trattino.
+ *
+ * 🔴 Valerio, 12/08: «ci sono dei piccoli segni di AI e di automatismo,
+ * tipo --- o -, insomma c'è sporco e non sembra ancora pronta come email
+ * umana e professionale». Aveva ragione su tutta la linea:
+ * - una riga di tre trattini prima della nota finale: nessuno la scrive
+ *   in un'email, è un separatore da documento generato;
+ * - i fatti in elenco puntato con i trattini: una lettera formale
+ *   italiana i fatti li racconta in prosa;
+ * - i campi fra parentesi quadre: sono un modulo, non una lettera.
+ *
+ * Qui la nota di trasparenza diventa l'ultimo capoverso, staccato da una
+ * riga vuota come qualsiasi altro. Dice la stessa cosa e non sembra
+ * uscita da una macchina.
+ */
+function chiusura(firma: string, email?: string | null): string {
+  const recapito = email ? `\n${email}` : "";
+  return `Distinti saluti,\n\n${firma}${recapito}\n\n${NOTA_TRASPARENZA}`;
+}
 
 /** Gli allegati che l'utente mette nella SUA email. */
 export const ALLEGATI = [
@@ -194,10 +225,7 @@ export function generaReclamo(
   const fattiENorma =
     caso && extra?.dichiarato
       ? corpoDichiarato(caso, fatto, verdetto, extra.dichiarato, km, euro)
-      : `I fatti, come risultano dai dati di volo (fonte: ${fatto.fonte}):
-- arrivo previsto: ${oraUtc(fatto.arrivoPrevistoUtc as string)};
-- arrivo effettivo: ${oraUtc(fatto.arrivoEffettivoUtc as string)};
-- ritardo all'arrivo: ${durata(verdetto.ritardoMinuti)}${fatto.kmOrtodromica ? `;\n- distanza della tratta: ${km(fatto.kmOrtodromica)}` : ""}.
+      : `Il volo era previsto in arrivo alle ${oraUtc(fatto.arrivoPrevistoUtc as string)} ed è atterrato alle ${oraUtc(fatto.arrivoEffettivoUtc as string)}, con un ritardo all'arrivo di ${durata(verdetto.ritardoMinuti)}${fatto.kmOrtodromica ? ` su una tratta di ${km(fatto.kmOrtodromica)}` : ""}. Gli orari risultano dai dati di volo archiviati (fonte: ${fatto.fonte}).
 ${extra?.meteo ? `\n${extra.meteo}\n` : ""}
 Ai sensi degli articoli 5 e 7 del Regolamento (CE) n. 261/2004, come interpretati dalla Corte di giustizia dell'Unione europea nella sentenza del 19 novembre 2009, cause riunite C-402/07 e C-432/07 (Sturgeon), un ritardo all'arrivo pari o superiore a tre ore dà diritto alla stessa compensazione pecuniaria prevista per la cancellazione del volo, salvo circostanze eccezionali che spetta al vettore provare.
 
@@ -211,14 +239,15 @@ ${fattiENorma}
 
 ${
   n === 1
-    ? `Chiedo pertanto il pagamento di ${euro(verdetto.importo)} per il passeggero sotto indicato:`
-    : `Chiedo pertanto il pagamento di ${euro(verdetto.importo)} per ciascuno dei seguenti ${n} passeggeri, per un totale di ${euro(totale)}:`
-}
-${passeggeri.map((p) => `- ${p}`).join("\n")}
+    ? `Chiedo pertanto il pagamento di ${euro(verdetto.importo)} in favore di ${passeggeri[0]}.`
+    : `Chiedo pertanto il pagamento di ${euro(verdetto.importo)} per ciascuno dei seguenti ${n} passeggeri, per un totale di ${euro(totale)}:
 
-Il pagamento può essere effettuato con bonifico su queste coordinate:
-IBAN: [da compilare]
-Intestato a: [da compilare]
+${passeggeri.map((p, i) => `${i + 1}. ${p}`).join("\n")}`
+}
+
+Il pagamento potrà essere effettuato con bonifico bancario sulle seguenti coordinate:
+Intestato a: ${passeggeri[0]}
+IBAN: [qui il tuo IBAN]
 
 Chiedo il pagamento, o una risposta scritta e motivata, entro 30 giorni dal ricevimento della presente. Se intendete invocare circostanze eccezionali, chiedo che siano indicate in modo specifico e documentate: l'onere della prova è a vostro carico, e l'esonero richiede anche la dimostrazione di aver adottato tutte le misure ragionevoli, ivi compresa la riprotezione su voli alternativi, anche operati da altri vettori.
 
@@ -226,14 +255,7 @@ In mancanza di riscontro nel termine indicato, presenterò reclamo a ${organismo
 
 In allegato: carta d'imbarco, documento d'identità e le eventuali ricevute delle spese sostenute.
 
-Distinti saluti,
-
-${passeggeri[0]}
-[indirizzo email con cui è stata fatta la prenotazione]
-[data di invio]
-
----
-${NOTA_TRASPARENZA}`;
+${chiusura(passeggeri[0], pratica.email)}`;
 
   return { oggetto, corpo };
 }
@@ -289,14 +311,7 @@ Vi chiedo il pagamento, o una risposta scritta e motivata, entro 14 giorni dal r
 
 Decorso inutilmente questo termine, presenterò reclamo a ${organismoDiPartenza(fatto)}, l'organismo nazionale responsabile dell'applicazione del Regolamento (CE) 261/2004 per lo Stato di partenza, che può accertare la violazione e applicare le sanzioni previste. Valuterò inoltre ogni ulteriore tutela nelle sedi competenti.
 
-Distinti saluti,
-
-${passeggeri[0]}
-[indirizzo email con cui è stato inviato il primo reclamo]
-[data di invio]
-
----
-${NOTA_TRASPARENZA}`;
+${chiusura(passeggeri[0], pratica.email)}`;
 
   return { oggetto, corpo };
 }
@@ -454,10 +469,7 @@ export function generaSegnalazioneEnte(
 il sottoscritto ${passeggeri[0]} presenta reclamo ai sensi dell'articolo 16 del Regolamento (CE) n. 261/2004 nei confronti di ${nomeCompagnia}.
 
 IL VOLO
-- volo ${fatto.voloIata} del ${giornoVolo}${fatto.partenzaIata && fatto.arrivoIata ? `, da ${fatto.partenzaIata} a ${fatto.arrivoIata}` : ""};
-- arrivo previsto: ${oraUtc(fatto.arrivoPrevistoUtc)};
-- arrivo effettivo: ${oraUtc(fatto.arrivoEffettivoUtc)};
-- ritardo all'arrivo: ${durata(verdetto.ritardoMinuti)}${fatto.kmOrtodromica ? `;\n- distanza della tratta: ${km(fatto.kmOrtodromica)}` : ""}.
+Volo ${fatto.voloIata} del ${giornoVolo}${fatto.partenzaIata && fatto.arrivoIata ? `, da ${fatto.partenzaIata} a ${fatto.arrivoIata}` : ""}. Era previsto in arrivo alle ${oraUtc(fatto.arrivoPrevistoUtc)} ed è atterrato alle ${oraUtc(fatto.arrivoEffettivoUtc)}, con un ritardo all'arrivo di ${durata(verdetto.ritardoMinuti)}${fatto.kmOrtodromica ? ` su una tratta di ${km(fatto.kmOrtodromica)}` : ""}.
 
 LA RICHIESTA GIÀ AVANZATA AL VETTORE
 In data ${primo} ho chiesto al vettore la compensazione pecuniaria di ${
@@ -473,15 +485,7 @@ Allego: copia del reclamo inviato al vettore, copia del sollecito, la carta d'im
 
 Resto a disposizione per ogni chiarimento.
 
-Distinti saluti,
-
-${passeggeri.join("\n")}
-[indirizzo di residenza]
-[recapito email e telefono]
-[data]
-
----
-${NOTA_TRASPARENZA}`;
+${chiusura(passeggeri.join("\n"), pratica.email)}`;
 
   return { oggetto, corpo };
 }

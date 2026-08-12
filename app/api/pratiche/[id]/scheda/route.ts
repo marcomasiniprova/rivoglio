@@ -52,13 +52,15 @@ type RigaPratica = {
   importo_fascia: number | null;
   garanzia_fino_al: string | null;
   inviata_il: string | null;
+  /** L'email con cui la pratica è stata aperta: chiude la lettera. */
+  email: string | null;
   creata_il: string;
   /** Il motivo del no della compagnia, se il cliente l'ha dichiarato. */
   rifiuto_motivo?: string | null;
 };
 
 const COLONNE_PRATICA =
-  "id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, importo_fascia, garanzia_fino_al, inviata_il, creata_il";
+  "id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, importo_fascia, garanzia_fino_al, inviata_il, creata_il, email";
 
 type RigaVolo = {
   volo_iata: string;
@@ -224,7 +226,7 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
       }
 
       const testo = generaReclamo(
-        { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo },
+        { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo, email: pratica.email },
         fatto,
         verdetto,
         { meteo },

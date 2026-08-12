@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { collaudoAperto, inCollaudo, passDi } from "@/lib/check/cancello";
 import { creaPratica, praticaPerVerifica, registraEvento, transizionePratica } from "@/lib/pratiche/pratiche";
+import { linkDiIngresso } from "@/lib/pratiche/ingresso";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { traccia } from "@/lib/eventi/registra";
 import { versoCasa } from "@/lib/sito";
@@ -191,5 +192,18 @@ export async function GET(req: NextRequest) {
      vuol dire perdere i cookie, quindi la ricevuta dell'analisi restava
      di la'. Vedi lib/sito.ts. Trovato percorrendo il giro sul sito vero
      il 12/08. */
-  return NextResponse.redirect(versoCasa(`/pratica/${pratica.id}`, req));
+  /* 🔴 E QUI FINIVA SU "ENTRA". La pratica è legata a un account, e
+     l'account l'abbiamo appena aperto noi con l'email della verifica: ma
+     il browser di chi ha appena "pagato" non ha nessuna sessione, quindi
+     `/pratica/<id>` lo rimbalzava al login. Valerio, 12/08: «quando pago
+     per la pratica mi reindirizza nella pagina login Entra, cosa
+     succede? perché proprio là?».
+     Adesso si passa da un link di accesso: entra da solo e atterra
+     dentro la pratica, senza vedere nessun login. Se il link non si
+     genera si finisce sulla pratica come prima, cioè al login: è il
+     ripiego, non la strada. */
+  const ingresso = await linkDiIngresso(verifica.email, `/pratica/${pratica.id}`);
+  return NextResponse.redirect(
+    ingresso.startsWith("http") ? ingresso : versoCasa(`/pratica/${pratica.id}`, req),
+  );
 }

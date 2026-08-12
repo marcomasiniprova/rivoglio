@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { colonnaMancante } from "@/lib/supabase/colonne";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
-import { compagniaPerVettore } from "@/lib/lettera/compagnie";
+import { compagniaPerVettore, modoInvio } from "@/lib/lettera/compagnie";
 import {
   ALLEGATI,
   generaReclamo,
@@ -59,12 +59,14 @@ type RigaPratica = {
   tipo: TipoPratica;
   passeggeri: Passeggero[] | null;
   inviata_il: string | null;
+  /** L'email con cui la pratica è stata aperta: finisce in fondo alla lettera. */
+  email: string | null;
   /** Il motivo del no della compagnia, se il cliente l'ha dichiarato. */
   rifiuto_motivo?: string | null;
 };
 
 const COLONNE_PRATICA =
-  "id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, inviata_il";
+  "id, utente_id, volo_id, verifica_id, stato, tipo, passeggeri, inviata_il, email";
 
 type RigaVolo = {
   volo_iata: string;
@@ -319,7 +321,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   }
 
   const lettera = generaReclamo(
-    { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo },
+    { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo, email: pratica.email },
     fatto,
     verdetto,
     { meteo, dichiarato },
@@ -347,7 +349,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   const sollecito =
     pratica.inviata_il && prontoPerSollecito(giorniDallInvio, motivoRifiuto)
       ? generaSollecito(
-          { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo },
+          { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo, email: pratica.email },
           fatto,
           verdetto,
           pratica.inviata_il.slice(0, 10),
@@ -362,7 +364,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   const segnalazione =
     sollecito && giorniDallInvio >= GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE
       ? generaSegnalazioneEnte(
-          { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo },
+          { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo, email: pratica.email },
           fatto,
           verdetto,
           pratica.inviata_il ? pratica.inviata_il.slice(0, 10) : null,
@@ -384,6 +386,10 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
 
   const compagnia =
     compagniaPerVettore(volo.vettore_operativo) ?? compagniaPerVettore(volo.volo_iata);
+  /* Dove va la lettera, deciso una volta sola (vedi modoInvio): email se
+     la compagnia ne pubblica una, altrimenti il suo modulo ufficiale.
+     Mai "cercatelo tu". */
+  const invio = modoInvio(compagnia);
   const organismo = istruzioniOrganismo(volo.partenza_iata);
   const passeggeriDaCompilare = (pratica.passeggeri ?? []).length === 0;
 
@@ -415,17 +421,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           Adesso in cima c'è il gesto, e le spiegazioni stanno sotto,
           chiuse: chi le vuole le apre. */}
       <section className="no-stampa rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-6">
-        <ApriEmail
-          destinatario={compagnia?.email ?? null}
-          oggetto={lettera.oggetto}
-          corpo={lettera.corpo}
-          etichetta="Apri l'email già scritta"
-          nota={
-            compagnia?.email
-              ? `Va a ${compagnia.nome}.`
-              : "Il destinatario resta da mettere: qui sotto c'è dove."
-          }
-        />
+        <ApriEmail modo={invio} oggetto={lettera.oggetto} corpo={lettera.corpo} />
       </section>
 
       {/* ------------------------------------------------ a chi va */}
@@ -458,25 +454,60 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
                 Canale verificato il {dataIt(compagnia.verificatoIl)}.
               </p>
             ) : (
+              /* Il canale c'è ed è sul dominio della compagnia: quello che
+                 non abbiamo potuto confermare è che sia il modulo DEI
+                 RECLAMI e non l'assistenza generica. Si dice, e si dice
+                 anche cosa fare arrivati lì: prima c'era scritto "cerca
+                 reclami sul sito ufficiale", che è mandare la persona a
+                 fare il lavoro nostro. */
               <p className="mt-1 flex items-start gap-1.5 rounded-xl bg-sole/15 px-3.5 py-2.5 text-sm leading-relaxed text-inchiostro">
                 <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
                 <span>
-                  Questo è il canale assistenza generico: al {dataIt(compagnia.verificatoIl)} non
-                  abbiamo trovato con certezza il modulo reclami. Prima di inviare, cerca
-                  &quot;reclami&quot; sul sito ufficiale della compagnia.
+                  Questa è la pagina di assistenza ufficiale, non il modulo reclami dedicato:
+                  arrivato lì, scegli la voce che parla di ritardo, cancellazione o diritti del
+                  passeggero. La lettera è la stessa.
                 </span>
+              </p>
+            )}
+            {compagnia.accettaIntermediari === false && (
+              <p className="mt-1 text-sm leading-relaxed text-fumo">
+                {compagnia.nome} dichiara di lavorare solo i reclami mandati dal passeggero. È il
+                motivo per cui la lettera parte dalla tua casella: così la compensazione ti arriva
+                intera.
+              </p>
+            )}
+            {compagnia.indirizzoPostale && (
+              <p className="mt-1 text-sm leading-relaxed text-fumo-2">
+                Sede legale, se un giorno servisse la raccomandata: {compagnia.indirizzoPostale}.
               </p>
             )}
           </div>
         ) : (
-          <p className="mt-3 flex items-start gap-1.5 rounded-xl bg-sole/15 px-3.5 py-2.5 text-sm leading-relaxed">
-            <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            <span>
-              Non abbiamo in archivio il canale reclami di questa compagnia. Cerca
-              &quot;reclami&quot; sul sito ufficiale del vettore che ha operato il volo e usa il
-              suo modulo: mai un intermediario.
-            </span>
-          </p>
+          /* 🔴 Qui c'era scritto: «Non abbiamo in archivio il canale
+             reclami di questa compagnia. Cerca "reclami" sul sito
+             ufficiale». Valerio, 12/08: «ma che cazzo vuol dire, stai
+             dicendo all'utente cercati le cose e fatti mille ricerche da
+             solo». Aveva ragione. Adesso l'indirizzo si dice DOVE STA, e
+             sta in un posto che ha chiunque abbia volato: in fondo
+             all'email di conferma della prenotazione, ogni compagnia ci
+             mette il proprio servizio clienti. Un posto, non una ricerca. */
+          <div className="mt-3 flex flex-col gap-2 text-[0.95rem] leading-relaxed">
+            <p>
+              <span className="font-medium">
+                {volo.vettore_operativo ?? volo.volo_iata.slice(0, 2)}
+              </span>{" "}
+              <span className="text-fumo">(compagnia non ancora in archivio)</span>
+            </p>
+            <p className="text-fumo">
+              L&apos;indirizzo del loro servizio clienti è in fondo all&apos;email di conferma
+              della prenotazione: ogni compagnia lo scrive lì. Copia la lettera qui sopra e
+              mandala a quell&apos;indirizzo.
+            </p>
+            <p className="text-sm leading-relaxed text-fumo-2">
+              Se non rispondono, il passo dopo è la segnalazione all&apos;organismo nazionale, e
+              quel documento lo prepariamo noi: compare qui sotto quando è il momento.
+            </p>
+          </div>
         )}
       </details>
 

@@ -7,6 +7,7 @@ import {
   transizionePratica,
 } from "@/lib/pratiche/pratiche";
 import { praticaPronta } from "@/lib/email/pratiche";
+import { linkDiIngresso } from "@/lib/pratiche/ingresso";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { casa } from "@/lib/email/posta";
 import { registraDa } from "@/lib/eventi/registra";
@@ -234,23 +235,13 @@ export async function POST(req: NextRequest) {
     `Volo ${verifica.volo_iata} del ${verifica.data_locale}`,
   );
 
-  // ---- link magico: chi ha appena pagato entra senza password
-  let link = `${casa()}/pratica/${pratica.id}`;
-  try {
-    const db = supabaseServizio();
-    const { data, error } = await db.auth.admin.generateLink({
-      type: "magiclink",
-      email,
-      options: { redirectTo: link },
-    });
-    if (!error && data.properties?.action_link) {
-      link = data.properties.action_link;
-    } else if (error) {
-      console.error("[polar] link magico non generato, uso il link semplice:", error.message);
-    }
-  } catch (e) {
-    console.error("[polar] link magico non generato, uso il link semplice:", e);
-  }
+  /* ---- link magico: chi ha appena pagato entra senza password.
+     ⚠️ Il rimbalzo passa da /auth/conferma e NON dritto sulla pratica:
+     Supabase consegna la sessione nel frammento dell'indirizzo, e solo
+     quella pagina lo sa leggere. Puntando dritto alla pratica il bottone
+     di questa email avrebbe sbattuto il primo cliente pagante sul login.
+     Vedi lib/pratiche/ingresso.ts. */
+  const link = await linkDiIngresso(email, `/pratica/${pratica.id}`);
 
   // ---- email T+0. Se non parte non si blocca niente: il cron non la
   // rimanda (il T+0 non è nella sequenza), ma l'utente ha comunque la

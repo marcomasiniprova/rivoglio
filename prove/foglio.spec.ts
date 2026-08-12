@@ -61,13 +61,19 @@ test.describe("Il foglio della pratica", () => {
          in fondo come un paragrafo qualsiasi: nessuno se ne accorgerebbe
          guardando, e sarebbe la riga che ci tiene fuori dall'esercizio
          abusivo della professione. */
-      const pezzi = corpo.split("\n---\n");
-      expect(pezzi.length, "il corpo deve avere il separatore del piede").toBe(2);
-      expect(pezzi[1].trim()).toBe(NOTA_TRASPARENZA);
+      /* ⚠️ Fino all'11/08 il taglio era una riga di tre trattini. È
+         sparita il 12/08 perché finiva anche nell'email che il
+         passeggero manda alla compagnia, e lì si legge come "generato da
+         un programma". Adesso il piede si riconosce dalla nota stessa,
+         che resta l'ULTIMA cosa del testo: se un domani qualcuno la
+         sposta o la toglie, questa prova si ferma. */
+      expect(corpo, "la nota deve chiudere il testo").toContain(NOTA_TRASPARENZA);
+      expect(corpo.trimEnd().endsWith(NOTA_TRASPARENZA)).toBe(true);
+      expect(corpo, "il separatore a trattini non deve tornare").not.toContain("\n---\n");
     });
 
     test(`${nome}: impaginando non si perde una parola`, () => {
-      const corpo = lettera!.corpo.split("\n---\n")[0];
+      const corpo = lettera!.corpo.split(NOTA_TRASPARENZA)[0];
       /* La scomposizione taglia solo righe vuote, trattini d'elenco e i
          punti e virgola in coda alle voci. Tutto il resto deve tornare. */
       const parole = (t: string) =>
