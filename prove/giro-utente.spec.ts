@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { cercaAeroporti, aeroportoPerIata } from "../lib/voli/aeroporti";
 import { COPY } from "../lib/copy";
-import { apriModoNumero } from "./aiuti";
 
 /**
  * IL GIRO DA UTENTE CRITICO (10/08).
@@ -40,34 +39,45 @@ test.describe("La ricerca degli aeroporti parla italiano", () => {
   });
 });
 
-test.describe("Cosa copre: nessuna colonna mente su quello che il motore fa", () => {
-  const gruppo = (etichetta: string) =>
-    COPY.copertura.gruppi.find((g) => g.etichetta === etichetta)!;
+test.describe("Cosa copriamo: il sito non mente su quello che il motore fa", () => {
+  /**
+   * ⚠️ QUESTE PROVE STAVANO SULLA SEZIONE "COSA COPRE", tolta dalla
+   * landing il 12/08 su richiesta di Valerio. Le promesse che
+   * difendevano NON sono sparite con la sezione: sono le stesse, solo
+   * scritte in un altro posto, cioè nelle FAQ. Cancellarle insieme al
+   * componente sarebbe stato il modo più silenzioso di riaprire i due
+   * buchi che avevano chiuso.
+   */
+  const faq = () => JSON.stringify(COPY.faq.voci).toLowerCase();
 
-  test("negato imbarco e coincidenza persa NON sono più fra i 'non ancora'", () => {
+  test("bagagli e treni restano dichiarati fuori", () => {
+    /* Chi paga aspettandosi il rimborso del bagaglio chiede indietro i
+       soldi e lascia una stella: questa riga vale soldi veri. */
+    const t = faq();
+    expect(t).toContain("bagagli");
+    expect(t).toContain("treni");
+    expect(t).toContain("convenzione di montreal");
+    // e la guida gratuita resta raggiungibile
+    expect(t).toContain("/guida-bagagli");
+  });
+
+  test("negato imbarco e coincidenza persa NON sono dichiarati mancanti", () => {
     /* Sono costruiti dal giro #35 (lib/regole/dichiarati.ts). Dire che
-       non ci sono è una vendita persa scritta sulla landing. */
-    const nonAncora = JSON.stringify(gruppo("Non ancora"));
-    expect(nonAncora.toLowerCase()).not.toContain("negato imbarco");
-    expect(nonAncora.toLowerCase()).not.toContain("coincidenza");
+       non ci sono è una vendita persa scritta sulla landing: è già
+       successo una volta ed è costato un giro per accorgersene. */
+    const t = faq();
+    expect(t).toContain("negato imbarco");
+    expect(t).toContain("coincidenza persa");
+    expect(t).not.toContain("prossimo pezzo che costruiamo");
+    expect(t).not.toContain("arrivano a breve");
   });
 
-  test("stanno nella colonna dove il verdetto si chiude con una domanda", () => {
-    const quasi = JSON.stringify(gruppo("Verdetto dopo due domande")).toLowerCase();
-    expect(quasi).toContain("lasciato a terra");
-    expect(quasi).toContain("coincidenza persa");
-  });
-
-  test("nessuna colonna promette un pezzo 'che costruiamo'", () => {
-    const tutto = JSON.stringify(COPY.copertura).toLowerCase();
-    expect(tutto).not.toContain("prossimo pezzo che costruiamo");
-    expect(tutto).not.toContain("arrivano a breve");
-  });
-
-  test("bagagli e treni restano fuori, e lo dicono", () => {
-    const nonAncora = JSON.stringify(gruppo("Non ancora")).toLowerCase();
-    expect(nonAncora).toContain("bagaglio");
-    expect(nonAncora).toContain("treni");
+  test("la sezione tolta non lascia link rotti", () => {
+    /* Un ancoraggio a una sezione che non esiste più non dà errore: la
+       pagina semplicemente non si muove, e nessuno se ne accorge. */
+    const testi = JSON.stringify(COPY);
+    expect(testi).not.toContain("#copertura");
+    expect(testi.toLowerCase()).not.toContain("nella sezione cosa copre");
   });
 });
 

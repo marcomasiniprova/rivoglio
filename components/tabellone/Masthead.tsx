@@ -62,11 +62,20 @@ export default function Masthead() {
           <MarchioTabellone />
         </div>
 
-        {/* le voci */}
-        <nav className="hidden items-center gap-7 lg:flex">
+        {/* le voci
+            ⚠️ `whitespace-nowrap` SU OGNI VOCE, e il perché è "Tutti gli
+            articoli": è l'unica voce di due parole lunghe, quindi è
+            l'unica che il browser può spezzare, e quando lo faceva
+            diventava due righe dentro una barra alta 62 punti (visto da
+            Valerio il 12/08). Vietare la spezzatura non basta da solo:
+            senza allentare i vuoti la barra andrebbe in overflow, quindi
+            il passo fra le voci scende a 5 e torna a 7 solo quando c'è
+            spazio davvero (xl). Sotto i 1024 punti questa nav non
+            esiste, quindi sul telefono non cambia niente. */}
+        <nav className="hidden items-center gap-5 lg:flex xl:gap-7">
           <Link
             href={RADICE}
-            className="text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
+            className="whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
           >
             Tutti gli articoli
           </Link>
@@ -74,7 +83,7 @@ export default function Masthead() {
           <div className="group relative">
             <button
               type="button"
-              className="flex items-center gap-1.5 text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
+              className="flex items-center gap-1.5 whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
               aria-haspopup="true"
             >
               Argomenti
@@ -98,13 +107,13 @@ export default function Masthead() {
 
           <Link
             href="/#osservatorio"
-            className="text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
+            className="whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
           >
             Osservatorio
           </Link>
           <Link
             href="/#prezzi"
-            className="text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
+            className="whitespace-nowrap text-[15px] font-medium text-verde-notte/75 transition-colors hover:text-verde-notte"
           >
             Prezzi
           </Link>
@@ -112,9 +121,12 @@ export default function Masthead() {
 
         {/* le azioni */}
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
+          {/* ⚠️ "Come funziona" torna solo da 1280 in su: è il bottone
+              meno importante dei due e a 1024 era lui a rubare i punti
+              che servivano alle voci per stare su una riga. */}
           <Link
             href="/#come-funziona"
-            className="hidden items-center gap-2 rounded-[9px] border border-verde-notte/22 bg-white px-4 py-2.5 text-[14px] font-semibold text-verde-notte transition-all duration-300 hover:-translate-y-0.5 hover:border-verde-notte/40 lg:inline-flex"
+            className="hidden items-center gap-2 whitespace-nowrap rounded-[9px] border border-verde-notte/22 bg-white px-4 py-2.5 text-[14px] font-semibold text-verde-notte transition-all duration-300 hover:-translate-y-0.5 hover:border-verde-notte/40 xl:inline-flex"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
               <circle cx="8" cy="8" r="6.6" stroke="currentColor" strokeWidth="1.6" />

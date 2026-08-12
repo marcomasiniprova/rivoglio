@@ -83,8 +83,20 @@ export default function CatturaEmail({
       <label htmlFor={id} className="sr-only">
         La tua email
       </label>
+      {/* 🔴 PERCHÉ ERA "SCHIACCIATO MINUSCOLO" (Valerio, 12/08), e non
+          era il padding: il campo dichiarava `h-12` (48 punti) e ne
+          misurava **27**. Colpa di `flex-1`, cioè `flex: 1 1 0%`: serve
+          da 640 punti in su, dove campo e bottone stanno affiancati e il
+          campo deve prendersi la larghezza che avanza. Ma sotto quella
+          soglia il telaio diventa una COLONNA, l'asse principale gira in
+          verticale, e quel `0%` smette di essere una larghezza di
+          partenza e diventa un'ALTEZZA di partenza: schiaccia il campo e
+          vince su `h-12`. Adesso `flex-1` esiste solo da `sm` in su.
+          ⚠️ Trovato misurando l'altezza vera nel browser, non leggendo
+          le classi: nel codice `h-12` c'era, e sembrava tutto giusto.
+          Più aria intorno, già che c'ero: p-1.5 → p-2. */}
       <div
-        className={`flex flex-col gap-2 rounded-[10px] p-1.5 sm:flex-row sm:gap-0 sm:rounded-[10px] ${
+        className={`flex flex-col gap-2 rounded-[12px] p-2 sm:flex-row sm:gap-0 ${
           scuro ? "bg-white/10" : "border border-verde-notte/20 bg-white"
         }`}
       >
@@ -96,16 +108,24 @@ export default function CatturaEmail({
           onChange={(e) => setEmail(e.target.value)}
           placeholder={segnaposto}
           autoComplete="email"
-          className={`h-11 w-full min-w-0 flex-1 rounded-[7px] bg-transparent px-3.5 text-[15.5px] outline-none ${
+          /* 🔴 16px, mai meno: sotto quella soglia iPhone ingrandisce la
+             pagina da solo appena tocchi il campo. Qui erano 15,5.
+             ⚠️ E SOLO SU TELEFONO il campo prende un contorno suo. Su
+             schermo largo campo e bottone stanno affiancati dentro un
+             telaio unico e si capisce; impilati invece il campo
+             trasparente dentro il telaio bianco spariva, e "La tua
+             email" sembrava una scritta sullo sfondo invece di un posto
+             dove si scrive. */
+          className={`h-12 w-full min-w-0 rounded-[8px] px-3.5 text-[16px] outline-none sm:flex-1 sm:border-0 sm:bg-transparent ${
             scuro
-              ? "text-white placeholder:text-white/40"
-              : "text-verde-notte placeholder:text-verde-notte/40"
+              ? "border border-white/15 bg-white/5 text-white placeholder:text-white/40"
+              : "border border-verde-notte/15 bg-carta/60 text-verde-notte placeholder:text-verde-notte/45 sm:bg-transparent"
           }`}
         />
         <button
           type="submit"
           disabled={stato === "invio"}
-          className={`riflesso h-11 shrink-0 rounded-[7px] px-5 text-[15px] font-semibold transition-all duration-300 disabled:pointer-events-none disabled:opacity-55 ${
+          className={`riflesso h-12 shrink-0 rounded-[8px] px-5 text-[15px] font-semibold transition-all duration-300 disabled:pointer-events-none disabled:opacity-55 ${
             scuro
               ? "bg-menta text-verde-notte hover:bg-white"
               : "bg-verde-notte text-carta hover:bg-verde-scuro"

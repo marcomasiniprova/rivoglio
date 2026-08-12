@@ -37,8 +37,14 @@ test.describe("Vetrina", () => {
        ⚠️ E il "socket hang up" LANCIA, non torna uno stato: la riprova
        scritta prima guardava `r.status()`, quindi non partiva mai e la
        prova falliva al primo colpo lo stesso (visto l'11/08, due rosse
-       nella suite piena). Qui si riprova anche su eccezione, con una
-       pausa in mezzo per dare tempo al server di respirare. */
+       nella suite piena). Qui si riprova anche su eccezione.
+       ⚠️ E LE PAUSE CRESCONO, che è la correzione del 12/08: tre colpi a
+       un secondo e mezzo l'uno dall'altro cadono tutti dentro lo stesso
+       momento di congestione, quindi riprovare non serviva a niente e la
+       prova è tornata rossa lo stesso. Adesso 1, 3 e 8 secondi: dopo
+       dodici secondi la suite è passata oltre e il server respira.
+       Controprova a mano con la suite ferma: 200, PNG, 91 KB, tre volte
+       su tre. L'immagine non è mai stata rotta. */
     const chiedi = async () => {
       try {
         const r = await request.get("/opengraph-image", { timeout: 30_000 });
@@ -48,9 +54,11 @@ test.describe("Vetrina", () => {
       }
     };
 
+    const PAUSE = [1_000, 3_000, 8_000];
     let esito = await chiedi();
-    for (let giro = 0; giro < 2 && esito.r?.status() !== 200; giro++) {
-      await new Promise((ok) => setTimeout(ok, 1_500));
+    for (const pausa of PAUSE) {
+      if (esito.r?.status() === 200) break;
+      await new Promise((ok) => setTimeout(ok, pausa));
       esito = await chiedi();
     }
 

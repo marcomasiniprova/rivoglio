@@ -294,7 +294,19 @@ export default function ConfrontoBanconote({
   });
 
   return (
-    <div ref={zona}>
+    /* 🔴 `overflow-x-clip` NON È UN DETTAGLIO: senza, questa scena fa
+       scorrere di lato TUTTA la pagina, ma solo mentre le banconote
+       volano. Su uno schermo da 375 punti (iPhone SE) l'ultima carta
+       arriva a 378, e tre punti bastano: la pagina si sposta a destra
+       sotto il dito e sembra rotta. Poi l'animazione finisce, la carta
+       sparisce e la pagina torna a posto, quindi guardando una schermata
+       ferma non si vede niente: è il difetto che Valerio descriveva come
+       «tantissime volte la vista si spappola, si storta, esce dallo
+       schermo», ed è stato trovato misurando durante lo scorrimento.
+       ⚠️ `clip` e non `hidden`: `hidden` su un asse costringe l'altro a
+       diventare scorrevole, e le banconote devono poter uscire in ALTO,
+       che è tutta la scena. `clip` taglia solo di lato e basta. */
+    <div ref={zona} className="overflow-x-clip">
       <p className="text-center text-[12px] font-medium uppercase tracking-[0.18em] text-fumo-2">
         {C.base}
       </p>

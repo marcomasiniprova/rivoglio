@@ -78,7 +78,7 @@ export default function ModuloEntra({
       <div
         role="tablist"
         aria-label="Modo di accesso"
-        className="mb-8 inline-flex rounded-pillola border border-bordo bg-white p-1"
+        className="mb-8 inline-flex max-w-full rounded-pillola border border-bordo bg-white p-1"
       >
         {(["accedi", "registrati"] as const).map((m) => (
           <button
@@ -87,7 +87,15 @@ export default function ModuloEntra({
             type="button"
             aria-selected={modo === m}
             onClick={() => setModo(m)}
-            className="relative rounded-pillola px-5 py-2 text-sm font-medium transition-colors"
+            /* ⚠️ `whitespace-nowrap`, e su telefono meno vuoto ai lati.
+               A 375 punti "Ho già un account" andava a capo dentro la
+               pillola: la linguetta diventava alta il doppio dell'altra
+               e la coppia usciva storta, che è il primo pezzo di
+               interfaccia che si vede entrando. Da 640 in su non cambia
+               niente. Il testo NON si accorcia: "Ho già un account" e
+               "Sono nuovo" sono la differenza fra entrare e iscriversi,
+               e su quella scelta non si risparmiano parole. */
+            className="relative min-h-11 whitespace-nowrap rounded-pillola px-4 py-2 text-sm font-medium transition-colors sm:min-h-0 sm:px-5"
           >
             {modo === m && (
               <motion.span

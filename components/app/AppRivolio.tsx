@@ -69,10 +69,21 @@ export default function AppRivolio({
 
   return (
     <div className="flex flex-col gap-7">
-      {/* ------------------------------------------------ le linguette */}
+      {/* ------------------------------------------------ le linguette
+          🔴 SU IPHONE SE LA BARRA USCIVA DALLO SCHERMO: "Controlla · Le
+          tue pratiche · Profilo" con le icone misura 379 punti, e lo
+          schermo ne ha 375. Quattro punti bastano a far scorrere di lato
+          TUTTA la pagina, ed è il difetto che si legge come «la vista si
+          storta, esce dallo schermo» (Valerio, 12/08).
+          ⚠️ La barra non si accorcia togliendo parole: i nomi delle
+          sezioni servono. Si stringe quello che si può stringere sul
+          telefono (il vuoto ai lati dei bottoni) e si lascia identica da
+          640 punti in su, dove lo spazio c'è. Se anche così un domani
+          non entrasse, `overflow-x-auto` fa scorrere la barra da sola
+          invece della pagina intera: il danno resta dentro la barra. */}
       <nav
         aria-label="Sezioni della web app"
-        className="flex gap-1 self-start rounded-pillola border border-bordo bg-white p-1"
+        className="-mx-1 flex max-w-full gap-1 self-start overflow-x-auto rounded-pillola border border-bordo bg-white p-1 [scrollbar-width:none] sm:mx-0 sm:overflow-visible"
       >
         {PANNELLI.map(({ chiave, icona: Icona, nome }) => {
           const attivo = pannello === chiave;
@@ -82,7 +93,7 @@ export default function AppRivolio({
               type="button"
               onClick={() => setPannello(chiave)}
               aria-current={attivo ? "page" : undefined}
-              className={`inline-flex items-center gap-1.5 rounded-pillola px-4 py-2 text-sm font-medium transition-colors ${
+              className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-pillola px-3 py-2 text-sm font-medium transition-colors sm:min-h-0 sm:px-4 ${
                 attivo ? "bg-menta-tenue text-verde-notte" : "text-fumo hover:text-inchiostro"
               }`}
             >

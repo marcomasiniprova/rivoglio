@@ -724,6 +724,36 @@ a:focus-visible .cornice-sfalsata::after {
   border-bottom-color: color-mix(in srgb, var(--color-verde-notte) 30%, transparent);
 }
 
+/* ---------- SUL TELEFONO IL VERDE DEVE RESTARE VERDE ----------
+   Valerio, 12/08: «da desktop il Tabellone è verde scuro, che va bene,
+   ma dalla vista telefono il colore del font diventa completamente
+   nero».
+
+   ⚠️ NON ERA UN GUASTO, ED È STATO MISURATO PRIMA DI TOCCARE NIENTE:
+   il colore calcolato è `rgb(5, 46, 31)` identico a 1440 e a 375. A
+   cambiare è la DIMENSIONE. #052e1f ha una luminosità del 10%: in un
+   titolo da 69 punti il verde si legge, negli stessi caratteri a 41
+   punti l'occhio non distingue più la tinta dal nero, e su iPhone la
+   resa più sottile del testo peggiora la cosa.
+
+   Quindi si alza la luminosità dell'inchiostro SOLO sotto i 640 punti,
+   che è la regola che Valerio ha dato nello stesso messaggio: quando
+   sistemi il telefono non toccare lo schermo grande. Il contrasto sulla
+   carta resta 9:1, molto sopra il minimo di legge.
+
+   ⚠️ Si sposta la VARIABILE dentro `.tabellone`, non il colore dei
+   titoli. Cambiare `color` con un selettore di elemento vincerebbe
+   anche sulle sezioni a fondo scuro, e i titoli chiari lì dentro
+   diventerebbero verde su verde: è lo stesso incidente che il
+   `:not(.not-prose *)` qui sopra esiste per evitare. Spostando la
+   variabile, invece, fondo e testo si muovono insieme e nessun
+   accostamento si rompe. */
+@media (max-width: 639px) {
+  .tabellone {
+    --color-verde-notte: #0a4b2f;
+  }
+}
+
 /* Sotto i 640px una tabella larga sfonda la pagina: scorre da sola. */
 .tabella-scorrevole {
   overflow-x: auto;

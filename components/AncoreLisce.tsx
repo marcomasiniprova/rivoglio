@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 /**
@@ -107,6 +108,57 @@ export default function AncoreLisce() {
     document.addEventListener("click", alClic, true);
     return () => document.removeEventListener("click", alClic, true);
   }, []);
+
+  /**
+   * E QUANDO IL CANCELLETTO ARRIVA DA UN'ALTRA PAGINA.
+   *
+   * ⚠️ Il pezzo qui sopra pulisce solo i clic dentro la pagina in cui
+   * sei. Ma dalla testata del Tabellone "Prezzi" punta a `/#prezzi`, che
+   * è **un'altra pagina**: lì la navigazione deve avvenire per davvero,
+   * quindi il clic non si può fermare, e si arrivava sulla home con
+   * `/#prezzi` scritto nella barra (Valerio, 12/08: «te l'ho detto mille
+   * volte, guarda l'immagine»). Aveva ragione: il giro dell'11/08 quel
+   * caso non lo copriva.
+   *
+   * Qui si arriva DOPO: la pagina nuova è caricata, si scorre fin dove
+   * doveva scorrere e poi si toglie il pezzo dall'indirizzo. Vale anche
+   * per chi arriva da fuori con un vecchio link: la destinazione resta
+   * quella giusta, cambia solo che l'indirizzo non se lo porta dietro.
+   *
+   * ⚠️ Non basta farlo una volta: la sezione può non essere ancora nel
+   * documento quando l'effetto parte. Si riprova per qualche disegno di
+   * schermo, e se dopo mezzo secondo non c'è si lascia stare senza
+   * toccare l'indirizzo: meglio un cancelletto che una pagina ferma in
+   * cima quando avrebbe dovuto scorrere.
+   */
+  const percorso = usePathname();
+  useEffect(() => {
+    const pezzo = location.hash.slice(1);
+    if (!pezzo) return;
+
+    let annullato = false;
+    let tentativi = 0;
+
+    const prova = () => {
+      if (annullato) return;
+      const meta = document.getElementById(decodeURIComponent(pezzo));
+      if (!meta) {
+        if (tentativi++ < 30) requestAnimationFrame(prova);
+        return;
+      }
+      const brusco = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({
+        top: Math.max(0, meta.getBoundingClientRect().top + window.scrollY - ARIA_SOPRA),
+        behavior: brusco ? "auto" : "smooth",
+      });
+      history.replaceState(null, "", location.pathname + location.search);
+    };
+
+    requestAnimationFrame(prova);
+    return () => {
+      annullato = true;
+    };
+  }, [percorso]);
 
   return null;
 }

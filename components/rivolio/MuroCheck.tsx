@@ -17,8 +17,13 @@ import { Button } from "@/components/ui/button";
  * del Regolamento, la stessa che il motore userebbe su quel volo.
  *
  * Le tre cose che tengono il muro onesto:
- * - **non si promette un esito.** "I voli come il tuo valgono fino a" non
- *   è "ti spettano": il verdetto lo dà il motore dopo, e può essere no.
+ * - **non si promette un esito.** ⚠️ E qui c'era scritto "Voli come il
+ *   tuo VALGONO fino a 600€", che Valerio ha letto il 12/08 e ha
+ *   bocciato: «stiamo truffando la gente, di' POSSONO valere». Aveva
+ *   ragione. "Valgono" è un fatto dichiarato su quel volo lì; ma quel
+ *   volo può benissimo valere zero, e lo sappiamo solo dopo l'analisi.
+ *   L'indicativo prometteva un esito prima di averlo verificato, che è
+ *   esattamente la cosa che questo prodotto dice di non fare.
  * - **il prezzo che sale è un impegno, non un finto sconto.** Si scrive
  *   "adesso 1,99, poi 4,99" perché è una promessa sul futuro; il finto
  *   ribasso dal passato in Italia è vietato (direttiva Omnibus).
@@ -48,7 +53,7 @@ export default function MuroCheck({
   onPaga: () => void;
   inCorso?: boolean;
 }) {
-  const { prezzoTesto, prezzoPienoTesto, inLancio, postiRimasti } = dati;
+  const { prezzoTesto, prezzoPienoTesto, inLancio } = dati;
 
   return (
     <Anima className="rounded-3xl border border-bordo bg-white p-6 shadow-[0_18px_50px_-30px_rgba(5,46,31,.35)] sm:p-8">
@@ -58,9 +63,9 @@ export default function MuroCheck({
 
       {/* La cifra grande è quella che vale il volo, non il prezzo. */}
       <p className="mt-3 font-display text-[clamp(2.2rem,7vw,3.2rem)] leading-[1] tracking-[-0.03em]">
-        Voli come il tuo valgono
+        Voli come il tuo possono
         <br />
-        fino a <span className="text-verde">{FASCIA_MASSIMA}€</span>
+        valere fino a <span className="text-verde">{FASCIA_MASSIMA}€</span>
       </p>
       <p className="mt-3 max-w-md text-[0.95rem] leading-relaxed text-fumo">
         Quanto spetta a te lo dice il ritardo certificato del tuo volo, e può
@@ -68,30 +73,52 @@ export default function MuroCheck({
         ti dà il numero esatto.
       </p>
 
-      {/* Il prezzo, letto subito dopo la cifra: è lì che si decide. */}
-      <div className="mt-7 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-bordo pt-6">
-        <span className="font-display text-[2.4rem] leading-none tracking-[-0.03em]">
-          {prezzoTesto}
-        </span>
-        <span className="text-[0.95rem] text-fumo">
-          una volta, per questo volo
-        </span>
+      {/* Il prezzo, letto subito dopo la cifra: è lì che si decide.
+          ⚠️ DUE PREZZI AFFIANCATI, IL PIENO **NON BARRATO** (scelta di
+          Valerio col popup, 12/08). Lui l'aveva chiesto barrato, come al
+          supermercato; barrare 4,99 però significa dichiarare uno sconto
+          da un prezzo che non abbiamo mai praticato, e l'art. 17-bis del
+          Codice del Consumo (direttiva Omnibus) pretende che il prezzo
+          barrato sia stato applicato davvero per almeno 30 giorni.
+          Il colpo d'occhio è lo stesso: la cifra bassa è enorme e verde,
+          quella piena sta accanto piccola e grigia. Quello che cambia è
+          la frase, e dice la verità: non è sceso, deve salire. */}
+      <div className="mt-7 border-t border-bordo pt-6">
+        {inLancio && (
+          <p className="mb-2.5 inline-flex items-center gap-2 rounded-full bg-menta-tenue px-3 py-1 text-[11.5px] font-semibold uppercase tracking-[0.14em] text-verde-scuro">
+            <span className="size-1.5 rounded-full bg-verde" aria-hidden="true" />
+            Prezzo di lancio
+          </p>
+        )}
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="font-display text-[clamp(2.6rem,10vw,3.4rem)] leading-none tracking-[-0.03em] text-verde-scuro">
+            {prezzoTesto}
+          </span>
+          {inLancio && (
+            <span className="font-display text-[1.5rem] leading-none tracking-[-0.02em] text-fumo-2">
+              {prezzoPienoTesto}
+            </span>
+          )}
+          <span className="w-full text-[0.95rem] text-fumo sm:w-auto">
+            una volta, per questo volo
+          </span>
+        </div>
       </div>
 
+      {/* ⚠️ IL CONTATORE DEI POSTI RIMASTI È STATO TOLTO (Valerio,
+          12/08: «quando dici 1,99 e mancano 500, togli quella roba»).
+          Non è stato spostato altrove: "ne restano 487" è il tipo di
+          scarsità che ogni sito mette e nessuno crede più, e su una
+          pagina che vende trasparenza suona peggio che altrove. Resta il
+          fatto, che è vero e verificabile: questo prezzo deve salire.
+          ⚠️ `postiRimasti` continua ad arrivare nei dati dal server e
+          adesso non lo guarda più nessuno. Resta nel tipo perché
+          toglierlo vorrebbe dire toccare il calcolo, la rotta e l'app,
+          cioè un refactoring che nessuno ha chiesto. */}
       {inLancio && (
-        <p className="mt-2 text-[13.5px] leading-relaxed text-fumo">
-          Prezzo di lancio.{" "}
-          {postiRimasti !== null ? (
-            <>
-              Ne restano{" "}
-              <span className="font-medium text-inchiostro">
-                {postiRimasti}
-              </span>{" "}
-              a questa cifra, poi passa a {prezzoPienoTesto}.
-            </>
-          ) : (
-            <>Quando i posti di lancio finiscono passa a {prezzoPienoTesto}.</>
-          )}
+        <p className="mt-2.5 text-[13.5px] leading-relaxed text-fumo">
+          Poi passa a{" "}
+          <span className="font-medium text-inchiostro">{prezzoPienoTesto}</span>.
         </p>
       )}
 

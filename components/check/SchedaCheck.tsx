@@ -610,7 +610,12 @@ export default function SchedaCheck() {
               setErrore(null);
             }}
             aria-pressed={modo === m}
-            className={`flex-1 rounded-pillola py-2 text-[14px] font-medium transition-colors ${
+            /* ⚠️ 44 PUNTI SUL TELEFONO, e solo lì. Questo è il comando
+               più toccato del sito: è la prima cosa che si preme per
+               fare un check. Era alto 37, cioè sotto i 44 che Apple
+               indica come minimo per un dito; da 640 punti in su si
+               clicca col puntatore e resta com'era. */
+            className={`min-h-11 flex-1 rounded-pillola py-2 text-[14px] font-medium transition-colors sm:min-h-0 ${
               modo === m ? "bg-white text-inchiostro shadow-sm" : "text-fumo hover:text-inchiostro"
             }`}
           >

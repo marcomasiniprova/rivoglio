@@ -432,85 +432,6 @@ export const COPY = {
   },
 
   /**
-   * COSA COPRE RIVOLIO, detto per esteso.
-   *
-   * Nasce da un feedback esterno del 9/08: leggendo la landing si capiva
-   * "solo ritardi", perché di cancellazioni e dirottamenti non si parlava
-   * da nessuna parte, pur essendo nel motore da giorni. Il silenzio su
-   * una cosa che facciamo è un danno quanto una promessa non mantenuta.
-   *
-   * Le tre colonne dicono la verità a tre livelli, e nessuna promette
-   * quello che il motore non fa: verdetto automatico / verdetto che
-   * dipende da una cosa che sai solo tu / non ancora.
-   */
-  copertura: {
-    occhiello: "Cosa copre",
-    titolo: "Non solo i ritardi.",
-    testo:
-      "Il Regolamento CE 261/2004 non parla solo di ritardo. Qui sotto c'è tutto quello che il check sa fare oggi, e quello che ancora non sa: senza mezze frasi.",
-    gruppi: [
-      {
-        stato: "pronto",
-        etichetta: "Verdetto automatico",
-        spiegazione: "Il check risponde da solo, con gli orari certificati del volo.",
-        voci: [
-          {
-            nome: "Ritardo all'arrivo",
-            testo:
-              "Da 3 ore in su. L'orario è quello delle ruote a terra, non quello che ricordi tu: fascia da 250, 400 o 600 euro secondo la distanza.",
-          },
-        ],
-      },
-      {
-        stato: "quasi",
-        etichetta: "Verdetto dopo due domande",
-        spiegazione:
-          "Il check li riconosce, poi ti chiede la cosa che sa solo tu e chiude il verdetto. Se resti nel dubbio NON paghi.",
-        voci: [
-          {
-            nome: "Volo cancellato",
-            testo:
-              "Dopo il check ti chiedo due cose che negli archivi non esistono: quando ti hanno avvisato e quanto dopo sei arrivato con l'alternativa. Con quelle il motore applica l'articolo 5 e ti dice se ti spetta, con la sua fascia. Rimborso del biglietto e volo alternativo si chiedono comunque.",
-          },
-          {
-            nome: "Atterrato in un altro aeroporto",
-            testo:
-              "Il dirottamento conta come ritardo se ci hai messo più di 3 ore ad arrivare a destinazione. Il tempo del trasferimento a terra lo sai solo tu.",
-          },
-          {
-            nome: "Ti hanno lasciato a terra",
-            testo:
-              "Il negato imbarco non si vede da nessun archivio: l'aereo può risultare partito in orario mentre tu sei rimasto al gate. Dopo il check ti chiedo se avevi la prenotazione e se eri al gate in tempo, e il motore applica l'articolo 4.",
-          },
-          {
-            nome: "Coincidenza persa",
-            testo:
-              "Se il primo volo era in ritardo e hai perso il secondo, quello che conta è di quanto sei arrivato tardi alla destinazione finale, a patto che i voli fossero sulla stessa prenotazione. Ti chiedo dove dovevi arrivare e il motore calcola il resto.",
-          },
-        ],
-      },
-      {
-        stato: "arrivo",
-        etichetta: "Non ancora",
-        spiegazione: "Lo diciamo prima che tu ci perda tempo.",
-        voci: [
-          {
-            nome: "Bagaglio perso o in ritardo",
-            testo:
-              "Qui vale la Convenzione di Montreal, non il CE 261, e nessun archivio certifica un bagaglio: un verdetto automatico non è possibile. La guida per farlo da solo però c'è già.",
-            link: { testo: "Leggi la guida bagagli", dove: "/guida-bagagli" },
-          },
-          {
-            nome: "Treni",
-            testo:
-              "Regolamento diverso (CE 1371/2007) e nessun archivio pubblico sui ritardi di Trenitalia e Italo. Oggi non lo facciamo, e preferiamo dirlo che prometterlo.",
-          },
-        ],
-      },
-    ],
-  },
-
-  /**
    * CHI FA COSA. Nasce dallo stesso feedback del 9/08: "il lavoro resta a
    * carico tuo". È vero che il reclamo lo manda l'utente, e non è un
    * ripiego: FR, U2, W6, V7 e DY dichiarano per iscritto che lavorano
@@ -658,7 +579,19 @@ export const COPY = {
       {
         domanda: "Quali voli posso controllare?",
         risposta:
-          "Verifichiamo i voli coperti dal Regolamento CE 261/2004: in partenza da un aeroporto UE, o in arrivo nell'UE con una compagnia europea. Copriamo il ritardo di 3 ore o più all'arrivo, il volo cancellato, il dirottamento, il negato imbarco e la coincidenza persa. Bagagli e treni no, e lo diciamo prima: nella sezione Cosa copre c'è l'elenco per intero.",
+          "Verifichiamo i voli coperti dal Regolamento CE 261/2004: in partenza da un aeroporto UE, o in arrivo nell'UE con una compagnia europea. Copriamo il ritardo di 3 ore o più all'arrivo, il volo cancellato, il dirottamento, il negato imbarco e la coincidenza persa. Sul ritardo il verdetto è automatico; negli altri quattro casi il check ti fa una o due domande a risposta chiusa, perché quei fatti negli archivi non ci sono. Se resti nel dubbio non paghi.",
+      },
+      {
+        /* ⚠️ QUESTA DOMANDA VIENE DALLA SEZIONE "COSA COPRE", tolta dalla
+           landing il 12/08 su richiesta di Valerio. Sono le uniche due
+           righe di quella sezione che è stato deciso di salvare, e il
+           motivo non è la completezza: è che chi paga aspettandosi il
+           rimborso del bagaglio chiede indietro i soldi e lascia una
+           stella. Dirlo prima costa una riga, scoprirlo dopo costa un
+           cliente. */
+        domanda: "E per i bagagli o per i treni?",
+        risposta:
+          "Non li facciamo, e preferiamo dirlo prima che tu ci perda tempo. Il bagaglio perso o in ritardo ricade sulla Convenzione di Montreal, non sul CE 261, e nessun archivio certifica un bagaglio: un verdetto automatico non è possibile. La guida per farlo da solo però c'è, ed è gratuita: la trovi su /guida-bagagli. I treni hanno un regolamento diverso (CE 1371/2007) e non esiste un archivio pubblico sui ritardi di Trenitalia e Italo.",
       },
       {
         domanda: "Che fine fanno i miei dati?",

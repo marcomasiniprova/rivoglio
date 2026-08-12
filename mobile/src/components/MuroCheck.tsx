@@ -48,9 +48,12 @@ export default function MuroCheck({
       <View style={stili.scheda}>
         <Text style={stili.occhiello}>L&apos;ANALISI DEL TUO VOLO</Text>
 
-        {/* La cifra grande è quella che vale il volo, non il prezzo. */}
+        {/* La cifra grande è quella che vale il volo, non il prezzo.
+            ⚠️ "POSSONO valere", mai "valgono": quel volo può valere
+            zero, e lo si sa solo dopo l'analisi (correzione di Valerio,
+            12/08). Stessa frase del sito, parola per parola. */}
         <Text style={stili.titolo}>
-          Voli come il tuo valgono{"\n"}fino a{" "}
+          Voli come il tuo possono{"\n"}valere fino a{" "}
           <Text style={stili.titoloVerde}>{FASCIA_MASSIMA}€</Text>
         </Text>
         <Text style={stili.testo}>
@@ -60,18 +63,19 @@ export default function MuroCheck({
 
         <View style={stili.riga} />
 
+        {/* ⚠️ IL PREZZO PIENO STA ACCANTO E NON È BARRATO: barrarlo
+            sarebbe dichiarare uno sconto da una cifra mai praticata, che
+            l'art. 17-bis del Codice del Consumo vieta. E il contatore
+            dei posti rimasti è stato tolto, come sul sito. */}
+        {dati.inLancio && <Text style={stili.bollo}>PREZZO DI LANCIO</Text>}
         <View style={stili.prezzoRiga}>
           <Text style={stili.prezzo}>{dati.prezzoTesto}</Text>
+          {dati.inLancio && <Text style={stili.prezzoPieno}>{dati.prezzoPienoTesto}</Text>}
           <Text style={stili.prezzoNota}>una volta, per questo volo</Text>
         </View>
 
         {dati.inLancio && (
-          <Text style={stili.lancio}>
-            Prezzo di lancio.{" "}
-            {dati.postiRimasti !== null
-              ? `Ne restano ${dati.postiRimasti} a questa cifra, poi passa a ${dati.prezzoPienoTesto}.`
-              : `Quando i posti di lancio finiscono passa a ${dati.prezzoPienoTesto}.`}
-          </Text>
+          <Text style={stili.lancio}>Poi passa a {dati.prezzoPienoTesto}.</Text>
         )}
 
         <View style={stili.elenco}>
@@ -137,12 +141,27 @@ const stili = StyleSheet.create({
     marginTop: SPAZIO.m,
   },
   riga: { height: 1, backgroundColor: COLORI.bordo, marginTop: SPAZIO.l },
-  prezzoRiga: { flexDirection: "row", alignItems: "baseline", gap: SPAZIO.s, marginTop: SPAZIO.l },
+  bollo: {
+    fontFamily: FONT.testo,
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1.4,
+    color: COLORI.verdeScuro,
+    marginTop: SPAZIO.l,
+  },
+  prezzoRiga: { flexDirection: "row", alignItems: "baseline", gap: SPAZIO.s, marginTop: SPAZIO.xs },
   prezzo: {
     fontFamily: FONT.display,
-    fontSize: 34,
+    fontSize: 38,
     letterSpacing: -1,
-    color: COLORI.inchiostro,
+    color: COLORI.verdeScuro,
+  },
+  /* Accanto, piccolo e grigio. Non barrato: vedi la nota sopra. */
+  prezzoPieno: {
+    fontFamily: FONT.display,
+    fontSize: 21,
+    letterSpacing: -0.5,
+    color: COLORI.fumo2,
   },
   prezzoNota: { fontFamily: FONT.testo, fontSize: 13, color: COLORI.fumo },
   lancio: {

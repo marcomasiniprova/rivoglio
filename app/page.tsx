@@ -4,7 +4,6 @@ import Footer from "@/components/Footer";
 import HeroCheck from "@/components/rivolio/HeroCheck";
 import ComeFunziona from "@/components/rivolio/ComeFunziona";
 import DatoOggettivo from "@/components/rivolio/DatoOggettivo";
-import Copertura from "@/components/rivolio/Copertura";
 import ChiFaCosa from "@/components/rivolio/ChiFaCosa";
 import Garanzia from "@/components/rivolio/Garanzia";
 import Retroattivo from "@/components/rivolio/Retroattivo";
@@ -19,13 +18,21 @@ import { COPY } from "@/lib/copy";
  * La home di Rivolio: lo scanner dei rimborsi (SPEC §1).
  *
  * L'ordine delle sezioni segue il funnel (SPEC §3): prima il check, che è
- * il prodotto; poi come funziona e cosa c'è dietro il verdetto; cosa copre;
- * la garanzia che azzera il rischio; SUBITO DOPO i numeri del problema (è
- * l'argomento che convince, prima stava sepolto sotto i prezzi); chi fa
- * cosa; il gancio retroattivo; i prezzi col confronto; le domande e
- * l'Osservatorio. "Chi fa cosa" è sceso qui sotto per non fare due spiegoni
- * di fila con "Cosa copre". I vecchi componenti viaggi restano nel
- * repository ma la pagina non li importa più.
+ * il prodotto; poi come funziona e cosa c'è dietro il verdetto; la garanzia
+ * che azzera il rischio; SUBITO DOPO i numeri del problema (è l'argomento
+ * che convince, prima stava sepolto sotto i prezzi); chi fa cosa; il gancio
+ * retroattivo; i prezzi col confronto; le domande e l'Osservatorio. I vecchi
+ * componenti viaggi restano nel repository ma la pagina non li importa più.
+ *
+ * ⚠️ "COSA COPRE" È STATA TOLTA (Valerio, 12/08: «elimina tutta questa
+ * sezione»). Era tre colonne che elencavano riga per riga cosa il motore
+ * sa fare: informazione onesta, ma lunga, e piazzata nel punto in cui una
+ * persona sta ancora decidendo se il prodotto la riguarda. Le uniche due
+ * righe che valeva la pena salvare sono quelle su **bagagli e treni**,
+ * cioè le cose che NON facciamo: sono passate nelle FAQ (scelta sua col
+ * popup). Non è pignoleria: chi paga aspettandosi il rimborso del bagaglio
+ * chiede indietro i soldi e lascia una stella, e la dichiarazione scritta
+ * prima è l'unica cosa che lo evita.
  */
 
 export const metadata: Metadata = {
@@ -84,7 +91,6 @@ export default function Home() {
         <HeroCheck />
         <ComeFunziona />
         <DatoOggettivo />
-        <Copertura />
         <Garanzia />
         <NumeriMercato />
         <ChiFaCosa />

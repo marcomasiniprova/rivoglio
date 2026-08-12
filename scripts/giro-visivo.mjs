@@ -33,7 +33,6 @@ const VISTE = [
 const TAPPE = [
   { id: "01-hero", url: "/", scorri: 0 },
   { id: "02-check", url: "/", scorri: 0.9 },
-  { id: "03-copertura", url: "/#copertura", scorri: 0 },
   { id: "04-prezzi", url: "/#prezzi", scorri: 0 },
   { id: "05-domande", url: "/#domande", scorri: 0 },
   { id: "06-tabellone", url: "/tabellone", scorri: 0 },
