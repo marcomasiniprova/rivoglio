@@ -1,4 +1,4 @@
-# Le copertine del Tabellone: i 10 prompt
+# Le copertine del Tabellone: gli 11 prompt
 
 *Scritto il 9/08/2026, giro #40. Aggiornato il 9/08 sera, giro #41.*
 
@@ -314,6 +314,40 @@ dentro la foto.
 
 **Cosa deve venire fuori:** l'Italia vista da chi ci sta volando sopra.
 È l'unica delle dieci senza persone, ed è voluto: chiude la serie.
+
+---
+
+## 11. La riforma dei diritti dei passeggeri: cosa cambia dal 2027
+
+*Aggiunta il 12/08. L'articolo esiste dal giro #48 ed e' l'unico nato
+dopo la generazione delle prime dieci: per questo e' rimasto col disegno.*
+
+**Nome file:** `riforma-2027.webp`
+
+> Editorial photograph, 16:10 horizontal. The empty semicircular chamber
+> of a European parliamentary assembly, photographed from the upper
+> gallery just after dawn. Rows of curved desks descend towards a low
+> speaker's podium; every seat is empty. The upholstery is a deep forest
+> green (#052E1F) and the desks are pale wood. Cold blue morning light
+> enters from high clerestory windows on the left and falls in long
+> diagonal bands across the empty rows, leaving the far side of the
+> chamber in shadow. A single sheet of white paper is left on one desk in
+> the middle foreground, slightly out of focus. Muted palette: deep green,
+> cream white (#FBF9EF), pale oak, cool grey stone.
+> Shot on 35mm, f/4, natural light, wide establishing shot, faint film
+> grain, architectural documentary photography, no HDR, no vignette.
+> Negative: no text, no readable signage, no flags, no logos, no emblems,
+> no people, no crowds, no lens flare, no watermark.
+
+**Cosa deve venire fuori:** una decisione presa e non ancora in vigore.
+L'aula e' vuota perche' il voto e' passato (luglio 2026) ma la norma parte
+d'estate 2027: e' esattamente il vuoto fra le due date. Se ti esce un'aula
+piena di gente, o una bandiera riconoscibile, o un martelletto da giudice,
+rigenerala.
+
+⚠️ **Niente bandiere, e non e' pignoleria:** l'emblema europeo ha regole
+d'uso sue e messo su una nostra copertina fa pensare che l'articolo sia
+ufficiale o approvato da qualcuno. Non lo e': lo abbiamo scritto noi.
 
 ---
 
