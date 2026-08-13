@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
 import { COPY } from "@/lib/copy";
 import MuroCheck, { type DatiMuro } from "@/components/rivolio/MuroCheck";
+import { riprendiCheck, sospendiCheck, tornatoDallaCassa } from "@/lib/check/ripresa";
 
 /**
  * LA SCHEDA DEL CHECK: lo standard, identico ovunque.
@@ -289,6 +290,10 @@ export default function SchedaCheck() {
       if (r.status === 402 && dati?.serveIlPass) {
         setFase("campo");
         setMuro(dati.muro as DatiMuro);
+        /* Il volo si mette da parte PRIMA di mandare qualcuno alla cassa:
+           al ritorno l'analisi riparte da sola, invece di ritrovarsi un
+           modulo vuoto dopo aver pagato (vedi lib/check/ripresa.ts). */
+        sospendiCheck(voloDaControllare, giornoIso);
         /* ⚠️ QUI NON SI SCROLLA, e prima si scrollava. C'era un
            `scrollIntoView` che riportava la pagina in cima al riquadro
            del check: sulla carta serviva a non far comparire la cifra
@@ -337,6 +342,39 @@ export default function SchedaCheck() {
       inCorso.current = false;
     }
   }
+
+  /**
+   * SI TORNA DALLA CASSA: l'analisi riparte da sola.
+   *
+   * Gira una volta sola, all'apertura della pagina, e solo se
+   * nell'indirizzo c'è il segno che dice "vengo dalla cassa". Il campo si
+   * riempie lo stesso, così chi guarda vede QUALE volo sta partendo:
+   * un'analisi che parte da sola senza dire su cosa è una scatola nera.
+   */
+  const ripresaFatta = useRef(false);
+  useEffect(() => {
+    if (ripresaFatta.current) return;
+    ripresaFatta.current = true;
+    if (!tornatoDallaCassa()) return;
+    const sospeso = riprendiCheck();
+    if (!sospeso) return;
+    /* ⚠️ Lo stato non si tocca dentro il corpo dell'effetto: React lo
+       vieta perché innesca un secondo disegno a catena. Un rinvio di un
+       giro basta, e il risultato per chi guarda è identico. */
+    /* ⚠️ E non si annulla in uscita: in sviluppo React monta, smonta e
+       rimonta apposta per scovare i difetti, e un `clearTimeout` qui
+       spegnerebbe la ripresa proprio in quel giro. A non farla partire
+       due volte ci pensa già il segnaposto qui sopra. */
+    setTimeout(() => {
+      setModo("numero");
+      setVolo(sospeso.volo);
+      setData(sospeso.data);
+      void avvia(sospeso.volo, sospeso.data);
+    }, 0);
+    /* Deve girare all'apertura e basta: `avvia` cambia a ogni disegno e
+       metterlo qui dentro rilancerebbe l'analisi in continuazione. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /** Il modo numero: valida e avvia. */
   function inviaNumero(e: FormEvent<HTMLFormElement>) {
