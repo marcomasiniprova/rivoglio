@@ -255,8 +255,13 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
                 dell'invio con la stessa costante che decide quando parte
                 davvero il sollecito. Se un domani si sposta la tappa, si
                 sposta anche questa riga. */}
+            {/* ⚠️ NON una pillola, e non è pignoleria: guardando gli scatti
+                a 390, 768 e 1440 questo testo va a capo a TUTTE E TRE le
+                misure, e una forma completamente tonda su due righe si
+                legge come un errore di impaginazione. Riquadro con gli
+                angoli normali. Trovato guardando, non da una prova. */}
             {attesa && (
-              <p className="numeri mt-3 inline-flex items-center rounded-pillola bg-menta-tenue px-3.5 py-1.5 text-sm font-medium text-verde-notte">
+              <p className="numeri mt-3 max-w-xl rounded-xl bg-menta-tenue px-4 py-2.5 text-sm leading-relaxed font-medium text-verde-notte">
                 {attesa}
               </p>
             )}
@@ -301,7 +306,11 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           </div>
         )}
         {R.letteraVisibile && !R.letteraApribile && (
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
+          /* `text-fumo` e non `text-fumo-2`: questa riga spiega perché il
+             bottone accanto è spento, quindi in quel momento è la cosa
+             più importante della sezione. Nel grigio più chiaro, negli
+             scatti, spariva proprio dove serviva. */
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo">
             {C.azioni.letteraChiusa}
           </p>
         )}
