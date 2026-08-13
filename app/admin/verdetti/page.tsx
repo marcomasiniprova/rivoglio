@@ -2,22 +2,39 @@ import { ExternalLink } from "lucide-react";
 import { Scheda } from "@/components/admin/Grafici";
 import { Avviso, Bollo, Vuoto } from "@/components/admin/Pezzi";
 import { Button } from "@/components/ui/button";
-import { confermaVerifica, correggiVerifica } from "@/app/admin/azioni";
+import { guardato, correggiVerifica } from "@/app/admin/azioni";
 import { dataIt, inizioOggiRoma } from "@/lib/admin/dati";
 import { soloAdmin } from "@/lib/admin/guardia";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 
 /**
- * I VERDETTI: il pannello dello SHADOW MODE (SPEC §4).
+ * I VERDETTI: IL CONTROLLO A CAMPIONE.
  *
- * Il motore emette il verdetto, ma finché lo shadow è acceso ogni
- * "idoneo" aspetta qui la conferma di un umano PRIMA che l'utente possa
- * pagare. Si spegne dopo 100 verdetti di fila senza correzioni; ogni
- * correzione è un caso nuovo per il golden set del motore.
+ * 🔴 Valerio, 13/08: «perché c'è ancora shadow mode quando l'avevamo
+ * tolto? perché ci sono ancora le revisioni manuali quando il tutto è
+ * stato generato? e poi le revisioni sono storte, la più recente è in
+ * fondo». Tutte e tre le osservazioni erano giuste, e la prima era la
+ * più grave, perché questa pagina raccontava una cosa FALSA.
  *
- * Prima questa era la schermata principale del retrobottega. Adesso è
- * una sezione fra le altre, ed è giusto così: è la coda di lavoro, non il
- * quadro della situazione.
+ * Com'era: lo shadow mode teneva ogni "idoneo" in attesa di una conferma
+ * umana PRIMA che il cliente potesse pagare. Il 12/08 quel cancello è
+ * stato tolto dalla cassa (rompeva il collaudo: in produzione lo shadow
+ * è acceso da solo, quindi nessuno avrebbe mai potuto comprare niente).
+ * Ma la pagina non è stata aggiornata e ha continuato a scrivere
+ * «aspetta la tua conferma prima che quel cliente possa pagare»: una
+ * frase che spinge a lavorare una coda che non blocca più nulla.
+ *
+ * Com'è adesso (scelta di Valerio col popup, 13/08). Questa non è una
+ * coda che sblocca: è un CAMPIONE. Il motore vende da solo; qui si
+ * guarda se sta dicendo la verità.
+ * - **Dalla più recente**, perché il verdetto di stamattina è quello che
+ *   sta ancora vendendo. Il più vecchio ha già fatto il suo danno.
+ * - **«Va bene»** toglie la riga dall'elenco e basta: non sblocca niente
+ *   e non manda nessuna email, perché non c'è niente da sbloccare.
+ * - **«Correggi»** è l'unica azione che pesa, ed è quella che serve: da
+ *   quel momento su quel caso non si vende più (il cancello vive nella
+ *   rotta della cassa e nel webhook di Polar), e il caso finisce nei log
+ *   come materiale nuovo per il golden set del motore.
  */
 export const dynamic = "force-dynamic";
 
@@ -73,7 +90,7 @@ export default async function PaginaVerdetti() {
             </div>
           ))}
         </div>
-        <Scheda titolo="Da confermare">
+        <Scheda titolo="Gli ultimi verdetti idonei">
           <Vuoto titolo="Non letto." />
         </Scheda>
       </div>
@@ -108,7 +125,11 @@ export default async function PaginaVerdetti() {
       )
       .eq("esito", "idoneo")
       .eq("conferma", "in_attesa")
-      .order("creata_il", { ascending: true })
+      /* ⚠️ DALLA PIÙ RECENTE. Prima era `ascending: true`, cioè la più
+         vecchia in cima: su un controllo a campione è il verso
+         sbagliato, perché il verdetto uscito un minuto fa è quello che
+         sta vendendo adesso. */
+      .order("creata_il", { ascending: false })
       .limit(30),
     db.from("verifiche").select("id", { count: "exact", head: true }).gte("creata_il", oggi),
     db
@@ -168,8 +189,8 @@ export default async function PaginaVerdetti() {
       </div>
 
       <Scheda
-        titolo="Da confermare"
-        sotto="Dalla più vecchia. Controlla gli orari del fatto contro la fonte: se il verdetto regge, conferma. Se il motore ha sbagliato, correggi e scrivi perché."
+        titolo="Gli ultimi verdetti idonei"
+        sotto="Dal più recente. Il motore vende gia' da solo: qui controlli a campione che stia dicendo la verita'. Confronta gli orari con la fonte; se regge premi Va bene, se ha sbagliato correggi e scrivi perche'. Solo la correzione ferma la vendita su quel caso."
         destra={
           codaNonLetta ? (
             /* ⚠️ Niente bollo verde su una lettura fallita: sarebbe una
@@ -180,22 +201,22 @@ export default async function PaginaVerdetti() {
             /* ⚠️ La lettura si ferma a 30: scrivere "30 in coda" quando ce ne
                sono di più è un numero che si legge come un totale e non lo è. */
             <Bollo tono="attesa">
-              {coda.length >= 30 ? "30+ in coda" : `${coda.length} in coda`}
+              {coda.length >= 30 ? "30+ da guardare" : `${coda.length} da guardare`}
             </Bollo>
           ) : (
-            <Bollo tono="verde">coda pulita</Bollo>
+            <Bollo tono="verde">tutti guardati</Bollo>
           )
         }
       >
         {codaNonLetta ? (
           <Vuoto
-            titolo="Non sono riuscito a leggere la coda."
-            spiega="Non vuol dire che è vuota: vuol dire che non lo so. Il database non ha risposto. Riprova fra poco; se continua, guarda la sezione Impostazioni."
+            titolo="Non sono riuscito a leggere l'elenco."
+            spiega="Non vuol dire che è vuoto: vuol dire che non lo so. Il database non ha risposto. Riprova fra poco; se continua, guarda la sezione Impostazioni."
           />
         ) : coda.length === 0 ? (
           <Vuoto
-            titolo="Niente in attesa."
-            spiega="Ogni analisi che esce idonea, con lo shadow mode acceso, compare qui e aspetta la tua conferma prima che quel cliente possa pagare."
+            titolo="Niente da guardare."
+            spiega="Ogni analisi che esce idonea compare qui finché non la marchi. Non sta bloccando nessuno: il cliente può pagare da subito, questo è un controllo a campione sul motore."
           />
         ) : (
           <ul className="flex flex-col gap-2.5">
@@ -244,15 +265,19 @@ export default async function PaginaVerdetti() {
                       Controlla
                     </a>
                     {/* l'azione torna un esito per il pannello comandi;
-                        qui il modulo vuole void, quindi si incarta */}
+                        qui il modulo vuole void, quindi si incarta.
+                        ⚠️ Si chiamava "Conferma" e non confermava niente:
+                        la vendita era gia' aperta. "Va bene" dice quello
+                        che fa davvero, cioe' togliere la riga dall'elenco
+                        di quelle da guardare. */}
                     <form
                       action={async () => {
                         "use server";
-                        await confermaVerifica(v.id);
+                        await guardato(v.id);
                       }}
                     >
-                      <Button type="submit" size="sm">
-                        Conferma
+                      <Button type="submit" size="sm" variant="contorno">
+                        Va bene
                       </Button>
                     </form>
                   </div>
@@ -307,9 +332,10 @@ export default async function PaginaVerdetti() {
       </Scheda>
 
       <p className="pb-2 text-[12.5px] leading-relaxed text-fumo-2">
-        Lo shadow mode si spegne dopo 100 verdetti di fila senza correzioni, e si spegne dalle
-        impostazioni, non dal codice. Ogni correzione che registri qui finisce nei log come
-        caso nuovo per il golden set del motore.
+        Nessuna riga di questo elenco sta bloccando un incasso: dal 12 agosto il cliente paga
+        senza aspettare nessuno. L&apos;unica azione che pesa è <strong>Correggi</strong>: da lì
+        in avanti su quel caso non si vende più, né dalla cassa né dal webhook del pagamento, e
+        il caso finisce nei log come materiale nuovo per il golden set del motore.
       </p>
     </div>
   );

@@ -153,14 +153,14 @@ export default async function PaginaPanoramica() {
           nota={`Oggi: ${q(oggi?.pagato)}`}
         />
         <Kpi
-          etichetta="Verdetti da confermare"
+          etichetta="Verdetti da guardare"
           valore={oNonLetto(inAttesa)}
           nota={
             inAttesa === null
-              ? "Coda non letta."
+              ? "Elenco non letto."
               : inAttesa > 0
-                ? "Finché non confermi, quei clienti non possono pagare."
-                : "Niente in coda."
+                ? "Controllo a campione: non stanno bloccando nessun pagamento."
+                : "Guardati tutti."
           }
         />
       </div>

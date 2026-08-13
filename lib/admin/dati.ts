@@ -17,11 +17,14 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 export type Numero = number | null;
 
 /**
- * Quanti verdetti idonei aspettano una conferma umana.
+ * Quanti verdetti idonei non sono ancora stati guardati a campione.
  *
- * Lo guardano la Panoramica (come numero) e i Verdetti (come coda): è
- * l'unico numero del pannello che blocca una vendita, perché finché la
- * conferma non arriva quel cliente non può pagare.
+ * ⚠️ QUI C'ERA SCRITTO che è "l'unico numero del pannello che blocca una
+ * vendita, perché finché la conferma non arriva quel cliente non può
+ * pagare". Era vero fino al 12/08; da quel giorno la cassa non aspetta
+ * più nessuno, e questa è una coda di controllo, non un cancello.
+ * Lasciare la frase vecchia spingeva a lavorare con urgenza una lista
+ * che non trattiene un euro.
  */
 export async function contaInAttesa(): Promise<Numero> {
   if (!SERVIZIO_ATTIVO) return null;

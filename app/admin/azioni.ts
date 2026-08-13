@@ -3,14 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
-import { casa, spedisci } from "@/lib/email/posta";
-import { bottone, COLORI as C, FONT, vestito } from "@/lib/email/modello";
+import { casa } from "@/lib/email/posta";
 
 /**
- * Le azioni dello shadow mode (SPEC §4): il motore emette il verdetto,
- * ma finché lo shadow è acceso un umano lo conferma da qui PRIMA che
- * l'utente possa pagare. Ogni correzione è oro: un caso vero in cui il
- * motore ha sbagliato, da mettere nel golden set.
+ * Le azioni sul controllo a campione dei verdetti.
+ *
+ * ⚠️ NON SBLOCCANO NIENTE, e il commento che c'era qui diceva il
+ * contrario ("un umano lo conferma PRIMA che l'utente possa pagare").
+ * Era vero fino al 12/08; dal 12/08 la cassa non aspetta più nessuno.
+ * L'unica azione che pesa è la CORREZIONE: da lì in avanti su quel caso
+ * non si vende, e il caso diventa materiale per il golden set.
  *
  * OGNI azione ricontrolla da capo che chi chiama sia admin: le server
  * action sono endpoint pubblici con un altro vestito, e fidarsi del fatto
@@ -30,93 +32,53 @@ export type EsitoAdmin = { ok?: string; errore?: string; dettaglio?: string };
 type EsitoVerifica = "idoneo" | "incerto" | "non_idoneo";
 const ESITI: EsitoVerifica[] = ["idoneo", "incerto", "non_idoneo"];
 
-const dataIt = (iso: string) =>
-  new Date(iso + "T12:00:00Z").toLocaleDateString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-
-const ritardoUmano = (minuti: number) =>
-  `${Math.floor(minuti / 60)}h${String(minuti % 60).padStart(2, "0")}`;
-
 /**
- * Conferma un verdetto idoneo in attesa: da adesso si può vendere.
- * Se il check aveva lasciato un'email, l'utente viene avvisato subito
- * col link al suo risultato: è il momento in cui torna a pagare.
+ * «VA BENE»: l'ho guardato e il verdetto regge.
+ *
+ * 🔴 QUESTA AZIONE SI CHIAMAVA `confermaVerifica` E NON CONFERMAVA
+ * NIENTE. Nata per lo shadow mode, quando la conferma umana apriva la
+ * cassa. Il 12/08 quel cancello è stato tolto (in produzione lo shadow
+ * è acceso da solo, quindi teneva chiusa la cassa a chiunque), ma
+ * l'azione è rimasta col nome, col testo e con l'email di prima:
+ * mandava al cliente «Ricontrollato a mano: il verdetto regge», cioè
+ * una rassicurazione su un blocco che non esisteva più, a gente che nel
+ * frattempo poteva aver già pagato.
+ *
+ * Adesso fa una cosa sola e la dice: marca la riga come guardata, così
+ * sparisce dall'elenco del campione. Nessuna email, nessuno sblocco.
+ * Quello che ferma davvero una vendita è `correggiVerifica`, qui sotto.
  */
-export async function confermaVerifica(id: string): Promise<EsitoAdmin> {
+export async function guardato(id: string): Promise<EsitoAdmin> {
   if (!(await soloAdmin())) return { errore: "Non sei autorizzato." };
   if (!SERVIZIO_ATTIVO) return { errore: "SUPABASE_SECRET_KEY assente." };
 
   const db = supabaseServizio();
-  const { data: v, error: errLettura } = await db
-    .from("verifiche")
-    .select("id, volo_iata, data_locale, importo, ritardo_minuti, email, conferma")
-    .eq("id", id)
-    .maybeSingle();
-  if (errLettura || !v) return { errore: "Verifica non trovata." };
-  if (v.conferma !== "in_attesa") return { errore: "Già lavorata: ricarica la pagina." };
-
-  // Il filtro su `conferma` chiude la corsa: se due mani premono insieme,
-  // una sola riga cambia davvero e l'email parte una volta sola.
+  // Il filtro su `conferma` chiude la corsa fra due mani che premono insieme.
   const { data: cambiata, error } = await db
     .from("verifiche")
     .update({ conferma: "confermata" })
     .eq("id", id)
     .eq("conferma", "in_attesa")
     .select("id");
-  if (error || !cambiata?.length) return { errore: "Conferma fallita: ricarica la pagina." };
+  if (error || !cambiata?.length) return { errore: "Non salvato: ricarica la pagina." };
 
-  /* La coda dei verdetti vive su /admin/verdetti dal giro del pannello;
-     la Panoramica mostra lo stesso numero, quindi si rinfrescano tutte e
-     due. Lasciarne fuori una vorrebbe dire vedere "1 da confermare" su
-     una schermata e "0" sull'altra. */
   revalidatePath("/admin/verdetti");
   revalidatePath("/admin");
-  if (!v.email) return { ok: "Confermata. Nessuna email da avvisare." };
-
-  const link = `${casa()}/verifica/${v.id}`;
-  const quando = ` del ${dataIt(v.data_locale)}`;
-  const dettagli =
-    v.ritardo_minuti !== null && v.importo !== null
-      ? ` Ritardo di ${ritardoUmano(v.ritardo_minuti)}, fascia da ${v.importo}€ a passeggero (Reg. CE 261/2004).`
-      : "";
-
-  const par = (t: string) =>
-    `<p style="margin:0 0 16px;font-family:${FONT};font-size:16px;line-height:1.65;color:${C.fumo};">${t}</p>`;
-
-  const esito = await spedisci({
-    a: v.email,
-    oggetto: "Il tuo controllo è confermato",
-    html: vestito({
-      titolo: "Il tuo controllo è confermato",
-      corpo:
-        `<h1 style="margin:0 0 16px;font-family:${FONT};font-size:27px;line-height:1.2;color:${C.inchiostro};font-weight:700;letter-spacing:-0.5px;">Ricontrollato a mano: il verdetto regge.</h1>` +
-        par(
-          `Abbiamo riguardato i dati del volo <strong style="color:${C.inchiostro}">${v.volo_iata}</strong>${quando}.${dettagli}`,
-        ) +
-        par(
-          "Restano da verificare le circostanze straordinarie, che può invocare solo la compagnia. Dal risultato apri la pratica quando vuoi.",
-        ) +
-        bottone("Vedi il tuo risultato", link),
-      coda: "Ricevi questa email perché hai chiesto un controllo su Rivolio.",
-    }),
-    testo: `Ricontrollato a mano: il verdetto regge.\n\nVolo ${v.volo_iata}${quando}.${dettagli}\n\nRestano da verificare le circostanze straordinarie, che può invocare solo la compagnia.\n\nIl tuo risultato: ${link}`,
-  });
-
-  return esito.ok
-    ? { ok: "Confermata. Email di avviso partita." }
-    : { ok: `Confermata. Email NON partita: ${esito.motivo}` };
+  return { ok: "Segnato come guardato." };
 }
 
 /**
  * Corregge un verdetto: il motore ha detto una cosa, l'umano un'altra.
- * La verifica passa a `corretta` con l'esito giusto, e il caso completo
- * finisce nei log in modo VISTOSO: ogni correzione è un caso nuovo per
- * il golden set (prove del motore), e azzera il conto dei 100 verdetti
- * consecutivi che spegne lo shadow mode.
+ * La verifica passa a `corretta` con l'esito giusto.
+ *
+ * ⚠️ È L'UNICA AZIONE DEL PANNELLO CHE FERMA UNA VENDITA: sia la rotta
+ * della cassa sia il webhook di Polar rifiutano un caso con
+ * `conferma === "corretta"`. Per questo il campo della nota è
+ * obbligatorio: una vendita si blocca con un motivo scritto, non con un
+ * clic.
+ *
+ * Il caso completo finisce nei log in modo VISTOSO: ogni correzione è un
+ * caso nuovo per il golden set (prove del motore).
  */
 export async function correggiVerifica(
   id: string,
@@ -161,7 +123,7 @@ export async function correggiVerifica(
   console.error(
     [
       "",
-      "⚠️ ══════════ CORREZIONE IN SHADOW MODE: CASO NUOVO PER IL GOLDEN SET ══════════ ⚠️",
+      "⚠️ ══════════ VERDETTO CORRETTO A MANO: CASO NUOVO PER IL GOLDEN SET ══════════ ⚠️",
       "Il motore ha sbagliato su un caso vero. Va etichettato a mano e aggiunto",
       "alle prove del motore (lib/regole/casi-oro.ts) prima di fidarsi di nuovo.",
       `verifica:         ${v.id}`,
