@@ -1,6 +1,7 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-13 (giro #66: gli undici rami mai camminati,
+**Aggiornato:** 2026-08-13 (giro #67: la skill video-review e il giro in
+un video solo · giro #66: gli undici rami mai camminati,
 filmati uno per uno · giro #65: il freno, un tetto sulla spesa ·
 giro #64: il collaudo di dieci voli sul sito vero, e i sei difetti che ha
 trovato · giro #63: i nove punti del collaudo di
@@ -24,6 +25,38 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #67 (13/08): LA SKILL `video-review` E IL GIRO IN UN VIDEO SOLO.**
+  Valerio, guardando gli undici filmati del giro prima: «perché
+  moltissimi video sono uguali e si ripetono? Perché molti sono inutili,
+  guardano e basta senza usare e testare? Perché tutti spezzettati? Da
+  quello che vedo non c'è niente di nuovo». Aveva ragione su tutto.
+  - **Nasce `.claude/skills/video-review/SKILL.md`**, e ogni sua regola è
+    un difetto di quel giro: un video solo e continuo; mai rifare lo
+    stesso pezzo (nove video su undici cominciavano con gli stessi
+    quaranta secondi); ogni passo si USA, scorrere non è provare; la
+    didascalia dice **cosa faccio, cosa mi aspetto e com'è andata**, e
+    l'ultima riga la scrive il codice misurando la pagina; si filma DOPO
+    il deploy e il deploy si verifica; **si aspetta la pagina, non
+    l'orologio**; un difetto si dichiara solo se si riproduce due volte;
+    alla fine si pulisce il database.
+  - **Il giro completo: 14 passi di fila, 12 verdi.** Foto della carta
+    d'imbarco → muro → cassa → OCR che compila volo e data → verdetto →
+    email → pratica famiglia → lettera senza cifre inventate → invio →
+    no incollato → replica → replica mandata → foto della loro risposta →
+    conciliazione → elenco pratiche.
+  - ⚠️ **Le due righe rosse del video sono errori MIEI di misura, non del
+    prodotto**, e vanno dette: la foto della risposta è stata accettata
+    perché parlava dello STESSO volo della pratica (il cancello ha fatto
+    la cosa giusta, la mia attesa era sbagliata), e il passo del
+    calendario l'ho provato su una pratica che aveva già un no
+    dichiarato, dove il ramo del silenzio non si applica per costruzione.
+    Il ramo del silenzio resta coperto dalle prove (`collaudo-rami`), non
+    dal filmato.
+  - **I tre fix del giro #66 confermati sul sito vero**: la foto alza il
+    muro (prima non succedeva niente), l'OCR legge `ZZ250 del 06/08/2026`
+    e compila i campi, la lettera famiglia non dichiara più «2
+    passeggeri» né un totale.
+  - Dati di prova cancellati: restano le 82 verifiche vere.
 - **GIRO #66 (13/08): GLI UNDICI RAMI MAI CAMMINATI, FILMATI UNO PER UNO.**
   Richiesta di Valerio dopo tre giorni di difetti a raffica: «provalo
   tutto adesso, in una seduta, e filmamelo». Nove punti su undici li ho
