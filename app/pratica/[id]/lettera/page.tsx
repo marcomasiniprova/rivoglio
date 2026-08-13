@@ -447,16 +447,60 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
      primo cliente si vedrebbe pure che è il numero uno. */
   const protocollo = `${volo.volo_iata} · ${dataIt(volo.data_locale)}`;
 
+  /**
+   * 🔴 QUAL È LA LETTERA DI ADESSO.
+   *
+   * Valerio, 13/08: «la pagina della lettera è un chilometro, è tutto
+   * così necessario?». Il collaudo ha trovato di peggio della lunghezza:
+   * dopo un no della compagnia questa pagina si apriva ancora con «La tua
+   * lettera è pronta» e col bottone verde che apriva l'email **del
+   * reclamo già mandato**. Cioè il gesto più in vista della pagina
+   * rimandava lo stesso documento una seconda volta, mentre la replica
+   * (quella che serve adesso) stava sotto quattro riquadri, senza
+   * bottone per mandarla.
+   *
+   * Adesso in cima c'è SEMPRE il documento del momento, con il suo
+   * bottone. Gli altri restano, chiusi, in fondo: servono a rileggere
+   * cosa si è già mandato, non a essere rimandati.
+   */
+  const attuale = segnalazione
+    ? {
+        chiave: "ente" as const,
+        titolo: "La segnalazione all'ente è pronta.",
+        sotto:
+          "Premi il bottone: si apre la tua email con tutto già scritto. L'indirizzo dell'ente è qui sotto.",
+        oggetto: segnalazione.oggetto,
+        corpo: segnalazione.corpo,
+      }
+    : sollecito
+      ? {
+          chiave: "replica" as const,
+          titolo:
+            scheda && scheda.motivo !== "silenzio"
+              ? "La risposta al loro no è pronta."
+              : "Il sollecito è pronto.",
+          sotto: "Premi il bottone: si apre la tua email con tutto già scritto. Tu premi Invia.",
+          oggetto: sollecito.oggetto,
+          corpo: sollecito.corpo,
+        }
+      : {
+          chiave: "reclamo" as const,
+          titolo: "La tua lettera è pronta.",
+          sotto: "Premi il bottone: si apre la tua email con tutto già scritto. Tu premi Invia.",
+          oggetto: lettera.oggetto,
+          corpo: lettera.corpo,
+        };
+  /** Vero quando il reclamo non è più il documento del momento. */
+  const reclamoDaArchivio = attuale.chiave !== "reclamo";
+
   return (
     <Cornice praticaId={id}>
       {/* ------------------------------------------------ la testata */}
       <div className="no-stampa">
         <h1 className="font-display text-[2.1rem] leading-none tracking-[-0.04em]">
-          La tua lettera è pronta.
+          {attuale.titolo}
         </h1>
-        <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
-          Premi il bottone: si apre la tua email con tutto già scritto. Tu premi Invia.
-        </p>
+        <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-fumo">{attuale.sotto}</p>
       </div>
 
       {/* ---------------------------------- IL BOTTONE, prima di tutto.
@@ -468,7 +512,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           Adesso in cima c'è il gesto, e le spiegazioni stanno sotto,
           chiuse: chi le vuole le apre. */}
       <section className="no-stampa rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-6">
-        <ApriEmail modo={invio} oggetto={lettera.oggetto} corpo={lettera.corpo} />
+        <ApriEmail modo={invio} oggetto={attuale.oggetto} corpo={attuale.corpo} />
       </section>
 
       {/* ------------------------------------------------ a chi va */}
@@ -558,13 +602,48 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         )}
       </details>
 
+      {/* --------------------- perché la replica dice quello che dice.
+          Sta PRIMA del documento, non dopo: è il motivo per cui quel
+          testo è fatto così, e leggerlo dopo non serve a niente. */}
+      {attuale.chiave === "replica" && sollecito && (
+        <section className="no-stampa rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-6">
+          <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde">
+            Il secondo colpo
+          </p>
+          <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-verde-notte/85">
+            {scheda && scheda.motivo !== "silenzio"
+              ? scheda.spiegazione
+              : `Le compagnie rispondono in otto-quattordici settimane, quindi il silenzio a questo punto è normale. Ma da oggi ${GIORNI_PRIMA_DEL_SOLLECITO} giorni sono passati, e mettere agli atti che non hanno risposto serve al passo dopo: la segnalazione all'ente nazionale.`}
+          </p>
+          {scheda && scheda.peso === "dipende" && (
+            <p className="mt-3 max-w-xl rounded-xl bg-white/70 px-4 py-3 text-sm leading-relaxed text-verde-notte">
+              Qui non ti prometto niente: su questo motivo la compagnia può avere ragione. La
+              replica serve a farglielo dimostrare, che è una cosa diversa.
+            </p>
+          )}
+          {scheda && (
+            <p className="mt-4 text-xs leading-relaxed text-verde-notte/70">
+              Su cosa si fonda: {scheda.riferimenti.join(" · ")}
+            </p>
+          )}
+        </section>
+      )}
+
       {/* ------------------------------------------------ il foglio */}
       <Foglio
         id="foglio"
-        atto="Reclamo · Reg. (CE) 261/2004"
+        atto={
+          attuale.chiave === "ente"
+            ? "Segnalazione all'organismo nazionale · art. 16 Reg. (CE) 261/2004"
+            : attuale.chiave === "replica"
+              ? scheda && scheda.motivo !== "silenzio"
+                ? "Replica al diniego · Reg. (CE) 261/2004"
+                : "Sollecito · Reg. (CE) 261/2004"
+              : "Reclamo · Reg. (CE) 261/2004"
+        }
         riferimento={protocollo}
-        oggetto={lettera.oggetto}
-        corpo={lettera.corpo}
+        oggetto={attuale.oggetto}
+        corpo={attuale.corpo}
       />
 
       {/* ------------------------------------------------ le azioni */}
@@ -645,107 +724,72 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         <p className="mt-4 text-sm leading-relaxed text-fumo-2">{organismo.avvertenza}</p>
       </details>
 
-      {/* ------------------------------------------- il secondo colpo */}
-      {sollecito && (
-        <>
-          <section className="no-stampa rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-6">
-            <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde">
-              Il secondo colpo
-            </p>
-            <h2 className="mt-2 font-display text-xl tracking-[-0.03em] text-verde-notte">
-              {scheda && scheda.motivo !== "silenzio"
-                ? "La risposta al loro no è pronta."
-                : "Sono passate sei settimane. Il sollecito è pronto."}
-            </h2>
-            <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-verde-notte/85">
-              {scheda && scheda.motivo !== "silenzio"
-                ? scheda.spiegazione
-                : `Le compagnie rispondono in otto-quattordici settimane, quindi il silenzio a questo punto è normale. Ma da oggi ${GIORNI_PRIMA_DEL_SOLLECITO} giorni sono passati, e mettere agli atti che non hanno risposto serve al passo dopo: la segnalazione all'ente nazionale.`}
-            </p>
-            {scheda && scheda.peso === "dipende" && (
-              <p className="mt-3 max-w-xl rounded-xl bg-white/70 px-4 py-3 text-sm leading-relaxed text-verde-notte">
-                Qui non ti prometto niente: su questo motivo la compagnia può avere ragione. La
-                replica serve a farglielo dimostrare, che è una cosa diversa.
-              </p>
-            )}
-            {scheda && (
-              <p className="mt-4 text-xs leading-relaxed text-verde-notte/70">
-                Su cosa si fonda: {scheda.riferimenti.join(" · ")}
-              </p>
-            )}
-          </section>
-
-          <Foglio
-            id="foglio-2"
-            atto={
-              scheda && scheda.motivo !== "silenzio"
-                ? "Replica al diniego · Reg. (CE) 261/2004"
-                : "Sollecito · Reg. (CE) 261/2004"
-            }
-            riferimento={protocollo}
-            oggetto={sollecito.oggetto}
-            corpo={sollecito.corpo}
-          />
-
-          <div className="no-stampa flex flex-wrap items-center gap-3">
-            <Button type="button" data-copia="#t-corpo-2">
-              <Copy className="size-4" aria-hidden="true" />
-              <span data-etichetta>Copia il sollecito</span>
-            </Button>
-            <Button type="button" variant="contorno" data-copia="#t-oggetto-2">
-              <Copy className="size-4" aria-hidden="true" />
-              <span data-etichetta>Copia l&apos;oggetto</span>
-            </Button>
-          </div>
-
-          <textarea id="t-oggetto-2" hidden readOnly defaultValue={sollecito.oggetto} />
-          <textarea id="t-corpo-2" hidden readOnly defaultValue={sollecito.corpo} />
-        </>
-      )}
-
-      {/* -------------------------------------------- il terzo colpo */}
-      {segnalazione && (
-        <>
-          <section className="no-stampa rounded-2xl border border-sole/40 bg-sole/10 px-6 py-6">
-            <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-inchiostro/60">
-              Il terzo colpo
-            </p>
-            <h2 className="mt-2 font-display text-xl tracking-[-0.03em]">
-              La segnalazione all&apos;ente nazionale è pronta.
-            </h2>
-            <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-inchiostro/80">
-              È il passo che le compagnie non ignorano: l&apos;ente accerta la violazione e può
-              sanzionarle. Dirti come funziona davvero: <span className="font-medium">non ti
-              paga lui</span>, la compensazione resta una cosa fra te e la compagnia. Serve a
-              farla muovere, e di solito funziona.
-            </p>
-          </section>
-
-          <Foglio
-            id="foglio-3"
-            atto="Segnalazione all'organismo nazionale · art. 16 Reg. (CE) 261/2004"
-            riferimento={protocollo}
-            oggetto={segnalazione.oggetto}
-            corpo={segnalazione.corpo}
-          />
-
-          <div className="no-stampa flex flex-wrap items-center gap-3">
-            <Button type="button" data-copia="#t-corpo-3">
-              <Copy className="size-4" aria-hidden="true" />
-              <span data-etichetta>Copia la segnalazione</span>
-            </Button>
-            <Button type="button" variant="contorno" data-copia="#t-oggetto-3">
-              <Copy className="size-4" aria-hidden="true" />
-              <span data-etichetta>Copia l&apos;oggetto</span>
-            </Button>
+      {/* ------ quando l'ente è il documento di adesso, si dice cos'è */}
+      {attuale.chiave === "ente" && (
+        <section className="no-stampa rounded-2xl border border-sole/40 bg-sole/10 px-6 py-6">
+          <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-inchiostro/60">
+            Il terzo colpo
+          </p>
+          <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-inchiostro/80">
+            È il passo che le compagnie non ignorano: l&apos;ente accerta la violazione e può
+            sanzionarle. Dirti come funziona davvero: <span className="font-medium">non ti paga
+            lui</span>, la compensazione resta una cosa fra te e la compagnia. Serve a farla
+            muovere, e di solito funziona.
+          </p>
+          <div className="mt-4">
             <Button asChild variant="contorno">
               <Link href="/giudice-di-pace">Se anche l&apos;ente non basta</Link>
             </Button>
           </div>
+        </section>
+      )}
 
-          <textarea id="t-oggetto-3" hidden readOnly defaultValue={segnalazione.oggetto} />
-          <textarea id="t-corpo-3" hidden readOnly defaultValue={segnalazione.corpo} />
-        </>
+      {/* ------------------------------- quello che hai già mandato.
+          🔴 Prima stavano tutti aperti, uno sotto l'altro, e il primo
+          della fila era il reclamo di sei settimane prima: la pagina
+          diventava un chilometro e la cosa da fare ADESSO era la più
+          nascosta. Adesso i documenti vecchi sono un cassetto chiuso:
+          servono a rileggere cosa è stato mandato, non a essere
+          rimandati. */}
+      {reclamoDaArchivio && (
+        <details className="no-stampa group rounded-2xl border border-bordo bg-white px-6 py-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-display text-lg tracking-[-0.03em] marker:hidden">
+            Quello che hai già mandato
+            <span aria-hidden="true" className="text-fumo-2 transition-transform group-open:rotate-45">
+              +
+            </span>
+          </summary>
+          <p className="mt-3 text-sm leading-relaxed text-fumo">
+            Sono qui per essere riletti. Il documento da mandare adesso è quello in cima alla
+            pagina.
+          </p>
+
+          <div className="mt-4">
+            <Foglio
+              id="foglio-reclamo"
+              atto="Reclamo · Reg. (CE) 261/2004"
+              riferimento={protocollo}
+              oggetto={lettera.oggetto}
+              corpo={lettera.corpo}
+            />
+          </div>
+
+          {attuale.chiave === "ente" && sollecito && (
+            <div className="mt-4">
+              <Foglio
+                id="foglio-replica"
+                atto={
+                  scheda && scheda.motivo !== "silenzio"
+                    ? "Replica al diniego · Reg. (CE) 261/2004"
+                    : "Sollecito · Reg. (CE) 261/2004"
+                }
+                riferimento={protocollo}
+                oggetto={sollecito.oggetto}
+                corpo={sollecito.corpo}
+              />
+            </div>
+          )}
+        </details>
       )}
 
       {/* ------------------------------------------- il quarto colpo */}
@@ -815,8 +859,12 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
       </p>
 
       {/* Il testo per i bottoni di copia: invisibile, mai stampato. */}
-      <textarea id="t-oggetto" hidden readOnly defaultValue={lettera.oggetto} />
-      <textarea id="t-corpo" hidden readOnly defaultValue={lettera.corpo} />
+      {/* Il testo che copia il bottone in cima: quello del documento del
+          momento, non del reclamo. Se restasse legato al reclamo, il
+          bottone "Copia l'oggetto" accanto alla replica copierebbe
+          l'oggetto della lettera di sei settimane prima. */}
+      <textarea id="t-oggetto" hidden readOnly defaultValue={attuale.oggetto} />
+      <textarea id="t-corpo" hidden readOnly defaultValue={attuale.corpo} />
 
       { }
       <style dangerouslySetInnerHTML={{ __html: CSS_STAMPA }} />

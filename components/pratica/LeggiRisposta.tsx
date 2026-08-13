@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, Camera, ClipboardPaste, Sparkles } from "lucide-react";
 
 /**
@@ -49,6 +50,7 @@ export default function LeggiRisposta({
   const [incoerente, setIncoerente] = useState(false);
   const [esito, setEsito] = useState<EsitoLettura | null>(null);
   const campoFile = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   async function manda(corpo: Record<string, unknown>) {
     setStato("invio");
@@ -71,6 +73,19 @@ export default function LeggiRisposta({
           suMisura: Boolean(d.suMisura),
         });
         setStato("fatto");
+        /* 🔴 IL RESTO DELLA PAGINA RESTAVA INDIETRO, e si contraddiceva.
+           Trovato col collaudo del 13/08: incollata la risposta della
+           compagnia, questo riquadro diceva «ho letto la loro risposta,
+           vedi la replica», mentre trenta centimetri più su la pagina
+           continuava a dire «PASSO 3 DI 6, attesa risposta, niente da
+           fare per ora: se restano in silenzio il sollecito è pronto fra
+           42 giorni». Due verità opposte sulla stessa schermata, che è
+           il difetto che Valerio segnala più spesso.
+           `router.refresh()` rifà la parte che calcola il server (i
+           passi, «dove siamo», il prossimo passo) SENZA ricaricare la
+           pagina: il riassunto qui sotto, che vive nel browser, resta
+           dov'è. Un `location.reload()` lo cancellerebbe. */
+        router.refresh();
         return;
       }
       /* Il server ha letto ma non ha capito: la loro risposta è comunque
