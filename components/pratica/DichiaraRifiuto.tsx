@@ -81,15 +81,31 @@ export default function DichiaraRifiuto({
       .catch(() => setErrore("Non riesco a caricare l'elenco. Riprova."));
   }, [aperto, motivi.length]);
 
-  async function manda() {
-    if (!scelto || invio) return;
+  /**
+   * 🔴 SCEGLIERE IL MOTIVO ADESSO SALVA SUBITO, e prima serviva un
+   * secondo bottone.
+   *
+   * Valerio, 13/08: «ho cliccato per maltempo come motivo del no e mi è
+   * apparsa la stessa identica schermata di prima, non è successo niente
+   * di visibile». Non era un guasto: la scelta si limitava a colorare il
+   * riquadro, e per salvarla bisognava premere «Preparami la risposta»,
+   * che con otto motivi in elenco sta sotto il bordo dello schermo. Chi
+   * clicca un'opzione e vede il riquadro accendersi pensa, ragionevolmente,
+   * di aver finito.
+   * Un gesto, un effetto. E l'effetto si vede: la pagina si rifà col
+   * motivo nuovo scritto e la replica riscritta.
+   */
+  async function manda(motivoScelto?: string) {
+    const motivo = motivoScelto ?? scelto;
+    if (!motivo || invio) return;
+    setScelto(motivo);
     setInvio(true);
     setErrore("");
     try {
       const r = await fetch("/api/pratiche/rifiuto", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ praticaId, motivo: scelto }),
+        body: JSON.stringify({ praticaId, motivo }),
       });
       const d = await r.json().catch(() => null);
       if (!r.ok || !d?.ok) {
@@ -203,7 +219,8 @@ export default function DichiaraRifiuto({
                 <button
                   key={m.motivo}
                   type="button"
-                  onClick={() => setScelto(m.motivo)}
+                  onClick={() => void manda(m.motivo)}
+                  disabled={invio}
                   aria-pressed={attivo}
                   className={`rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
                     attivo
@@ -229,16 +246,10 @@ export default function DichiaraRifiuto({
             </p>
           )}
 
-          <button
-            type="button"
-            onClick={() => void manda()}
-            disabled={!scelto || invio}
-            className="riflesso mt-4 h-11 rounded-bottone bg-verde px-5 text-[0.95rem] font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro disabled:pointer-events-none disabled:opacity-50"
-          >
-            {invio ? "Un attimo." : "Preparami la risposta"}
-          </button>
-          <p className="mt-3 text-sm leading-relaxed text-fumo-2">
-            È incluso nel prezzo che hai già pagato. Non ti chiediamo altro.
+          <p className="mt-4 text-sm leading-relaxed text-fumo-2">
+            {invio
+              ? "Sto riscrivendo la replica."
+              : "Tocca il motivo: preparo la risposta subito. È incluso nel prezzo che hai già pagato."}
           </p>
         </>
       )}

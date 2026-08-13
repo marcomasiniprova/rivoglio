@@ -350,7 +350,17 @@ export function percorsoPratica(
       /* Si può caricare la carta d'imbarco finché la pratica è viva, e
          serve anche dopo l'invio: rinforza il sollecito allo stesso modo.
          Ma è sempre un riquadro bianco fra gli altri, mai un passo. */
-      documentoExtra: !documentiFatti && !chiusa && stato !== "creata",
+      /* 🔴 IL RIQUADRO DEI DOCUMENTI SPARISCE DOPO L'INVIO. Valerio,
+         13/08: «quando invio la pratica e clicco inviata, rimane ancora
+         il box per caricare i documenti di imbarco: sembra che le cose si
+         muovano come una lumaca, se fai una cosa rimane tutto il resto
+         vecchio».
+         Aveva ragione, e la vecchia giustificazione («serve anche per il
+         sollecito») non regge alla prova dei fatti: la carta d'imbarco
+         rinforza la lettera PRIMA che parta. Dopo, la lettera è già in
+         mano alla compagnia, e quel riquadro è solo una cosa vecchia
+         rimasta accesa. */
+      documentoExtra: !documentiFatti && !reclamoPartito && stato !== "creata",
       letteraApribile: letteraVisibile,
       letteraVisibile,
       confermaInvio: stato === "pagata" || stato === "pronta",

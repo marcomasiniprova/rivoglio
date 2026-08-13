@@ -4,8 +4,17 @@ import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { colonnaMancante } from "@/lib/supabase/colonne";
 import { COPY } from "@/lib/copy";
-import type { EventoPratica, StatoPratica, TipoPratica } from "@/lib/pratiche/pratiche";
-import { aChePunto, diChiELaPalla, percorsoPratica, type DiChiELaPalla } from "@/lib/pratiche/passi";
+import type {
+  EventoPratica,
+  StatoPratica,
+  TipoPratica,
+} from "@/lib/pratiche/pratiche";
+import {
+  aChePunto,
+  diChiELaPalla,
+  percorsoPratica,
+  type DiChiELaPalla,
+} from "@/lib/pratiche/passi";
 
 /**
  * LA WEB APP: le stesse sezioni dell'app sul telefono (Controlla,
@@ -30,12 +39,15 @@ type RigaPratica = {
 type VoloBreve = { volo_iata: string; data_locale: string };
 
 const dataIt = (iso: string) =>
-  new Date(iso.length === 10 ? `${iso}T12:00:00Z` : iso).toLocaleDateString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "Europe/Rome",
-  });
+  new Date(iso.length === 10 ? `${iso}T12:00:00Z` : iso).toLocaleDateString(
+    "it-IT",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "Europe/Rome",
+    },
+  );
 
 const riempi = (template: string, valori: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (tutto, chiave) => valori[chiave] ?? tutto);
@@ -60,7 +72,9 @@ function classiStato(palla: DiChiELaPalla, stato: StatoPratica): string {
   if (stato === "rimborsata") return "bg-nebbia-2 text-fumo";
   // Tocca a te: giallo, che è il colore di "guardami". Tocca a loro:
   // grigio, che è il colore di "non fare niente".
-  return palla === "tua" ? "bg-sole/25 text-inchiostro" : "bg-nebbia-2 text-fumo";
+  return palla === "tua"
+    ? "bg-sole/25 text-inchiostro"
+    : "bg-nebbia-2 text-fumo";
 }
 
 export default async function PaginaApp() {
@@ -83,15 +97,23 @@ export default async function PaginaApp() {
   /* ⚠️ `rifiuto_motivo` arriva con la migrazione del 15/08: se non fosse
      applicata, chiederla farebbe fallire TUTTA la lettura e l'elenco
      resterebbe vuoto. Stessa rete della lettera e della scheda. */
-  const COLONNE = "id, stato, tipo, importo_fascia, volo_id, creata_il, aggiornata_il";
+  const COLONNE =
+    "id, stato, tipo, importo_fascia, volo_id, creata_il, aggiornata_il";
   const elenco = async (colonne: string) =>
-    supabase.from("pratiche").select(colonne).order("aggiornata_il", { ascending: false });
+    supabase
+      .from("pratiche")
+      .select(colonne)
+      .order("aggiornata_il", { ascending: false });
   const primoGiro = await elenco(`${COLONNE}, rifiuto_motivo`);
   const [{ data, error }, { data: profilo }] = await Promise.all([
     primoGiro.error && colonnaMancante(primoGiro.error.message)
       ? await elenco(COLONNE)
       : primoGiro,
-    supabase.from("profili").select("nickname, classifica_optin").eq("id", utente.id).maybeSingle(),
+    supabase
+      .from("profili")
+      .select("nickname, classifica_optin")
+      .eq("id", utente.id)
+      .maybeSingle(),
   ]);
 
   const righe = (data ?? []) as unknown as RigaPratica[];
@@ -100,7 +122,10 @@ export default async function PaginaApp() {
      a che punto è ognuna (il passo dei documenti sta lì dentro). Una
      query per pratica sarebbe una query per riga a ogni apertura
      dell'elenco. */
-  const eventiPer = new Map<string, { tipo: string; nota: string | null; creato_il: string }[]>();
+  const eventiPer = new Map<
+    string,
+    { tipo: string; nota: string | null; creato_il: string }[]
+  >();
   if (righe.length > 0) {
     const { data: ev } = await supabase
       .from("pratiche_eventi")
@@ -112,7 +137,11 @@ export default async function PaginaApp() {
       .order("creato_il", { ascending: true });
     for (const e of ev ?? []) {
       const lista = eventiPer.get(e.pratica_id as string) ?? [];
-      lista.push({ tipo: e.tipo as string, nota: e.nota as string | null, creato_il: e.creato_il as string });
+      lista.push({
+        tipo: e.tipo as string,
+        nota: e.nota as string | null,
+        creato_il: e.creato_il as string,
+      });
       eventiPer.set(e.pratica_id as string, lista);
     }
   }
@@ -120,26 +149,39 @@ export default async function PaginaApp() {
   /* I voli delle pratiche, in un colpo solo. Se la chiave di servizio manca
      l'elenco resta in piedi lo stesso: si mostra la data della pratica. */
   const voli = new Map<string, VoloBreve>();
-  const voloIds = [...new Set(righe.map((p) => p.volo_id).filter(Boolean))] as string[];
+  const voloIds = [
+    ...new Set(righe.map((p) => p.volo_id).filter(Boolean)),
+  ] as string[];
   if (SERVIZIO_ATTIVO && voloIds.length > 0) {
     const { data: vr } = await supabaseServizio()
       .from("voli")
       .select("id, volo_iata, data_locale")
       .in("id", voloIds);
     for (const v of vr ?? []) {
-      voli.set(v.id as string, { volo_iata: v.volo_iata, data_locale: v.data_locale });
+      voli.set(v.id as string, {
+        volo_iata: v.volo_iata,
+        data_locale: v.data_locale,
+      });
     }
   }
 
   const C = COPY.pratica.elenco;
   const pratiche: CardPratica[] = righe.map((p) => {
-    const stato = COPY.pratica.stati[p.stato] ?? null;
-    const volo = p.volo_id ? voli.get(p.volo_id) : undefined;
     const percorso = percorsoPratica(
       p.stato,
       (eventiPer.get(p.id) ?? []) as EventoPratica[],
       p.rifiuto_motivo ?? null,
     );
+    /* ⚠️ Il testo NON si prende dallo stato del database: allo stesso
+       `sollecito` si arriva per silenzio o perché hanno risposto, e qui
+       l'elenco scriveva «sei settimane, nessuna risposta» accanto a una
+       pratica in cui la risposta era arrivata. Vedi chiaveTesto. */
+    const stato =
+      COPY.pratica.stati[percorso.chiaveTesto] ??
+      COPY.pratica.stati[p.stato] ??
+      null;
+    const volo = p.volo_id ? voli.get(p.volo_id) : undefined;
+
     const palla = diChiELaPalla(percorso.attivo);
     const punto = aChePunto(percorso);
     return {
@@ -157,7 +199,10 @@ export default async function PaginaApp() {
       fasciaFonte: C.fasciaFonte,
       famiglia: p.tipo === "famiglia",
       titolo: volo
-        ? riempi(C.voloTemplate, { volo: volo.volo_iata, data: dataIt(volo.data_locale) })
+        ? riempi(C.voloTemplate, {
+            volo: volo.volo_iata,
+            data: dataIt(volo.data_locale),
+          })
         : riempi(C.voloMancante, { data: dataIt(p.creata_il) }),
       prossimoPasso: stato?.prossimoPasso ?? null,
       apri: C.apri,

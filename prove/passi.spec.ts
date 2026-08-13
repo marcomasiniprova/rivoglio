@@ -107,8 +107,14 @@ test.describe("La carta d'imbarco non blocca piu' niente", () => {
     }
   });
 
-  test("l'invito a caricare resta finche' serve, e sparisce quando e' fatto", () => {
-    expect(percorsoPratica("inviata", [], null).riquadri.documentoExtra).toBe(true);
+  test("l'invito a caricare vale PRIMA dell'invio, e sparisce dopo", () => {
+    /* 🔴 Valerio, 13/08: «quando invio la pratica e clicco inviata, rimane
+       ancora il box per caricare i documenti: se fai una cosa rimane tutto
+       il resto vecchio». La vecchia giustificazione («serve anche per il
+       sollecito») non regge: la carta d'imbarco rinforza la lettera PRIMA
+       che parta. Dopo è solo una cosa rimasta accesa. */
+    expect(percorsoPratica("pagata", [], null).riquadri.documentoExtra).toBe(true);
+    expect(percorsoPratica("inviata", [], null).riquadri.documentoExtra).toBe(false);
     expect(
       percorsoPratica("inviata", [evento(EVENTO_CARICATO)], null).riquadri.documentoExtra,
     ).toBe(false);

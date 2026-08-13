@@ -345,7 +345,19 @@ export async function eventiPratica(praticaId: string): Promise<EventoPratica[]>
       .from("pratiche_eventi")
       .select()
       .eq("pratica_id", praticaId)
-      .order("creato_il", { ascending: true });
+      /* 🔴 L'ORDINE ERA CASUALE FRA EVENTI DELLO STESSO SECONDO, e Valerio
+         se n'è accorto: «con lo stesso identico click la cronologia mi ha
+         mostrato due versioni diverse in momenti diversi».
+         Dichiarare il no della compagnia scrive QUATTRO righe nello stesso
+         istante (il testo, l'analisi, il rifiuto, il passaggio di stato).
+         Ordinandole solo per data e ora, Postgres è libero di restituirle
+         nell'ordine che gli conviene, e quell'ordine può cambiare da una
+         lettura all'altra: nessuna riga sparisce, ma la storia si racconta
+         al contrario e sembra un'altra pratica.
+         L'`id` come secondo criterio non è un dettaglio: è quello che
+         rende la cronologia sempre uguale a se stessa. */
+      .order("creato_il", { ascending: true })
+      .order("id", { ascending: true });
     if (error) {
       console.error("[pratiche] eventi non letti:", error.message);
       return [];
