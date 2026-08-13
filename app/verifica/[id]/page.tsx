@@ -11,6 +11,8 @@ import { COPY } from "@/lib/copy";
 import { listinoCorrente } from "@/lib/prezzi-server";
 import { scadenzaStimata, valuta } from "@/lib/regole/eu261";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
+import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
+import { utenteCollegato } from "@/lib/supabase/server";
 import { demo as fornitoreDemo } from "@/lib/voli/fornitori/demo";
 import { normalizzaData, normalizzaVolo } from "@/lib/voli/normalizza";
 
@@ -69,17 +71,34 @@ function checkoutConfigurato() {
 
 /* --------------------------------------------------------- la cornice */
 
-function Cornice({ children }: { children: ReactNode }) {
+/**
+ * 🔴 CHI ERA COLLEGATO VENIVA SBATTUTO FUORI DALLA WEB APP.
+ *
+ * Valerio, 13/08: «quando rifai un'altra analisi loggato nella web app e
+ * paghi, vieni fatto uscire dalla web app e fatto ritornare nel sito».
+ * Qui c'era metà della causa: il check dentro `/app` porta su questa
+ * pagina, e l'unica uscita di questa pagina era `/` , cioè la landing di
+ * vendita. Uno che ha già un account e sta seguendo le sue pratiche
+ * finiva sulla pagina che serve a convincere gli estranei.
+ *
+ * L'altra metà stava dopo il pagamento, ed è chiusa in
+ * lib/pratiche/ingresso.ts.
+ *
+ * ⚠️ Il ritorno non è deciso dall'indirizzo da cui si arriva ma da CHI
+ * sta guardando: un link a un risultato mandato per email a un utente
+ * collegato deve riportarlo a casa sua lo stesso.
+ */
+function Cornice({ children, collegato }: { children: ReactNode; collegato: boolean }) {
   return (
     <div className="min-h-dvh bg-nebbia">
       <header className="border-b border-bordo bg-white/85 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-2xl items-center justify-between px-5 sm:px-8">
           <Logo />
           <Link
-            href="/"
+            href={collegato ? "/app" : "/"}
             className="text-sm text-fumo transition-colors hover:text-inchiostro"
           >
-            {COPY.risultato.nonIdoneo.cta}
+            {collegato ? COPY.pratica.torna : COPY.risultato.nonIdoneo.cta}
           </Link>
         </div>
       </header>
@@ -193,6 +212,9 @@ export default async function PaginaVerifica({
 }) {
   const { id } = await params;
   const avvisoCheckout = avvisoCheckoutDa((await searchParams).checkout);
+  /* Chi sta guardando: decide dove riporta l'uscita in alto a destra.
+     Vedi il commento sulla Cornice. */
+  const collegato = SUPABASE_CONFIGURATO ? Boolean(await utenteCollegato()) : false;
 
   // ── Esempio dimostrativo: si ricalcola, non si legge ────────────────
   const demoMatch = id.match(DEMO_OK);
@@ -200,7 +222,7 @@ export default async function PaginaVerifica({
     const dati = await datiDemo(id, demoMatch[1], demoMatch[2], avvisoCheckout);
     if (!dati) {
       return (
-        <Cornice>
+        <Cornice collegato={collegato}>
           <Pannello
             titolo={COPY.risultato.nonTrovata.titolo}
             testo={COPY.risultato.nonTrovata.testo}
@@ -213,7 +235,7 @@ export default async function PaginaVerifica({
       // La data o il volo dell'esempio non stanno in piedi: si spiega
       // con l'errore vero del normalizzatore, non con un generico.
       return (
-        <Cornice>
+        <Cornice collegato={collegato}>
           <Pannello
             titolo={COPY.risultato.nonTrovata.titolo}
             testo={dati.errore}
@@ -223,7 +245,7 @@ export default async function PaginaVerifica({
       );
     }
     return (
-      <Cornice>
+      <Cornice collegato={collegato}>
         <Risultato dati={dati} />
       </Cornice>
     );
@@ -232,7 +254,7 @@ export default async function PaginaVerifica({
   // ── Link non riconoscibile: né UUID né demo ─────────────────────────
   if (!UUID_OK.test(id)) {
     return (
-      <Cornice>
+      <Cornice collegato={collegato}>
         <Pannello
           titolo={COPY.risultato.nonTrovata.titolo}
           testo={COPY.risultato.nonTrovata.testo}
@@ -245,7 +267,7 @@ export default async function PaginaVerifica({
   // ── Verifica vera: si legge col client di servizio ──────────────────
   if (!SERVIZIO_ATTIVO) {
     return (
-      <Cornice>
+      <Cornice collegato={collegato}>
         <Pannello
           titolo={COPY.risultato.nonDisponibile.titolo}
           testo={COPY.risultato.nonDisponibile.testo}
@@ -269,7 +291,7 @@ export default async function PaginaVerifica({
   } catch (e) {
     console.error("[verifica/pagina] lettura fallita:", e);
     return (
-      <Cornice>
+      <Cornice collegato={collegato}>
         <Pannello
           titolo={COPY.risultato.nonDisponibile.titolo}
           testo={COPY.risultato.nonDisponibile.testo}
@@ -280,7 +302,7 @@ export default async function PaginaVerifica({
 
   if (!riga) {
     return (
-      <Cornice>
+      <Cornice collegato={collegato}>
         <Pannello
           titolo={COPY.risultato.nonTrovata.titolo}
           testo={COPY.risultato.nonTrovata.testo}
@@ -347,7 +369,7 @@ export default async function PaginaVerifica({
   };
 
   return (
-    <Cornice>
+    <Cornice collegato={collegato}>
       <Risultato dati={dati} />
     </Cornice>
   );

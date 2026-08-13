@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { collaudoAperto, inCollaudo, passDi } from "@/lib/check/cancello";
 import { creaPratica, praticaPerVerifica, registraEvento, transizionePratica } from "@/lib/pratiche/pratiche";
-import { linkDiIngresso } from "@/lib/pratiche/ingresso";
+import { ingressoDopoPagamento } from "@/lib/pratiche/ingresso";
+import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
+import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { traccia } from "@/lib/eventi/registra";
 import { versoCasa } from "@/lib/sito";
@@ -202,8 +204,19 @@ export async function GET(req: NextRequest) {
      dentro la pratica, senza vedere nessun login. Se il link non si
      genera si finisce sulla pratica come prima, cioè al login: è il
      ripiego, non la strada. */
-  const ingresso = await linkDiIngresso(verifica.email, `/pratica/${pratica.id}`);
+  /* 🔴 E CHI ERA GIÀ COLLEGATO USCIVA DAL SITO PER RIENTRARE (13/08).
+     Il link di accesso serve a chi paga senza sessione. Qui veniva usato
+     sempre, quindi chi stava dentro la web app faceva il giro da
+     supabase.co e tornava come un estraneo, e se la sessione era su un
+     altro indirizzo gli veniva pure cambiato account. Vedi il commento in
+     lib/pratiche/ingresso.ts. */
+  const collegato = SUPABASE_CONFIGURATO ? await utenteCollegato() : null;
+  const ingresso = await ingressoDopoPagamento(
+    verifica.email,
+    `/pratica/${pratica.id}`,
+    collegato?.email ?? null,
+  );
   return NextResponse.redirect(
-    ingresso.startsWith("http") ? ingresso : versoCasa(`/pratica/${pratica.id}`, req),
+    ingresso.startsWith("http") ? ingresso : versoCasa(ingresso, req),
   );
 }

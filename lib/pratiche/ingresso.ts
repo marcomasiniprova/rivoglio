@@ -39,6 +39,36 @@ function conferma(percorso: string): string {
 }
 
 /**
+ * 🔴 E CHI ERA GIÀ COLLEGATO VENIVA MANDATO FUORI DAL SITO PER RIENTRARE.
+ *
+ * Valerio, 13/08: «quando rifai un'altra analisi loggato nella web app e
+ * paghi, vieni fatto uscire dalla web app e fatto ritornare nel sito».
+ * Il link di accesso qui sopra è nato per chi paga SENZA sessione, e per
+ * quello è giusto. Ma veniva usato sempre: chi stava già dentro la web
+ * app usciva su supabase.co, tornava su /auth/conferma e atterrava sulla
+ * pagina della pratica come un estraneo appena arrivato. Tre indirizzi,
+ * due domini, per una sessione che c'era già.
+ *
+ * ⚠️ E NON ERA SOLO UN GIRO INUTILE. Il link accede come l'email lasciata
+ * sulla verifica: se quella è diversa da quella con cui sei collegato, ti
+ * cambiava account sotto i piedi senza dirtelo. Con due indirizzi in
+ * casa (uno tuo e uno di tua moglie) è esattamente quello che succede.
+ *
+ * Quindi: la sessione giusta c'è già → si va dritti alla pratica. In
+ * tutti gli altri casi si passa dal link, come prima.
+ */
+export async function ingressoDopoPagamento(
+  emailPratica: string,
+  percorso: string,
+  emailCollegata: string | null | undefined,
+): Promise<string> {
+  if (emailCollegata && emailCollegata.toLowerCase() === emailPratica.toLowerCase()) {
+    return percorso;
+  }
+  return linkDiIngresso(emailPratica, percorso);
+}
+
+/**
  * Torna un indirizzo che, aperto in un browser, collega l'utente e lo
  * porta su `percorso`.
  *
