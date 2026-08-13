@@ -30,14 +30,29 @@ export default function Nav() {
           di mezzo cade esattamente a metà della barra, e siccome è
           disposizione vera e non posizionamento, la sovrapposizione non
           può avvenire: se lo spazio manca, le colonne si stringono.
-          Sotto i 1024 punti le voci non ci sono e la griglia diventa due
-          colonne, marchio e bottoni, come prima. */}
-      <header className="mx-auto grid h-[60px] max-w-[1200px] grid-cols-[auto_1fr] items-center gap-3 rounded-pillola border border-white/60 bg-white/60 px-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] lg:grid-cols-[1fr_auto_1fr]">
-        <div className="pl-1 sm:pl-4 xl:min-w-0">
+          Sotto la soglia le voci non ci sono e la griglia diventa due
+          colonne, marchio e bottoni, come prima.
+
+          🔴 E ANCHE COSÌ SI SOVRAPPONEVA, a poco più di mille punti
+          (Valerio, 13/08, terza volta che lo segnala: «smettila di
+          stortare la navbar»). Due cause insieme, e nessuna delle due
+          era il centraggio:
+          1. le voci comparivano già a 1024, dove lo spazio che avanza
+             dopo marchio e bottoni non basta a contenerle;
+          2. le colonne avevano `min-width: auto`, che è il valore
+             predefinito di una griglia: vuol dire "non stringerti sotto
+             il tuo contenuto". Quando la colonna di mezzo cresce oltre
+             il posto disponibile, non spinge le altre: le invade.
+          Adesso le voci partono da 1280, dove ci stanno con margine, e
+          tutte e tre le colonne possono stringersi (`min-w-0`). Con
+          queste due la sovrapposizione non è più possibile per
+          costruzione, non "provata a una misura". */}
+      <header className="mx-auto grid h-[60px] max-w-[1200px] grid-cols-[auto_1fr] items-center gap-3 rounded-pillola xl:gap-6 border border-white/60 bg-white/60 px-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] xl:grid-cols-[1fr_auto_1fr]">
+        <div className="min-w-0 pl-1 sm:pl-4">
           <Logo />
         </div>
 
-        <nav className="hidden items-center justify-center gap-5 lg:flex xl:gap-8">
+        <nav className="hidden min-w-0 items-center justify-center gap-6 xl:flex">
           {COPY.nav.voci.map((v) => (
             <a
               key={v.ancora}
@@ -50,7 +65,7 @@ export default function Nav() {
           ))}
         </nav>
 
-        <div className="flex items-center justify-end gap-2 sm:gap-3 xl:min-w-0">
+        <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-3">
           {/* la porta della web app: dall'8/08 è di nuovo linkata dal sito.
               Pillola di vetro, non testo nudo: ogni bottone è un bottone. */}
           <a

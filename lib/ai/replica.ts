@@ -103,25 +103,42 @@ export type EsitoCoerenza =
     };
 
 /**
- * I codici di volo dentro un testo: due caratteri di compagnia (lettere,
- * o una lettera e una cifra: "U2", "4U") seguiti da 1-4 cifre.
+ * I codici di volo dentro un testo.
  *
- * ⚠️ Il confine `\b` prima non basta: dentro "REF-98765" o "art. 261/2004"
- * ci sono sequenze che somigliano a un volo. Si pretende che il codice
- * NON sia attaccato a una lettera o a un trattino, e si buttano le
- * combinazioni note che voli non sono.
+ * 🔴 LA PRIMA VERSIONE HA PRODOTTO UN FALSO ALLARME SUBITO, e Valerio
+ * l'ha visto il 13/08: ha scritto «NON FACCIAMO IL RIMBORSO PERCHE IL
+ * VOLO ERA **DI 2** ORE E 50 MINUTI IN RITARDO», e il sistema ha
+ * risposto «questa risposta parla del volo DI2». In quel testo un volo
+ * non c'era: c'era la preposizione «di» seguita da un numero.
+ *
+ * Il difetto era la regola. Due caratteri qualsiasi più delle cifre
+ * pesca mezzo vocabolario italiano: «di 2», «in 3», «la 5», «al 10». E
+ * un falso allarme qui è più grave del difetto che stiamo riparando,
+ * perché blocca un cliente che ha incollato la cosa giusta.
+ *
+ * Adesso un codice si riconosce in due soli modi, tutti e due stretti:
+ * 1. **attaccato**, con almeno due cifre: «FR1234», «U21234». Nessuna
+ *    preposizione italiana si scrive attaccata a un numero;
+ * 2. **preceduto dalla parola volo** (o flight, vuelo, vol, flug), che è
+ *    come lo scrive una compagnia quando lo scrive davvero.
+ * Tutto il resto non è un volo e non fa scattare niente.
  */
-const CODICE_VOLO = /(?<![A-Z0-9/-])([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?(\d{1,4})(?![\dA-Z/-])/g;
+const ATTACCATO = /(?<![A-Z0-9/-])([A-Z]{2}|[A-Z]\d|\d[A-Z])(\d{2,4})(?![\dA-Z/-])/g;
+const DOPO_LA_PAROLA =
+  /(?:VOLO|VOLI|FLIGHT|VUELO|VOL|FLUG)\s*(?:N\.?|NUMERO|NUMBER)?\s*:?\s*([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?(\d{1,4})(?![\dA-Z/-])/g;
 
 /** Sigle che compaiono nelle email e voli non sono. */
 const NON_VOLI = new Set(["CE", "UE", "EU", "EC", "IT", "SR", "PA", "RE", "ID", "OK", "NO", "SI"]);
 
 function voliNominati(testo: string): string[] {
+  const su = testo.toUpperCase();
   const trovati = new Set<string>();
-  for (const m of testo.toUpperCase().matchAll(CODICE_VOLO)) {
-    const compagnia = m[1];
-    if (NON_VOLI.has(compagnia)) continue;
-    trovati.add(`${compagnia}${m[2].replace(/^0+/, "")}`);
+  for (const re of [ATTACCATO, DOPO_LA_PAROLA]) {
+    for (const m of su.matchAll(re)) {
+      const compagnia = m[1];
+      if (NON_VOLI.has(compagnia)) continue;
+      trovati.add(`${compagnia}${m[2].replace(/^0+/, "")}`);
+    }
   }
   return [...trovati];
 }

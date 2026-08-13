@@ -127,3 +127,40 @@ test.describe("Il cancello sta prima del modello, e non sporca il fascicolo", ()
     expect(blocco).not.toContain("registraEvento");
   });
 });
+
+test.describe("Un falso allarme e' peggio del difetto che ripara", () => {
+  test("🔴 «DI 2 ORE» non e' il volo DI2", () => {
+    /* Il caso vero: Valerio, 13/08, ha scritto «NON FACCIAMO IL RIMBORSO
+       PERCHE IL VOLO ERA DI 2 ORE E 50 MINUTI IN RITARDO NON 3 ORE» e il
+       sistema gli ha risposto «questa risposta parla del volo DI2».
+       In quel testo un volo non c'era: c'era una preposizione. */
+    const suo =
+      "NON FACCIAMO IL RIMBORSO PERCHE IL VOLO ERA DI 2 ORE E 50 MINUTI IN RITARDO NON 3 ORE.";
+    expect(coerenzaRisposta(suo, dossier("ZZ250")).ok).toBe(true);
+  });
+
+  test("nessuna preposizione italiana piu' un numero fa scattare il blocco", () => {
+    const frasi = [
+      "Il ritardo era di 2 ore e non di 3 ore come da lei indicato.",
+      "La pratica in 4 giorni lavorativi verra' chiusa.",
+      "Le scrivo da 12 anni nel settore, la 5 volta questo mese.",
+      "Al 30 del mese le verra' comunicato l'esito, e ne 12 casi su 100 si accoglie.",
+      "Con riferimento al Regolamento CE 261/2004 e all'art. 5, rif. REF-98765.",
+    ];
+    for (const f of frasi) {
+      expect(coerenzaRisposta(f, dossier("ZZ250")).ok, f).toBe(true);
+    }
+  });
+
+  test("ma un volo scritto come lo scrive una compagnia si riconosce ancora", () => {
+    for (const f of [
+      "Gentile cliente, in merito al volo FR 1234 del 12 agosto la informiamo del diniego.",
+      "Oggetto: reclamo volo FR1234 respinto.",
+      "Flight number: FR 1234. Your claim has been rejected.",
+    ]) {
+      const e = coerenzaRisposta(f, dossier("ZZ250"));
+      expect(e.ok, f).toBe(false);
+      if (!e.ok) expect(e.voloTrovato).toBe("FR1234");
+    }
+  });
+});

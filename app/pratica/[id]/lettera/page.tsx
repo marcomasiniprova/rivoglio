@@ -145,22 +145,47 @@ function Avviso({ titolo, children }: { titolo: string; children: ReactNode }) {
   );
 }
 
-function Cornice({ children }: { children: ReactNode }) {
+/**
+ * 🔴 DA QUI NON SI TORNAVA INDIETRO. Valerio, 13/08: «apro la lettera e
+ * resto bloccato nella pagina della lettera, fai che posso ritornare a
+ * tutti gli step con pulsante indietro».
+ *
+ * Aveva ragione: in cima c'era «Torna all'app», che porta all'ELENCO
+ * delle pratiche. Cioè per rientrare nella pratica da cui eri appena
+ * uscito dovevi ritrovarla in una lista. Con una pratica sola non si
+ * nota; con tre diventa un labirinto.
+ *
+ * Adesso il ritorno è alla PRATICA, che è il posto da cui sei arrivato e
+ * dove stanno i passi. Sta in cima e si ripete in fondo: chi ha letto
+ * tutto il foglio non deve risalire per uscire.
+ */
+function Cornice({ praticaId, children }: { praticaId: string | null; children: ReactNode }) {
+  const indietro = praticaId ? `/pratica/${praticaId}` : "/app";
+  const etichetta = praticaId ? "Torna alla pratica" : "Torna all'app";
   return (
     <div className="min-h-dvh bg-nebbia">
-      <header className="no-stampa border-b border-bordo bg-white/85 backdrop-blur-xl">
+      <header className="no-stampa sticky top-0 z-40 border-b border-bordo bg-white/85 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5 sm:px-8">
           <Logo />
           <Link
-            href="/app"
-            className="inline-flex items-center gap-1.5 text-sm text-fumo transition-colors hover:text-inchiostro"
+            href={indietro}
+            className="inline-flex items-center gap-1.5 rounded-bottone border border-bordo bg-white px-3.5 py-2 text-sm font-medium text-inchiostro transition-colors hover:bg-nebbia"
           >
             <ArrowLeft className="size-4" aria-hidden="true" />
-            Torna all&apos;app
+            {etichetta}
           </Link>
         </div>
       </header>
-      <main className="mx-auto flex max-w-3xl flex-col gap-6 px-5 py-10 sm:px-8">{children}</main>
+      <main className="mx-auto flex max-w-3xl flex-col gap-6 px-5 py-10 sm:px-8">
+        {children}
+        <Link
+          href={indietro}
+          className="no-stampa inline-flex items-center gap-1.5 text-sm font-medium text-verde hover:text-verde-scuro"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          {etichetta}
+        </Link>
+      </main>
     </div>
   );
 }
@@ -182,7 +207,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
 
   if (!SERVIZIO_ATTIVO) {
     return (
-      <Cornice>
+      <Cornice praticaId={id}>
         <Avviso titolo="Configurazione incompleta">
           Manca la chiave di servizio del database: la lettera non si può leggere. Riprova tra
           poco; se il problema resta, scrivici.
@@ -225,7 +250,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
 
   if (pratica.stato === "creata") {
     return (
-      <Cornice>
+      <Cornice praticaId={id}>
         <Avviso titolo="La lettera arriva col pagamento">
           Questa pratica è aperta ma il pagamento non risulta ancora. Appena arriva, qui trovi la
           lettera pronta da copiare e inviare.
@@ -281,7 +306,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
     (!dichiarato && verifica.ritardo_minuti === null)
   ) {
     return (
-      <Cornice>
+      <Cornice praticaId={id}>
         <Avviso titolo="Qui manca un pezzo">
           Per scrivere la lettera servono i dati del volo e un verdetto idoneo, e a questa pratica
           ne manca uno. Non è normale: scrivici rispondendo a una qualsiasi email della pratica e
@@ -347,7 +372,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
 
   if (!lettera) {
     return (
-      <Cornice>
+      <Cornice praticaId={id}>
         <Avviso titolo="Qui manca un pezzo">
           Mancano gli orari archiviati del volo, e senza quelli la lettera non si scrive.
           Scrivici rispondendo a una qualsiasi email della pratica e la sistemiamo noi.
@@ -423,7 +448,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   const protocollo = `${volo.volo_iata} · ${dataIt(volo.data_locale)}`;
 
   return (
-    <Cornice>
+    <Cornice praticaId={id}>
       {/* ------------------------------------------------ la testata */}
       <div className="no-stampa">
         <h1 className="font-display text-[2.1rem] leading-none tracking-[-0.04em]">
