@@ -35,6 +35,26 @@ import { letteraSbloccata } from "./documenti";
  * file, e questo file garantisce che il passo attivo sia **uno solo**.
  */
 
+/**
+ * 🔴 E IL 13/08 IL MURO È STATO TOLTO DEL TUTTO (scelta di Valerio col
+ * popup, dopo averlo provato da utente): «perché nella pagina appena pago
+ * la pratica vengo rediretto dove il bottone è grigio? che senso ha
+ * scusa?».
+ *
+ * Aveva ragione due volte. La prima: il riquadro sopra il bottone diceva
+ * «apri la lettera, inviala dalla tua email» mentre il bottone non si
+ * poteva premere. Una pagina che ti ordina una cosa e te la impedisce
+ * nella stessa schermata è rotta, indipendentemente da quanto sia buona
+ * la ragione. La seconda, più seria: quel muro arriva **un secondo dopo
+ * il pagamento**, cioè nel punto in cui la fiducia è più fragile di tutto
+ * il percorso.
+ *
+ * La carta d'imbarco resta, e resta utile: adesso è un rinforzo che si
+ * propone DOPO, con scritto quanto pesa. Non è più una tappa, quindi non
+ * è più nemmeno un pallino nella barra: le tappe sono le cose che
+ * bisogna attraversare per forza.
+ */
+
 export type ChiavePasso =
   | "pagamento"
   | "documento"
@@ -57,11 +77,22 @@ export type Passo = {
 
 /** Quali riquadri la pagina accende. Nessun altro decide. */
 export type Riquadri = {
-  /** Il caricamento come PASSO ATTIVO: titolo grande, verde, con la porta di servizio. */
-  documentoPasso: boolean;
-  /** Lo stesso caricamento in versione di contorno: bianco, niente "passo 1 di 2". */
+  /**
+   * Il caricamento della carta d'imbarco, sempre in versione di contorno:
+   * un riquadro bianco fra gli altri, mai un muro.
+   *
+   * ⚠️ Prima esisteva anche `documentoPasso`, la versione "PASSO 1 DI 2"
+   * che teneva chiusa la lettera. È sparita col muro: tenerne il campo
+   * "spento per sicurezza" avrebbe lasciato in giro un interruttore che
+   * qualcuno riaccende senza sapere cosa riaccende.
+   */
   documentoExtra: boolean;
-  /** Il bottone che apre la lettera è premibile? */
+  /**
+   * Il bottone che apre la lettera è premibile?
+   *
+   * Dal 13/08 la risposta è sempre sì da quando la pratica è pagata: la
+   * lettera è la cosa che il cliente ha comprato, e non si trattiene.
+   */
   letteraApribile: boolean;
   /** Si mostra il bottone che apre la lettera (anche spento)? */
   letteraVisibile: boolean;
@@ -85,6 +116,8 @@ export type Riquadri = {
 export type Percorso = {
   passi: Passo[];
   attivo: ChiavePasso;
+  /** La chiave con cui si scelgono i testi. Vedi `ChiaveTesto`. */
+  chiaveTesto: ChiaveTesto;
   riquadri: Riquadri;
 };
 
@@ -118,10 +151,12 @@ export function aChePunto(p: Percorso): { indice: number; totale: number; nome: 
   };
 }
 
-/** L'ordine in cui si attraversano, e il nome che l'utente legge. */
+/** L'ordine in cui si attraversano, e il nome che l'utente legge.
+ *  ⚠️ "documento" NON c'è più: non è una tappa, è un rinforzo
+ *  facoltativo, e mettere fra le tappe una cosa che si può saltare è il
+ *  modo di far sembrare il percorso più lungo di quello che è. */
 const NOMI: { chiave: ChiavePasso; nome: string }[] = [
   { chiave: "pagamento", nome: "Pratica aperta" },
-  { chiave: "documento", nome: "Carta d'imbarco" },
   { chiave: "lettera", nome: "Reclamo pronto" },
   { chiave: "invio", nome: "Reclamo inviato" },
   { chiave: "attesa", nome: "Attesa risposta" },
@@ -130,10 +165,7 @@ const NOMI: { chiave: ChiavePasso; nome: string }[] = [
   { chiave: "chiusa", nome: "Chiusa" },
 ];
 
-/**
- * Gli stati da cui in poi la prima lettera è già uscita di casa. Da qui il
- * muro dei documenti non ha più senso, e non deve più bloccare niente.
- */
+/** Gli stati da cui in poi la prima lettera è già uscita di casa. */
 const RECLAMO_PARTITO: StatoPratica[] = [
   "inviata",
   "sollecito",
@@ -146,16 +178,11 @@ const RECLAMO_PARTITO: StatoPratica[] = [
 const CHIUSE: StatoPratica[] = ["esito_pagata", "esito_rifiutata", "rimborsata"];
 
 /** Il passo attivo, cioè l'unica cosa che l'utente deve guardare adesso. */
-function passoAttivo(
-  stato: StatoPratica,
-  documentiFatti: boolean,
-  rifiutoDichiarato: boolean,
-): ChiavePasso {
+function passoAttivo(stato: StatoPratica, rifiutoDichiarato: boolean): ChiavePasso {
   if (CHIUSE.includes(stato)) return "chiusa";
   if (stato === "creata") return "pagamento";
-  if (stato === "pagata" || stato === "pronta") {
-    return documentiFatti ? "lettera" : "documento";
-  }
+  /* Pagata = la lettera è pronta e si apre. Niente in mezzo. */
+  if (stato === "pagata" || stato === "pronta") return "lettera";
   if (stato === "inviata") {
     /* Chi ha già dichiarato il no non sta più aspettando: la replica è
        pronta e il calendario non c'entra più niente. */
@@ -163,6 +190,43 @@ function passoAttivo(
   }
   if (stato === "sollecito") return "replica";
   return "ente";
+}
+
+/**
+ * LA CHIAVE DEI TESTI, E PERCHÉ NON È LO STATO DEL DATABASE.
+ *
+ * 🔴 Valerio, 13/08: ha dichiarato il no della compagnia CINQUE MINUTI
+ * dopo aver mandato il reclamo, e la pagina gli ha risposto: «Sollecito.
+ * Sei settimane, nessuna risposta: il sollecito è pronto». Una frase
+ * falsa in tre punti su tre, scritta con sicurezza a un cliente pagante.
+ *
+ * La causa non è un refuso: lo stato `sollecito` sul database vuol dire
+ * due cose diverse. Ci si arriva **per silenzio** (sono passate sei
+ * settimane e nessuno ha risposto) oppure **per risposta** (hanno detto
+ * no, e allora il calendario non c'entra niente). Un nome solo per due
+ * fatti diversi produce, per forza, un testo sbagliato su uno dei due.
+ *
+ * Da qui in avanti i testi si scelgono con questa chiave, che guarda
+ * cosa è SUCCESSO. Lo stato del database resta quello che è: serve alle
+ * transizioni e ai cron, e non deve reggere anche il peso di raccontare.
+ */
+export type ChiaveTesto =
+  | "creata"
+  | "pagata"
+  | "pronta"
+  | "inviata"
+  | "risposta_no"
+  | "sollecito"
+  | "enac"
+  | "esito_pagata"
+  | "esito_rifiutata"
+  | "rimborsata";
+
+function chiaveTesto(stato: StatoPratica, rifiutoDichiarato: boolean): ChiaveTesto {
+  /* Il no dichiarato vince su tutto quello che dice il calendario: è un
+     fatto avvenuto, non una scadenza scattata. */
+  if (rifiutoDichiarato && (stato === "inviata" || stato === "sollecito")) return "risposta_no";
+  return stato as ChiaveTesto;
 }
 
 /** Dove si trova questo passo rispetto a quello attivo. */
@@ -188,7 +252,7 @@ export function percorsoPratica(
   const rifiutoDichiarato = Boolean(rifiutoMotivo);
   const reclamoPartito = RECLAMO_PARTITO.includes(stato);
   const chiusa = CHIUSE.includes(stato);
-  const attivo = passoAttivo(stato, documentiFatti, rifiutoDichiarato);
+  const attivo = passoAttivo(stato, rifiutoDichiarato);
 
   /* La barra non mostra "invio" e "risposta" come tappe a sé: sono azioni
      dentro le tappe accanto, e una barra da nove pallini su un telefono
@@ -203,29 +267,26 @@ export function percorsoPratica(
     stato: confronta(i, indiceAttivo),
   }));
 
-  /* LA LETTERA. Il muro dei documenti vale solo prima che il reclamo
-     parta: dopo, aprirla è un diritto già pagato. */
+  /* LA LETTERA. Pagata = apribile, punto. Il muro è stato tolto il
+     13/08: vedi il commento in cima. */
   const letteraVisibile = stato !== "creata";
-  const letteraApribile = letteraVisibile && (documentiFatti || reclamoPartito);
 
   return {
     passi,
     attivo,
+    /* La chiave con cui la pagina sceglie i testi. NON è lo stato del
+       database: vedi `chiaveTesto` qui sotto. */
+    chiaveTesto: chiaveTesto(stato, rifiutoDichiarato),
     riquadri: {
-      documentoPasso: attivo === "documento",
-      /* Dopo l'invio si può ancora caricare, e serve: la carta d'imbarco
-         rafforza anche il sollecito. Ma diventa un riquadro bianco fra
-         gli altri, non "PASSO 1 DI 2" sopra una lettera già spedita. */
-      documentoExtra: !documentiFatti && reclamoPartito && !chiusa,
-      letteraApribile,
+      /* Si può caricare la carta d'imbarco finché la pratica è viva, e
+         serve anche dopo l'invio: rinforza il sollecito allo stesso modo.
+         Ma è sempre un riquadro bianco fra gli altri, mai un passo. */
+      documentoExtra: !documentiFatti && !chiusa && stato !== "creata",
+      letteraApribile: letteraVisibile,
       letteraVisibile,
-      /* ⚠️ NON SI DICHIARA DI AVER MANDATO UNA LETTERA CHE NON SI È
-         POTUTA APRIRE. Prima il bottone c'era comunque: si poteva
-         confermare l'invio di un foglio ancora chiuso dietro il muro dei
-         documenti, e la pratica avanzava su un fatto non avvenuto. */
-      confermaInvio: (stato === "pagata" || stato === "pronta") && letteraApribile,
+      confermaInvio: stato === "pagata" || stato === "pronta",
       rifiuto: stato === "inviata" || stato === "sollecito" || stato === "enac",
-      istruzioni: (stato === "pagata" || stato === "pronta") && letteraApribile,
+      istruzioni: stato === "pagata" || stato === "pronta",
       scadenza: !reclamoPartito,
     },
   };

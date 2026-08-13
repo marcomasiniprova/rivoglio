@@ -46,12 +46,14 @@ export default function LeggiRisposta({
   const [testo, setTesto] = useState("");
   const [stato, setStato] = useState<"fermo" | "invio" | "fatto">("fermo");
   const [errore, setErrore] = useState("");
+  const [incoerente, setIncoerente] = useState(false);
   const [esito, setEsito] = useState<EsitoLettura | null>(null);
   const campoFile = useRef<HTMLInputElement>(null);
 
   async function manda(corpo: Record<string, unknown>) {
     setStato("invio");
     setErrore("");
+    setIncoerente(false);
     try {
       const r = await fetch(`/api/pratiche/${praticaId}/risposta`, {
         method: "POST",
@@ -79,8 +81,16 @@ export default function LeggiRisposta({
         return;
       }
       setStato("fermo");
+      /* 🔴 LA RISPOSTA È DI UN ALTRO VOLO. Non è un errore qualsiasi ed è
+         l'unico caso in cui vale la pena fermare tutto: una replica
+         costruita sui fatti di un altro volo la compagnia la respinge con
+         una riga, e il cliente ha pagato per farsi dire di no.
+         Si segna a parte perché va mostrata in giallo, come un avviso da
+         leggere, non in rosso fra gli errori tecnici. */
+      setIncoerente(d?.incoerente === true);
       setErrore(typeof d?.errore === "string" ? d.errore : "Qualcosa non ha funzionato. Riprova.");
     } catch {
+      setIncoerente(false);
       setStato("fermo");
       setErrore("Qualcosa non ha funzionato. Riprova tra poco.");
     }
@@ -229,9 +239,25 @@ export default function LeggiRisposta({
       )}
 
       {errore && (
-        <p role="alert" className="mt-3 flex items-start gap-2 text-sm leading-relaxed text-red-600">
+        <p
+          role="alert"
+          className={
+            incoerente
+              ? "mt-3 flex items-start gap-2 rounded-xl bg-sole/15 px-4 py-3 text-sm leading-relaxed text-inchiostro"
+              : "mt-3 flex items-start gap-2 text-sm leading-relaxed text-red-600"
+          }
+        >
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          {errore}
+          <span>
+            {errore}
+            {incoerente && (
+              <>
+                {" "}
+                <strong>Non ho scritto niente</strong> e non ho toccato la tua pratica: correggi il
+                testo e riprova.
+              </>
+            )}
+          </span>
         </p>
       )}
     </div>

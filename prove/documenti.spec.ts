@@ -1,95 +1,87 @@
 import { test, expect } from "@playwright/test";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import {
-  EVENTO_CARICATO,
-  EVENTO_SALTATO,
-  letteraSbloccata,
-} from "../lib/pratiche/documenti";
+import { EVENTO_CARICATO, EVENTO_SALTATO, letteraSbloccata } from "../lib/pratiche/documenti";
 import type { EventoPratica } from "../lib/pratiche/pratiche";
 
 /**
- * IL PASSO 1: LA CARTA D'IMBARCO PRIMA DELLA LETTERA.
+ * LA CARTA D'IMBARCO È UN RINFORZO, NON UN MURO.
  *
- * Scelta di Valerio col popup del 12/08. Il guadagno è vero (due fonti
- * che dicono la stessa cosa reggono meglio a un no), ma il rischio lo è
- * altrettanto: il cliente a quel punto HA GIÀ PAGATO, e un muro che non
- * riesce a superare è un prodotto venduto e non consegnato.
+ * Il 12/08 era stata resa obbligatoria: la lettera si apriva solo dopo
+ * averla caricata. Il 13/08 Valerio l'ha provata da utente e il muro è
+ * stato tolto (scelta sua col popup):
  *
- * Queste prove tengono ferme tutte e due le cose: che il muro ci sia
- * davvero (anche per chi digita l'indirizzo a mano) e che la porta di
- * servizio non sparisca mai.
+ *   «Perché nella pagina appena pago la pratica vengo rediretto dove il
+ *   bottone è grigio? Che senso ha scusa?»
+ *
+ * Aveva ragione due volte. La prima: il riquadro sopra il bottone diceva
+ * «apri la lettera, inviala dalla tua email» mentre il bottone non si
+ * poteva premere. Una pagina che ordina una cosa e la impedisce nella
+ * stessa schermata è rotta, per quanto buona sia la ragione. La seconda,
+ * più seria: quel muro arrivava **un secondo dopo il pagamento**, cioè
+ * nel punto in cui la fiducia è più fragile di tutto il percorso.
+ *
+ * Queste prove tengono ferme le due cose che contano adesso: che la
+ * lettera pagata non si possa più trattenere, e che il riquadro non
+ * ridiventi un passo.
  */
 
 const RADICE = join(__dirname, "..");
 const leggi = (p: string) => readFileSync(join(RADICE, p), "utf8");
 
 const evento = (tipo: string): EventoPratica =>
-  ({ id: "x", pratica_id: "y", tipo, nota: null, creato_il: "2026-08-12T10:00:00Z" }) as EventoPratica;
+  ({
+    id: "x",
+    pratica_id: "y",
+    tipo,
+    nota: null,
+    creato_il: "2026-08-12T10:00:00Z",
+  }) as EventoPratica;
 
-test.describe("Il passo dei documenti", () => {
-  test("senza documenti la lettera è chiusa", () => {
+test.describe("Il documento non blocca più niente", () => {
+  test("`letteraSbloccata` resta, e dice solo se il documento c'è", () => {
+    /* Non decide più l'accesso alla lettera: serve a sapere se
+       riproporre l'invito. Le pratiche vecchie hanno già gli eventi
+       scritti, e chi aveva usato la porta di servizio non deve vedersi
+       richiedere niente. */
     expect(letteraSbloccata([])).toBe(false);
-    expect(letteraSbloccata([evento("creata"), evento("pagata")])).toBe(false);
-  });
-
-  test("un documento caricato apre la lettera", () => {
-    expect(letteraSbloccata([evento("pagata"), evento(EVENTO_CARICATO)])).toBe(true);
-  });
-
-  test("chi dichiara di non averli passa lo stesso", () => {
-    /* ⚠️ È LA PROVA PIÙ IMPORTANTE DEL FILE. Se un domani questa porta
-       si chiude, un cliente che ha pagato 14,90 e non ha la carta
-       d'imbarco resta senza la lettera che ha comprato: rimborso,
-       recensione a una stella, e avrebbe ragione lui. */
+    expect(letteraSbloccata([evento(EVENTO_CARICATO)])).toBe(true);
     expect(letteraSbloccata([evento(EVENTO_SALTATO)])).toBe(true);
   });
 
-  test("il muro sta anche sul server, non solo sul bottone", () => {
-    /* L'indirizzo della lettera si digita, sta nella cronologia del
-       browser e finisce nei segnalibri: spegnere il bottone sulla pagina
-       della pratica non è un controllo, è un suggerimento.
-
-       ⚠️ QUESTA PROVA CERCAVA `letteraSbloccata` DENTRO LA PAGINA, e dal
-       13/08 non lo trova più: non perché il muro sia sparito, ma perché
-       la pagina ha smesso di riscriversi la regola per conto suo e la
-       chiede a `percorsoPratica`, che è l'unico posto dove vive. Il muro
-       è più solido di prima, non più debole; il comportamento vero (senza
-       documenti la lettera non si apre) è provato in prove/passi.spec.ts
-       chiamando la funzione, che è meglio che cercare una parola in un
-       file. Qui resta il controllo che il cancello ci sia e rimandi
-       indietro. */
-    const pagina = leggi("app/pratica/[id]/lettera/page.tsx");
-    expect(pagina, "la pagina della lettera deve controllare il passo 1").toContain(
-      "letteraApribile",
+  test("🔴 la parola «bloccante» non deve tornare nel riquadro", () => {
+    /* Il riquadro aveva due facce e una porta di servizio. Sono sparite
+       tutte e tre col muro: se una torna, torna anche il bottone grigio
+       subito dopo il pagamento. */
+    const c = leggi("components/pratica/CaricaDocumento.tsx");
+    expect(c).not.toContain("bloccante");
+    expect(c, "la porta di servizio non serve più: non c'è niente da sbloccare").not.toContain(
+      "documento/salta",
     );
-    const i = pagina.lastIndexOf("letteraApribile");
-    expect(pagina.slice(i, i + 200), "e deve rimandare alla pratica").toContain("redirect");
-    /* E la regola deve arrivare da lì, non da un `if` scritto a mano
-       accanto: due copie divergono al primo cambio. */
-    expect(pagina).toContain("percorsoPratica");
   });
 
-  test("la porta di servizio esiste come rotta, e controlla di chi è la pratica", () => {
-    const rotta = leggi("app/api/pratiche/[id]/documento/salta/route.ts");
-    /* Il tipo dell'evento arriva dalla costante condivisa, non scritto a
-       mano: due stringhe uguali in due file divergono al primo refuso, e
-       un refuso qui vorrebbe dire una lettera che non si sblocca mai. */
-    expect(rotta).toContain("EVENTO_SALTATO");
-    expect(EVENTO_SALTATO).toBe("documento_saltato");
-    /* `caricaPratica` legge con la chiave di servizio, che salta le
-       regole di riga: senza questo confronto bastava conoscere un id
-       altrui per scrivergli nella cronologia. */
-    expect(rotta, "manca il controllo del proprietario").toContain("utente_id !== utente.id");
+  test("🔴 la rotta che sbloccava la lettera non esiste più", () => {
+    /* Una porta che non serve a niente resta una porta: si toglie. */
+    const cartella = join(RADICE, "app/api/pratiche/[id]/documento");
+    const dentro = readdirSync(cartella).map((v) => v.toString());
+    expect(dentro, "la rotta /salta va rimossa col muro").not.toContain("salta");
   });
 
-  test("il bottone della lettera si spegne, non sparisce", () => {
-    /* Un bottone che sparisce fa pensare di aver comprato una cosa che
-       non c'è. Spento con accanto la riga che dice cosa manca, invece,
-       si capisce in tre secondi. */
-    const pagina = leggi("app/pratica/[id]/page.tsx");
-    expect(pagina).toContain("letteraApribile");
-    expect(pagina).toContain("letteraChiusa");
+  test("il percorso non conosce più un riquadro «passo»", () => {
+    /* Si guardano i CAMPI, non il file e nemmeno i commenti: la
+       spiegazione di perché quel campo è stato tolto contiene il suo
+       nome, ed è giusto che lo contenga. Una prova che vieta di spiegare
+       un difetto è una prova che spinge a cancellare la spiegazione. */
+    const p = leggi("lib/pratiche/passi.ts");
+    const senzaCommenti = p
+      .replace(/\/\*[\s\S]*?\*\//g, " ")
+      .replace(/^\s*\/\/.*$/gm, " ");
+    const tipo = senzaCommenti.slice(
+      senzaCommenti.indexOf("export type Riquadri"),
+      senzaCommenti.indexOf("export type Percorso"),
+    );
+    expect(tipo).not.toContain("documentoPasso");
+    expect(tipo, "resta solo l'invito di contorno").toContain("documentoExtra");
   });
 });
 
@@ -101,7 +93,6 @@ test.describe("Dopo l'invio si sa quando succede il prossimo passo", () => {
     const pagina = leggi("app/pratica/[id]/page.tsx");
     expect(pagina).toContain("GIORNI_PRIMA_DEL_SOLLECITO");
     expect(pagina, "il conto alla rovescia deve esistere").toContain("attesaDopoInvio");
-    /* Nessun numero di giorni scritto in chiaro dentro la funzione. */
     const i = pagina.indexOf("function attesaDopoInvio");
     expect(pagina.slice(i, i + 900)).not.toMatch(/\b(42|56|90)\b/);
   });

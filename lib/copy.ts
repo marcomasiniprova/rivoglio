@@ -1138,6 +1138,22 @@ export const COPY = {
         prossimoPasso:
           "Invia il sollecito che ti abbiamo mandato via email, sempre dalla tua casella.",
       },
+      /* 🔴 QUESTO STATO NON ESISTEVA, E ERA IL BUCO. Alla stessa casella
+         del database (`sollecito`) si arriva in due modi opposti: per
+         silenzio, cioè perché sono passate sei settimane, oppure perché
+         la compagnia ha RISPOSTO no. Con un testo solo, chi dichiarava il
+         no cinque minuti dopo l'invio si leggeva «Sei settimane, nessuna
+         risposta»: una frase falsa in tre punti su tre, detta con
+         sicurezza a un cliente che ha pagato.
+         Adesso i testi si scelgono con `chiaveTesto` (lib/pratiche/passi.ts),
+         che guarda cosa è successo e non che giorno è. */
+      risposta_no: {
+        nome: "Hanno risposto no",
+        descrizione:
+          "La compagnia ha respinto la richiesta. Succede alla maggior parte dei reclami validi, e quasi sempre è un no che non regge: la replica è pronta e risponde punto per punto a quello che hanno scritto loro.",
+        prossimoPasso:
+          "Apri la replica e mandala alla compagnia dalla tua casella, come hai fatto col reclamo.",
+      },
       /* 🔴 QUESTO STATO SI CHIAMAVA "ENAC" E LO DICEVA A TUTTI. Ma la
          competenza è dello Stato dell'aeroporto di PARTENZA (art. 16 par.
          1), e la lettera dal giro #38 nomina l'ente giusto paese per
@@ -1178,6 +1194,12 @@ export const COPY = {
     /* ---- la linea del tempo, dagli eventi in pratiche_eventi ---- */
     lineaTempo: {
       titolo: "La cronologia",
+      /* Il passaggio allo stato `sollecito` si chiama così anche quando
+         ci si arriva perché la compagnia ha RISPOSTO: sotto la riga
+         «hanno risposto no» leggere «Sollecito pronto» è la stessa
+         confusione fra calendario e fatti che ha fatto arrabbiare Valerio
+         il 13/08. */
+      replicaPronta: "Replica pronta",
       vuota: "Ancora nessun evento registrato.",
       /** Etichette per `tipo`: le transizioni di stato e le email del cron. */
       eventi: {

@@ -4,7 +4,13 @@ import { verificaVolo } from "@/lib/voli/verifica";
 import { inItaliano } from "@/lib/voli/aeroporti";
 import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { CHECK_A_PAGAMENTO, CORTESIA_SU_INCERTO } from "@/lib/check/ingresso";
-import { creditoFinito, passDi, rispostaMuro, segnaConsumo } from "@/lib/check/cancello";
+import {
+  analisiGiaPagata,
+  creditoFinito,
+  passDi,
+  rispostaMuro,
+  segnaConsumo,
+} from "@/lib/check/cancello";
 import { COOKIE_PASS, consumaPass } from "@/lib/check/pass";
 import { traccia } from "@/lib/eventi/registra";
 
@@ -68,17 +74,6 @@ export async function POST(req: Request) {
     return rispostaMuro(req);
   }
 
-  /* ⚠️ E NON BASTA AVERE UNA RICEVUTA VALIDA: bisogna che le analisi che
-     ha comprato non siano già finite. Il credito nel cookie non fa fede,
-     perché il cookie sta nel browser di chi lo usa: chi si copiava il
-     valore di prima tornava ad avere il credito pieno (provato l'11/08:
-     seconda analisi con la stessa ricevuta consumata, 200). Il conto lo
-     tiene il database. */
-  if (pass && (await creditoFinito(pass))) {
-    traccia(req, { tipo: "check" }, { tipo: "muro", extra: { motivo: "credito finito" } });
-    return rispostaMuro(req);
-  }
-
   let corpo: unknown;
   try {
     corpo = await req.json();
@@ -97,6 +92,29 @@ export async function POST(req: Request) {
       },
       { status: 400, headers: CORS },
     );
+  }
+
+  /* ⚠️ IL CANCELLO DEL CREDITO STA QUI, DOPO AVER LETTO IL VOLO, e il
+     motivo vale un cliente.
+
+     Non basta avere una ricevuta valida: bisogna che le analisi comprate
+     non siano già finite, e il conto lo tiene il database perché il
+     cookie sta nel browser di chi lo usa (chi si copiava il valore di
+     prima tornava al credito pieno: provato l'11/08).
+
+     🔴 Ma prima questo controllo girava PRIMA di sapere di che volo si
+     parlasse, e quindi non poteva distinguere «un'analisi nuova» da
+     «la stessa analisi rifatta». Valerio, 13/08: «un utente paga mentre
+     fa l'analisi, lì si refresha il browser, e da quanto vedo gli fa
+     ripagare per forza». Ricaricare la pagina, tornare indietro col
+     tasto del browser o riaprire il link dopo che il telefono si è
+     spento mangiava un secondo credito sullo STESSO volo.
+     Adesso si guarda anche il volo: quello che uno ha comprato è la
+     risposta su quel volo, non un'esecuzione del programma. */
+  const giaPagata = pass ? await analisiGiaPagata(pass, volo, data) : false;
+  if (pass && !giaPagata && (await creditoFinito(pass))) {
+    traccia(req, { tipo: "check", volo }, { tipo: "muro", extra: { motivo: "credito finito" } });
+    return rispostaMuro(req);
   }
 
   // Da qui in giù verificaVolo non lancia mai: un guasto diventa esito incerto.
@@ -123,7 +141,11 @@ export async function POST(req: Request) {
      il credito resta: chi paga per sapere e si sente rispondere "non lo
      so" non ha comprato niente, e trattenergli i soldi è la strada più
      breve per una contestazione sulla carta (vedi CORTESIA_SU_INCERTO). */
-  const siConsuma = Boolean(pass) && !(CORTESIA_SU_INCERTO && verdetto.esito === "incerto");
+  const siConsuma =
+    Boolean(pass) &&
+    /* Lo stesso volo non si paga due volte: vedi `analisiGiaPagata`. */
+    !giaPagata &&
+    !(CORTESIA_SU_INCERTO && verdetto.esito === "incerto");
   const daConsumare = siConsuma && pass ? consumaPass(pass) : undefined;
 
   /* Il consumo si scrive nel REGISTRO, non solo nel cookie: è quello che

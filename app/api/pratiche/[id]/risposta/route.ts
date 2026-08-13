@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { utenteDaRichiesta } from "@/lib/api/utente";
-import { analizzaRifiuto } from "@/lib/ai/replica";
+import { analizzaRifiuto, coerenzaRisposta } from "@/lib/ai/replica";
 import {
   EVENTO_ANALISI_RIFIUTO,
   EVENTO_TESTO_RIFIUTO,
@@ -178,6 +178,32 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     : { data: null };
 
   const dossier = costruisciDossier({ pratica, volo, verifica, eventi });
+
+  /* -------------------------- 2-bis. È DAVVERO LA RISPOSTA A QUESTO CASO?
+     🔴 Valerio, 13/08: ha incollato dentro la pratica del volo ZZ400 la
+     risposta di un altro volo (FR1234) e il sistema ha scritto la replica
+     come se niente fosse. Il controllo che c'era guardava il testo
+     GENERATO; nessuno guardava quello IN INGRESSO.
+     Sta PRIMA del modello di proposito: non si spendono soldi di API per
+     analizzare l'email sbagliata, e soprattutto l'AI non ha modo di
+     "aggiustare" un caso che non torna. Vedi lib/ai/replica.ts. */
+  const coerente = coerenzaRisposta(rispostaLoro, dossier);
+  if (!coerente.ok) {
+    /* Non si registra niente: il testo non appartiene a questa pratica, e
+       scriverlo nella sua cronologia vorrebbe dire sporcare il fascicolo
+       con i fatti di un altro volo, che è esattamente il danno che stiamo
+       evitando. */
+    return NextResponse.json(
+      {
+        ok: false,
+        incoerente: true,
+        voloTrovato: coerente.voloTrovato,
+        voloAtteso: coerente.voloAtteso,
+        errore: coerente.messaggio,
+      },
+      { status: 409, headers: CORS },
+    );
+  }
 
   /* ------------------------------------------------ 3 e 4. l'analisi */
   const analisi = await analizzaRifiuto(dossier, rispostaLoro);

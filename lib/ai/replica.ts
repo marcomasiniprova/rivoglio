@@ -61,6 +61,98 @@ export type AnalisiRifiuto = {
   riassunto: string;
 };
 
+/* ------------------------------ il cancello ZERO: è la tua risposta? */
+
+/**
+ * 🔴 LA RISPOSTA INCOLLATA PARLA DAVVERO DI QUESTO CASO?
+ *
+ * Valerio, 13/08: ha incollato dentro la pratica del volo **ZZ400** la
+ * risposta di un altro volo (**FR1234**, con un altro ritardo e un altro
+ * numero di reclamo) e il sistema ha scritto la replica come se niente
+ * fosse: motivo riconosciuto, fatti estratti, paragrafo pronto. «Il mio
+ * fascicolo non lo ha letto veramente.»
+ *
+ * Aveva ragione, e il buco era strutturale: `controlla()` guardava le
+ * sentenze, le cifre e il tono del testo GENERATO, ma nessuno guardava se
+ * il testo IN INGRESSO fosse del caso giusto. Il risultato è la cosa
+ * peggiore che possiamo mandare a una compagnia: una replica che discute
+ * fatti mai avvenuti su quel volo. Loro rispondono con una riga, e il
+ * cliente ha pagato per farsi respingere.
+ *
+ * Questo controllo è **deterministico e viene prima del modello**: non si
+ * spendono soldi di API per analizzare l'email sbagliata, e soprattutto
+ * l'AI non ha modo di "aggiustare" un caso che non torna.
+ *
+ * ⚠️ COME È TARATO, e perché così. Blocca **solo quando il testo nomina
+ * dei voli e nessuno è il tuo**. Se l'email non nomina nessun volo (ne
+ * arrivano tante così: «Gentile cliente, la sua richiesta è stata
+ * respinta») passa, perché non c'è niente che la smentisca. Sbagliare
+ * dalla parte di chi blocca troppo vorrebbe dire fermare un cliente che
+ * ha ragione, e quello è il difetto che stiamo riparando, non uno nuovo.
+ */
+export type EsitoCoerenza =
+  | { ok: true }
+  | {
+      ok: false;
+      /** Il volo che compare nella loro risposta, come l'hanno scritto. */
+      voloTrovato: string;
+      /** Il volo di questa pratica. */
+      voloAtteso: string;
+      /** La frase da mostrare all'utente. */
+      messaggio: string;
+    };
+
+/**
+ * I codici di volo dentro un testo: due caratteri di compagnia (lettere,
+ * o una lettera e una cifra: "U2", "4U") seguiti da 1-4 cifre.
+ *
+ * ⚠️ Il confine `\b` prima non basta: dentro "REF-98765" o "art. 261/2004"
+ * ci sono sequenze che somigliano a un volo. Si pretende che il codice
+ * NON sia attaccato a una lettera o a un trattino, e si buttano le
+ * combinazioni note che voli non sono.
+ */
+const CODICE_VOLO = /(?<![A-Z0-9/-])([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?(\d{1,4})(?![\dA-Z/-])/g;
+
+/** Sigle che compaiono nelle email e voli non sono. */
+const NON_VOLI = new Set(["CE", "UE", "EU", "EC", "IT", "SR", "PA", "RE", "ID", "OK", "NO", "SI"]);
+
+function voliNominati(testo: string): string[] {
+  const trovati = new Set<string>();
+  for (const m of testo.toUpperCase().matchAll(CODICE_VOLO)) {
+    const compagnia = m[1];
+    if (NON_VOLI.has(compagnia)) continue;
+    trovati.add(`${compagnia}${m[2].replace(/^0+/, "")}`);
+  }
+  return [...trovati];
+}
+
+/** "FR 1234", "fr1234", "FR01234" diventano tutti "FR1234". */
+function normalizzaVolo(v: string | null | undefined): string | null {
+  if (!v) return null;
+  const m = /^([A-Z]{2}|[A-Z]\d|\d[A-Z])\s?0*(\d{1,4})$/.exec(v.trim().toUpperCase());
+  return m ? `${m[1]}${m[2]}` : null;
+}
+
+export function coerenzaRisposta(testo: string, d: Dossier): EsitoCoerenza {
+  const nostro = normalizzaVolo(d.volo.numero);
+  if (!nostro) return { ok: true };
+
+  const nominati = voliNominati(testo);
+  if (nominati.length === 0) return { ok: true };
+  if (nominati.includes(nostro)) return { ok: true };
+
+  /* Da qui in poi: la loro risposta nomina almeno un volo, e nessuno è il
+     nostro. Non si prova a indovinare: si dice cosa non torna e ci si
+     ferma. */
+  const voloTrovato = nominati[0];
+  return {
+    ok: false,
+    voloTrovato,
+    voloAtteso: nostro,
+    messaggio: `Questa risposta parla del volo ${voloTrovato}, ma questa pratica è del volo ${nostro}. Controlla di aver incollato l'email giusta: una replica costruita sui fatti di un altro volo la compagnia la respinge con una riga.`,
+  };
+}
+
 /* ------------------------------------------------- il cancello, prima */
 
 /** Tutte le fonti che è lecito citare: sono quelle che abbiamo verificato. */

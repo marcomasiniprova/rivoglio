@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, Check, FileText } from "lucide-react";
+import { AlertTriangle, Check } from "lucide-react";
 import LeggiRisposta from "./LeggiRisposta";
 
 /**
@@ -119,17 +119,18 @@ export default function DichiaraRifiuto({
             ? `L'abbiamo scritta sul no che ti hanno dato («${etichettaScelta}»), punto per punto. Non è un testo generico: cita le sentenze che smontano proprio quella risposta.`
             : "L'abbiamo scritta sul motivo che ti hanno dato, punto per punto. Non è un testo generico: cita le sentenze che smontano proprio quella risposta."}
         </p>
-        <a
-          href={`/pratica/${praticaId}/lettera`}
-          className="riflesso mt-4 inline-flex h-11 items-center gap-2 rounded-bottone bg-verde px-5 text-[0.95rem] font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro"
-        >
-          <FileText className="size-4" aria-hidden="true" />
-          Leggi la replica
-        </a>
+        {/* 🔴 QUI C'ERA UN SECONDO BOTTONE «Leggi la replica», e portava
+            allo STESSO indirizzo di «Apri la replica» che sta in cima
+            alla pagina. Valerio, 13/08: «è tutto pieno di bottoni, apri
+            replica o leggi replica, che cazzo cambia!!!!». Non cambiava
+            niente: erano lo stesso link scritto due volte, e due bottoni
+            identici a mezza pagina di distanza fanno pensare che facciano
+            cose diverse. Il gesto sta in cima, dove c'è «il prossimo
+            passo»: qui resta solo la spiegazione. */}
         <button
           type="button"
           onClick={() => setAperto(true)}
-          className="mt-3 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
+          className="mt-4 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
         >
           Ho sbagliato motivo, lo cambio
         </button>

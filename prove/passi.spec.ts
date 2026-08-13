@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { percorsoPratica } from "../lib/pratiche/passi";
 import { EVENTO_CARICATO, EVENTO_SALTATO } from "../lib/pratiche/documenti";
 import type { EventoPratica, StatoPratica } from "../lib/pratiche/pratiche";
@@ -64,47 +66,62 @@ test.describe("Un passo attivo alla volta", () => {
   });
 });
 
-test.describe("Il muro dei documenti sta al suo posto", () => {
-  test("prima dell'invio blocca davvero", () => {
-    const p = percorsoPratica("pagata", [], null);
-    expect(p.attivo).toBe("documento");
-    expect(p.riquadri.documentoPasso).toBe(true);
-    expect(p.riquadri.letteraApribile).toBe(false);
-  });
+test.describe("La carta d'imbarco non blocca piu' niente", () => {
+  /* 🔴 Il muro e' stato tolto il 13/08 (scelta di Valerio col popup) dopo
+     che l'ha provato da utente: «perche' appena pago la pratica vengo
+     rediretto dove il bottone e' grigio? che senso ha scusa?».
+     Il riquadro sopra diceva «apri la lettera, inviala dalla tua email» e
+     il bottone non si poteva premere: una pagina che ordina una cosa e la
+     impedisce nella stessa schermata e' rotta, per quanto buona sia la
+     ragione. E arrivava un secondo dopo il pagamento, cioe' nel punto in
+     cui la fiducia e' piu' fragile di tutto il percorso. */
 
-  test("la porta di servizio apre la lettera senza documento", () => {
-    const p = percorsoPratica("pagata", [evento(EVENTO_SALTATO)], null);
+  test("appena pagata, la lettera si apre", () => {
+    const p = percorsoPratica("pagata", [], null);
     expect(p.attivo).toBe("lettera");
     expect(p.riquadri.letteraApribile).toBe(true);
   });
 
-  test("🔴 dopo l'invio NON blocca più niente, nemmeno senza documento", () => {
-    /* È il difetto della schermata 5 del 13/08: dichiarato il no, la
-       replica c'era ma il bottone restava grigio. */
-    for (const stato of ["inviata", "sollecito", "enac"] as StatoPratica[]) {
-      const p = percorsoPratica(stato, [], null);
-      expect(p.riquadri.letteraApribile, stato).toBe(true);
-      expect(p.riquadri.documentoPasso, stato).toBe(false);
+  test("il documento non e' piu' una tappa della barra", () => {
+    /* Mettere fra le tappe una cosa che si puo' saltare fa sembrare il
+       percorso piu' lungo di quello che e'. Ed era il motivo per cui sulla
+       stessa schermata c'erano due conteggi diversi: «passo 2 di 7» in
+       cima e «passo 1 di 2» nel riquadro. */
+    const p = percorsoPratica("pagata", [], null);
+    expect(p.passi.map((x) => x.chiave)).not.toContain("documento");
+  });
+
+  test("in nessuno stato la lettera resta chiusa dopo il pagamento", () => {
+    const stati: StatoPratica[] = [
+      "pagata",
+      "pronta",
+      "inviata",
+      "sollecito",
+      "enac",
+      "esito_pagata",
+      "esito_rifiutata",
+      "rimborsata",
+    ];
+    for (const stato of stati) {
+      expect(percorsoPratica(stato, [], null).riquadri.letteraApribile, stato).toBe(true);
     }
   });
 
-  test("🔴 dopo l'invio il riquadro non è più 'passo 1 di 2'", () => {
-    // La schermata 2: lettera già spedita e sopra "prima carica la carta".
-    const p = percorsoPratica("inviata", [], null);
-    expect(p.riquadri.documentoPasso).toBe(false);
-    expect(p.riquadri.documentoExtra).toBe(true);
+  test("l'invito a caricare resta finche' serve, e sparisce quando e' fatto", () => {
+    expect(percorsoPratica("inviata", [], null).riquadri.documentoExtra).toBe(true);
+    expect(
+      percorsoPratica("inviata", [evento(EVENTO_CARICATO)], null).riquadri.documentoExtra,
+    ).toBe(false);
+    /* Chi aveva usato la vecchia porta di servizio ha l'evento scritto:
+       non gli si richiede niente. */
+    expect(
+      percorsoPratica("inviata", [evento(EVENTO_SALTATO)], null).riquadri.documentoExtra,
+    ).toBe(false);
   });
 
-  test("chi il documento l'ha già dato non se lo vede più chiedere", () => {
-    const p = percorsoPratica("inviata", [evento(EVENTO_CARICATO)], null);
-    expect(p.riquadri.documentoPasso).toBe(false);
-    expect(p.riquadri.documentoExtra).toBe(false);
-  });
-
-  test("su una pratica chiusa non si chiede più niente", () => {
+  test("su una pratica chiusa non si chiede piu' niente", () => {
     for (const stato of ["esito_pagata", "esito_rifiutata", "rimborsata"] as StatoPratica[]) {
       const p = percorsoPratica(stato, [], null);
-      expect(p.riquadri.documentoPasso, stato).toBe(false);
       expect(p.riquadri.documentoExtra, stato).toBe(false);
       expect(p.riquadri.rifiuto, stato).toBe(false);
       expect(p.attivo, stato).toBe("chiusa");
@@ -112,18 +129,59 @@ test.describe("Il muro dei documenti sta al suo posto", () => {
   });
 });
 
-test.describe("Non si dichiara un fatto non avvenuto", () => {
-  test("«Ho inviato il reclamo» non compare se la lettera è ancora chiusa", () => {
-    const p = percorsoPratica("pagata", [], null);
-    expect(p.riquadri.letteraApribile).toBe(false);
-    expect(p.riquadri.confermaInvio).toBe(false);
-    expect(p.riquadri.istruzioni).toBe(false);
+test.describe("I testi raccontano i fatti, non il calendario", () => {
+  /* 🔴 Valerio ha dichiarato il no della compagnia CINQUE MINUTI dopo aver
+     mandato il reclamo, e la pagina gli ha risposto «Sollecito. Sei
+     settimane, nessuna risposta». Falsa in tre punti su tre.
+     La causa: allo stato `sollecito` si arriva in due modi opposti (per
+     silenzio o perche' hanno risposto), e un nome solo per due fatti
+     diversi produce per forza un testo sbagliato su uno dei due. */
+
+  test("il no dichiarato non si racconta come silenzio", () => {
+    expect(percorsoPratica("inviata", [], "sciopero_esterno").chiaveTesto).toBe("risposta_no");
+    expect(percorsoPratica("sollecito", [], "sciopero_esterno").chiaveTesto).toBe("risposta_no");
   });
 
-  test("appena la lettera si apre, il bottone c'è", () => {
-    const p = percorsoPratica("pagata", [evento(EVENTO_SALTATO)], null);
+  test("il silenzio vero resta silenzio", () => {
+    expect(percorsoPratica("inviata", [], null).chiaveTesto).toBe("inviata");
+    expect(percorsoPratica("sollecito", [], null).chiaveTesto).toBe("sollecito");
+  });
+
+  test("ogni chiave ha il suo testo, se no la pagina resta muta", () => {
+    /* ⚠️ Si legge il sorgente invece di importare COPY: `lib/copy.ts`
+       tira dentro moduli con l'alias `@/`, che il caricatore delle prove
+       non risolve. Vale come controllo: se un domani si aggiunge una
+       chiave di testo senza scriverne il testo, la pagina mostra il nome
+       tecnico dello stato al cliente. */
+    const copy = readFileSync(join(__dirname, "..", "lib/copy.ts"), "utf8");
+    for (const chiave of ["risposta_no", "sollecito", "inviata", "pagata", "enac"]) {
+      expect(copy, `manca il testo per ${chiave}`).toMatch(new RegExp(`\\n\\s+${chiave}: \\{`));
+    }
+  });
+});
+
+test.describe("Non si dichiara un fatto non avvenuto", () => {
+  test("appena la pratica e' pagata, lettera, istruzioni e bottone stanno insieme", () => {
+    /* ⚠️ Prima questa prova pretendeva il contrario: che senza documento
+       la lettera fosse chiusa e il bottone spento. Il muro e' stato tolto
+       il 13/08 (scelta di Valerio col popup) perche' arrivava un secondo
+       dopo il pagamento e contraddiceva la riga sopra, che diceva di
+       aprire la lettera. Adesso le tre cose compaiono insieme: o c'e'
+       tutto il gesto, o non c'e' niente. Una pagina che mostra le
+       istruzioni per mandare una lettera che non si apre e' rotta. */
+    const p = percorsoPratica("pagata", [], null);
+    expect(p.riquadri.letteraApribile).toBe(true);
     expect(p.riquadri.confermaInvio).toBe(true);
     expect(p.riquadri.istruzioni).toBe(true);
+  });
+
+  test("le istruzioni non compaiono mai senza la lettera apribile", () => {
+    const stati: StatoPratica[] = ["creata", "pagata", "pronta", "inviata", "sollecito", "enac"];
+    for (const stato of stati) {
+      const r = percorsoPratica(stato, [], null).riquadri;
+      if (r.istruzioni) expect(r.letteraApribile, stato).toBe(true);
+      if (r.confermaInvio) expect(r.letteraApribile, stato).toBe(true);
+    }
   });
 
   test("dopo l'invio il bottone sparisce: non si invia due volte", () => {

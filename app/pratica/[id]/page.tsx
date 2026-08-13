@@ -17,6 +17,10 @@ import { costruisciDossier, type VoloDossier } from "@/lib/pratiche/dossier";
 import { colonnaMancante } from "@/lib/supabase/colonne";
 import { caricaPratica, eventiPratica, type StatoPratica } from "@/lib/pratiche/pratiche";
 import { percorsoPratica } from "@/lib/pratiche/passi";
+import {
+  EVENTO_ANALISI_RIFIUTO,
+  EVENTO_TESTO_RIFIUTO,
+} from "@/lib/pratiche/dossier";
 import { GIORNI_PRIMA_DEL_SOLLECITO, schedaRifiuto } from "@/lib/pratiche/rifiuto";
 /* Il tempo viene tutto da un posto solo: fusi, giorni di calendario e
    giorni della settimana. Vedi lib/tempo.ts. */
@@ -40,6 +44,10 @@ export const metadata: Metadata = {
 };
 
 type VoloBreve = { volo_iata: string; data_locale: string };
+
+/** Gli eventi che servono a noi e non dicono niente a chi ha pagato.
+ *  Restano nel database e nel fascicolo; fuori dalla cronologia. */
+const EVENTI_TECNICI = new Set<string>([EVENTO_TESTO_RIFIUTO, EVENTO_ANALISI_RIFIUTO]);
 
 /* 🔴 QUI C'ERANO TRE LISTE DI STATI SCRITTE A MANO (`CONFERMABILE`,
    `DICHIARABILE`, `CON_LETTERA`), una accanto al riquadro che
@@ -166,16 +174,33 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
   const eventi = await eventiPratica(pratica.id);
 
   const C = COPY.pratica;
-  const stato = C.stati[pratica.stato] ?? null;
   const etichetteEventi: Record<string, string> = C.lineaTempo.eventi;
   /* Un posto solo decide cosa è fatto, cosa si fa adesso e cosa dopo.
      La pagina qui sotto non fa più ragionamenti suoi. */
   const percorso = percorsoPratica(pratica.stato, eventi, pratica.rifiuto_motivo ?? null);
   const R = percorso.riquadri;
+  /* 🔴 I TESTI NON SI SCELGONO PIÙ CON LO STATO DEL DATABASE. Allo stato
+     `sollecito` ci si arriva per silenzio (sei settimane) o perché la
+     compagnia ha risposto no: due fatti opposti, un nome solo. Chi
+     dichiarava il no cinque minuti dopo l'invio leggeva «Sei settimane,
+     nessuna risposta» (Valerio, 13/08). Adesso decide `chiaveTesto`, che
+     guarda cosa è SUCCESSO. Vedi lib/pratiche/passi.ts. */
+  const stato = C.stati[percorso.chiaveTesto] ?? C.stati[pratica.stato] ?? null;
   const attesa = attesaDopoInvio(pratica.inviata_il, pratica.stato);
   /* IL FASCICOLO (scelta di Valerio col popup, 13/08). Lo stesso che
      legge l'AI prima di scrivere una replica: se lo mostriamo a lei e non
      a lui, la trasparenza che vendiamo si ferma alla porta di casa. */
+  /* 🔴 LA CRONOLOGIA MOSTRAVA IL CODICE DELL'AI. Valerio, 13/08: un suo
+     clic solo («hanno risposto no») produceva quattro righe, e due erano
+     `rifiuto_testo` e `rifiuto_analisi`, cioè il testo grezzo dell'email e
+     un blocco JSON con dentro il ragionamento del modello. Un cliente che
+     apre la sua pratica e trova del codice smette di crederci.
+     Quei due eventi restano scritti nel database e restano nel FASCICOLO,
+     che è il posto dove hanno senso: lì si legge la loro risposta e cosa
+     ne abbiamo capito. Nella cronologia no: lì ci vanno i fatti, uno per
+     gesto. Scelta di Valerio col popup, 13/08. */
+  const eventiVisibili = eventi.filter((e) => !EVENTI_TECNICI.has(e.tipo));
+
   const dossier = costruisciDossier({
     pratica,
     volo,
@@ -337,19 +362,13 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
       </section>
 
       {/* ------------------------------------------------ i documenti.
-          Sta QUI, prima delle istruzioni d'invio, perché finché la lettera
-          non è partita è il passo 1.
-          ⚠️ DOPO L'INVIO IL RIQUADRO CAMBIA MESTIERE, non resta uguale:
-          la carta d'imbarco serve ancora (rafforza il sollecito) ma non è
-          più «passo 1 di 2», perché la lettera è già uscita di casa. Era
-          il difetto della schermata 2 del 13/08. */}
-      {(R.documentoPasso || R.documentoExtra) && (
-        <CaricaDocumento
-          praticaId={pratica.id}
-          bloccante={R.documentoPasso}
-          dopoInvio={R.documentoExtra}
-        />
-      )}
+          ⚠️ NON È PIÙ UN PASSO, e non blocca più niente (scelta di Valerio
+          col popup, 13/08). Era «PASSO 1 DI 2» e teneva grigio il bottone
+          della lettera un secondo dopo il pagamento: la pagina ti diceva
+          di aprire la lettera e non te la faceva aprire.
+          Adesso è un rinforzo che si propone dopo, con scritto quanto
+          pesa davvero, e sta SOTTO il gesto che porta i soldi a casa. */}
+      {R.documentoExtra && <CaricaDocumento praticaId={pratica.id} />}
 
       {/* ---------------------------------------------- il fascicolo */}
       <Fascicolo dossier={dossier} />
@@ -382,15 +401,15 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
       {/* ------------------------------------------------ la cronologia */}
       <section className="rounded-2xl border border-bordo bg-white px-6 py-6">
         <h2 className="font-display text-lg tracking-[-0.03em]">{C.lineaTempo.titolo}</h2>
-        {eventi.length === 0 ? (
+        {eventiVisibili.length === 0 ? (
           <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{C.lineaTempo.vuota}</p>
         ) : (
           <>
             <ol className="mt-5 flex flex-col">
-              {eventi.map((evento, i) => (
+              {eventiVisibili.map((evento, i) => (
                 <li key={evento.id} className="relative flex gap-4 pb-6 last:pb-0">
                   {/* il filo che unisce i punti; l'ultimo non lo tira oltre */}
-                  {i < eventi.length - 1 && (
+                  {i < eventiVisibili.length - 1 && (
                     <span
                       aria-hidden="true"
                       className="absolute top-4 left-[5px] h-full w-px bg-bordo"
@@ -399,14 +418,21 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
                   <span
                     aria-hidden="true"
                     className={`relative mt-1.5 size-[11px] shrink-0 rounded-full ${
-                      i === eventi.length - 1
+                      i === eventiVisibili.length - 1
                         ? "bg-verde shadow-[0_0_0_4px_var(--color-menta-tenue)]"
                         : "border-2 border-verde/50 bg-white"
                     }`}
                   />
                   <div className="min-w-0">
                     <p className="text-[0.95rem] font-medium leading-snug">
-                      {etichetteEventi[evento.tipo] ?? evento.tipo}
+                      {/* ⚠️ Il passaggio a `sollecito` si chiama così anche
+                          quando ci si arriva perché hanno RISPOSTO: nella
+                          cronologia diventerebbe «Sollecito pronto» sotto
+                          la riga «hanno risposto no», che è la stessa
+                          confusione fra calendario e fatti. */}
+                      {evento.tipo === "sollecito" && pratica.rifiuto_motivo
+                        ? C.lineaTempo.replicaPronta
+                        : (etichetteEventi[evento.tipo] ?? evento.tipo)}
                     </p>
                     <p className="numeri mt-0.5 text-xs text-fumo-2">
                       {dataOraIt(evento.creato_il)}

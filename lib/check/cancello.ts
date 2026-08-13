@@ -175,6 +175,58 @@ export async function creditoFinito(pass: Pass): Promise<boolean> {
 }
 
 /**
+ * 🔴 QUESTA ANALISI L'HA GIÀ PAGATA, PER QUESTO STESSO VOLO?
+ *
+ * Valerio, 13/08: «un utente paga mentre fa l'analisi, lì si refresha il
+ * browser. Da quanto vedo io adesso gli fa ripagare per forza».
+ *
+ * Aveva ragione, e il difetto era nella cosa che si conta. Il credito si
+ * consumava a ogni ANALISI, e ogni analisi scrive una riga nuova: quindi
+ * ricaricare la pagina sullo stesso volo, tornare indietro col tasto del
+ * browser, riaprire il link dopo che il telefono si è spento, o
+ * semplicemente rifare lo stesso check dieci minuti dopo, mangiava un
+ * secondo credito e portava al muro. Chi aveva pagato per sapere del suo
+ * volo si ritrovava a dover pagare di nuovo per lo stesso volo.
+ *
+ * Ma quello che uno compra non è "un'esecuzione del programma": è la
+ * risposta su QUEL volo. Quindi il conto si tiene per volo e data: la
+ * prima volta si paga, tutte le altre volte su quello stesso volo sono
+ * gratis e per sempre, dentro la durata della ricevuta.
+ *
+ * ⚠️ Non è un buco: per analizzare un volo DIVERSO serve un credito
+ * diverso, ed è quello che stiamo vendendo. Qui si regala solo la
+ * ripetizione di una risposta già data e già pagata.
+ */
+export async function analisiGiaPagata(
+  pass: Pass,
+  voloIata: string,
+  dataLocale: string,
+): Promise<boolean> {
+  if (!SERVIZIO_ATTIVO) return false;
+  try {
+    const { count, error } = await supabaseServizio()
+      .from("verifiche")
+      .select("id", { count: "exact", head: true })
+      .eq("ordine_check", pass.ordine)
+      .eq("volo_iata", voloIata.trim().toUpperCase())
+      .eq("data_locale", dataLocale);
+    if (error) {
+      /* Nel dubbio si lascia passare: il rischio è regalare un'analisi,
+         e l'altro è far ripagare una persona che ha già pagato. Fra i
+         due, il secondo è quello che costa un cliente. */
+      if (!colonnaMancante(error.message)) {
+        console.error("[cancello] registro non leggibile:", error.message);
+      }
+      return false;
+    }
+    return (count ?? 0) > 0;
+  } catch (e) {
+    console.error("[cancello] registro non leggibile:", e);
+    return false;
+  }
+}
+
+/**
  * Scrive nel registro che questa analisi è stata consumata da quest'ordine.
  * Se fallisce lo dice forte: senza questa riga la stessa ricevuta si
  * potrebbe riusare, ed è il buco che il registro esiste per chiudere.
