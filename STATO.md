@@ -1,7 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-13 (giro #64: il collaudo di dieci voli sul sito
-vero, e i sei difetti che ha trovato · giro #63: i nove punti del collaudo di
+**Aggiornato:** 2026-08-13 (giro #65: il freno, un tetto sulla spesa ·
+giro #64: il collaudo di dieci voli sul sito vero, e i sei difetti che ha
+trovato · giro #63: i nove punti del collaudo di
 Valerio, dalle email finte ai paletti della pratica, più l'AI che legge
 la risposta della compagnia e la pagina che spiega il motore · giro #62:
 il pagamento che finiva su localhost, il tempo in un posto solo,
@@ -22,6 +23,53 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #65 (13/08): IL FRENO. Un tetto sulla SPESA, non solo per
+  persona.**
+  - 🔴 **IL FRENO PER IP NON PROTEGGE IL PORTAFOGLIO.** Conta le
+    richieste di UN indirizzo dentro UNA copia della funzione: chi vuole
+    farci male usa cento indirizzi (costano pochi euro) e ognuno resta
+    educatamente sotto il suo tetto. Il freno non se ne accorge nemmeno,
+    e intanto ogni volo nuovo è una chiamata al fornitore che paghiamo
+    noi. Il freno condiviso su Upstash chiuderebbe metà del problema, ma
+    è **spento** finché non c'è l'account, e resta comunque un tetto per
+    persona.
+  - **NASCE IL TETTO SULLA SPESA** (`lib/api/tetto-fornitore.ts`):
+    quante chiamate al fornitore si fanno in un'ora, in tutto il sito,
+    senza guardare chi chiama. Sopra il tetto i check escono incerti fino
+    all'ora dopo e arriva un TIN sul telefono. **Mille all'ora**, si
+    cambia con `TETTO_FORNITORE_ORA` su Netlify.
+    ⚠️ **Funziona già adesso**, senza configurare niente: il conto lo
+    tiene il database che abbiamo già. Migrazione applicata sul Supabase
+    vero (`consumo_fornitore` + `segna_chiamata_fornitore`), scritta
+    anche in `DA-APPLICARE.sql` al punto 7.
+  - **Sta dentro la funzione che parla col fornitore, non nelle rotte.**
+    Da lì non si scappa: ci passano il check, le tre rotte del seguito e
+    il lavoro notturno degli avvisi. Un tetto scritto rotta per rotta è
+    un tetto che la rotta numero sei non ha. I ritentativi non contano
+    doppio.
+  - ⚠️ **IL CONTATORE NON TIENE TRACCIA DI NESSUNO**: nella riga c'è
+    l'ora e un numero, nessun indirizzo IP. È la regola del registro
+    (giro #56) e qui vale doppio, perché un contatore per IP sarebbe
+    l'unico posto del sito dove teniamo traccia di chi passa. Una prova
+    lo vieta.
+  - ⚠️ **Sbaglia dalla parte di chi paga**: se il conto non si può fare
+    (database giù, tabella non ancora creata) non si blocca nessuno.
+  - **Provato sul sito vero, non solo a parole**: un check reale ha
+    portato il contatore da 0 a 1; col tetto forzato a 1001 un volo nuovo
+    esce incerto **mentre un volo già in archivio risponde lo stesso**
+    (1,5 secondi, verdetto vero). Cioè sotto attacco chi controlla un
+    volo già noto continua a essere servito: a fermarsi è solo quello che
+    costa. Contatore rimesso al valore vero dopo la prova.
+  - **Tre buchi chiusi strada facendo:** `cancellato`, `dichiara` e
+    `operativo` chiamano il fornitore e avevano ancora il freno debole;
+    e 🔴 **la cassa di prova, che stampa le ricevute, non aveva NESSUN
+    freno**. Con la cassa aperta a tutti bastava chiamarla in ciclo per
+    avere ricevute a volontà, e ogni ricevuta manda un TIN: mille
+    ricevute sono mille messaggi, cioè un canale che si silenzia e non
+    suona più il giorno che serve.
+  - Prove: **1446 verdi**, 6 saltate, zero rosse. Le 6 nuove stanno in
+    `prove/freno.spec.ts`, e una gira tutte le rotte dell'API: se una
+    nuova tocca il fornitore senza una porta chiusa, la suite si ferma.
 - **GIRO #64 (13/08): DIECI VOLI SUL SITO VERO, DAL MODULO ALLA REPLICA.**
   Cinque dimostrativi e cinque veri, ognuno da una finestra pulita, senza
   scorciatoie: muro, cassa, verdetto, email, pratica, lettera. Sei
