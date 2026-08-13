@@ -66,7 +66,7 @@ export default function CampoAeroporto({ etichetta, segnaposto, scelto, onScegli
         <View style={stili.sceltoRiga}>
           <View style={stili.sceltoTesti}>
             <Text style={stili.sceltoCitta}>
-              {scelto.citta} <Text style={stili.sceltoCodice}>{scelto.iata}</Text>
+              {scelto.etichetta} <Text style={stili.sceltoCodice}>{scelto.iata}</Text>
             </Text>
             <Text style={stili.sceltoNome} numberOfLines={1}>
               {scelto.nome}
@@ -119,10 +119,10 @@ export default function CampoAeroporto({ etichetta, segnaposto, scelto, onScegli
             >
               <View style={stili.propostaTesti}>
                 <Text style={stili.propostaCitta} numberOfLines={1}>
-                  {a.citta}
+                  {a.etichetta}
                 </Text>
                 <Text style={stili.propostaNome} numberOfLines={1}>
-                  {a.nome} · {a.paese}
+                  {a.paese}
                 </Text>
               </View>
               <Text style={stili.propostaCodice}>{a.iata}</Text>

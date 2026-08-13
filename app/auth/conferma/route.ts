@@ -3,6 +3,7 @@ import { type EmailOtpType } from "@supabase/supabase-js";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { percorsoInterno } from "@/lib/api/percorso";
+import { versoCasa } from "@/lib/sito";
 
 /**
  * Dove atterra chi clicca il link ricevuto per email.
@@ -40,7 +41,11 @@ function jsSicuro(valore: string): string {
 }
 
 function fallito(request: NextRequest, motivo: string) {
-  const u = new URL("/entra", request.url);
+  /* ⚠️ `versoCasa` e non `request.url`: dietro il proxy di Netlify
+     quest'ultimo e' l'indirizzo interno della copia pubblicata, e
+     cambiare dominio vuol dire perdere i cookie proprio mentre si sta
+     cercando di collegare qualcuno. Vedi lib/sito.ts. */
+  const u = versoCasa("/entra", request);
   u.searchParams.set("errore", motivo);
   return NextResponse.redirect(u);
 }
@@ -74,7 +79,7 @@ export async function GET(request: NextRequest) {
       console.error("[conferma] verifyOtp:", error.message);
       return fallito(request, /expired/i.test(error.message) ? "scaduto" : "link");
     }
-    return NextResponse.redirect(new URL(poi, request.url));
+    return NextResponse.redirect(versoCasa(poi, request));
   }
 
   // ---- forma 2: code (rimbalzo da Supabase)
@@ -85,7 +90,7 @@ export async function GET(request: NextRequest) {
       console.error("[conferma] exchangeCodeForSession:", error.message);
       return fallito(request, /expired/i.test(error.message) ? "scaduto" : "link");
     }
-    return NextResponse.redirect(new URL(poi, request.url));
+    return NextResponse.redirect(versoCasa(poi, request));
   }
 
   /* ---- forma 3: i dati stanno nel frammento (#access_token=...).

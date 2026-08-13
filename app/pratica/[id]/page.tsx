@@ -18,6 +18,9 @@ import { colonnaMancante } from "@/lib/supabase/colonne";
 import { caricaPratica, eventiPratica, type StatoPratica } from "@/lib/pratiche/pratiche";
 import { percorsoPratica } from "@/lib/pratiche/passi";
 import { GIORNI_PRIMA_DEL_SOLLECITO, schedaRifiuto } from "@/lib/pratiche/rifiuto";
+/* Il tempo viene tutto da un posto solo: fusi, giorni di calendario e
+   giorni della settimana. Vedi lib/tempo.ts. */
+import { adesso, dataConGiorno, dataIt, dataOraIt, fraQuanto, giorniFra, giornoPiu } from "@/lib/tempo";
 import { COPY } from "@/lib/copy";
 
 /**
@@ -47,24 +50,6 @@ type VoloBreve = { volo_iata: string; data_locale: string };
    della compagnia. Sono i due difetti che Valerio ha visto il 13/08.
    Adesso decide un file solo: lib/pratiche/passi.ts. */
 
-const dataIt = (iso: string) =>
-  new Date(iso.length === 10 ? `${iso}T12:00:00Z` : iso).toLocaleDateString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "Europe/Rome",
-  });
-
-const dataOraIt = (iso: string) =>
-  new Date(iso).toLocaleString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Europe/Rome",
-  });
-
 /**
  * «Inviato il 12 agosto. Se non rispondono, il sollecito è pronto il 23
  * settembre.» La riga che mancava dopo aver premuto il bottone.
@@ -80,15 +65,24 @@ const dataOraIt = (iso: string) =>
  */
 function attesaDopoInvio(inviataIl: string | null, stato: StatoPratica): string | null {
   if (!inviataIl || stato !== "inviata") return null;
-  const partenza = Date.parse(inviataIl);
-  if (!Number.isFinite(partenza)) return null;
-  const giorno = new Date(partenza + GIORNI_PRIMA_DEL_SOLLECITO * 86_400_000);
-  const passati = Math.floor((Date.now() - partenza) / 86_400_000);
-  const mancano = GIORNI_PRIMA_DEL_SOLLECITO - passati;
+  if (!Number.isFinite(Date.parse(inviataIl))) return null;
+
+  /* ⚠️ GIORNI DI CALENDARIO, non blocchi di 24 ore. Chi manda il reclamo
+     alle 23:50 e riguarda la pagina venti minuti dopo è al giorno DOPO:
+     dividere i millisecondi direbbe che è ancora al giorno zero, e il
+     conto alla rovescia mostrerebbe un giorno in più di quelli veri.
+     Su una data promessa a un cliente pagante si vede. Vedi lib/tempo.ts. */
+  const giorno = giornoPiu(GIORNI_PRIMA_DEL_SOLLECITO, inviataIl);
+  const mancano = giorniFra(adesso(), `${giorno}T12:00:00Z`);
   if (mancano <= 0) return null;
-  return `Inviato il ${dataIt(inviataIl)}. Se restano in silenzio, il sollecito è pronto il ${dataIt(
-    giorno.toISOString(),
-  )}: mancano ${mancano} giorni.`;
+
+  /* Il giorno della settimana lo calcola la data, sempre. Sotto la
+     settimana si dice anche in parole, perché "fra 3 giorni" si colloca
+     senza pensarci. */
+  const parole = fraQuanto(mancano);
+  return `Inviato il ${dataIt(inviataIl)}. Se restano in silenzio, il sollecito è pronto ${dataConGiorno(
+    giorno,
+  )}: ${parole ?? `mancano ${mancano} giorni`}.`;
 }
 
 const riempi = (template: string, valori: Record<string, string>) =>
@@ -424,7 +418,7 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           cima, sotto lo stato. Vedi il commento lassù. */}
 
       {/* ------------------------------------------------ la scadenza stimata */}
-      {pratica.scadenza_stimata && (
+      {pratica.scadenza_stimata && R.scadenza && (
         <section className="rounded-2xl border border-bordo bg-white px-6 py-5">
           <h2 className="font-display text-lg tracking-[-0.03em]">{C.scadenza.titolo}</h2>
           <p className="numeri mt-2 text-[0.95rem] leading-relaxed">

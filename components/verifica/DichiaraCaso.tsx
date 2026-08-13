@@ -23,7 +23,9 @@ const T = COPY.risultato.dichiara;
 const CURVA = [0.16, 1, 0.3, 1] as const;
 
 type Esito = { esito: "idoneo" | "incerto" | "non_idoneo"; motivo: string; importo?: number };
-type Scalo = { iata: string; citta: string; nome: string };
+/* Come lo manda /api/aeroporti. `etichetta` è il nome pronto da
+   mostrare: "Milano Malpensa". Vedi lib/voli/aeroporti.ts. */
+type Scalo = { iata: string; citta: string; nome: string; etichetta: string };
 
 function Scelte<V extends string>({
   domanda,
@@ -114,7 +116,7 @@ function CampoDestinazione({
       {scelto ? (
         <div className="mt-2.5 flex items-center justify-between gap-3 rounded-xl border border-verde bg-menta-tenue px-4 py-2.5">
           <p className="text-[14px] font-medium text-inchiostro">
-            {scelto.citta} <span className="numeri text-[12px] text-fumo">({scelto.iata})</span>
+            {scelto.etichetta} <span className="numeri text-[12px] text-fumo">({scelto.iata})</span>
           </p>
           <button
             type="button"
@@ -149,7 +151,7 @@ function CampoDestinazione({
                     onClick={() => scegli(s)}
                     className="flex w-full items-baseline gap-2 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-menta-tenue"
                   >
-                    <span className="font-medium text-inchiostro">{s.citta}</span>
+                    <span className="font-medium text-inchiostro">{s.etichetta}</span>
                     <span className="truncate text-[12.5px] text-fumo">{s.nome}</span>
                     <span className="numeri ml-auto text-[12px] text-fumo-2">{s.iata}</span>
                   </button>

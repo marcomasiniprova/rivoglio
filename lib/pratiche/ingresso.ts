@@ -33,9 +33,37 @@ import { supabaseServizio } from "@/lib/supabase/servizio";
  * frammento lo sa leggere ed è l'unico punto del sito che lo fa.
  */
 
-/** Dove far atterrare l'utente dopo l'accesso. Solo percorsi interni. */
-function conferma(percorso: string): string {
-  return `${casa()}/auth/conferma?poi=${encodeURIComponent(percorso)}`;
+/**
+ * 🔴 E POI HO ROTTO IO IL PAGAMENTO, il 12/08 sera. Valerio preme «Paga
+ * 14,90 e genera la pratica» dal telefono e si ritrova su
+ * `localhost:3000`, cioè su niente.
+ *
+ * Il motivo. La prima versione di questo file usava `action_link`, cioè
+ * l'indirizzo di Supabase che consuma il gettone e POI rimbalza dove
+ * gli abbiamo detto. Ma Supabase quel rimbalzo lo fa solo se
+ * l'indirizzo è nella sua lista bianca; se non c'è, non dà errore:
+ * **scarica l'utente sul "Site URL" del progetto**, che di default è
+ * `http://localhost:3000`. In locale non si vede, perché lì localhost è
+ * davvero il sito.
+ *
+ * ⚠️ La lezione vale oltre questo caso: un rimbalzo che passa da un
+ * servizio esterno dipende da un'impostazione che vive in un pannello,
+ * non nel repository. Nessuna prova la vede, nessuna revisione la
+ * legge, e si rompe il giorno del dominio nuovo.
+ *
+ * Adesso da Supabase si prende **solo il gettone** (`hashed_token`) e
+ * l'indirizzo lo costruiamo noi su casa nostra: chi lo apre arriva su
+ * `/auth/conferma`, che il gettone lo sa consumare da sé
+ * (`verifyOtp`). Nessun rimbalzo esterno, nessuna lista bianca, e il
+ * link non può più portare da nessun'altra parte che qui.
+ */
+function ingressoNostro(token: string, percorso: string): string {
+  const p = new URLSearchParams({
+    token_hash: token,
+    type: "magiclink",
+    poi: percorso,
+  });
+  return `${casa()}/auth/conferma?${p}`;
 }
 
 /**
@@ -84,13 +112,20 @@ export async function linkDiIngresso(email: string, percorso: string): Promise<s
     const { data, error } = await db.auth.admin.generateLink({
       type: "magiclink",
       email,
-      options: { redirectTo: conferma(percorso) },
+      /* `redirectTo` resta, ma non ci contiamo più: serve solo a chi
+         aprisse per sbaglio l'action_link. La strada vera è il gettone
+         qui sotto. */
+      options: { redirectTo: `${casa()}/auth/conferma` },
     });
     if (error) {
       console.error("[ingresso] link di accesso non generato:", error.message);
       return semplice;
     }
-    return data.properties?.action_link || semplice;
+    const gettone = data.properties?.hashed_token;
+    /* Senza gettone si torna all'indirizzo semplice, che vuol dire
+       passare dal login: una scocciatura, non un vicolo cieco. Mai
+       l'action_link, che è quello che scaricava su localhost. */
+    return gettone ? ingressoNostro(gettone, percorso) : semplice;
   } catch (e) {
     console.error("[ingresso] link di accesso non generato:", e);
     return semplice;

@@ -1,63 +1,13 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-13 (giro #62: i nove punti del collaudo di
+**Aggiornato:** 2026-08-13 (giro #63: i nove punti del collaudo di
 Valerio, dalle email finte ai paletti della pratica, più l'AI che legge
-la risposta della compagnia e la pagina che spiega il motore · giro #58: il retrobottega diventa un
-gestionale, con la barra laterale e i grafici · giro #57: il pannello
-non si apriva perché
-Valerio non aveva il ruolo admin, e i cancelletti spariscono
-dall'indirizzo · giro #56: IL CRUSCOTTO E IL TIN, cioè vedere
-in tempo reale chi arriva, dove si ferma e chi paga, col telefono che
-squilla sui soldi e sui guasti · giro #55: le tre email ai venditori
-SPEDITE, la cassa finta visibile, il blog da cui si esce, le impostazioni
-che si spiegano da sole · giro #54: I QUATTRO TAPPI DEL LANCIO, il
-database completo e collaudato online, le quattro email ai venditori, un
-errore vero nelle citazioni delle sentenze, la coda con ritentativo ·
-giro #53: IL MURO NON SI APRIVA SOLO SULLA
-PORTA PRINCIPALE, tre buchi chiusi, e le 60 promesse di gratis legate
-all'interruttore · giro #52: IL CHECK SI PAGA, deciso da
-Valerio: 1,99 di lancio col totale che resta 14,90, tutto spento dietro
-un interruttore · lo scroll pesante · giro #51: TUTTE E 34 LE SCHERMATE SULLA
-LAVAGNA col 404 chiuso alla radice, l'autopilot che ha girato per la
-prima volta (+2.943 scali) e la rifinitura in tre pezzi · giro #50: LA LAVAGNA DELL'APP, tutte le
-schermate su un tavolo che si trascina, più la pratica messa al riparo
-dalla quinta migrazione non ancora applicata · giro #49: L'APP MIGRA AL DESIGN DELLA TAVOLA
-DEFINITIVA, terza ondata: la migrazione è COMPLETA per tutto ciò che è
-onesto costruire oggi · giro #48: IL QUARTO COLPO, cioè quello che i
-soldi li muove davvero, più la riforma del 2027 scritta e messa in
-calendario · giro #47: LA SVIZZERA VERIFICATA, non più un
-punto interrogativo · giro #46: IL GIRO DA UTENTE CRITICO, tre
-difetti veri trovati e chiusi · il titolo della hero ha il font del
-Tabellone · giro #45: IL DOPO-LETTERA, cioè il secondo e
-il terzo colpo quando la compagnia dice no · ramo unito a main · giro #44: IL MOTORE CHE NON LASCIA PIÙ NESSUNO
-SENZA RISPOSTA (la cache che congelava gli incerti, gli aeroporti che si
-aggiornano da soli, i vettori extra UE, il codeshare che si chiede) ·
-giro #43: IL CANCELLO TERRITORIALE LASCIAVA SOLDI
-SUL TAVOLO, chiuso · giro #42: LE FOTO VERE sulle copertine del blog ·
-giro #41: LE PAGINE EVENTO e l'autopilot degli
-scioperi · giro #40: IL TABELLONE, il blog · più un
-falso positivo sull'IMPORTO chiuso nel motore (art. 7 lett. b) ·
-giro #39: test dei due prezzi · giro #38: garanzia legata all'ESITO invece
-che ai 90 giorni, enti nazionali per paese di partenza nella lettera,
-l'app ha finalmente i casi cancellato/negato imbarco/coincidenza persa ·
-giro #37: cancello territoriale, chiuso un falso positivo vero (New York
-→ Toronto usciva idoneo a 600€), banco di prova coi 30 casi reali, ricerca
-su archivi, conversione e mercato · giro #36: repo BLINDATA — rate limit e
-CORS chiusa su /api/verifica e tutte le rotte, poi= reso a prova di
-open-redirect E di XSS in auth/conferma, header di sicurezza CSP ovunque,
-strato anti-copia; banconote del confronto RIFATTE pulite (le vere hanno
-"specimen" per legge, ora sono 100€ disegnate da noi), animazione più
-lunga e umana, barra grigia tolta dalle scadenze, busta email 3D verde,
-landing riordinata · giro #35: Rivoglio estinto anche nei
-lockup spezzati e nel mockup, negato imbarco e coincidenza persa con
-verdetto, banconote VERE nel confronto, aerei in volo sulle scadenze,
-Entra dritto al login, ritardo in parole · giro #34: il marchio è RIVOLIO, i voli
-cancellati hanno un verdetto vero, social veri, velo nero tolto · giro #33: firma del footer a tutta larghezza,
-mano che entra in scena, check gratis con la sua scheda, confronto con le
-banconote, casella che si cerca da sola, barre della scadenza, sezioni
-"Cosa copre" e "Chi fa cosa" dal feedback esterno · giro #32: mockup del footer con l'app VERA,
-monumenti sulle card dell'Osservatorio, doppio opt-in con conferma e
-disdetta, tasti muti dell'anteprima app, skill copertura-prompt)
+la risposta della compagnia e la pagina che spiega il motore · giro #62:
+il pagamento che finiva su localhost, il tempo in un posto solo,
+l'archivio chiuso a 85 compagnie e 9.016 scali · giro #58: il retrobottega
+diventa un gestionale · giro #57: il pannello non si apriva perché
+Valerio non aveva il ruolo admin · giro #56: il cruscotto e il TIN ·
+giro #52: il check si paga · giro #45: il dopo-lettera)
 **RIVOLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
 Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
 verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
@@ -71,7 +21,7 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
-- **GIRO #62 (13/08): I NOVE PUNTI DEL COLLAUDO DI VALERIO.** Aperti
+- **GIRO #63 (13/08): I NOVE PUNTI DEL COLLAUDO DI VALERIO.** Aperti
   provando una pratica vera dalla web app. Tutti chiusi, più tre difetti
   veri trovati strada facendo che lui non aveva visto.
   - 🔴 **GLI ACCOUNT NASCEVANO CON EMAIL FINTE, TEMPORANEE E SCRITTE
@@ -205,6 +155,79 @@ social rifatta (era rimasta al prodotto viaggi).
     cui è nata («ogni rotta che ci costa soldi passa dal cancello»):
     l'esenzione è scritta col motivo, perché il suo cancello è più
     stretto di quello del check, non più largo.
+- **GIRO #62 (12-13/08): IL PAGAMENTO CHE FINIVA SU `localhost`, IL TEMPO
+  IN UN POSTO SOLO, E L'ARCHIVIO CHIUSO (85 compagnie, 9.016 scali).**
+  - 🔴 **«PAGA 14,90» PORTAVA SU `localhost:3000`, ed era colpa mia.** Il
+    link di accesso introdotto poche ore prima passava dal **rimbalzo di
+    Supabase**, e Supabase quel rimbalzo lo fa solo se l'indirizzo è
+    nella sua lista bianca: se non c'è **non dà errore**, scarica
+    l'utente sul "Site URL" del progetto, che di default è
+    `http://localhost:3000`. In locale non si vede mai, perché lì
+    localhost è davvero il sito.
+    Adesso da Supabase si prende **solo il gettone** e l'indirizzo lo
+    costruiamo noi: nessun rimbalzo esterno, nessuna impostazione in un
+    pannello che possa rompere il pagamento.
+    ⚠️ La lezione oltre il caso: un pezzo di percorso che dipende da una
+    casella in un pannello non lo vede nessuna prova e non lo legge
+    nessuna revisione. Si rompe il giorno del dominio nuovo.
+    Chiusa la stessa famiglia in `/auth/conferma` e `/auth/sessione`,
+    che costruivano i rimandi da `request.url`.
+  - **IL TEMPO VIENE DA UN POSTO SOLO** (`lib/tempo.ts`), su richiesta di
+    Valerio («c'è un orario corretto? nessuna data o conto cannato?»).
+    🔴 **E cercando è saltato fuori un difetto che nessuno avrebbe visto
+    fino a fine ottobre**: il riepilogo della sera su Telegram era
+    programmato alle 19 UTC «cioè le 21 in Italia». Vero da marzo a
+    ottobre; con l'ora solare sarebbero state le **20**, per sei mesi,
+    senza che nessun allarme suonasse. Il cron di Netlify conosce solo
+    l'UTC: adesso suona a entrambe le ore e la funzione si spegne da sola
+    se in Italia non sono le 21.
+    Le tre regole: le date che vede una persona si scrivono in **ora
+    italiana** (a mezzanotte e mezza l'UTC dice ancora il giorno prima);
+    i giorni si contano sul **calendario**, non a colpi di 24 ore; il
+    **giorno della settimana lo calcola la data**, sempre, e una prova
+    boccia qualunque file che lo nomini senza derivarlo.
+  - **LA PRATICA RIORDINATA** (quattro scelte col popup): i documenti
+    sono il **passo 1** e la lettera si apre dopo (col muro anche sul
+    server, non solo sul bottone); la garanzia è **una riga in cima**;
+    dopo «Ho inviato il reclamo» c'è il **conto alla rovescia** col
+    giorno vero e parte un'**email di conferma**; dopo l'invio spariscono
+    le istruzioni d'invio e la scadenza stimata.
+    ⚠️ Il passo 1 ha una **porta di servizio**, e non è un modo di
+    aggirare la scelta: a quel punto il cliente **ha già pagato**, e un
+    muro che non riesce a superare è un prodotto venduto e non
+    consegnato.
+  - **COMPAGNIE: da 20 a 85 in cinque giri.** Ognuna cercata **filtrando
+    sul dominio ufficiale**. Tre pubblicano un'email vera (Kuwait, Royal
+    Jordanian, Azerbaijan): lì il bottone apre la posta.
+    ⚠️ **Cinque esclusioni dichiarate:** PLAY e Air Moldova hanno chiuso,
+    Hi Fly vola in wet lease e i biglietti non li vende, Southwest fa
+    solo voli interni agli USA, EgyptAir non pubblica nessun canale.
+    🔴 **Due difetti trovati dalle prove, non leggendo il codice:**
+    cercando **«Iberia» non si trovava Iberia** (le chiavi di nome erano
+    vuote di proposito, per non pescare Iberia Express: giusta la
+    prudenza, non il prezzo; risolto col confronto esatto); e **«Malta
+    Air» sta dentro «KM Malta Airlines»**, quindi accorciando una chiave
+    il reclamo di un passeggero KM sarebbe partito verso Ryanair.
+  - **AEROPORTI, i tre buchi chiusi:**
+    - **I nomi**: si mostrava il comune, e dall'aggiornamento del 10/08
+      Malpensa era **«Ferno»**. Adesso «Milano Malpensa», «Parigi Charles
+      de Gaulle», «Monaco di Baviera». Due difetti trovati dalle prove:
+      tagliando «la prima parola» sparivano **Fiumicino** da Roma e
+      **Le** da Le Bourget; e **«Romeo» veniva scambiato per «Rome»**.
+    - **I fusi**: mancavano su **3.500 scali su 9.016, Doha compresa**.
+      Adesso ne mancano **2**, zero fra i grandi. Non inventati: si
+      deducono dall'archivio stesso (paese a fuso unico, altrimenti lo
+      scalo più vicino) e ogni riga riempita porta `tzDedotto: true`.
+      ⚠️ **Correzione a quanto avevo scritto io**: il fuso **non cambia
+      nessun verdetto**, il ritardo si calcola sugli orari UTC del
+      fornitore. Far uscire incerti quei voli avrebbe ucciso vendite
+      per niente.
+    - **La ricerca** mostra solo i **4.560 scali con voli di linea**: le
+      4.456 piste private restano in archivio per le distanze e per il
+      cancello territoriale, spariscono solo dal campo di ricerca.
+  - Prove: **1162 verdi**, 6 saltate, zero rosse. Le nuove stanno in
+    `prove/tempo.spec.ts`, `prove/documenti.spec.ts` e
+    `prove/aeroporti.spec.ts`.
 - **GIRO #61 (12/08): IL DESTINATARIO C'È SEMPRE.** Cinque punti alzati da
   Valerio aprendo una pratica vera, tutti chiusi.
   - 🔴 **«IL DESTINATARIO NON C'È PERCHÉ?»** Non era pigrizia:
@@ -268,6 +291,32 @@ social rifatta (era rimasta al prodotto viaggi).
     niente e non lo trova nessuno, finché non lo trova un cliente.
   - Prove: **1084 verdi**, 6 saltate, zero rosse. Le 26 nuove stanno in
     `prove/destinatario.spec.ts`.
+  - **SECONDA ONDATA, la pagina della pratica riordinata** (quattro
+    scelte di Valerio col popup):
+    - **I DOCUMENTI SONO IL PASSO 1**: la lettera si apre dopo aver
+      caricato la carta d'imbarco. Il muro sta **anche sul server**, non
+      solo sul bottone: quell'indirizzo si digita e sta nei segnalibri.
+      ⚠️ **Con una porta di servizio**, e non è un modo di aggirare la
+      scelta: a quel punto il cliente **ha già pagato**, e un muro che
+      non riesce a superare è un prodotto venduto e non consegnato. Chi
+      dichiara di non avere i documenti passa con un clic in più, e
+      resta scritto in cronologia. Una prova la difende per sempre.
+    - **La garanzia è una riga in cima**, sotto lo stato, invece di un
+      riquadro verde scuro a metà pagina.
+    - **Dopo «Ho inviato il reclamo» si sa cosa succede**: in pagina il
+      conto alla rovescia col giorno vero del sollecito, e un'email che
+      mette per iscritto le due strade (silenzio fino a quella data,
+      oppure un no che apre subito la replica).
+      ⚠️ Il giorno non è scritto a mano da nessuna parte: si conta da
+      `GIORNI_PRIMA_DEL_SOLLECITO`. Una prova vieta di scriverlo a mano.
+    - Il bottone della lettera **si spegne, non sparisce**: uno che
+      sparisce fa pensare di aver comprato una cosa che non c'è.
+    - ⚠️ **La pagina vera non l'ha vista nessuno**: sta dietro il login e
+      qui Supabase non risponde. I pezzi nuovi sono stati guardati a
+      390, 768 e 1440 con una pagina di prova **temporanea, poi
+      cancellata** (controllato che non resti traccia). Zero errori in
+      console, nessuno scorrimento orizzontale.
+    - Prove: **1100 verdi**, 6 saltate, zero rosse.
 - **GIRO #58 (11/08 notte): IL RETROBOTTEGA DIVENTA UN GESTIONALE.**
   «La parte admin è inguardabile, sviluppala come un software
   gestionale, sezioni a LATO non sopra» (richiesta di Valerio, con

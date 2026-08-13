@@ -71,6 +71,15 @@ export type Riquadri = {
   rifiuto: boolean;
   /** Le istruzioni su come si manda. */
   istruzioni: boolean;
+  /**
+   * La scadenza per fare causa.
+   *
+   * ⚠️ Sparisce appena il reclamo è partito (richiesta di Valerio,
+   * 12/08). Serviva a decidere di non rimandare; dopo l'invio la
+   * decisione è presa, e resterebbe solo una data in più da leggere in
+   * una pagina che deve dire una cosa sola: a che punto siamo.
+   */
+  scadenza: boolean;
 };
 
 export type Percorso = {
@@ -217,6 +226,7 @@ export function percorsoPratica(
       confermaInvio: (stato === "pagata" || stato === "pronta") && letteraApribile,
       rifiuto: stato === "inviata" || stato === "sollecito" || stato === "enac",
       istruzioni: (stato === "pagata" || stato === "pronta") && letteraApribile,
+      scadenza: !reclamoPartito,
     },
   };
 }
