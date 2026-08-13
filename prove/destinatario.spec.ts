@@ -87,6 +87,50 @@ test.describe("A chi va la lettera", () => {
     }
   });
 
+  test("nessuna chiave di aggancio è troppo corta o sporca", () => {
+    /* L'aggancio per nome è per SOTTOSTRINGA: una chiave di tre lettere
+       pesca qualunque nome che le contenga, e manderebbe il reclamo alla
+       compagnia sbagliata. Uno spazio in coda fa il danno opposto: non
+       aggancia più il nome secco.
+       Trovato scrivendo la scheda di ANA: "ANA " non avrebbe agganciato
+       "ANA", e "ANA" avrebbe agganciato mezzo mondo. */
+    for (const c of COMPAGNIE) {
+      for (const k of c.chiavi) {
+        expect(k, `${c.nome}: chiave con spazi ai bordi ("${k}")`).toBe(k.trim());
+        expect(k, `${c.nome}: chiave tutta maiuscola`).toBe(k.toUpperCase());
+        /* Tre lettere è il minimo: "KLM" è un nome vero e va bene. Due
+           sarebbero un codice IATA, e per quello c'è il campo `iata`. */
+        expect(k.length, `${c.nome}: chiave troppo corta ("${k}")`).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+
+  test("cercando una compagnia per nome si trova QUELLA compagnia", () => {
+    /* L'invariante che conta davvero. L'aggancio per nome è per
+       sottostringa, quindi due compagnie possono contendersi lo stesso
+       testo: "MALTA AIR" (la controllata di Ryanair) sta dentro "KM
+       Malta Airlines". A salvare la situazione è che le chiavi si
+       provano dalla più lunga alla più corta, ma è un dettaglio del
+       codice, non una garanzia: se un domani qualcuno accorcia una
+       chiave, il reclamo di un passeggero KM partirebbe verso Ryanair.
+       Questa prova non guarda le chiavi: guarda il RISULTATO. */
+    for (const c of COMPAGNIE) {
+      const trovata = compagniaPerVettore(c.nome);
+      expect(trovata?.nome, `cercando "${c.nome}" si trova ${trovata?.nome ?? "niente"}`).toBe(
+        c.nome,
+      );
+    }
+  });
+
+  test("le sorelle con canali propri NON vengono pescate dalla capofila", () => {
+    /* È la ragione per cui Iberia e Transavia hanno le chiavi di nome
+       vuote: Iberia Express e Transavia France sono società diverse, con
+       un ufficio reclami diverso. Il confronto esatto aggiunto il 13/08
+       non deve aver riaperto questo buco. */
+    expect(compagniaPerVettore("IBERIA EXPRESS")).toBeNull();
+    expect(compagniaPerVettore("TRANSAVIA FRANCE")).toBeNull();
+  });
+
   test("i tempi di risposta dichiarati sono numeri credibili", () => {
     /* È una promessa della compagnia, non un termine di legge: se un
        domani ci finisce dentro un numero assurdo, la lettera concederebbe
@@ -119,6 +163,10 @@ test.describe("A chi va la lettera", () => {
       /* Terzo giro, 12/08: dalla classifica delle cento messa insieme
          da Valerio, quelle che volano da o per l'Europa. */
       "EN", "DE", "LS", "LG", "BT", "FI", "QS", "X3", "XQ", "EY", "ET",
+      /* Quarto giro, 13/08: le intercontinentali che partono da Roma e
+         Milano. Coperte a metà per costruzione (art. 3 par. 1 lett. a:
+         solo in partenza dall'Europa), ma quella metà è vendibile. */
+      "SQ", "CX", "NH", "JL", "KE", "TG", "AI", "AC", "LA", "FZ", "SV", "LY",
     ];
     const presenti = new Set(COMPAGNIE.map((c) => c.iata));
     const mancanti = ATTESI.filter((i) => !presenti.has(i));

@@ -1,6 +1,6 @@
 /**
  * I canali reclamo UFFICIALI delle compagnie che possono finire in una
- * pratica vera: **50 al 12/08**, cresciute in tre giri (20 → 39 → 50).
+ * pratica vera: **62 al 13/08**, cresciute in quattro giri (20 → 39 → 50 → 62).
  * Strato 5 (generazione documenti): la lettera va spedita al
  * canale giusto del vettore OPERATIVO, perché l'errore n.1 dei reclami
  * respinti è scriverla a chi ha venduto il biglietto invece che a chi
@@ -110,6 +110,9 @@ export const VERIFICATO_IL = "2026-08-08";
  * si è preso quello; dove no, resta quello indicizzato, che funziona.
  */
 export const VERIFICATO_IL_2 = "2026-08-12";
+
+/** Il quarto giro (13/08): le intercontinentali che partono dall'Europa. */
+export const VERIFICATO_IL_3 = "2026-08-13";
 
 export const COMPAGNIE: CanaleCompagnia[] = [
   /* ------------------------------------------------ le low cost del mercato Italia */
@@ -1159,6 +1162,260 @@ export const COMPAGNIE: CanaleCompagnia[] = [
       "Ricerca web 12/08/2026 con filtro sul dominio ethiopianairlines.com: 'Support and Feedback' e 'Ethiopian Customer Commitment'.",
     chiavi: ["ETHIOPIAN"],
   },
+
+  /* =================================================================
+     QUARTO GIRO (13/08). Le intercontinentali che partono dall'Europa.
+
+     ⚠️ QUESTE COMPAGNIE SONO COPERTE A META', ed è giusto saperlo prima
+     di scrivere: l'art. 3 par. 1 lett. a) copre qualunque compagnia che
+     PARTA da uno scalo europeo, quindi un Roma → Singapore con Singapore
+     Airlines rientra in pieno. Il ritorno no, perché non hanno licenza
+     europea. Il motore lo sa già e lo decide da sé: qui serve solo il
+     canale per la metà che vale.
+
+     La costante di quasi tutte: 30 giorni per confermare di aver
+     ricevuto il reclamo, 60 per rispondere nel merito. È il termine che
+     si sono dati da sole, e nella lettera vale più di uno scelto da noi.
+     ================================================================= */
+  {
+    iata: "SQ",
+    icao: "SIA",
+    nome: "Singapore Airlines",
+    nomeLegale: "Singapore Airlines Limited",
+    paese: "SG",
+    canale:
+      "Modulo di segnalazione ufficiale. Dichiarano di confermare la ricezione entro 30 giorni e di rispondere nel merito entro 60.",
+    url: "https://www.singaporeair.com/feedback-form",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio singaporeair.com: 'Feedback' e 'Passenger Rights and Regulations' (la pagina dedicata all'Europa).",
+    chiavi: ["SINGAPORE AIRLINES"],
+    giorniRisposta: 60,
+  },
+  {
+    iata: "CX",
+    icao: "CPA",
+    nome: "Cathay Pacific",
+    nomeLegale: "Cathay Pacific Airways Limited",
+    paese: "HK",
+    canale:
+      "Modulo ufficiale per reclami e segnalazioni. Dopo l'invio arriva un'email di conferma: è da lì che si allegano i documenti.",
+    url: "https://www.cathaypacific.com/cx/en_US/contact-us/complaints-and-suggestions.html",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio cathaypacific.com: 'Complaints, compliments and suggestions' e l'avviso ufficiale EC261 in PDF.",
+    chiavi: ["CATHAY"],
+  },
+  {
+    iata: "NH",
+    icao: "ANA",
+    nome: "ANA",
+    nomeLegale: "All Nippon Airways Co., Ltd.",
+    paese: "JP",
+    canale:
+      "Portale ufficiale delle richieste di compensazione. ⚠️ Chiedono di presentarla entro 30 giorni dalla data del volo: è un termine loro, non di legge, ma superarlo complica la pratica.",
+    url: "https://www.ana.co.jp/en/jp/guide/reservation/refund/expenses/compensation-portal/",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio ana.co.jp: 'Information on Compensation', la guida al portale e l'opuscolo ufficiale sui diritti del passeggero.",
+    /* ⚠️ NON si mette "ANA" come chiave. L'aggancio per nome è per
+       sottostringa, e tre lettere così comuni pescherebbero qualunque
+       cosa le contenga. Il volo si riconosce dal codice NH; per il nome
+       basta "NIPPON", che è inequivocabile. */
+    chiavi: ["ALL NIPPON", "NIPPON AIRWAYS"],
+    giorniRisposta: 60,
+  },
+  {
+    iata: "JL",
+    icao: "JAL",
+    nome: "Japan Airlines",
+    nomeLegale: "Japan Airlines Co., Ltd.",
+    paese: "JP",
+    canale:
+      "Pagina ufficiale dedicata al Regolamento (CE) 261/2004, con il modulo da cui si presenta la richiesta.",
+    url: "https://www.jal.co.jp/uk/en/info/ec261_04/",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sui domini jal.co.jp e jal.com: 'Passenger Rights EU Regulation (EC) 261/2004'.",
+    chiavi: ["JAPAN AIRLINES"],
+  },
+  {
+    iata: "KE",
+    icao: "KAL",
+    nome: "Korean Air",
+    nomeLegale: "Korean Air Lines Co., Ltd.",
+    paese: "KR",
+    canale: "Modulo ufficiale 'Customer Voice', il canale con cui raccolgono i reclami scritti.",
+    url: "https://www.koreanair.com/footer/customer-support/customer-voice",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio koreanair.com: 'online customer feedback form' e le condizioni di trasporto ufficiali.",
+    chiavi: ["KOREAN AIR"],
+  },
+  {
+    iata: "TG",
+    icao: "THA",
+    nome: "Thai Airways",
+    nomeLegale: "Thai Airways International Public Company Limited",
+    paese: "TH",
+    canale:
+      "Pagina ufficiale sui diritti del passeggero secondo il Regolamento 261/2004, con i contatti per il reclamo. Confermano entro 30 giorni, rispondono entro 60.",
+    url: "https://www.thaiairways.com/en-be/content/passenger-rights/",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio thaiairways.com: 'Passenger Rights' e il PDF ufficiale 'THAI and Regulation EC No. 261/2004'.",
+    chiavi: ["THAI AIRWAYS"],
+    giorniRisposta: 60,
+  },
+  {
+    iata: "AI",
+    icao: "AIC",
+    nome: "Air India",
+    nomeLegale: "Air India Limited",
+    paese: "IN",
+    canale:
+      "Modulo dedicato proprio ai disservizi di volo: c'è la voce 'EU/UK Flight Delay Claim'. Dopo l'invio arriva un numero di pratica per seguirla.",
+    url: "https://www.airindia.com/in/en/contact-us/customer-support-portal/feedback/flight-disruptions.html",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio airindia.com: 'Flight Disruptions | Feedback', 'Grievance Resolution' e la guida ai diritti del passeggero.",
+    chiavi: ["AIR INDIA"],
+  },
+  {
+    iata: "AC",
+    icao: "ACA",
+    nome: "Air Canada",
+    nomeLegale: "Air Canada",
+    paese: "CA",
+    canale:
+      "Modulo di assistenza clienti ufficiale. Alcune richieste passano dalla loro piattaforma di conciliazione online (eConciliador), che chiude la pratica in pochi minuti.",
+    url: "https://www.aircanada.com/us/en/aco/home/fly/customer-support.html",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio aircanada.com: 'Air Canada Customer Support', 'eConciliador' e l'avviso ufficiale sui diritti nei paesi UE.",
+    chiavi: ["AIR CANADA"],
+    giorniRisposta: 30,
+  },
+  {
+    iata: "LA",
+    icao: "LAN",
+    nome: "LATAM Airlines",
+    nomeLegale: "LATAM Airlines Group S.A.",
+    paese: "CL",
+    canale:
+      "Apertura di una pratica dal centro assistenza ufficiale: si riceve un numero e lo stato si segue online.",
+    url: "https://www.latamairlines.com/us/en/help-center/faq/special-needs/contact-center-offices/create-case",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio latamairlines.com: 'Case creation, requests and claims' e 'Find out about your rights as a passenger'.",
+    chiavi: ["LATAM"],
+  },
+  {
+    iata: "FZ",
+    icao: "FDB",
+    nome: "flydubai",
+    nomeLegale: "Dubai Aviation Corporation (flydubai)",
+    paese: "AE",
+    canale:
+      "Modulo di contatto ufficiale. Dichiarano che la compensazione dovuta viene pagata entro 45 giorni dalla richiesta scritta.",
+    url: "https://www.flydubai.com/en/help/contact-us-form",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio flydubai.com: 'Contact us form' e 'Disruptions policy'.",
+    chiavi: ["FLYDUBAI"],
+    giorniRisposta: 45,
+  },
+  {
+    iata: "SV",
+    icao: "SVA",
+    nome: "Saudia",
+    nomeLegale: "Saudi Arabian Airlines Corporation",
+    paese: "SA",
+    canale: "Modulo ufficiale per reclami e segnalazioni, nella sezione relazioni con i clienti.",
+    url: "https://saudia.com/pages/help/contact-us/feedback-and-contact",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio saudia.com: 'Complaints And Feedback', il modulo di contatto e le condizioni generali di trasporto.",
+    chiavi: ["SAUDIA", "SAUDI ARABIAN"],
+  },
+  {
+    iata: "LY",
+    icao: "ELY",
+    nome: "EL AL",
+    nomeLegale: "EL AL Israel Airlines Ltd.",
+    paese: "IL",
+    canale:
+      "Pagina ufficiale sui diritti del passeggero secondo la normativa europea, con i recapiti per il reclamo.",
+    url: "https://www.elal.com/eng/legal/european-aviation-services-law",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    /* Un modulo dedicato ai soli casi 261 non è comparso: c'è la pagina
+       che spiega i diritti e i recapiti. Si dichiara, e l'interfaccia lo
+       dice all'utente (scelta di Valerio col popup del 13/08: meglio
+       portarlo sul sito giusto che dirgli che non la conosciamo). */
+    verificato: false,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio elal.com: 'Passenger Rights According to the European Aviation Services Law' e la pagina sulla risoluzione alternativa delle controversie.",
+    chiavi: ["EL AL", "ELAL"],
+  },
 ];
 
 /* ------------------------------------------------------ come si manda */
@@ -1229,6 +1486,24 @@ export function compagniaPerVettore(
     (c) => c.iata === codice || c.iataAlias?.includes(codice),
   );
   if (perIata) return perIata;
+
+  /* 🔴 IL NOME ESATTO, e questo passaggio mancava. Iberia e Transavia
+     hanno le chiavi di nome VUOTE di proposito: le sorelle Iberia
+     Express e Transavia France sono società diverse con canali propri, e
+     una chiave "IBERIA" le pescherebbe tutte e due. La prudenza era
+     giusta, ma il prezzo non lo era: se il fornitore mandava il nome
+     secco "Iberia", non trovavamo più nemmeno Iberia, e il passeggero
+     leggeva "compagnia non in archivio" per una delle più grandi
+     d'Europa.
+     Il confronto esatto risolve senza riaprire niente: "IBERIA" trova
+     Iberia, "IBERIA EXPRESS" non combacia con nessuno e prosegue.
+     Vale anche per le sigle che non si possono usare come sottostringa,
+     tipo SAS e ANA. Trovato da una prova scritta il 13/08, che non
+     guardava le chiavi ma il risultato. */
+  const perNome = COMPAGNIE.find(
+    (c) => c.nome.toUpperCase() === testo || c.nomeLegale.toUpperCase() === testo,
+  );
+  if (perNome) return perNome;
 
   // Nome del vettore, per aggancio di sottostringa.
   const coppie = COMPAGNIE.flatMap((c) => c.chiavi.map((chiave) => ({ chiave, c })));
