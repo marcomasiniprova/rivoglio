@@ -543,11 +543,21 @@ non altro codice.**
   minuto per indirizzo e serve un account con una pratica pagata, quindi
   il costo cresce coi clienti e non col traffico. Da riguardare il giorno
   che le pratiche diventano decine al giorno.
-- **A-analisi.** `analizzaRifiuto` non ha mai girato contro Mistral vero
-  da questo ambiente: il cancello che boccia il testo generato è provato
-  a fondo (25 prove), ma il **prompt** no. Il primo giro vero va guardato
-  con una risposta di compagnia in mano, e va letto cosa scrive nei log
-  quando scarta un paragrafo.
+- ~~**A-analisi.** Il prompt non ha mai girato contro Mistral vero.~~
+  ✅ **PROVATO IL 13/08, e ha funzionato al primo colpo** su un rifiuto
+  scritto come li scrivono le compagnie (guasto tecnico + «abbiamo già
+  rimborsato il biglietto»): motivo riconosciuto `guasto_tecnico` con
+  sicurezza alta, sei fatti loro estratti compreso il numero di pratica,
+  e il paragrafo **passato dal controllo**, con la citazione giusta
+  (Wallentin-Hermann C-549/07, che è nel nostro archivio).
+  ⚠️ **Da qui serve un trucco per provarlo**: `fetch` di Node ignora
+  `HTTPS_PROXY`, quindi in sandbox le chiamate a `api.mistral.ai` tornano
+  403 e sembra una chiave scaduta. Non lo è: si lancia con
+  `NODE_USE_ENV_PROXY=1` e `NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt`.
+  Su Netlify il proxy non c'è e il problema nemmeno.
+  ⚠️ Resta da guardare **cosa scrive nei log quando SCARTA** un
+  paragrafo: quello capiterà solo su una risposta strana, e va visto una
+  volta prima di fidarsi del tutto.
 - **A-eventi.** Risposta e analisi stanno in `pratiche_eventi.nota` come
   testo (l'analisi come JSON). Funziona e non richiede migrazioni, ma
   quella colonna non ha un limite: una risposta di compagnia molto lunga
