@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Instrument_Serif, Poppins } from "next/font/google";
 import AntiCopia from "@/components/AntiCopia";
+import IndirizzoPulito from "@/components/IndirizzoPulito";
 import ScrollPesante from "@/components/ScrollPesante";
 import Visita from "@/components/Visita";
 import AncoreLisce from "@/components/AncoreLisce";
@@ -114,6 +115,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         <AntiCopia />
+        <IndirizzoPulito />
         <ScrollPesante />
         <Visita />
         <AncoreLisce />
