@@ -1,5 +1,6 @@
 import type { EventoPratica, StatoPratica } from "./pratiche";
 import { letteraSbloccata } from "./documenti";
+import { GIORNI_PRIMA_DELL_ENTE, GIORNI_PRIMA_DEL_SOLLECITO } from "./rifiuto";
 
 /**
  * I PALETTI DELLA PRATICA: cosa è fatto, cosa si fa ADESSO, cosa viene dopo.
@@ -183,8 +184,30 @@ const RECLAMO_PARTITO: StatoPratica[] = [
 
 const CHIUSE: StatoPratica[] = ["esito_pagata", "esito_rifiutata", "rimborsata"];
 
+/**
+ * 🔴 IL CALENDARIO NON ARRIVAVA FIN QUI, e il cliente restava fermo.
+ *
+ * Trovato col collaudo del 13/08, portando una pratica al giorno 43 e poi
+ * al 57. La pagina dei documenti diceva «il sollecito è pronto» e, trenta
+ * centimetri più su, la pratica diceva ancora «PASSO 3 DI 6, attesa
+ * risposta, niente da fare per ora: se restano in silenzio, alla sesta ti
+ * mandiamo il sollecito già pronto». Il documento c'era, e chi doveva
+ * mandarlo non lo sapeva.
+ *
+ * Il motivo: i passi guardavano solo gli EVENTI (hai dichiarato un no?
+ * hai mandato la replica?). Il ramo del silenzio invece non produce
+ * nessun evento: è il tempo che passa. Adesso i giorni entrano qui, e
+ * sono lo stesso conto che fa la pagina dei documenti.
+ */
+function passoDelSilenzio(giorni: number | null): "ente" | "replica" | null {
+  if (giorni === null) return null;
+  if (giorni >= GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE) return "ente";
+  if (giorni >= GIORNI_PRIMA_DEL_SOLLECITO) return "replica";
+  return null;
+}
+
 /** Il passo attivo, cioè l'unica cosa che l'utente deve guardare adesso. */
-function passoAttivo(stato: StatoPratica, giri: Giri): ChiavePasso {
+function passoAttivo(stato: StatoPratica, giri: Giri, giorni: number | null): ChiavePasso {
   if (CHIUSE.includes(stato)) return "chiusa";
   if (stato === "creata") return "pagamento";
   /* Pagata = la lettera è pronta e si apre. Niente in mezzo. */
@@ -195,7 +218,8 @@ function passoAttivo(stato: StatoPratica, giri: Giri): ChiavePasso {
      zero vuol dire che hai risposto e stai aspettando loro. Zero no vuol
      dire che stai ancora aspettando la prima risposta. */
   if (giri.no > giri.replicheMandate) return "replica";
-  return "attesa";
+  /* Nessun no dichiarato: decide il calendario. */
+  return passoDelSilenzio(giorni) ?? "attesa";
 }
 
 /**
@@ -229,7 +253,7 @@ export type ChiaveTesto =
   | "esito_rifiutata"
   | "rimborsata";
 
-function chiaveTesto(stato: StatoPratica, giri: Giri): ChiaveTesto {
+function chiaveTesto(stato: StatoPratica, giri: Giri, giorni: number | null): ChiaveTesto {
   if (stato !== "inviata" && stato !== "sollecito") return stato as ChiaveTesto;
   /* Il no dichiarato vince su tutto quello che dice il calendario: è un
      fatto avvenuto, non una scadenza scattata. */
@@ -239,6 +263,12 @@ function chiaveTesto(stato: StatoPratica, giri: Giri): ChiaveTesto {
      senza un nome suo la pagina raccontava ancora il no che avevi già
      chiuso. */
   if (giri.no > 0) return "attesa_replica";
+  /* Silenzio: al giorno 42 il sollecito è pronto, al 56 anche la
+     segnalazione all'ente. Sono gli stessi numeri della pagina dei
+     documenti, presi dalla stessa costante. */
+  const silenzio = passoDelSilenzio(giorni);
+  if (silenzio === "ente") return "enac";
+  if (silenzio === "replica") return "sollecito";
   return stato as ChiaveTesto;
 }
 
@@ -311,6 +341,8 @@ export function percorsoPratica(
   stato: StatoPratica,
   eventi: EventoPratica[],
   rifiutoMotivo: string | null | undefined,
+  /** Giorni passati dall'invio del reclamo. null = non ancora inviato. */
+  giorniDallInvio: number | null = null,
 ): Percorso {
   const documentiFatti = letteraSbloccata(eventi);
   const reclamoPartito = RECLAMO_PARTITO.includes(stato);
@@ -320,7 +352,7 @@ export function percorsoPratica(
      piena ma può non avere l'evento: si conta come un giro, se no il suo
      percorso tornerebbe indietro da solo. */
   if (giri.no === 0 && rifiutoMotivo) giri.no = 1;
-  const attivo = passoAttivo(stato, giri);
+  const attivo = passoAttivo(stato, giri, giorniDallInvio);
 
   /* La barra non mostra "invio" e "risposta" come tappe a sé: sono azioni
      dentro le tappe accanto, e una barra da nove pallini su un telefono
@@ -344,7 +376,7 @@ export function percorsoPratica(
     attivo,
     /* La chiave con cui la pagina sceglie i testi. NON è lo stato del
        database: vedi `chiaveTesto` qui sotto. */
-    chiaveTesto: chiaveTesto(stato, giri),
+    chiaveTesto: chiaveTesto(stato, giri, giorniDallInvio),
     giri,
     riquadri: {
       /* Si può caricare la carta d'imbarco finché la pratica è viva, e

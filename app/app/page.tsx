@@ -3,6 +3,7 @@ import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { colonnaMancante } from "@/lib/supabase/colonne";
+import { giorniDaQuando } from "@/lib/tempo";
 import { COPY } from "@/lib/copy";
 import type {
   EventoPratica,
@@ -34,6 +35,7 @@ type RigaPratica = {
   creata_il: string;
   aggiornata_il: string;
   rifiuto_motivo?: string | null;
+  inviata_il?: string | null;
 };
 
 type VoloBreve = { volo_iata: string; data_locale: string };
@@ -97,8 +99,11 @@ export default async function PaginaApp() {
   /* ⚠️ `rifiuto_motivo` arriva con la migrazione del 15/08: se non fosse
      applicata, chiederla farebbe fallire TUTTA la lettura e l'elenco
      resterebbe vuoto. Stessa rete della lettera e della scheda. */
+  /* `inviata_il` serve ai passi: senza, l'elenco non sa che al giorno 42
+     il sollecito è pronto e continua a scrivere "in attesa di risposta"
+     accanto a una pratica che aspetta te. */
   const COLONNE =
-    "id, stato, tipo, importo_fascia, volo_id, creata_il, aggiornata_il";
+    "id, stato, tipo, importo_fascia, volo_id, creata_il, aggiornata_il, inviata_il";
   const elenco = async (colonne: string) =>
     supabase
       .from("pratiche")
@@ -171,6 +176,7 @@ export default async function PaginaApp() {
       p.stato,
       (eventiPer.get(p.id) ?? []) as EventoPratica[],
       p.rifiuto_motivo ?? null,
+      giorniDaQuando(p.inviata_il ?? null),
     );
     /* ⚠️ Il testo NON si prende dallo stato del database: allo stesso
        `sollecito` si arriva per silenzio o perché hanno risposto, e qui

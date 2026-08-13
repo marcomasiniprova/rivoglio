@@ -432,6 +432,19 @@ export default function SchedaCheck() {
       });
       const j = await r.json().catch(() => null);
       setLeggoCarta(false);
+      /* 🔴 QUI NON SUCCEDEVA NIENTE, e "niente" è la risposta peggiore.
+         Trovato col collaudo del 13/08: col muro acceso anche la lettura
+         della carta d'imbarco si paga, quindi il server risponde 402. Il
+         messaggio d'errore però compare più giù, fuori dallo schermo, e
+         chi caricava la foto vedeva la pagina identica a prima. Il primo
+         riquadro del check, quello che dice "caricala e compilo io", era
+         un bottone che non faceva niente.
+         Adesso il 402 alza il muro, come sul check: stessa schermata,
+         stesso prezzo, stesso posto. */
+      if (r.status === 402 && j?.serveIlPass) {
+        setMuro(j.muro as DatiMuro);
+        return;
+      }
       if (!r.ok || !j?.ok) {
         setErrore(typeof j?.errore === "string" ? j.errore : COPY.comune.erroreGenerico);
         return;

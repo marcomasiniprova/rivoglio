@@ -140,9 +140,22 @@ function elencoPasseggeri(passeggeri: Passeggero[], tipo: PraticaPerLettera["tip
     .filter((p) => p.nome.trim() || p.cognome.trim())
     .map((p) => `${p.nome.trim()} ${p.cognome.trim()}`.trim());
   if (compilati.length > 0) return compilati;
-  return tipo === "famiglia"
-    ? ["[Nome e cognome del primo passeggero]", "[Nome e cognome degli altri passeggeri]"]
-    : ["[Nome e cognome]"];
+  /* 🔴 SU UNA PRATICA FAMIGLIA QUI USCIVANO DUE SEGNAPOSTO, e da quei due
+     la lettera tirava fuori un conto: «600 euro per ciascuno dei seguenti
+     2 passeggeri, per un totale di 1200 euro». Trovato col collaudo del
+     13/08, aprendo una pratica famiglia vera.
+     Erano due numeri inventati da noi in un documento che chiede soldi a
+     una compagnia aerea. La pratica famiglia si vende «fino a 5
+     passeggeri», i nomi non li chiediamo da nessuna parte, e nessuno ci
+     ha mai detto quanti erano: quel 2 non l'ha scelto nessuno. Chi vola
+     in quattro chiede la metà di quello che gli spetta, e non se ne
+     accorge.
+     Adesso il segnaposto è UNO, e la lettera che si costruisce sopra non
+     dichiara né quantità né totale: dice «per ciascuno dei passeggeri
+     sotto elencati» e lascia le righe da riempire. Un documento che
+     chiede di completare una riga è onesto; uno che dichiara un totale
+     sbagliato no. */
+  return tipo === "famiglia" ? ["[Nome e cognome di ogni passeggero, uno per riga]"] : ["[Nome e cognome]"];
 }
 
 /** Il destinatario in testa alla lettera: ragione sociale se la conosciamo. */
@@ -206,6 +219,11 @@ export function generaReclamo(
   const n = passeggeri.length;
   const totale = verdetto.importo * n;
   const giornoVolo = dataLunga(fatto.dataLocale);
+  /* Pratica famiglia di cui non sappiamo i nomi: quanti fossero non ce
+     l'ha detto nessuno, quindi non si dichiara né il numero né il totale. */
+  const famigliaSenzaNomi =
+    pratica.tipo === "famiglia" &&
+    !(pratica.passeggeri ?? []).some((p) => p.nome.trim() || p.cognome.trim());
 
   const oggetto = caso
     ? oggettoDichiarato(caso, fatto.voloIata, giornoVolo)
@@ -238,15 +256,21 @@ ${n === 1 ? "scrivo in qualità di passeggero" : "scrivo a nome dei passeggeri s
 ${fattiENorma}
 
 ${
-  n === 1
-    ? `Chiedo pertanto il pagamento di ${euro(verdetto.importo)} in favore di ${passeggeri[0]}.`
-    : `Chiedo pertanto il pagamento di ${euro(verdetto.importo)} per ciascuno dei seguenti ${n} passeggeri, per un totale di ${euro(totale)}:
+  famigliaSenzaNomi
+    ? /* Nessuna quantità e nessun totale: non li sappiamo. Vedi il
+         commento in `elencoPasseggeri`. */
+      `Chiedo pertanto il pagamento di ${euro(verdetto.importo)} per ciascuno dei passeggeri sotto elencati, che hanno viaggiato sulla stessa prenotazione:
+
+[Nome e cognome di ogni passeggero, uno per riga]`
+    : n === 1
+      ? `Chiedo pertanto il pagamento di ${euro(verdetto.importo)} in favore di ${passeggeri[0]}.`
+      : `Chiedo pertanto il pagamento di ${euro(verdetto.importo)} per ciascuno dei seguenti ${n} passeggeri, per un totale di ${euro(totale)}:
 
 ${passeggeri.map((p, i) => `${i + 1}. ${p}`).join("\n")}`
 }
 
 Il pagamento potrà essere effettuato con bonifico bancario sulle seguenti coordinate:
-Intestato a: ${passeggeri[0]}
+Intestato a: ${famigliaSenzaNomi ? "[Nome e cognome dell'intestatario del conto]" : passeggeri[0]}
 IBAN: [qui il tuo IBAN]
 
 Chiedo il pagamento, o una risposta scritta e motivata, entro 30 giorni dal ricevimento della presente. Se intendete invocare circostanze eccezionali, chiedo che siano indicate in modo specifico e documentate: l'onere della prova è a vostro carico, e l'esonero richiede anche la dimostrazione di aver adottato tutte le misure ragionevoli, ivi compresa la riprotezione su voli alternativi, anche operati da altri vettori.

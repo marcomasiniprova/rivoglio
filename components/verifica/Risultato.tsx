@@ -464,7 +464,16 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
       {/* --------------------------------------- il fatto oggettivo */}
       <Anima ritardo={0.16}>
         <Card>
-          {dati.arrivoPrevistoUtc && dati.arrivoEffettivoUtc ? (
+          {/* 🔴 A CHI È RIMASTO A TERRA NON SI DICE «SEI ATTERRATO ALLE
+              00:59». Trovato col collaudo del 13/08: dopo aver dichiarato
+              il negato imbarco la pagina stampava lo stesso gli orari di
+              arrivo del volo, cioè di un volo che quella persona non ha
+              preso. Il ritardo era già stato tolto dal titolo per lo
+              stesso motivo; questa riga era rimasta indietro.
+              Su negato imbarco e coincidenza persa il fatto che conta
+              l'ha dichiarato il passeggero, e il volo si nomina senza
+              raccontargli un viaggio che non ha fatto. */}
+          {!dichiarato && dati.arrivoPrevistoUtc && dati.arrivoEffettivoUtc ? (
             <>
               <p className="text-[1.05rem] leading-relaxed">
                 {riempi(t.fattoTemplate, {

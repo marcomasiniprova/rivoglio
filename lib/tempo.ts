@@ -100,6 +100,21 @@ export function dataIt(iso: string | Date): string {
 }
 
 /**
+ * Quanti giorni di calendario sono passati da una data. `null` se la data
+ * non c'è o non si legge.
+ *
+ * Serve ai passi della pratica: il ramo del silenzio (sollecito al 42,
+ * ente al 56) non produce nessun evento, lo decide il tempo. Sta qui e
+ * non dentro una pagina perché l'orologio si legge in un posto solo.
+ */
+export function giorniDaQuando(quando: string | null | undefined): number | null {
+  if (!quando) return null;
+  const t = Date.parse(quando);
+  if (!Number.isFinite(t)) return null;
+  return giorniFra(new Date(t), adesso());
+}
+
+/**
  * "l'11 novembre 2026", "il 12 novembre 2026": la data con l'articolo
  * giusto davanti.
  *

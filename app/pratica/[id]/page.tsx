@@ -31,6 +31,7 @@ import {
   dataItArticolo,
   dataOraIt,
   fraQuanto,
+  giorniDaQuando,
   giorniFra,
   giornoPiu,
 } from "@/lib/tempo";
@@ -186,7 +187,15 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
   const etichetteEventi: Record<string, string> = C.lineaTempo.eventi;
   /* Un posto solo decide cosa è fatto, cosa si fa adesso e cosa dopo.
      La pagina qui sotto non fa più ragionamenti suoi. */
-  const percorso = percorsoPratica(pratica.stato, eventi, pratica.rifiuto_motivo ?? null);
+  /* I giorni passati dall'invio: senza, i passi non sanno del silenzio e
+     la pratica continua a dire "niente da fare" mentre il sollecito è
+     già pronto (vedi passoDelSilenzio in lib/pratiche/passi.ts). */
+  const percorso = percorsoPratica(
+    pratica.stato,
+    eventi,
+    pratica.rifiuto_motivo ?? null,
+    giorniDaQuando(pratica.inviata_il),
+  );
   const R = percorso.riquadri;
   /* 🔴 I TESTI NON SI SCELGONO PIÙ CON LO STATO DEL DATABASE. Allo stato
      `sollecito` ci si arriva per silenzio (sei settimane) o perché la
