@@ -1,6 +1,7 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-13 (giro #65: il freno, un tetto sulla spesa ·
+**Aggiornato:** 2026-08-13 (giro #66: gli undici rami mai camminati,
+filmati uno per uno · giro #65: il freno, un tetto sulla spesa ·
 giro #64: il collaudo di dieci voli sul sito vero, e i sei difetti che ha
 trovato · giro #63: i nove punti del collaudo di
 Valerio, dalle email finte ai paletti della pratica, più l'AI che legge
@@ -23,6 +24,54 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #66 (13/08): GLI UNDICI RAMI MAI CAMMINATI, FILMATI UNO PER UNO.**
+  Richiesta di Valerio dopo tre giorni di difetti a raffica: «provalo
+  tutto adesso, in una seduta, e filmamelo». Nove punti su undici li ho
+  percorsi io sul sito vero (l'admin vuole il ruolo sul suo account, il
+  telefono vero è fisico): undici filmati a 390 punti, con la didascalia
+  che dice cosa sta succedendo.
+  - 🔴 **LA PRATICA FAMIGLIA CHIEDEVA UNA CIFRA INVENTATA.** La lettera
+    diceva «600 euro per ciascuno dei seguenti **2 passeggeri**, per un
+    totale di **1200 euro**». Quel 2 non l'aveva detto nessuno: i nomi
+    non si chiedono da nessuna parte del prodotto e la pratica si vende
+    «fino a 5». Chi vola in quattro chiedeva **la metà** del suo, dentro
+    un documento indirizzato a una compagnia aerea. Adesso niente
+    quantità e niente totale: si chiede la somma per ciascuno dei
+    passeggeri elencati, e le righe si compilano.
+  - 🔴 **LA FOTO DELLA CARTA D'IMBARCO NON FACEVA NIENTE.** Col muro
+    acceso anche la lettura si paga: il server rispondeva 402 e la pagina
+    restava identica, nessun messaggio e nessun muro. Il primo riquadro
+    del check («caricala e compilo io volo e data») era un bottone morto.
+    Adesso il 402 alza il muro, come sul check.
+  - 🔴 **AL GIORNO 42 E AL 56 LA PRATICA NON LO DICEVA.** Portata una
+    pratica al giorno 43 e poi al 57: i documenti dicevano «il sollecito
+    è pronto» e «la segnalazione all'ente è pronta», e trenta centimetri
+    più su la pratica continuava a scrivere «PASSO 3 DI 6, niente da fare
+    per ora: se restano in silenzio, alla sesta ti mandiamo il
+    sollecito». I passi guardavano solo gli EVENTI, e il ramo del
+    silenzio non produce eventi: è il tempo che passa. Adesso i giorni
+    entrano nei passi, dalla stessa costante che decide quando il
+    documento compare.
+  - 🔴 **A CHI È RIMASTO A TERRA SI DICEVA «SEI ATTERRATO ALLE 00:59».**
+    Sul negato imbarco il titolo aveva già smesso di parlare di ritardo,
+    ma la riga con gli orari era rimasta indietro: raccontava a quella
+    persona un viaggio che non ha fatto.
+  - ⚠️ **UN QUINTO DIFETTO NON C'ERA**, e va detto: mi era sembrato che
+    la spunta del recesso avesse un passo nascosto. Guardando il codice,
+    «Registro il consenso.» è l'etichetta del bottone MENTRE registra,
+    non un passo in più. A rimbalzare era il mio script, che aveva
+    riempito l'altro campo email della pagina.
+  - **Quello che ha funzionato, camminandolo:** lo screenshot della
+    risposta della compagnia (Mistral legge l'immagine, riconosce il
+    motivo, estrae i fatti); il **cancello che ha rifiutato una foto di
+    un altro volo** senza scrivere niente sulla pratica; il volo
+    cancellato chiuso con le due domande; il negato imbarco chiuso con le
+    sue; il secondo no che riapre il giro; la conciliazione; l'elenco
+    pratiche della web app che dice di chi è la palla.
+  - **I dati di prova sono stati cancellati** dal database vero
+    (pratiche, eventi e verifiche ZZ): restano le 82 verifiche vere.
+  - Prove: **1460 verdi**, 6 saltate, zero rosse. Le 7 nuove stanno in
+    `prove/collaudo-rami.spec.ts`.
 - **GIRO #65 (13/08): IL FRENO. Un tetto sulla SPESA, non solo per
   persona.**
   - 🔴 **IL FRENO PER IP NON PROTEGGE IL PORTAFOGLIO.** Conta le
