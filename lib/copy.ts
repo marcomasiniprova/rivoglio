@@ -1147,6 +1147,19 @@ export const COPY = {
          sicurezza a un cliente che ha pagato.
          Adesso i testi si scelgono con `chiaveTesto` (lib/pratiche/passi.ts),
          che guarda cosa è successo e non che giorno è. */
+      /* 🔴 IL TERZO MOMENTO CHE NON AVEVA UN NOME. Hai risposto al loro
+         no e adesso aspetti di nuovo: non è «il silenzio del primo giro»
+         e non è «hanno risposto». Senza una voce sua, la pagina
+         continuava a raccontare il no che avevi già chiuso, e il
+         percorso sembrava fermo (Valerio, 13/08: «ti blocchi al passo
+         4»). */
+      attesa_replica: {
+        nome: "In attesa della loro risposta",
+        descrizione:
+          "La replica è partita e adesso la palla è di nuovo alla compagnia. Le risposte alle repliche arrivano di solito più in fretta della prima: il caso è già aperto da loro.",
+        prossimoPasso:
+          "Niente da fare per ora. Se ti rispondono, torna qui e incolla quello che ti hanno scritto: preparo la replica successiva. Se restano in silenzio, ci penso io a dirti quando muoverti.",
+      },
       risposta_no: {
         nome: "Hanno risposto no",
         descrizione:
@@ -1259,6 +1272,14 @@ export const COPY = {
       /* Compare quando la lettera è ancora chiusa dietro il passo dei
          documenti. Dice cosa manca, non "non puoi": chi ha appena pagato
          merita di sapere che il documento c'è e cosa lo apre. */
+      /* Chiude il giro del no: senza, il percorso restava fermo sulla
+         replica anche dopo averla mandata. */
+      confermaReplica: "Ho mandato la replica",
+      confermaReplicaInCorso: "Un attimo.",
+      confermaReplicaFatta: "Registrato. Ricarico la pagina.",
+      confermaReplicaErrore: "Non sono riuscito a salvare. Riprova tra poco.",
+      confermaReplicaNota:
+        "Premilo solo dopo aver spedito davvero la replica: da lì riparte l'attesa.",
       letteraChiusa:
         "La lettera è pronta e si apre appena hai caricato la carta d'imbarco, qui sotto. Se non ce l'hai adesso, puoi andare avanti lo stesso.",
     },

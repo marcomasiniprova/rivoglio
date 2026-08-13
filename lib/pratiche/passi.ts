@@ -100,6 +100,10 @@ export type Riquadri = {
   confermaInvio: boolean;
   /** "La compagnia ti ha risposto no?" */
   rifiuto: boolean;
+  /** "Ho mandato la replica": chiude il giro e riapre l'attesa. */
+  confermaReplica: boolean;
+  /** Ente nazionale e conciliazione: dal secondo no in poi. */
+  enteEConciliazione: boolean;
   /** Le istruzioni su come si manda. */
   istruzioni: boolean;
   /**
@@ -118,6 +122,8 @@ export type Percorso = {
   attivo: ChiavePasso;
   /** La chiave con cui si scelgono i testi. Vedi `ChiaveTesto`. */
   chiaveTesto: ChiaveTesto;
+  /** A che giro di «no» siamo, e se la replica di questo giro è partita. */
+  giri: Giri;
   riquadri: Riquadri;
 };
 
@@ -178,18 +184,18 @@ const RECLAMO_PARTITO: StatoPratica[] = [
 const CHIUSE: StatoPratica[] = ["esito_pagata", "esito_rifiutata", "rimborsata"];
 
 /** Il passo attivo, cioè l'unica cosa che l'utente deve guardare adesso. */
-function passoAttivo(stato: StatoPratica, rifiutoDichiarato: boolean): ChiavePasso {
+function passoAttivo(stato: StatoPratica, giri: Giri): ChiavePasso {
   if (CHIUSE.includes(stato)) return "chiusa";
   if (stato === "creata") return "pagamento";
   /* Pagata = la lettera è pronta e si apre. Niente in mezzo. */
   if (stato === "pagata" || stato === "pronta") return "lettera";
-  if (stato === "inviata") {
-    /* Chi ha già dichiarato il no non sta più aspettando: la replica è
-       pronta e il calendario non c'entra più niente. */
-    return rifiutoDichiarato ? "replica" : "attesa";
-  }
-  if (stato === "sollecito") return "replica";
-  return "ente";
+  if (stato === "enac") return "ente";
+  /* 🔴 IL CUORE DEL FLUSSO, e prima non c'era: un no in più della
+     replica mandata vuol dire che la palla è tua. Pari e maggiori di
+     zero vuol dire che hai risposto e stai aspettando loro. Zero no vuol
+     dire che stai ancora aspettando la prima risposta. */
+  if (giri.no > giri.replicheMandate) return "replica";
+  return "attesa";
 }
 
 /**
@@ -216,16 +222,23 @@ export type ChiaveTesto =
   | "pronta"
   | "inviata"
   | "risposta_no"
+  | "attesa_replica"
   | "sollecito"
   | "enac"
   | "esito_pagata"
   | "esito_rifiutata"
   | "rimborsata";
 
-function chiaveTesto(stato: StatoPratica, rifiutoDichiarato: boolean): ChiaveTesto {
+function chiaveTesto(stato: StatoPratica, giri: Giri): ChiaveTesto {
+  if (stato !== "inviata" && stato !== "sollecito") return stato as ChiaveTesto;
   /* Il no dichiarato vince su tutto quello che dice il calendario: è un
      fatto avvenuto, non una scadenza scattata. */
-  if (rifiutoDichiarato && (stato === "inviata" || stato === "sollecito")) return "risposta_no";
+  if (giri.no > giri.replicheMandate) return "risposta_no";
+  /* Hai risposto al loro no e adesso aspetti di nuovo: non è né "il
+     silenzio del primo giro" né "hanno risposto". È un terzo momento, e
+     senza un nome suo la pagina raccontava ancora il no che avevi già
+     chiuso. */
+  if (giri.no > 0) return "attesa_replica";
   return stato as ChiaveTesto;
 }
 
@@ -243,16 +256,71 @@ function confronta(indice: number, indiceAttivo: number): StatoPasso {
  * scritto lì (vedi documenti.ts) e una colonna in più sarebbe un secondo
  * posto dove la stessa verità può divergere.
  */
+/**
+ * QUANTI GIRI DI «NO» SONO STATI FATTI, E A CHE PUNTO È L'ULTIMO.
+ *
+ * 🔴 Valerio, 13/08: «stranamente gli ultimi passi ti blocchi al passo 4,
+ * perché dici solo il primo no e poi basta: non c'è possibilità dopo la
+ * prima controproposta di un altro no».
+ *
+ * Aveva ragione, ed era un vicolo cieco vero: la pratica sapeva che la
+ * compagnia aveva detto no UNA volta (una colonna, `rifiuto_motivo`) e
+ * non aveva nessun posto dove mettere il secondo. Ma nella realtà il
+ * secondo no è normalissimo: si risponde alla replica con un'altra
+ * lettera di diniego, e il passeggero resta lì a guardare una pagina che
+ * non gli offre più niente.
+ *
+ * Il conto si tiene sugli EVENTI, che sono in ordine e non richiedono
+ * nessuna colonna nuova:
+ * - un evento `rifiuto` per ogni no dichiarato;
+ * - un evento `replica_inviata` per ogni replica che il passeggero dice
+ *   di aver mandato.
+ * Se i no sono più delle repliche mandate, tocca a lui. Se sono pari e
+ * maggiori di zero, tocca a loro e si aspetta.
+ */
+export type Giri = { no: number; replicheMandate: number };
+
+export const EVENTO_REPLICA_INVIATA = "replica_inviata";
+
+export function giriDiNo(eventi: EventoPratica[]): Giri {
+  let no = 0;
+  let replicheMandate = 0;
+  for (const e of eventi) {
+    if (e.tipo === "rifiuto") no++;
+    else if (e.tipo === EVENTO_REPLICA_INVIATA) replicheMandate++;
+  }
+  /* Le repliche non possono superare i no: se succede (una pratica
+     vecchia, un doppio clic andato a segno) si tronca, se no il conto
+     direbbe che c'è una replica da mandare che non esiste. */
+  return { no, replicheMandate: Math.min(replicheMandate, no) };
+}
+
+/**
+ * Dal SECONDO no in poi si apre anche la strada dell'ente e della
+ * conciliazione, e non al posto della replica: insieme.
+ *
+ * Il motivo è pratico. Al primo no la trattativa diretta ha ancora senso
+ * (spesso stanno solo misurando il ritardo alla partenza invece che
+ * all'arrivo). Al secondo no stanno tenendo la posizione, e continuare a
+ * scriversi da soli serve a poco: la conciliazione è gratuita, si fa da
+ * casa, e a quel punto è la strada che muove i soldi.
+ */
+export const NO_PRIMA_DELL_ENTE = 2;
+
 export function percorsoPratica(
   stato: StatoPratica,
   eventi: EventoPratica[],
   rifiutoMotivo: string | null | undefined,
 ): Percorso {
   const documentiFatti = letteraSbloccata(eventi);
-  const rifiutoDichiarato = Boolean(rifiutoMotivo);
   const reclamoPartito = RECLAMO_PARTITO.includes(stato);
   const chiusa = CHIUSE.includes(stato);
-  const attivo = passoAttivo(stato, rifiutoDichiarato);
+  const giri = giriDiNo(eventi);
+  /* ⚠️ Una pratica aperta prima del 13/08 ha la colonna `rifiuto_motivo`
+     piena ma può non avere l'evento: si conta come un giro, se no il suo
+     percorso tornerebbe indietro da solo. */
+  if (giri.no === 0 && rifiutoMotivo) giri.no = 1;
+  const attivo = passoAttivo(stato, giri);
 
   /* La barra non mostra "invio" e "risposta" come tappe a sé: sono azioni
      dentro le tappe accanto, e una barra da nove pallini su un telefono
@@ -276,7 +344,8 @@ export function percorsoPratica(
     attivo,
     /* La chiave con cui la pagina sceglie i testi. NON è lo stato del
        database: vedi `chiaveTesto` qui sotto. */
-    chiaveTesto: chiaveTesto(stato, rifiutoDichiarato),
+    chiaveTesto: chiaveTesto(stato, giri),
+    giri,
     riquadri: {
       /* Si può caricare la carta d'imbarco finché la pratica è viva, e
          serve anche dopo l'invio: rinforza il sollecito allo stesso modo.
@@ -285,7 +354,16 @@ export function percorsoPratica(
       letteraApribile: letteraVisibile,
       letteraVisibile,
       confermaInvio: stato === "pagata" || stato === "pronta",
-      rifiuto: stato === "inviata" || stato === "sollecito" || stato === "enac",
+      /* «Hanno risposto no?» si chiede solo quando ha senso: dopo che il
+         reclamo è partito, e solo se non c'è già un no in attesa di
+         replica. Chiederlo due volte di fila fa dichiarare lo stesso no
+         due volte. */
+      rifiuto: reclamoPartito && !chiusa && giri.no === giri.replicheMandate,
+      /* «Ho mandato la replica»: l'azione che chiudeva il vicolo cieco. */
+      confermaReplica: giri.no > giri.replicheMandate,
+      /* Ente e conciliazione: dal secondo no in poi, INSIEME alla
+         replica, non al posto suo. */
+      enteEConciliazione: stato === "enac" || giri.no >= NO_PRIMA_DELL_ENTE,
       istruzioni: stato === "pagata" || stato === "pronta",
       scadenza: !reclamoPartito,
     },

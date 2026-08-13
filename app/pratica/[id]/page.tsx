@@ -251,6 +251,71 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
       {/* ------------------------------------------------ i passi.
           Sta prima di tutto perché è la domanda che uno si fa aprendo la
           pagina: a che punto sono. */}
+      {/* ------------------------------------------------ la cronologia.
+          🔴 STA QUI, SOPRA I PASSI, E SI APRE SOLO SE LA VUOI. Valerio,
+          13/08: «tagliala da tutti gli step, mettila in una posizione
+          visibile apribile, tipo sotto la scritta del volo o leggermente
+          sopra la progress bar».
+          Aveva ragione sul posto: la cronologia non è un passo e non è
+          un'azione, è la prova che qualcosa sta succedendo mentre
+          aspetti. In mezzo alle cose da fare allungava la pagina di
+          mezzo schermo per chi non la stava cercando; qui è una riga, e
+          chi la vuole la apre. */}
+      <details className="group rounded-2xl border border-bordo bg-white px-6 py-4">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-display text-lg tracking-[-0.03em] marker:hidden">
+          {C.lineaTempo.titolo}
+          <span aria-hidden="true" className="text-fumo-2 transition-transform group-open:rotate-45">
+            +
+          </span>
+        </summary>
+        {eventiVisibili.length === 0 ? (
+          <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{C.lineaTempo.vuota}</p>
+        ) : (
+          <>
+            <ol className="mt-5 flex flex-col">
+              {eventiVisibili.map((evento, i) => (
+                <li key={evento.id} className="relative flex gap-4 pb-6 last:pb-0">
+                  {/* il filo che unisce i punti; l'ultimo non lo tira oltre */}
+                  {i < eventiVisibili.length - 1 && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute top-4 left-[5px] h-full w-px bg-bordo"
+                    />
+                  )}
+                  <span
+                    aria-hidden="true"
+                    className={`relative mt-1.5 size-[11px] shrink-0 rounded-full ${
+                      i === eventiVisibili.length - 1
+                        ? "bg-verde shadow-[0_0_0_4px_var(--color-menta-tenue)]"
+                        : "border-2 border-verde/50 bg-white"
+                    }`}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-[0.95rem] font-medium leading-snug">
+                      {/* ⚠️ Il passaggio a `sollecito` si chiama così anche
+                          quando ci si arriva perché hanno RISPOSTO: nella
+                          cronologia diventerebbe «Sollecito pronto» sotto
+                          la riga «hanno risposto no», che è la stessa
+                          confusione fra calendario e fatti. */}
+                      {evento.tipo === "sollecito" && pratica.rifiuto_motivo
+                        ? C.lineaTempo.replicaPronta
+                        : (etichetteEventi[evento.tipo] ?? evento.tipo)}
+                    </p>
+                    <p className="numeri mt-0.5 text-xs text-fumo-2">
+                      {dataOraIt(evento.creato_il)}
+                    </p>
+                    {evento.nota && (
+                      <p className="mt-1 text-sm leading-relaxed text-fumo">{evento.nota}</p>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-4 text-xs text-fumo-2">{C.lineaTempo.notaOrari}</p>
+          </>
+        )}
+      </details>
+
       <BarraPassi passi={percorso.passi} />
 
       {/* ------------------------------------------------ dove siamo */}
@@ -319,6 +384,20 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
                 {C.azioni.apriLettera}
               </Button>
             )}
+            {/* 🔴 CHIUDE IL GIRO, e prima non esisteva: la pagina restava
+                ferma sulla replica anche dopo averla mandata, quindi un
+                secondo no non aveva dove andare (Valerio, 13/08: «ti
+                blocchi al passo 4»). */}
+            {R.confermaReplica && (
+              <HoInviato
+                praticaId={pratica.id}
+                gesto="replica"
+                etichetta={C.azioni.confermaReplica}
+                inCorso={C.azioni.confermaReplicaInCorso}
+                fatta={C.azioni.confermaReplicaFatta}
+                errore={C.azioni.confermaReplicaErrore}
+              />
+            )}
             {R.confermaInvio && (
               <HoInviato
                 praticaId={pratica.id}
@@ -344,6 +423,11 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
             {C.azioni.confermaInvioNota}
           </p>
         )}
+        {R.confermaReplica && (
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
+            {C.azioni.confermaReplicaNota}
+          </p>
+        )}
 
         {/* LA GARANZIA, UNA RIGA E IN CIMA (scelta di Valerio col popup,
             12/08). Prima era un riquadro verde scuro a metà pagina: si
@@ -361,26 +445,32 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
         </p>
       </section>
 
-      {/* ------------------------------------------------ i documenti.
-          ⚠️ NON È PIÙ UN PASSO, e non blocca più niente (scelta di Valerio
-          col popup, 13/08). Era «PASSO 1 DI 2» e teneva grigio il bottone
-          della lettera un secondo dopo il pagamento: la pagina ti diceva
-          di aprire la lettera e non te la faceva aprire.
-          Adesso è un rinforzo che si propone dopo, con scritto quanto
-          pesa davvero, e sta SOTTO il gesto che porta i soldi a casa. */}
-      {R.documentoExtra && <CaricaDocumento praticaId={pratica.id} />}
-
-      {/* ---------------------------------------------- il fascicolo */}
-      <Fascicolo dossier={dossier} />
-
-      {/* ---------------------------- il no della compagnia, dichiarato */}
+      {/* ---------------------------- il no della compagnia, dichiarato.
+          🔴 STA QUI, SUBITO SOTTO «dove siamo», e prima stava terzultimo.
+          Valerio, 13/08: «nella sezione 4 che senso ha dire 1. dove
+          siamo, 2. carica i documenti, 3. il fascicolo, 4. la replica è
+          pronta? metti la 3 come la prima!».
+          Aveva ragione: l'ordine di una pagina deve essere l'ordine in
+          cui le cose servono. La cosa che fa muovere i soldi è dire che
+          hanno risposto no; la carta d'imbarco e il fascicolo sono
+          contorno, e il contorno sta sotto. */}
       {R.rifiuto && (
         <DichiaraRifiuto
           praticaId={pratica.id}
           giaDichiarato={pratica.rifiuto_motivo ?? null}
           etichettaScelta={schedaRifiuto(pratica.rifiuto_motivo)?.etichetta ?? null}
+          nuovoGiro={percorso.giri.no > 0 && percorso.giri.no === percorso.giri.replicheMandate}
         />
       )}
+
+      {/* ------------------------------------------------ i documenti.
+          ⚠️ NON È PIÙ UN PASSO, e non blocca più niente (scelta di Valerio
+          col popup, 13/08). Era «PASSO 1 DI 2» e teneva grigio il bottone
+          della lettera un secondo dopo il pagamento. */}
+      {R.documentoExtra && <CaricaDocumento praticaId={pratica.id} />}
+
+      {/* ---------------------------------------------- il fascicolo */}
+      <Fascicolo dossier={dossier} />
 
       {/* ------------------------------------------------ come si invia */}
       {R.istruzioni && (
@@ -397,57 +487,6 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           <p className="mt-4 text-sm leading-relaxed text-fumo-2">{C.istruzioniInvio.perche}</p>
         </section>
       )}
-
-      {/* ------------------------------------------------ la cronologia */}
-      <section className="rounded-2xl border border-bordo bg-white px-6 py-6">
-        <h2 className="font-display text-lg tracking-[-0.03em]">{C.lineaTempo.titolo}</h2>
-        {eventiVisibili.length === 0 ? (
-          <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{C.lineaTempo.vuota}</p>
-        ) : (
-          <>
-            <ol className="mt-5 flex flex-col">
-              {eventiVisibili.map((evento, i) => (
-                <li key={evento.id} className="relative flex gap-4 pb-6 last:pb-0">
-                  {/* il filo che unisce i punti; l'ultimo non lo tira oltre */}
-                  {i < eventiVisibili.length - 1 && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute top-4 left-[5px] h-full w-px bg-bordo"
-                    />
-                  )}
-                  <span
-                    aria-hidden="true"
-                    className={`relative mt-1.5 size-[11px] shrink-0 rounded-full ${
-                      i === eventiVisibili.length - 1
-                        ? "bg-verde shadow-[0_0_0_4px_var(--color-menta-tenue)]"
-                        : "border-2 border-verde/50 bg-white"
-                    }`}
-                  />
-                  <div className="min-w-0">
-                    <p className="text-[0.95rem] font-medium leading-snug">
-                      {/* ⚠️ Il passaggio a `sollecito` si chiama così anche
-                          quando ci si arriva perché hanno RISPOSTO: nella
-                          cronologia diventerebbe «Sollecito pronto» sotto
-                          la riga «hanno risposto no», che è la stessa
-                          confusione fra calendario e fatti. */}
-                      {evento.tipo === "sollecito" && pratica.rifiuto_motivo
-                        ? C.lineaTempo.replicaPronta
-                        : (etichetteEventi[evento.tipo] ?? evento.tipo)}
-                    </p>
-                    <p className="numeri mt-0.5 text-xs text-fumo-2">
-                      {dataOraIt(evento.creato_il)}
-                    </p>
-                    {evento.nota && (
-                      <p className="mt-1 text-sm leading-relaxed text-fumo">{evento.nota}</p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-4 text-xs text-fumo-2">{C.lineaTempo.notaOrari}</p>
-          </>
-        )}
-      </section>
 
       {/* La garanzia non è più un riquadro qui: è diventata una riga in
           cima, sotto lo stato. Vedi il commento lassù. */}

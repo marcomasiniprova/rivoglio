@@ -34,12 +34,21 @@ export default function HoInviato({
   inCorso: testoInCorso,
   fatta,
   errore: testoErrore,
+  /**
+   * Quale gesto si sta confermando. Lo stesso bottone serve al reclamo e
+   * alla replica: cambia solo la porta a cui bussa.
+   * ⚠️ Un secondo componente copiato-incollato avrebbe voluto dire due
+   * posti dove riparare lo stesso difetto, ed è già successo una volta
+   * con lo `<script>` che non si rieseguiva.
+   */
+  gesto = "reclamo",
 }: {
   praticaId: string;
   etichetta: string;
   inCorso: string;
   fatta: string;
   errore: string;
+  gesto?: "reclamo" | "replica";
 }) {
   const router = useRouter();
   const [stato, setStato] = useState<"fermo" | "invio" | "fatto">("fermo");
@@ -50,11 +59,14 @@ export default function HoInviato({
     setStato("invio");
     setErrore(null);
     try {
-      const r = await fetch("/api/pratiche/conferma-invio", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pratica_id: praticaId }),
-      });
+      const r =
+        gesto === "replica"
+          ? await fetch(`/api/pratiche/${praticaId}/replica-inviata`, { method: "POST" })
+          : await fetch("/api/pratiche/conferma-invio", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ pratica_id: praticaId }),
+            });
       const corpo = (await r.json().catch(() => null)) as { errore?: string } | null;
       if (!r.ok) throw new Error(corpo?.errore ?? testoErrore);
       setStato("fatto");

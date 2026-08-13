@@ -39,10 +39,18 @@ export default function DichiaraRifiuto({
   praticaId,
   giaDichiarato,
   etichettaScelta,
+  nuovoGiro = false,
 }: {
   praticaId: string;
   /** Il motivo già registrato, se il cliente ha già risposto una volta. */
   giaDichiarato?: string | null;
+  /**
+   * Vero quando la replica del giro precedente è già stata mandata e si
+   * aspetta una risposta nuova. In quel caso il riquadro torna a essere
+   * il modulo («hanno risposto di nuovo?»), non il resoconto del no
+   * vecchio: quel giro è chiuso.
+   */
+  nuovoGiro?: boolean;
   /**
    * Come si legge quel motivo, in italiano. Arriva dal server bell'e
    * pronto: se lo chiedessimo all'elenco, il riquadro chiuso resterebbe
@@ -57,9 +65,12 @@ export default function DichiaraRifiuto({
      modello non ce la fa. */
   const [lista, setLista] = useState(false);
   const [motivi, setMotivi] = useState<Motivo[]>([]);
-  const [scelto, setScelto] = useState<string | null>(giaDichiarato ?? null);
+  const [scelto, setScelto] = useState<string | null>(nuovoGiro ? null : (giaDichiarato ?? null));
   const [invio, setInvio] = useState(false);
-  const [fatto, setFatto] = useState(Boolean(giaDichiarato));
+  /* Su un giro nuovo il riquadro riparte da capo: il no vecchio è già
+     stato chiuso con la sua replica, e mostrarne il resoconto farebbe
+     credere che non sia successo niente. */
+  const [fatto, setFatto] = useState(!nuovoGiro && Boolean(giaDichiarato));
   const [errore, setErrore] = useState("");
 
   useEffect(() => {
@@ -109,15 +120,20 @@ export default function DichiaraRifiuto({
        Adesso qui dentro c'è il bottone che porta al foglio, e dice quale
        no ha in pancia: si legge da solo che qualcosa è cambiato. */
     return (
-      <section className="rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-5">
-        <p className="flex items-center gap-2 text-[0.95rem] font-medium text-verde-notte">
-          <Check className="size-4 shrink-0" aria-hidden="true" />
-          La replica è pronta.
-        </p>
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-verde-notte/80">
-          {etichettaScelta
-            ? `L'abbiamo scritta sul no che ti hanno dato («${etichettaScelta}»), punto per punto. Non è un testo generico: cita le sentenze che smontano proprio quella risposta.`
-            : "L'abbiamo scritta sul motivo che ti hanno dato, punto per punto. Non è un testo generico: cita le sentenze che smontano proprio quella risposta."}
+      /* 🔴 QUI C'ERA UN SECONDO «La replica è pronta.», e lo dice già il
+         riquadro «dove siamo» in cima alla pagina. Valerio, 13/08:
+         «perché dire due volte la replica è pronta? se lo dice già il box
+         dove siamo, perché metterne un altro che conferma?».
+         Adesso questo riquadro dice l'unica cosa che l'altro non può
+         dire: SU QUALE no è stata scritta, e come cambiarlo. */
+      <section className="rounded-2xl border border-bordo bg-white px-6 py-4">
+        <p className="flex items-start gap-2 text-[0.95rem] leading-relaxed text-fumo">
+          <Check className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
+          <span>
+            {etichettaScelta
+              ? `Il no che hai registrato: «${etichettaScelta}». La replica è scritta su quello, punto per punto.`
+              : "La replica è scritta sul motivo che hai registrato, punto per punto."}
+          </span>
         </p>
         {/* 🔴 QUI C'ERA UN SECONDO BOTTONE «Leggi la replica», e portava
             allo STESSO indirizzo di «Apri la replica» che sta in cima
@@ -130,7 +146,7 @@ export default function DichiaraRifiuto({
         <button
           type="button"
           onClick={() => setAperto(true)}
-          className="mt-4 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
+          className="mt-3 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
         >
           Ho sbagliato motivo, lo cambio
         </button>
@@ -173,7 +189,7 @@ export default function DichiaraRifiuto({
               setLista(true);
               setErrore("");
             }}
-            className="mt-4 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
+            className="mt-3 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
           >
             Non ho la loro risposta sottomano: scelgo dall&apos;elenco
           </button>

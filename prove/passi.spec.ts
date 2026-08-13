@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { percorsoPratica } from "../lib/pratiche/passi";
+import { EVENTO_REPLICA_INVIATA, giriDiNo, percorsoPratica } from "../lib/pratiche/passi";
 import { EVENTO_CARICATO, EVENTO_SALTATO } from "../lib/pratiche/documenti";
 import type { EventoPratica, StatoPratica } from "../lib/pratiche/pratiche";
 
@@ -205,5 +205,84 @@ test.describe("Il no della compagnia sposta il percorso", () => {
     expect(percorsoPratica("inviata", [], null).riquadri.rifiuto).toBe(true);
     expect(percorsoPratica("sollecito", [], null).riquadri.rifiuto).toBe(true);
     expect(percorsoPratica("esito_pagata", [], null).riquadri.rifiuto).toBe(false);
+  });
+});
+
+test.describe("I giri di «no» sono illimitati", () => {
+  /* 🔴 Valerio, 13/08: «stranamente gli ultimi passi ti blocchi al passo
+     4, perché dici solo il primo no e poi basta: non c'è possibilità dopo
+     la prima controproposta di un altro no».
+     Era un vicolo cieco vero: la pratica sapeva di UN no (una colonna) e
+     non aveva dove mettere il secondo. Nella realtà il secondo no è
+     normalissimo. Adesso il conto si tiene sugli eventi. */
+
+  const no = () => evento("rifiuto");
+  const replica = () => evento(EVENTO_REPLICA_INVIATA);
+
+  test("primo no: tocca a te, e il bottone per chiudere il giro c'è", () => {
+    const p = percorsoPratica("sollecito", [no()], "sciopero_esterno");
+    expect(p.attivo).toBe("replica");
+    expect(p.riquadri.confermaReplica).toBe(true);
+    /* Non si chiede «hanno risposto no?» mentre un no è già aperto: si
+       dichiarerebbe due volte lo stesso. */
+    expect(p.riquadri.rifiuto).toBe(false);
+  });
+
+  test("mandata la replica: la palla torna a loro e si può dichiarare un nuovo no", () => {
+    const p = percorsoPratica("sollecito", [no(), replica()], "sciopero_esterno");
+    expect(p.attivo).toBe("attesa");
+    expect(p.chiaveTesto).toBe("attesa_replica");
+    expect(p.riquadri.confermaReplica).toBe(false);
+    expect(p.riquadri.rifiuto, "il modulo deve riaprirsi per il giro dopo").toBe(true);
+  });
+
+  test("🔴 secondo no: il percorso NON si ferma", () => {
+    const p = percorsoPratica("sollecito", [no(), replica(), no()], "sciopero_esterno");
+    expect(p.attivo).toBe("replica");
+    expect(p.riquadri.confermaReplica).toBe(true);
+    expect(p.giri).toEqual({ no: 2, replicheMandate: 1 });
+  });
+
+  test("dal secondo no compaiono ente e conciliazione, INSIEME alla replica", () => {
+    const uno = percorsoPratica("sollecito", [no()], "sciopero_esterno");
+    expect(uno.riquadri.enteEConciliazione, "al primo no la trattativa ha ancora senso").toBe(false);
+    const due = percorsoPratica("sollecito", [no(), replica(), no()], "sciopero_esterno");
+    expect(due.riquadri.enteEConciliazione).toBe(true);
+    expect(due.riquadri.confermaReplica, "non al posto della replica: insieme").toBe(true);
+  });
+
+  test("il conto non va mai in negativo", () => {
+    /* Un doppio clic o due schede aperte non devono far credere che ci
+       sia una replica da mandare che non esiste. */
+    expect(giriDiNo([replica(), replica(), no()])).toEqual({ no: 1, replicheMandate: 1 });
+  });
+
+  test("⚠️ una pratica vecchia col solo motivo in colonna conta come un giro", () => {
+    /* Le pratiche aperte prima del 13/08 hanno `rifiuto_motivo` pieno ma
+       possono non avere l'evento: senza questa prudenza il loro percorso
+       tornerebbe indietro da solo. */
+    const p = percorsoPratica("sollecito", [], "sciopero_esterno");
+    expect(p.giri.no).toBe(1);
+    expect(p.attivo).toBe("replica");
+  });
+
+  test("nessuno stato lascia l'utente senza niente da fare e senza attesa", () => {
+    const casi: [StatoPratica, EventoPratica[], string | null][] = [
+      ["pagata", [], null],
+      ["inviata", [], null],
+      ["inviata", [no()], "sciopero_esterno"],
+      ["sollecito", [], null],
+      ["sollecito", [no(), replica()], "sciopero_esterno"],
+      ["sollecito", [no(), replica(), no(), replica(), no()], "sciopero_esterno"],
+      ["enac", [], null],
+    ];
+    for (const [stato, eventi, motivo] of casi) {
+      const p = percorsoPratica(stato, eventi, motivo);
+      const r = p.riquadri;
+      const qualcosaDaFare =
+        r.confermaInvio || r.confermaReplica || r.rifiuto || r.enteEConciliazione;
+      const staAspettando = p.attivo === "attesa";
+      expect(qualcosaDaFare || staAspettando, `${stato} è un vicolo cieco`).toBe(true);
+    }
   });
 });
