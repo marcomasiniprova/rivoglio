@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cassaDiProvaAperta } from "@/lib/check/cancello";
 import { CHECK_PER_PAGAMENTO, PREZZO_LANCIO } from "@/lib/check/ingresso";
 import { COOKIE_PASS, creaPass } from "@/lib/check/pass";
+import { ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { dopo, traccia } from "@/lib/eventi/registra";
 import { tin } from "@/lib/eventi/telegram";
 
@@ -41,6 +42,22 @@ export async function POST(req: Request) {
      inventata. È l'interruttore che la spegne il giorno del venditore. */
   if (!cassaDiProvaAperta()) {
     return NextResponse.json({ ok: false, errore: "Non trovato." }, { status: 404 });
+  }
+
+  /* 🔴 QUESTA ROTTA NON AVEVA NESSUN FRENO, ed è quella che stampa le
+     ricevute. Con la cassa aperta a tutti (decisione del 12/08) bastava
+     chiamarla in ciclo per avere ricevute a volontà, e ogni ricevuta è
+     un'analisi che paghiamo al fornitore. In più ogni ricevuta manda un
+     messaggio su Telegram: mille ricevute sono mille TIN, cioè un canale
+     che si silenzia e non suona più il giorno che serve davvero.
+     Quattro al minuto è dieci volte quello che serve a una persona che
+     sta provando il prodotto, e mille volte meno di quello che serve a
+     chi vuole farci male. */
+  if (await oltreIlLimiteCondiviso("cassa-prova", ipDi(req), 4)) {
+    return NextResponse.json(
+      { ok: false, errore: "Troppe richieste di seguito. Riprova fra un minuto." },
+      { status: 429 },
+    );
   }
 
   /* L'ordine porta scritto in faccia che è una prova: se un giorno

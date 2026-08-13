@@ -230,3 +230,57 @@ create index if not exists verifiche_ordine_check_idx
 select column_name
 from information_schema.columns
 where table_name = 'verifiche' and column_name = 'ordine_check';
+
+-- ═══════════════════════════════════════════════════════════════════════
+-- 7. IL TETTO SULLA SPESA  (13/08, giro #65)  ✅ GIÀ APPLICATO
+-- ═══════════════════════════════════════════════════════════════════════
+-- Quante chiamate al fornitore dei dati di volo si fanno in un'ora, in
+-- tutto il sito. È la difesa che il freno per IP non può dare: chi vuole
+-- farci male usa cento indirizzi, e ognuno resta educatamente sotto il
+-- suo tetto mentre il conto sale.
+--
+-- ⚠️ NELLA RIGA NON C'È NESSUNA PERSONA: l'ora (in ora italiana) e un
+-- numero. È la stessa regola del registro degli eventi, e qui vale
+-- doppio, perché un contatore per IP sarebbe l'unico posto del sito dove
+-- teniamo traccia di chi passa.
+create table if not exists public.consumo_fornitore (
+  ora text primary key,
+  chiamate integer not null default 0,
+  aggiornato_il timestamptz not null default now()
+);
+
+alter table public.consumo_fornitore enable row level security;
+
+-- L'aumento e la lettura in un colpo solo. Con due query separate due
+-- copie della funzione partite insieme leggerebbero lo stesso numero e
+-- scriverebbero lo stesso numero: il contatore perderebbe colpi proprio
+-- sotto raffica, cioè quando serve.
+create or replace function public.segna_chiamata_fornitore(p_ora text)
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  n integer;
+begin
+  insert into public.consumo_fornitore (ora, chiamate, aggiornato_il)
+  values (p_ora, 1, now())
+  on conflict (ora) do update
+    set chiamate = public.consumo_fornitore.chiamate + 1,
+        aggiornato_il = now()
+  returning chiamate into n;
+
+  if n = 1 then
+    delete from public.consumo_fornitore where aggiornato_il < now() - interval '3 days';
+  end if;
+
+  return n;
+end;
+$$;
+
+revoke all on function public.segna_chiamata_fornitore(text) from public, anon, authenticated;
+grant execute on function public.segna_chiamata_fornitore(text) to service_role;
+
+-- Controllo: deve rispondere 1 e poi 2.
+-- select public.segna_chiamata_fornitore('prova'), public.segna_chiamata_fornitore('prova');

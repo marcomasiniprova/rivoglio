@@ -29,6 +29,7 @@
 
 import { dopo } from "@/lib/eventi/registra";
 import { tinGuasto } from "@/lib/eventi/telegram";
+import { segnaChiamataFornitore, TETTO_ORA } from "@/lib/api/tetto-fornitore";
 
 /** Tempo totale che possiamo spendere, tentativi e attese comprese. */
 export const BUDGET_MS = 8_000;
@@ -64,6 +65,24 @@ function allarmeFornitore(etichetta: string, stato: number): void {
       stato === 0
         ? `Il fornitore dei dati di volo non risponde (${etichetta}).\nI check escono "incerto": nessuno paga per un verdetto sbagliato, ma le vendite si fermano.`
         : `Il fornitore dei dati di volo risponde ${stato} (${etichetta}).\n${stato === 429 ? "È il tetto delle richieste al secondo: sta arrivando troppa gente insieme." : "È un guasto dalla loro parte."}`,
+    ),
+  );
+}
+
+/**
+ * IL TIN QUANDO IL TETTO SI CHIUDE.
+ *
+ * È uno dei tre casi in cui i soldi si muovono o si fermano, quindi vale
+ * un messaggio sul telefono: da quel momento i check escono "incerto" e
+ * non si vende più niente finché non scocca l'ora dopo. Il silenziatore
+ * da un quarto d'ora di `tinGuasto` fa il resto: sotto attacco arrivano
+ * quattro messaggi all'ora, non quattromila.
+ */
+function allarmeTetto(fatte: number): void {
+  dopo(() =>
+    tinGuasto(
+      "tetto-fornitore",
+      `Tetto orario delle chiamate al fornitore raggiunto: ${fatte} in un'ora (limite ${TETTO_ORA}).\nDa adesso i check escono "incerto" finché non scocca l'ora nuova: nessuno paga per un verdetto sbagliato, ma le vendite si fermano.\nSe non è traffico vero, è qualcuno che ci sta girando un elenco di voli.`,
     ),
   );
 }
@@ -106,6 +125,22 @@ export async function chiamaConRitentativo(
   etichetta: string,
   budgetMs = BUDGET_MS,
 ): Promise<EsitoChiamata> {
+  /* IL TETTO SULLA SPESA, prima di tutto il resto.
+     Sta qui e non nelle rotte perché qui passa OGNI chiamata che
+     paghiamo, comprese quelle delle tre rotte del seguito (cancellato,
+     dichiara, operativo) e del lavoro notturno degli avvisi. Un tetto
+     scritto rotta per rotta è un tetto che la rotta numero sei non ha.
+     ⚠️ I ritentativi NON contano doppio: il conto si fa una volta per
+     chiamata logica, prima del ciclo. Contare anche i ritentativi
+     vorrebbe dire chiudere il rubinetto proprio nel momento in cui il
+     fornitore sta già facendo i capricci. */
+  const tetto = await segnaChiamataFornitore();
+  if (tetto.chiuso) {
+    console.warn(`[${etichetta}] tetto orario raggiunto (${tetto.fatte}/${TETTO_ORA})`);
+    allarmeTetto(tetto.fatte ?? TETTO_ORA);
+    return { ok: false, stato: 0 };
+  }
+
   const scadenza = Date.now() + budgetMs;
 
   for (let tentativo = 0; tentativo < TENTATIVI; tentativo++) {

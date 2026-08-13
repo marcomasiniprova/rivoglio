@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { normalizzaData, normalizzaVolo } from "@/lib/voli/normalizza";
-import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { verificaCoerente, cancelloDelSeguito } from "@/lib/check/cancello";
 import {
   rispostaCoincidenzaValida,
@@ -41,7 +41,7 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  if (oltreIlLimite("dichiara", ipDi(req), MASSIMO_AL_MINUTO)) {
+  if (await oltreIlLimiteCondiviso("dichiara", ipDi(req), MASSIMO_AL_MINUTO)) {
     return NextResponse.json(
       { ok: false, errore: "Troppe richieste di fila. Aspetta un minuto." },
       { status: 429, headers: CORS },

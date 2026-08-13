@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { normalizzaData, normalizzaVolo } from "@/lib/voli/normalizza";
-import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { verificaCoerente, cancelloDelSeguito } from "@/lib/check/cancello";
 import { cercaVettore, valutaOperativo, vettoreValido } from "@/lib/regole/operativo";
 import { verificaVolo } from "@/lib/voli/verifica";
@@ -34,7 +34,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  if (oltreIlLimite("operativo", ipDi(req), MASSIMO_AL_MINUTO)) {
+  if (await oltreIlLimiteCondiviso("operativo", ipDi(req), MASSIMO_AL_MINUTO)) {
     return NextResponse.json(
       { ok: false, errore: "Troppe richieste di fila. Aspetta un minuto." },
       { status: 429, headers: CORS },

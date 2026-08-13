@@ -178,6 +178,15 @@ function stato(): Voce[] {
       ceSta: c(process.env.UPSTASH_REDIS_REST_TOKEN),
     },
     {
+      nome: "TETTO_FORNITORE_ORA",
+      serve:
+        "Quante chiamate al fornitore dei dati di volo si fanno in un'ora, in tutto il sito. È il tetto sulla SPESA, e funziona già adesso senza configurare niente: il conto lo tiene il database. Sopra il tetto i check escono incerti fino all'ora dopo, e ti arriva un TIN.",
+      seManca:
+        "Vale mille all'ora, che è molto sopra il traffico di oggi e molto sotto quello che serve a chi vuole farci male. Si scrive un numero qui solo per alzarlo o abbassarlo.",
+      peso: "facoltativa",
+      ceSta: c(process.env.TETTO_FORNITORE_ORA),
+    },
+    {
       nome: "NEXT_PUBLIC_SITO",
       serve:
         "L'indirizzo del sito, usato nelle email e nella mappa per Google. ⚠️ Si può TOGLIERE: senza, il sito legge l'indirizzo che Netlify gli dà da solo, e quello non diventa mai vecchio.",
