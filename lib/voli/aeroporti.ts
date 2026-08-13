@@ -24,6 +24,13 @@ export type AeroportoTrovato = {
   iata: string;
   citta: string;
   nome: string;
+  /**
+   * Come si scrive all'utente: "Milano Malpensa", "Parigi Charles de
+   * Gaulle". Non il nome grezzo dell'archivio, che è in inglese e pieno
+   * di parole di riempimento, e non il comune, che dopo l'aggiornamento
+   * del 10/08 faceva diventare Malpensa "Ferno". Vedi `etichettaScalo`.
+   */
+  etichetta: string;
   paese: string;
 };
 
@@ -213,14 +220,31 @@ const PRINCIPALI = new Set([
 type Riga = { iata: string; a: Aeroporto; citta: string; nome: string };
 let indice: Riga[] | null = null;
 
+/**
+ * SOLO GLI SCALI CON VOLI DI LINEA (scelta di Valerio, 13/08).
+ *
+ * L'archivio ne ha 9.016, ma 4.456 sono piste private, eliporti e campi
+ * di volo da cui non è mai partito un passeggero: nella ricerca uscivano
+ * insieme agli aeroporti veri, e chi scriveva "mila" se li trovava in
+ * mezzo. Il `peso` viene dal tipo dichiarato da OurAirports: 2 = grande,
+ * 1 = medio, 0 = piccolo.
+ *
+ * ⚠️ Gli scali esclusi restano nell'archivio e continuano a servire per
+ * le distanze e per il cancello territoriale: spariscono SOLO dal campo
+ * di ricerca. Un volo da uno di quelli si analizza lo stesso.
+ */
+const CERCABILE = 1;
+
 function costruisci(): Riga[] {
   if (indice) return indice;
-  indice = Object.entries(ELENCO).map(([iata, a]) => ({
-    iata,
-    a,
-    citta: piatto(a.citta ?? ""),
-    nome: piatto(a.nome ?? ""),
-  }));
+  indice = Object.entries(ELENCO)
+    .filter(([, a]) => (a.peso ?? 0) >= CERCABILE)
+    .map(([iata, a]) => ({
+      iata,
+      a,
+      citta: piatto(a.citta ?? ""),
+      nome: piatto(a.nome ?? ""),
+    }));
   return indice;
 }
 
@@ -308,6 +332,9 @@ export function cercaAeroporti(query: string, limite = MASSIMO): AeroportoTrovat
     iata: riga.iata,
     citta: inItaliano(riga.a.citta) ?? riga.a.citta,
     nome: riga.a.nome,
+    /* Come si legge davvero: "Milano Malpensa", non "Milan Malpensa
+       International Airport" e non "Ferno". Vedi etichettaScalo. */
+    etichetta: etichettaScalo(riga.a.nome, riga.a.citta),
     paese: paeseInItaliano(riga.a.iso, riga.a.paese),
   }));
 }
@@ -324,8 +351,18 @@ const IN_ITALIANO: Record<string, string> = Object.fromEntries(
   Object.entries(ESONIMI).map(([it, en]) => [en, it]),
 );
 
+/**
+ * Esonimi che si accettano SCRITTI ma non si mostrano mai.
+ *
+ * "Nuova York" sta in tabella perché qualcuno potrebbe cercarlo così, ma
+ * nessuno lo dice più: farlo comparire nell'elenco farebbe sembrare il
+ * sito tradotto con un dizionario del secolo scorso.
+ */
+const SOLO_IN_ENTRATA = new Set(["new york", "philadelphia", "new orleans"]);
+
 export function inItaliano(nome: string | null | undefined): string | null {
   if (!nome) return null;
+  if (SOLO_IN_ENTRATA.has(nome.trim().toLowerCase())) return nome;
   const italiano = IN_ITALIANO[nome.trim().toLowerCase()];
   if (!italiano) return nome;
   /* Le iniziali maiuscole, parola per parola: "the hague" → "L'Aia" no,
@@ -359,6 +396,89 @@ export function paeseInItaliano(iso: string | null | undefined, riserva: string)
   }
 }
 
+/**
+ * COME SI SCRIVE UN AEROPORTO ALL'UTENTE: "Milano Malpensa".
+ *
+ * 🔴 Il difetto che ha fatto nascere questa funzione. L'archivio scrive
+ * il nome in inglese e con le parole di riempimento: "Milan Malpensa
+ * International Airport", "Charles de Gaulle International Airport". E
+ * la CITTA' a volte è il comune, non la città: dopo l'aggiornamento
+ * automatico del 10/08 Malpensa era diventata "Ferno". Chi cerca il
+ * proprio volo non riconosce né l'uno né l'altro, e se ne va.
+ *
+ * Le tre regole, in ordine:
+ * 1. si tolgono le parole che non dicono niente (Airport, International,
+ *    Aeroporto, e le loro versioni in altre lingue);
+ * 2. se quello che resta comincia col nome inglese della città, si
+ *    sostituisce con l'italiano: "Milan Malpensa" → "Milano Malpensa";
+ * 3. se non contiene affatto la città, la si mette davanti: "Charles de
+ *    Gaulle" → "Parigi Charles de Gaulle".
+ *
+ * ⚠️ Non si inventa mai un nome: se la tabella degli esonimi non
+ * conosce quella città, resta quella dell'archivio. Meglio "Anaa" che
+ * una traduzione fantasiosa.
+ */
+const RIEMPITIVI =
+  /\b(international|intl|airport|aeroporto|aeropuerto|a[ée]roport|flughafen|regional|municipal|metropolitan|field)\b/gi;
+
+/** Toglie spazi, virgole e trattini (anche quelli lunghi) dai bordi. */
+const spuntato = (t: string) => t.replace(/^[\s,\-–—]+|[\s,\-–—]+$/g, "");
+
+export function etichettaScalo(nomeGrezzo: string, cittaGrezza: string): string {
+  /* ⚠️ L'ARCHIVIO NON È PULITO: qualche riga ha spazi in coda alla città
+     ("Artigas "), e quello spazio finiva dritto nell'etichetta. Si
+     spunta all'ingresso, una volta sola. */
+  const nome = (nomeGrezzo ?? "").trim();
+  const citta = (cittaGrezza ?? "").trim();
+  const cittaIt = (inItaliano(citta) ?? citta).trim();
+
+  const pulito = spuntato(nome.replace(RIEMPITIVI, " ").replace(/\s{2,}/g, " "));
+
+  /* Un nome che si riduce a niente (succede sugli scali che si chiamano
+     solo "Airport") lascia il posto alla sola città. */
+  if (!pulito) return cittaIt;
+
+  const piattoNome = piatto(pulito);
+  const piattaCitta = piatto(citta);
+  const piattaCittaIt = piatto(cittaIt);
+
+  /* Il nome È la città: "Munich Airport" → "Monaco di Baviera". */
+  if (piattoNome === piattaCitta || piattoNome === piattaCittaIt) return cittaIt;
+
+  /* ⚠️ LA CITTA' DENTRO IL NOME PUO' ESSERE SCRITTA IN UN'ALTRA LINGUA E
+     ATTACCATA CON UN TRATTINO. L'archivio ha "Milan Malpensa" con città
+     "Milano", e "Rome–Fiumicino Leonardo da Vinci" con città "Rome".
+     Si tolgono in testa, esattamente, i nomi che sappiamo essere quella
+     città: quello italiano, quello dell'archivio e quello inglese della
+     tabella degli esonimi. Tagliare invece "la prima parola" costava
+     pezzi veri del nome: da Fiumicino spariva "Fiumicino", e da
+     "Paris-Le Bourget" spariva "Le". */
+  const candidati = [cittaIt, citta, ESONIMI[piattaCittaIt], ESONIMI[piattaCitta]].filter(
+    (c): c is string => Boolean(c),
+  );
+  for (const c of candidati) {
+    const n = c.length;
+    if (piatto(pulito.slice(0, n)) !== piatto(c)) continue;
+    /* Deve finire lì o essere seguito da uno stacco: senza questo,
+       "Romeo" verrebbe tagliato come se fosse "Rome". */
+    if (pulito.length > n && !/[\s\-–—]/.test(pulito[n])) continue;
+    const resto = spuntato(pulito.slice(n));
+    return resto ? `${cittaIt} ${resto}` : cittaIt;
+  }
+
+  /* La città non compare da nessuna parte: la si mette davanti, che è
+     come si dice. "Parigi Charles de Gaulle".
+     ⚠️ Il confronto è a PAROLA INTERA. Con `includes` semplice, "Romeo"
+     conteneva "Rome" e lo scalo restava senza città davanti: un nome
+     che comincia come la città non è la città. */
+  const comeParola = (dentro: string, cercata: string) =>
+    new RegExp(`\\b${cercata.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(dentro);
+  if (!comeParola(piattoNome, piattaCitta) && !comeParola(piattoNome, piattaCittaIt)) {
+    return spuntato(`${cittaIt} ${pulito}`);
+  }
+  return spuntato(pulito);
+}
+
 /** Un aeroporto preciso dal suo codice, per mostrarlo in chiaro. */
 export function aeroportoPerIata(iata: string): AeroportoTrovato | null {
   const codice = (iata ?? "").trim().toUpperCase();
@@ -368,6 +488,7 @@ export function aeroportoPerIata(iata: string): AeroportoTrovato | null {
     iata: codice,
     citta: inItaliano(a.citta) ?? a.citta,
     nome: a.nome,
+    etichetta: etichettaScalo(a.nome, a.citta),
     paese: paeseInItaliano(a.iso, a.paese),
   };
 }

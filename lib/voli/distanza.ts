@@ -27,6 +27,17 @@ export type Aeroporto = {
   lat: number;
   lon: number;
   tz: string | null;
+  /**
+   * Quanto è grande lo scalo, dal tipo dichiarato da OurAirports:
+   * 2 = grande, 1 = medio, 0 = pista privata o campo di volo.
+   * Serve alla ricerca, che mostra solo quelli con voli di linea.
+   */
+  peso?: number;
+  /**
+   * true se il fuso non veniva dalla fonte ma l'abbiamo dedotto noi
+   * (dal paese o dallo scalo più vicino). Vedi scripts/aeroporti/fusi.mjs.
+   */
+  tzDedotto?: boolean;
 };
 
 const ELENCO = aeroporti as Record<string, Aeroporto>;

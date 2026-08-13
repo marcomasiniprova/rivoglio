@@ -167,6 +167,9 @@ test.describe("A chi va la lettera", () => {
          Milano. Coperte a metà per costruzione (art. 3 par. 1 lett. a:
          solo in partenza dall'Europa), ma quella metà è vendibile. */
       "SQ", "CX", "NH", "JL", "KE", "TG", "AI", "AC", "LA", "FZ", "SV", "LY",
+      /* Quinto giro, 13/08: l'archivio si chiude. */
+      "BQ", "FB", "XC", "CA", "MU", "CZ", "BR", "VN", "MH", "PR", "UL",
+      "KU", "RJ", "ME", "GF", "WY", "J2", "KC", "AH", "KQ", "AM", "AV", "CM",
     ];
     const presenti = new Set(COMPAGNIE.map((c) => c.iata));
     const mancanti = ATTESI.filter((i) => !presenti.has(i));

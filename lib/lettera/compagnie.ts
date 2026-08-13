@@ -1,6 +1,6 @@
 /**
  * I canali reclamo UFFICIALI delle compagnie che possono finire in una
- * pratica vera: **62 al 13/08**, cresciute in quattro giri (20 → 39 → 50 → 62).
+ * pratica vera: **85 al 13/08**, cresciute in cinque giri (20 → 39 → 50 → 62 → 85).
  * Strato 5 (generazione documenti): la lettera va spedita al
  * canale giusto del vettore OPERATIVO, perché l'errore n.1 dei reclami
  * respinti è scriverla a chi ha venduto il biglietto invece che a chi
@@ -1415,6 +1415,470 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     fonte:
       "Ricerca web 13/08/2026 con filtro sul dominio elal.com: 'Passenger Rights According to the European Aviation Services Law' e la pagina sulla risoluzione alternativa delle controversie.",
     chiavi: ["EL AL", "ELAL"],
+  },
+
+  /* =================================================================
+     QUINTO GIRO (13/08): l'archivio si chiude.
+
+     Le ultime della classifica di Valerio. Da qui in avanti «compagnia
+     non in archivio» dovrebbe essere un caso che non capita quasi mai.
+
+     🔴 TRE COMPAGNIE PUBBLICANO UN'EMAIL VERA, ed è la prima volta da
+     venti schede: Kuwait Airways, Royal Jordanian e Azerbaijan Airlines
+     la scrivono sulle proprie pagine ufficiali. Su quelle il bottone
+     apre l'email già scritta, non il modulo.
+
+     ⚠️ RESTANO FUORI, dichiarate: Hi Fly (vola in wet lease, i biglietti
+     non li vende), Air Moldova (ha cessato le operazioni), Southwest
+     (solo voli interni agli Stati Uniti: il Regolamento non la tocca
+     mai) e IndiGo (nessun collegamento con l'Europa al 13/08).
+     ================================================================= */
+
+  /* ------------------------------------------------------------ Europa */
+  {
+    iata: "BQ",
+    icao: "SWU",
+    nome: "SkyAlps",
+    nomeLegale: "SkyAlps S.r.l.",
+    paese: "IT",
+    canale:
+      "Pagina ufficiale sui diritti del passeggero, in italiano. Il reclamo va rivolto direttamente alla compagnia, che ha 30 giorni per rispondere.",
+    url: "https://www.skyalps.com/it/su-skyalps/diritti-del-passeggero",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio skyalps.com: 'Diritti del passeggero' e le condizioni generali di trasporto. Codici IATA/ICAO confermati da fonti di settore.",
+    chiavi: ["SKYALPS", "SKY ALPS"],
+    giorniRisposta: 30,
+  },
+  {
+    iata: "FB",
+    icao: "LZB",
+    nome: "Bulgaria Air",
+    nomeLegale: "Bulgaria Air JSC",
+    paese: "BG",
+    canale:
+      "Piattaforma ufficiale dei reclami. Dichiarano di chiudere la pratica entro due mesi dalla presentazione.",
+    url: "https://www.air.bg/en/customer-support/passenger-rights/",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio air.bg: 'Complaints and Claims - Submit Request' e 'Your passenger rights when travelling by air'.",
+    chiavi: ["BULGARIA AIR"],
+    giorniRisposta: 60,
+  },
+  {
+    iata: "XC",
+    icao: "CAI",
+    nome: "Corendon Airlines",
+    nomeLegale: "Corendon Airlines A.Ş.",
+    paese: "TR",
+    canale:
+      "Pagina ufficiale dei diritti del passeggero, da cui si registra il reclamo. ⚠️ Chiedono di registrarsi prima: da lì si segue lo stato della pratica.",
+    url: "https://www.corendonairlines.com/contact/passenger-rights",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio corendonairlines.com: 'Post-Flight Information', 'Passenger Rights' e il modulo di contatto.",
+    chiavi: ["CORENDON"],
+  },
+
+  /* ------------------------------------------------------ Asia orientale */
+  {
+    iata: "CA",
+    icao: "CCA",
+    nome: "Air China",
+    nomeLegale: "Air China Limited",
+    paese: "CN",
+    canale: "Modulo ufficiale per le segnalazioni dei passeggeri, sul sito in lingua inglese.",
+    url: "https://www.airchina.us/US/GB/contact-us/passenger-feedbak/",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sui domini airchina.com e airchina.us: 'Passenger Feedback' e la pagina degli uffici europei.",
+    chiavi: ["AIR CHINA"],
+  },
+  {
+    iata: "MU",
+    icao: "CES",
+    nome: "China Eastern",
+    nomeLegale: "China Eastern Airlines Corporation Limited",
+    paese: "CN",
+    canale: "Modulo ufficiale 'Comment / Complaint' della consulenza online.",
+    url: "https://us.ceair.com/en/online-consulting.html",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio ceair.com: 'COMMENT/COMPLAINT', la piattaforma reclami e il Customer Service Plan ufficiale.",
+    chiavi: ["CHINA EASTERN"],
+  },
+  {
+    iata: "CZ",
+    icao: "CSN",
+    nome: "China Southern",
+    nomeLegale: "China Southern Airlines Company Limited",
+    paese: "CN",
+    canale:
+      "Modulo di segnalazione ufficiale. Confermano la ricezione entro 30 giorni e rispondono nel merito entro 60.",
+    url: "https://feedback.csair.com/feedback-mobile/mobile/enfeedbackForm/us",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio csair.com: modulo 'Feedback' e 'Customer Service Plan'.",
+    chiavi: ["CHINA SOUTHERN"],
+    giorniRisposta: 60,
+  },
+  {
+    iata: "BR",
+    icao: "EVA",
+    nome: "EVA Air",
+    nomeLegale: "EVA Airways Corporation",
+    paese: "TW",
+    canale:
+      "Pagina ufficiale dei disservizi e delle irregolarità di volo: arrivato lì, scegli la voce del ritardo o della cancellazione.",
+    url: "https://www.evaair.com/en-global/customer-services/ticket-changes-refunds-due-to-schedule-changes/",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    /* Un modulo dedicato ai soli casi 261 non è comparso sul dominio: si
+       dichiara, e l'interfaccia lo dice all'utente. */
+    verificato: false,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio evaair.com: 'Ticket Changes/Refunds Due to Flight Irregularities' e le condizioni di trasporto.",
+    chiavi: ["EVA AIR", "EVA AIRWAYS"],
+  },
+  {
+    iata: "VN",
+    icao: "HVN",
+    nome: "Vietnam Airlines",
+    nomeLegale: "Vietnam Airlines JSC",
+    paese: "VN",
+    canale:
+      "Modulo di segnalazione ufficiale. ⚠️ Chiedono di presentare la richiesta entro 90 giorni dalla data prevista di partenza.",
+    url: "https://www.vietnamairlines.com/us/en/feed-back",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio vietnamairlines.com: 'Feedback', 'Helpdesk Center' e il Customer Service Plan.",
+    chiavi: ["VIETNAM AIRLINES"],
+  },
+  {
+    iata: "MH",
+    icao: "MAS",
+    nome: "Malaysia Airlines",
+    nomeLegale: "Malaysia Airlines Berhad",
+    paese: "MY",
+    canale:
+      "Modulo di segnalazione ufficiale. Dichiarano di confermare la ricezione entro 48 ore e di rispondere entro cinque giorni lavorativi.",
+    url: "https://www.malaysiaairlines.com/uk/en/askmh/contact-us.html",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio malaysiaairlines.com: 'Customer Feedback', 'How do I file an official complaint' e le informazioni legali.",
+    chiavi: ["MALAYSIA AIRLINES"],
+    giorniRisposta: 7,
+  },
+  {
+    iata: "PR",
+    icao: "PAL",
+    nome: "Philippine Airlines",
+    nomeLegale: "Philippine Airlines, Inc.",
+    paese: "PH",
+    canale: "Modulo ufficiale di segnalazione, nella sezione contatti.",
+    url: "https://www.philippineairlines.com/ph/en/about-us/contact-us/customer-feedback.html",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio philippineairlines.com: 'Customer Feedback' e 'Commitment to Customer Satisfaction'.",
+    chiavi: ["PHILIPPINE AIRLINES"],
+  },
+  {
+    iata: "UL",
+    icao: "ALK",
+    nome: "SriLankan Airlines",
+    nomeLegale: "SriLankan Airlines Limited",
+    paese: "LK",
+    canale:
+      "Pagina contatti ufficiale: arrivato lì, scegli la voce che riguarda il volo, non i bagagli.",
+    url: "https://www.srilankan.com/en_uk/flying-with-us/contact-us",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: false,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio srilankan.com: 'Contact SriLankan Airlines' e il piano per i ritardi. Un modulo dedicato ai casi 261 non è comparso.",
+    chiavi: ["SRILANKAN", "SRI LANKAN"],
+  },
+
+  /* ------------------------------------------- Medio Oriente e Asia centrale */
+  {
+    iata: "KU",
+    icao: "KAC",
+    nome: "Kuwait Airways",
+    nomeLegale: "Kuwait Airways Corporation",
+    paese: "KW",
+    canale:
+      "La pagina ufficiale dedicata al Regolamento (CE) 261/2004 pubblica l'indirizzo delle relazioni con i clienti: il reclamo si manda lì, per email.",
+    url: "https://kuwaitairways.com/en/information/usefulinfo/Pages/ec-regulation.aspx",
+    /* Prima email vera da venti schede: la scrivono loro, sulla pagina
+       che parla proprio del Regolamento. */
+    email: "customer-relations@kuwaitairways.com",
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio kuwaitairways.com: 'Useful Information EU Regulation' (dove compare l'indirizzo email) e 'Contact Compliments and Complaints'.",
+    chiavi: ["KUWAIT AIRWAYS"],
+  },
+  {
+    iata: "RJ",
+    icao: "RJA",
+    nome: "Royal Jordanian",
+    nomeLegale: "Alia - The Royal Jordanian Airlines PLC",
+    paese: "JO",
+    canale:
+      "Il reclamo si manda per email al servizio clienti: rispondono con un numero di pratica entro dieci giorni lavorativi.",
+    url: "https://www.rj.com/en/contact-us/e-mail-us",
+    email: "customer.services@rj.com",
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio rj.com: 'E-Mail us', 'Customer Service Plan' e 'Travel Updates and Passenger Support'.",
+    chiavi: ["ROYAL JORDANIAN"],
+    giorniRisposta: 14,
+  },
+  {
+    iata: "ME",
+    icao: "MEA",
+    nome: "Middle East Airlines",
+    nomeLegale: "Middle East Airlines - Air Liban S.A.L.",
+    paese: "LB",
+    canale:
+      "Pagina ufficiale sui diritti del passeggero in caso di ritardo, con i recapiti per il reclamo.",
+    url: "https://www.mea.com.lb/english/plan-book/legal-notices/passenger-rights/-delay",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio mea.com.lb: le pagine 'Passenger Rights' su ritardo e cancellazione, e 'Contact Us'.",
+    chiavi: ["MIDDLE EAST AIRLINES"],
+  },
+  {
+    iata: "GF",
+    icao: "GFA",
+    nome: "Gulf Air",
+    nomeLegale: "Gulf Air B.S.C. (c)",
+    paese: "BH",
+    canale:
+      "Pagina ufficiale dedicata al Regolamento europeo, con il modulo per presentare la richiesta di compensazione.",
+    url: "https://www.gulfair.com/transparency/europe-regulation",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio gulfair.com: 'Passenger Rights - Europe Regulation', 'Help Center' e 'Contact Us'.",
+    chiavi: ["GULF AIR"],
+  },
+  {
+    iata: "WY",
+    icao: "OMA",
+    nome: "Oman Air",
+    nomeLegale: "Oman Air S.A.O.C.",
+    paese: "OM",
+    canale: "Modulo di segnalazione ufficiale, nel portale servizi della compagnia.",
+    url: "https://services.omanair.com/gbl/en/feedback",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio omanair.com: 'FeedBack', 'Contact us' e 'Download Forms'.",
+    chiavi: ["OMAN AIR"],
+  },
+  {
+    iata: "J2",
+    icao: "AHY",
+    nome: "Azerbaijan Airlines",
+    nomeLegale: "Azerbaijan Airlines CJSC (AZAL)",
+    paese: "AZ",
+    canale:
+      "Per ritardi e cancellazioni pubblicano un indirizzo dedicato ai reclami; c'è anche il modulo del centro assistenza.",
+    url: "https://help.azal.az/hc/en-us/requests/new",
+    email: "claims@azal.az",
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio azal.az: 'Submit a request', 'How can I submit complaints or suggestions' e l'articolo che indica l'indirizzo per ritardi e cancellazioni.",
+    chiavi: ["AZERBAIJAN AIRLINES", "AZAL"],
+  },
+  {
+    iata: "KC",
+    icao: "KZR",
+    nome: "Air Astana",
+    nomeLegale: "Air Astana JSC",
+    paese: "KZ",
+    canale: "Modulo ufficiale del centro assistenza, sezione ritardi e cancellazioni.",
+    url: "https://help.airastana.com/hc/en-gb/requests/new",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio airastana.com: 'Submit a request' e la categoria 'Flight delay or cancellation'.",
+    chiavi: ["AIR ASTANA"],
+  },
+
+  /* ---------------------------------------------- Africa e Sud America */
+  {
+    iata: "AH",
+    icao: "DAH",
+    nome: "Air Algérie",
+    nomeLegale: "Air Algérie SpA",
+    paese: "DZ",
+    canale: "Piattaforma ufficiale dei reclami, con il modulo per ritardi e cancellazioni.",
+    url: "https://doleances.airalgerie.dz/reclamation/form",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio airalgerie.dz: la piattaforma reclami e il documento ufficiale sui diritti dei passeggeri.",
+    chiavi: ["AIR ALGERIE", "AIR ALGÉRIE"],
+  },
+  {
+    iata: "KQ",
+    icao: "KQA",
+    nome: "Kenya Airways",
+    nomeLegale: "Kenya Airways PLC",
+    paese: "KE",
+    canale:
+      "Portale ufficiale dei reclami, con la sezione dedicata alle richieste di compensazione. Rispondono in 21-30 giorni lavorativi.",
+    url: "https://feedbackhub.kenya-airways.com/claim",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio kenya-airways.com: 'Your Claim - KQ Feedback Hub', 'Flight Delay and Cancellations' e il Customer Service Plan.",
+    chiavi: ["KENYA AIRWAYS"],
+    giorniRisposta: 42,
+  },
+  {
+    iata: "AM",
+    icao: "AMX",
+    nome: "Aeroméxico",
+    nomeLegale: "Aerovías de México, S.A. de C.V.",
+    paese: "MX",
+    canale: "Pagina contatti ufficiale: da lì si apre la segnalazione.",
+    url: "https://www.aeromexico.com/en-nl/contact-us",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: false,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio aeromexico.com: 'Contact us' e 'Notifications for passengers'. Un modulo dedicato ai casi 261 non è comparso.",
+    chiavi: ["AEROMEXICO", "AEROMÉXICO"],
+  },
+  {
+    iata: "AV",
+    icao: "AVA",
+    nome: "Avianca",
+    nomeLegale: "Avianca S.A.",
+    paese: "CO",
+    canale:
+      "Modulo ufficiale del centro assistenza: si sceglie il tipo di problema e la richiesta arriva alle relazioni con i clienti.",
+    url: "https://ayuda.avianca.com/hc/en-us/requests/new",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio avianca.com: 'Submit a request', la sezione 'Compensation' del centro assistenza e 'Information on passenger rights'.",
+    chiavi: ["AVIANCA"],
+  },
+  {
+    iata: "CM",
+    icao: "CMP",
+    nome: "Copa Airlines",
+    nomeLegale: "Compañía Panameña de Aviación, S.A.",
+    paese: "PA",
+    canale: "Modulo ufficiale del centro assistenza, da cui si apre la pratica.",
+    url: "https://help.copaair.com/hc/en-us/requests/new",
+    email: null,
+    pec: null,
+    indirizzoPostale: null,
+    accettaIntermediari: null,
+    verificato: true,
+    verificatoIl: VERIFICATO_IL_3,
+    fonte:
+      "Ricerca web 13/08/2026 con filtro sul dominio copaair.com: 'Submit a request', 'Customer Care' e 'Customer Commitment'.",
+    chiavi: ["COPA AIRLINES"],
   },
 ];
 

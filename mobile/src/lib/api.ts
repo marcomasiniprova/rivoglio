@@ -90,6 +90,8 @@ export type AeroportoTrovato = {
   iata: string;
   citta: string;
   nome: string;
+  /** Come si scrive all'utente: "Milano Malpensa". La calcola il sito. */
+  etichetta: string;
   paese: string;
 };
 

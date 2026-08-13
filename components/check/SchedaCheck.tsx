@@ -70,7 +70,9 @@ const dataBreve = (iso: string) => iso.split("-").reverse().join("/");
 
 /* ─────────────────────────── il campo aeroporto ────────────────────── */
 
-type Scalo = { iata: string; citta: string; nome: string; paese: string };
+/* Come lo manda /api/aeroporti. `etichetta` è il nome pronto da
+   mostrare: "Milano Malpensa". Vedi lib/voli/aeroporti.ts. */
+type Scalo = { iata: string; citta: string; nome: string; etichetta: string; paese: string };
 
 function CampoScalo({
   id,
@@ -164,12 +166,12 @@ function CampoScalo({
                 className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-nebbia"
               >
                 <span className="min-w-0">
+                  {/* "Milano Malpensa", non "Milan Malpensa International
+                      Airport" e non "Ferno". Vedi etichettaScalo. */}
                   <span className="block truncate text-[15px] font-medium text-inchiostro">
-                    {a.citta}
+                    {a.etichetta}
                   </span>
-                  <span className="block truncate text-[12px] text-fumo">
-                    {a.nome} · {a.paese}
-                  </span>
+                  <span className="block truncate text-[12px] text-fumo">{a.paese}</span>
                 </span>
                 <span className="shrink-0 text-[13px] font-semibold tracking-wide text-verde-scuro">
                   {a.iata}
