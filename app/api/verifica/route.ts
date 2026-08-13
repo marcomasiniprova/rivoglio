@@ -188,12 +188,14 @@ export async function POST(req: Request) {
     { headers: CORS },
   );
 
-  if (pass && daConsumare !== undefined) {
-    if (daConsumare === null) {
-      risposta.cookies.delete(COOKIE_PASS);
-    } else {
-      risposta.cookies.set(COOKIE_PASS, daConsumare, BISCOTTO);
-    }
-  }
+  /* 🔴 LA RICEVUTA NON SI CANCELLA PIÙ, e prima si cancellava appena
+     finiva il credito. Sembrava pulizia, era un buco nei soldi: quel
+     cookie è anche la prova che l'analisi è stata pagata, e senza prova
+     lo sconto di 1,99 sulla pratica non si applica. Chi pagava l'analisi
+     si vedeva chiedere 14,90 pieni, cioè 16,89 in tutto, contro i 14,90
+     promessi in quattro punti del sito. Trovato col collaudo del 13/08.
+     Adesso arriva a zero e resta: a impedire una seconda analisi ci
+     pensa il registro nel database, non il cookie. */
+  if (pass && daConsumare) risposta.cookies.set(COOKIE_PASS, daConsumare, BISCOTTO);
   return risposta;
 }

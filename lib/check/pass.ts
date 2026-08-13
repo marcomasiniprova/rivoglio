@@ -129,7 +129,18 @@ export function leggiPass(pass: string | null | undefined, adesso = Date.now()):
     return null;
   }
 
-  if (typeof letto.r !== "number" || letto.r <= 0) return null;
+  /* 🔴 UNA RICEVUTA SPESA RESTA UNA RICEVUTA.
+     Fino al 13/08 qui si pretendeva `r > 0`, cioè del credito residuo, e
+     la ricevuta finita veniva buttata. Ma questo foglietto dice due cose
+     diverse: "hai pagato" e "ti resta del credito". La seconda scade, la
+     prima no, e sulla prima poggia lo sconto di 1,99 sulla pratica.
+     Buttandola, chi pagava l'analisi si vedeva chiedere la pratica a
+     prezzo pieno: 1,99 + 14,90 invece dei 14,90 promessi in quattro
+     punti del sito. Trovato col collaudo del 13/08.
+     ⚠️ Non apre nessuna porta: a decidere se si può fare un'altra
+     analisi è `passUsabile`, che conta le analisi consumate NEL
+     DATABASE. Il numero nel cookie è un promemoria, non un permesso. */
+  if (typeof letto.r !== "number" || letto.r < 0) return null;
   if (typeof letto.x !== "number" || letto.x < adesso) return null;
   if (typeof letto.o !== "string" || !letto.o) return null;
 
@@ -141,8 +152,9 @@ export function leggiPass(pass: string | null | undefined, adesso = Date.now()):
 }
 
 /**
- * La ricevuta dopo un check consumato. Torna null quando era l'ultimo:
- * il cookie va cancellato, non lasciato lì a zero.
+ * La ricevuta dopo un check consumato: stesso foglietto, un credito in
+ * meno. Quando finisce arriva a zero e RESTA, perché continua a
+ * dimostrare il pagamento (vedi il commento sopra, in `leggiPass`).
  *
  * ⚠️ Un verdetto INCERTO non consuma niente (vedi CORTESIA_SU_INCERTO in
  * ingresso.ts): chi paga per sapere e si sente rispondere "non lo so"
@@ -150,11 +162,15 @@ export function leggiPass(pass: string | null | undefined, adesso = Date.now()):
  * di prendersi una contestazione sulla carta.
  */
 export function consumaPass(pass: Pass, adesso = Date.now()): string | null {
-  if (pass.restano <= 1) return null;
   const k = chiave();
   if (!k) return null;
   const corpo = b64(
-    JSON.stringify({ r: pass.restano - 1, q: pass.quanti, x: pass.scadenza, o: pass.ordine }),
+    JSON.stringify({
+      r: Math.max(0, pass.restano - 1),
+      q: pass.quanti,
+      x: pass.scadenza,
+      o: pass.ordine,
+    }),
   );
   void adesso;
   return `${corpo}.${firma(corpo, k)}`;

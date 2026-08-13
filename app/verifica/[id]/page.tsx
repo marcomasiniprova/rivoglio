@@ -324,8 +324,22 @@ export default async function PaginaVerifica({
      sconto invece di ritirare la promessa (Valerio, 12/08).
      ⚠️ Lo sconto si applica solo a chi la ricevuta ce l'ha davvero: la
      legge dal cookie firmato, non da un parametro nell'indirizzo. */
+  /* ⚠️ E LO SCONTO SI MOSTRA SOLO SE LA CASSA LO SA FARE.
+     Oggi l'unica cassa è quella di prova, che il conto lo rifà identico:
+     pagina e cassa dicono la stessa cifra. Il giorno che si configura un
+     venditore, il suo link porta un PREZZO FISSO deciso in un pannello,
+     che dei 1,99 non sa niente: mostrare 12,91 e poi farne pagare 14,90
+     è il prezzo che cambia fra il bottone e il pagamento, cioè il motivo
+     per cui uno chiude la pagina.
+     🔴 Quindi il giorno del venditore serve un secondo prodotto (pratica
+     scontata) oppure la promessa "i 1,99 si scalano" va tolta dal sito.
+     È in LANCIO.md. Finché la scelta non è fatta, qui si sta dalla parte
+     onesta: prezzo pieno, che è quello che pagherà davvero. */
+  const cassePronte = checkoutConfigurato();
+  const venditoreVero = cassePronte.singola || cassePronte.famiglia;
   const pass = passDi(await richiesta());
-  const listino = pass ? scontoDaCheck(listinoPieno, prezzoPagatoPerIlCheck()) : listinoPieno;
+  const listino =
+    pass && !venditoreVero ? scontoDaCheck(listinoPieno, prezzoPagatoPerIlCheck()) : listinoPieno;
 
   const dati: DatiVerifica = {
     idPagina: id,
@@ -364,7 +378,7 @@ export default async function PaginaVerifica({
       riga.esito === "idoneo"
         ? scadenzaStimata(riga.data_locale, riga.voli?.vettore_operativo ?? riga.volo_iata)
         : null,
-    checkout: checkoutConfigurato(),
+    checkout: cassePronte,
     avvisoCheckout,
   };
 

@@ -42,6 +42,27 @@ Le due strade vere, in ordine di quanto sono nelle nostre mani:
    intermediario si tiene di più. Ma è una decisione fiscale e va presa
    col commercialista, non qui.
 
+### 🔴 E il giorno del venditore serve un prodotto in più, o si toglie una promessa
+
+Il sito scrive in quattro punti che **i 1,99 dell'analisi si scalano
+dalla pratica**: chi paga l'analisi deve poi vedersi chiedere **12,91**,
+non 14,90.
+
+Il link di un venditore però porta un **prezzo fisso**, deciso nel suo
+pannello, che dei 1,99 non sa niente. Quindi il giorno che si configura
+`POLAR_CHECKOUT_PRATICA` (o l'equivalente di chi incassa) le strade sono
+due, e vanno scelte prima di accendere:
+
+- **due prodotti in più** (`Pratica scontata` 12,91 e `Pratica famiglia
+  scontata` 22,91), e il codice manda lì chi ha la ricevuta;
+- **oppure si toglie la promessa** dal sito, e l'analisi si paga a parte.
+
+Finché non è deciso, la pagina del verdetto mostra il **prezzo pieno**
+appena un venditore vero è configurato: uno sconto scritto sul bottone e
+non applicato alla cassa è il motivo per cui una persona chiude la
+pagina. Con la sola cassa di prova lo sconto si vede e si applica, perché
+lì il conto lo rifà lo stesso codice.
+
 ---
 
 ## 2. 🟡 Il vero rischio a due milioni di visite: TRE al secondo
