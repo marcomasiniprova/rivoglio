@@ -69,6 +69,79 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #62 (12-13/08): IL PAGAMENTO CHE FINIVA SU `localhost`, IL TEMPO
+  IN UN POSTO SOLO, E L'ARCHIVIO CHIUSO (85 compagnie, 9.016 scali).**
+  - 🔴 **«PAGA 14,90» PORTAVA SU `localhost:3000`, ed era colpa mia.** Il
+    link di accesso introdotto poche ore prima passava dal **rimbalzo di
+    Supabase**, e Supabase quel rimbalzo lo fa solo se l'indirizzo è
+    nella sua lista bianca: se non c'è **non dà errore**, scarica
+    l'utente sul "Site URL" del progetto, che di default è
+    `http://localhost:3000`. In locale non si vede mai, perché lì
+    localhost è davvero il sito.
+    Adesso da Supabase si prende **solo il gettone** e l'indirizzo lo
+    costruiamo noi: nessun rimbalzo esterno, nessuna impostazione in un
+    pannello che possa rompere il pagamento.
+    ⚠️ La lezione oltre il caso: un pezzo di percorso che dipende da una
+    casella in un pannello non lo vede nessuna prova e non lo legge
+    nessuna revisione. Si rompe il giorno del dominio nuovo.
+    Chiusa la stessa famiglia in `/auth/conferma` e `/auth/sessione`,
+    che costruivano i rimandi da `request.url`.
+  - **IL TEMPO VIENE DA UN POSTO SOLO** (`lib/tempo.ts`), su richiesta di
+    Valerio («c'è un orario corretto? nessuna data o conto cannato?»).
+    🔴 **E cercando è saltato fuori un difetto che nessuno avrebbe visto
+    fino a fine ottobre**: il riepilogo della sera su Telegram era
+    programmato alle 19 UTC «cioè le 21 in Italia». Vero da marzo a
+    ottobre; con l'ora solare sarebbero state le **20**, per sei mesi,
+    senza che nessun allarme suonasse. Il cron di Netlify conosce solo
+    l'UTC: adesso suona a entrambe le ore e la funzione si spegne da sola
+    se in Italia non sono le 21.
+    Le tre regole: le date che vede una persona si scrivono in **ora
+    italiana** (a mezzanotte e mezza l'UTC dice ancora il giorno prima);
+    i giorni si contano sul **calendario**, non a colpi di 24 ore; il
+    **giorno della settimana lo calcola la data**, sempre, e una prova
+    boccia qualunque file che lo nomini senza derivarlo.
+  - **LA PRATICA RIORDINATA** (quattro scelte col popup): i documenti
+    sono il **passo 1** e la lettera si apre dopo (col muro anche sul
+    server, non solo sul bottone); la garanzia è **una riga in cima**;
+    dopo «Ho inviato il reclamo» c'è il **conto alla rovescia** col
+    giorno vero e parte un'**email di conferma**; dopo l'invio spariscono
+    le istruzioni d'invio e la scadenza stimata.
+    ⚠️ Il passo 1 ha una **porta di servizio**, e non è un modo di
+    aggirare la scelta: a quel punto il cliente **ha già pagato**, e un
+    muro che non riesce a superare è un prodotto venduto e non
+    consegnato.
+  - **COMPAGNIE: da 20 a 85 in cinque giri.** Ognuna cercata **filtrando
+    sul dominio ufficiale**. Tre pubblicano un'email vera (Kuwait, Royal
+    Jordanian, Azerbaijan): lì il bottone apre la posta.
+    ⚠️ **Cinque esclusioni dichiarate:** PLAY e Air Moldova hanno chiuso,
+    Hi Fly vola in wet lease e i biglietti non li vende, Southwest fa
+    solo voli interni agli USA, EgyptAir non pubblica nessun canale.
+    🔴 **Due difetti trovati dalle prove, non leggendo il codice:**
+    cercando **«Iberia» non si trovava Iberia** (le chiavi di nome erano
+    vuote di proposito, per non pescare Iberia Express: giusta la
+    prudenza, non il prezzo; risolto col confronto esatto); e **«Malta
+    Air» sta dentro «KM Malta Airlines»**, quindi accorciando una chiave
+    il reclamo di un passeggero KM sarebbe partito verso Ryanair.
+  - **AEROPORTI, i tre buchi chiusi:**
+    - **I nomi**: si mostrava il comune, e dall'aggiornamento del 10/08
+      Malpensa era **«Ferno»**. Adesso «Milano Malpensa», «Parigi Charles
+      de Gaulle», «Monaco di Baviera». Due difetti trovati dalle prove:
+      tagliando «la prima parola» sparivano **Fiumicino** da Roma e
+      **Le** da Le Bourget; e **«Romeo» veniva scambiato per «Rome»**.
+    - **I fusi**: mancavano su **3.500 scali su 9.016, Doha compresa**.
+      Adesso ne mancano **2**, zero fra i grandi. Non inventati: si
+      deducono dall'archivio stesso (paese a fuso unico, altrimenti lo
+      scalo più vicino) e ogni riga riempita porta `tzDedotto: true`.
+      ⚠️ **Correzione a quanto avevo scritto io**: il fuso **non cambia
+      nessun verdetto**, il ritardo si calcola sugli orari UTC del
+      fornitore. Far uscire incerti quei voli avrebbe ucciso vendite
+      per niente.
+    - **La ricerca** mostra solo i **4.560 scali con voli di linea**: le
+      4.456 piste private restano in archivio per le distanze e per il
+      cancello territoriale, spariscono solo dal campo di ricerca.
+  - Prove: **1162 verdi**, 6 saltate, zero rosse. Le nuove stanno in
+    `prove/tempo.spec.ts`, `prove/documenti.spec.ts` e
+    `prove/aeroporti.spec.ts`.
 - **GIRO #61 (12/08): IL DESTINATARIO C'È SEMPRE.** Cinque punti alzati da
   Valerio aprendo una pratica vera, tutti chiusi.
   - 🔴 **«IL DESTINATARIO NON C'È PERCHÉ?»** Non era pigrizia:
