@@ -24,7 +24,16 @@ import {
 import { GIORNI_PRIMA_DEL_SOLLECITO, schedaRifiuto } from "@/lib/pratiche/rifiuto";
 /* Il tempo viene tutto da un posto solo: fusi, giorni di calendario e
    giorni della settimana. Vedi lib/tempo.ts. */
-import { adesso, dataConGiorno, dataIt, dataOraIt, fraQuanto, giorniFra, giornoPiu } from "@/lib/tempo";
+import {
+  adesso,
+  dataConGiorno,
+  dataIt,
+  dataItArticolo,
+  dataOraIt,
+  fraQuanto,
+  giorniFra,
+  giornoPiu,
+} from "@/lib/tempo";
 import { COPY } from "@/lib/copy";
 
 /**
@@ -439,7 +448,7 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           <ShieldCheck className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
           <span>
             {pratica.garanzia_fino_al
-              ? riempi(C.garanzia.template, { data: dataIt(pratica.garanzia_fino_al) })
+              ? riempi(C.garanzia.template, { data: dataItArticolo(pratica.garanzia_fino_al) })
               : C.garanzia.senzaData}
           </span>
         </p>

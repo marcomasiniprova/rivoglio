@@ -100,6 +100,26 @@ export function dataIt(iso: string | Date): string {
 }
 
 /**
+ * "l'11 novembre 2026", "il 12 novembre 2026": la data con l'articolo
+ * giusto davanti.
+ *
+ * 🔴 Serve perché in italiano l'articolo si mangia la vocale, e i testi
+ * lo scrivevano a mano: sulla pratica si leggeva «Se entro il 11 novembre
+ * 2026 la compagnia non ti ha pagato», trovato guardando la pagina vera
+ * il 13/08. È la riga della garanzia, cioè quella che una persona rilegge
+ * due volte prima di fidarsi: scritta male vale meno.
+ *
+ * Elidono solo i giorni che si pronunciano con una vocale davanti: l'8 e
+ * l'11. Il 18 no ("il diciotto"), e nemmeno l'1, che nelle date si legge
+ * "il primo".
+ */
+export function dataItArticolo(iso: string | Date): string {
+  const testo = dataIt(iso);
+  const giorno = Number.parseInt(testo, 10);
+  return `${giorno === 8 || giorno === 11 ? "l'" : "il "}${testo}`;
+}
+
+/**
  * "mercoledì 23 settembre 2026".
  *
  * Si usa dove la data è una cosa DA FARE, non una da leggere: il giorno

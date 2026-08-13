@@ -151,6 +151,16 @@ function numerazione(blocchi: Blocco[]): (number | null)[] {
   return blocchi.map((b) => {
     if (b.tipo !== "paragrafo") return null;
     if (/^(distinti saluti|cordiali saluti|in allegato)/i.test(b.testo)) return null;
+    /* 🔴 «1. scrivo in qualità di passeggero del volo...»
+       Trovato guardando la lettera vera il 13/08. In una lettera italiana
+       la riga dopo «Spett.le ...,» continua il saluto e comincia in
+       minuscolo: è giusto così. Numerarla no: un punto elenco che
+       comincia in minuscolo si legge come un errore, e questa è la PRIMA
+       riga che vede la compagnia.
+       La regola vale in generale, e si spiega da sola: un paragrafo che
+       comincia in minuscolo non è un punto a sé, è il seguito di quello
+       che sta sopra. */
+    if (/^[a-zà-ú]/.test(b.testo)) return null;
     n += 1;
     return n;
   });

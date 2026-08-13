@@ -48,5 +48,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(u);
   }
 
-  return NextResponse.redirect(versoCasa(poi, request));
+  /* Indirizzo pulito, come in /auth/conferma: qui nella richiesta ci sono
+     ADDIRITTURA i due gettoni di sessione, e non devono restare scritti
+     nella barra del browser di nessuno. */
+  const destinazione = versoCasa(poi, request);
+  destinazione.search = "";
+  return NextResponse.redirect(destinazione);
 }

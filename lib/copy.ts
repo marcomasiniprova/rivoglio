@@ -1309,9 +1309,12 @@ export const COPY = {
 
     garanzia: {
       titolo: "La garanzia",
-      /** {data} = garanzia_fino_al della pratica. */
+      /** {data} = garanzia_fino_al della pratica, articolo compreso
+       *  (`dataItArticolo`): in italiano davanti all'8 e all'11
+       *  l'articolo si elide, e scriverlo a mano qui dentro produceva
+       *  «entro il 11 novembre». */
       template:
-        "Se entro il {data} la compagnia non ti ha pagato, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
+        "Se entro {data} la compagnia non ti ha pagato, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
       senzaData:
         "Se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di legge, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
     },

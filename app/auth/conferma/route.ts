@@ -40,6 +40,25 @@ function jsSicuro(valore: string): string {
   return JSON.stringify(valore).replace(/</g, "\\u003c");
 }
 
+/**
+ * Dove si va dopo essere entrati, con l'indirizzo PULITO.
+ *
+ * 🔴 Il gettone restava scritto nella barra degli indirizzi: dopo il
+ * pagamento si atterrava su
+ * `/pratica/<id>?token_hash=...&type=magiclink&poi=...`. Trovato col
+ * collaudo del 13/08, seguendo i rimandi uno per uno.
+ * Il gettone a quel punto è già consumato, quindi non apre più niente:
+ * resta però un indirizzo che una persona copia e incolla (a un
+ * familiare, in una chat) e che porta con sé roba che non deve girare, e
+ * che fa sembrare rotto un passaggio che ha appena funzionato.
+ * Qui si azzera la parte dopo il punto interrogativo, esplicitamente.
+ */
+function destinazione(poi: string, request: NextRequest) {
+  const u = versoCasa(poi, request);
+  u.search = "";
+  return u;
+}
+
 function fallito(request: NextRequest, motivo: string) {
   /* ⚠️ `versoCasa` e non `request.url`: dietro il proxy di Netlify
      quest'ultimo e' l'indirizzo interno della copia pubblicata, e
@@ -79,7 +98,7 @@ export async function GET(request: NextRequest) {
       console.error("[conferma] verifyOtp:", error.message);
       return fallito(request, /expired/i.test(error.message) ? "scaduto" : "link");
     }
-    return NextResponse.redirect(versoCasa(poi, request));
+    return NextResponse.redirect(destinazione(poi, request));
   }
 
   // ---- forma 2: code (rimbalzo da Supabase)
@@ -90,7 +109,7 @@ export async function GET(request: NextRequest) {
       console.error("[conferma] exchangeCodeForSession:", error.message);
       return fallito(request, /expired/i.test(error.message) ? "scaduto" : "link");
     }
-    return NextResponse.redirect(versoCasa(poi, request));
+    return NextResponse.redirect(destinazione(poi, request));
   }
 
   /* ---- forma 3: i dati stanno nel frammento (#access_token=...).
