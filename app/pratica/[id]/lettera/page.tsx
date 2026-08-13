@@ -8,6 +8,8 @@ import ApriEmail from "@/components/pratica/ApriEmail";
 import Foglio from "@/components/pratica/Foglio";
 import { Button } from "@/components/ui/button";
 import { colonnaMancante } from "@/lib/supabase/colonne";
+import { letteraSbloccata } from "@/lib/pratiche/documenti";
+import { eventiPratica } from "@/lib/pratiche/pratiche";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { compagniaPerVettore, modoInvio } from "@/lib/lettera/compagnie";
@@ -204,6 +206,14 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   // Il controllo del proprietario. Esplicito, prima di qualunque render:
   // chi non è il titolare non deve nemmeno sapere che la pratica esiste.
   if (!pratica || !pratica.utente_id || pratica.utente_id !== utente.id) redirect("/app");
+
+  /* IL PASSO 1 SI CONTROLLA QUI, NON SOLO SUL BOTTONE. Dal 12/08 la
+     lettera si apre dopo aver caricato la carta d'imbarco (scelta di
+     Valerio col popup). Spegnere il bottone sulla pagina della pratica
+     non basta: questo indirizzo si digita, sta nella cronologia del
+     browser e finisce nei segnalibri. Chi arriva qui prima del tempo
+     torna alla pratica, dove il passo c'è e si fa. */
+  if (!letteraSbloccata(await eventiPratica(pratica.id))) redirect(`/pratica/${pratica.id}`);
 
   if (pratica.stato === "creata") {
     return (

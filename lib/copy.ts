@@ -1039,6 +1039,26 @@ export const COPY = {
         "Non siamo riusciti a leggere il documento. Riprova con una foto più nitida e ben illuminata.",
       privacy:
         "Il file non viene salvato: lo leggiamo, registriamo l'esito del confronto e lo scartiamo.",
+      /* ---- quando il passo viene PRIMA della lettera (scelta di Valerio
+         col popup del 12/08). Il tono cambia: non è più un extra che
+         qualcuno farà, è la cosa da fare adesso, e dice perché conviene
+         invece di dire che è obbligatoria. Nessuno carica un documento
+         perché glielo ordinano; lo carica se capisce che gli serve. */
+      passo: "Passo 1 di 2",
+      titoloBloccante: "Prima carica la carta d'imbarco",
+      testoBloccante:
+        "La confrontiamo con gli orari archiviati del volo. Se combaciano, la compagnia ha un argomento in meno per dirti di no, ed è lì che si perdono i reclami. Ci vuole una foto.",
+      saltaPremessa: "Non ce l'hai sottomano?",
+      salta: "Vai avanti senza",
+      /* ---- quando il reclamo è GIÀ PARTITO. Il riquadro resta, perché
+         il documento serve ancora, ma non può più dire "prima carica" né
+         promettere di rendere più solido un reclamo che è già uscito di
+         casa: quello che rinforza adesso è il sollecito. Era il difetto
+         della schermata 2 del 13/08, dove sopra una lettera spedita
+         campeggiava ancora "PASSO 1 DI 2". */
+      titoloDopo: "Puoi ancora aggiungere la carta d'imbarco",
+      testoDopo:
+        "Il reclamo è già partito, ma il documento serve ancora: se concorda con gli orari archiviati, rafforza il sollecito e la replica a un eventuale no. Quando la trovi, caricala qui.",
     },
 
     /* ---- la testata dell'area riservata (/app/layout) ---- */
@@ -1179,6 +1199,8 @@ export const COPY = {
            merita una frase, non un identificatore. */
         pratica_di_prova: "Pratica di collaudo, nessun pagamento",
         documento_incrociato: "Documento confrontato con i dati del volo",
+        documento_saltato: "Nessun documento caricato, per scelta",
+        email_invio: "Email di conferma dell'invio inviata",
         // I nomi vecchi delle stesse tappe: le pratiche di prima li hanno
         // ancora scritti in cronologia e devono restare leggibili.
         email_t15: "Email col sollecito inviata",
@@ -1190,12 +1212,25 @@ export const COPY = {
 
     azioni: {
       apriLettera: "Apri la lettera",
+      /* ⚠️ IL BOTTONE DEVE DIRE COSA APRE, e cambia col momento. Dopo un
+         no dichiarato il foglio non è più il reclamo: è la replica scritta
+         su quel no. Chiamarlo ancora "la lettera" faceva credere di
+         riaprire quella di prima, ed è metà del motivo per cui Valerio,
+         dopo aver cliccato "maltempo", ha scritto «non è successo
+         niente». */
+      apriReplica: "Apri la replica",
+      apriSegnalazione: "Apri la segnalazione",
       confermaInvio: "Ho inviato il reclamo",
       confermaInvioInCorso: "Un attimo.",
       confermaInvioFatta: "Registrato. Ricarico la pagina.",
       confermaInvioErrore: "Non sono riuscito a salvare. Riprova tra poco.",
       confermaInvioNota:
         "Premilo solo dopo aver spedito davvero l'email: da quel giorno partono i tempi del sollecito.",
+      /* Compare quando la lettera è ancora chiusa dietro il passo dei
+         documenti. Dice cosa manca, non "non puoi": chi ha appena pagato
+         merita di sapere che il documento c'è e cosa lo apre. */
+      letteraChiusa:
+        "La lettera è pronta e si apre appena hai caricato la carta d'imbarco, qui sotto. Se non ce l'hai adesso, puoi andare avanti lo stesso.",
     },
 
     istruzioniInvio: {

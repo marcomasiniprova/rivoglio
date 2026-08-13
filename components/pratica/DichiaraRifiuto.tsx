@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle, Check } from "lucide-react";
+import { AlertTriangle, Check, FileText } from "lucide-react";
 
 /**
  * "LA COMPAGNIA MI HA RISPOSTO NO."
@@ -30,10 +30,17 @@ type Motivo = {
 export default function DichiaraRifiuto({
   praticaId,
   giaDichiarato,
+  etichettaScelta,
 }: {
   praticaId: string;
   /** Il motivo già registrato, se il cliente ha già risposto una volta. */
   giaDichiarato?: string | null;
+  /**
+   * Come si legge quel motivo, in italiano. Arriva dal server bell'e
+   * pronto: se lo chiedessimo all'elenco, il riquadro chiuso resterebbe
+   * senza testo finché qualcuno non lo apre, cioè sempre.
+   */
+  etichettaScelta?: string | null;
 }) {
   const [aperto, setAperto] = useState(false);
   const [motivi, setMotivi] = useState<Motivo[]>([]);
@@ -77,20 +84,39 @@ export default function DichiaraRifiuto({
   }
 
   if (fatto && !aperto) {
+    /* 🔴 QUI FINIVA IL PERCORSO, e non doveva.
+       Valerio, 13/08: «ho cliccato per maltempo e mi appare la stessa
+       pagina, non ci ho capito nulla, la contro-risposta? perché non è
+       successo niente? cosa significa "il loro no è registrato"?».
+       Il difetto era doppio. Primo: questo riquadro raccontava un fatto
+       nostro («è registrato») invece di dare l'azione sua. Secondo: la
+       replica c'era davvero, ma il bottone per aprirla in quel momento
+       era GRIGIO, perché il muro dei documenti restava su anche dopo che
+       la lettera era partita (chiuso in lib/pratiche/passi.ts).
+       Adesso qui dentro c'è il bottone che porta al foglio, e dice quale
+       no ha in pancia: si legge da solo che qualcosa è cambiato. */
     return (
       <section className="rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-5">
         <p className="flex items-center gap-2 text-[0.95rem] font-medium text-verde-notte">
           <Check className="size-4 shrink-0" aria-hidden="true" />
-          Il loro no è registrato.
+          La replica è pronta.
         </p>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-verde-notte/80">
-          La risposta è pronta nella pagina della lettera: è scritta apposta sul motivo che ti
-          hanno dato, non è un testo generico.
+          {etichettaScelta
+            ? `L'abbiamo scritta sul no che ti hanno dato («${etichettaScelta}»), punto per punto. Non è un testo generico: cita le sentenze che smontano proprio quella risposta.`
+            : "L'abbiamo scritta sul motivo che ti hanno dato, punto per punto. Non è un testo generico: cita le sentenze che smontano proprio quella risposta."}
         </p>
+        <a
+          href={`/pratica/${praticaId}/lettera`}
+          className="riflesso mt-4 inline-flex h-11 items-center gap-2 rounded-bottone bg-verde px-5 text-[0.95rem] font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro"
+        >
+          <FileText className="size-4" aria-hidden="true" />
+          Leggi la replica
+        </a>
         <button
           type="button"
           onClick={() => setAperto(true)}
-          className="mt-3 text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
+          className="mt-3 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
         >
           Ho sbagliato motivo, lo cambio
         </button>
