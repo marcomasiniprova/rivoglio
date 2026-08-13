@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AlertTriangle, ArrowLeft, Copy, ExternalLink, Paperclip, Printer, ShieldCheck } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ExternalLink, Paperclip, ShieldCheck } from "lucide-react";
 import Logo from "@/components/Logo";
 import ApriEmail from "@/components/pratica/ApriEmail";
 import Foglio from "@/components/pratica/Foglio";
 import { Button } from "@/components/ui/button";
+import AzioniFoglio from "@/components/pratica/AzioniFoglio";
 import { colonnaMancante } from "@/lib/supabase/colonne";
 import { eventiPratica, type StatoPratica } from "@/lib/pratiche/pratiche";
 import { paragrafoSuMisura } from "@/lib/pratiche/dossier";
@@ -646,17 +647,10 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         corpo={attuale.corpo}
       />
 
-      {/* ------------------------------------------------ le azioni */}
-      <div className="no-stampa flex flex-wrap items-center gap-3">
-        <Button type="button" variant="contorno" data-copia="#t-oggetto">
-          <Copy className="size-4" aria-hidden="true" />
-          <span data-etichetta>Copia l&apos;oggetto</span>
-        </Button>
-        <Button type="button" variant="contorno" data-stampa>
-          <Printer className="size-4" aria-hidden="true" />
-          Stampa o salva in PDF
-        </Button>
-      </div>
+      {/* ------------------------------------------------ le azioni
+          🔴 Erano collegate da uno <script> nel JSX, che non viene mai
+          eseguito: due bottoni finti. Vedi components/pratica/AzioniFoglio. */}
+      <AzioniFoglio oggetto={attuale.oggetto} corpo={attuale.corpo} />
 
       <p className="no-stampa rounded-xl bg-menta-tenue px-4 py-3 text-sm leading-relaxed text-verde-notte">
         Una cosa sola prima di premere Invia: al posto di [da compilare] metti il tuo IBAN
@@ -684,7 +678,13 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         </ul>
       </details>
 
-      {/* ------------------------------------------------ se tacciono */}
+      {/* ------------------------------------------------ se tacciono
+          🔴 «PERCHÉ IL BOX DELL'ENAC APPARE SEMPRE? Non è necessario al
+          primo invio!» (Valerio, 13/08). Aveva ragione: le istruzioni per
+          l'ente stavano sotto il reclamo dal primo giorno, cioè sei
+          settimane prima che servissero. Adesso compaiono quando l'ente è
+          davvero il passo del momento. */}
+      {attuale.chiave === "ente" && (
       <details className="no-stampa group rounded-2xl border border-bordo bg-white px-6 py-4">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-display text-lg tracking-[-0.03em] marker:hidden">
           {organismo.titolo}
@@ -723,6 +723,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         </div>
         <p className="mt-4 text-sm leading-relaxed text-fumo-2">{organismo.avvertenza}</p>
       </details>
+      )}
 
       {/* ------ quando l'ente è il documento di adesso, si dice cos'è */}
       {attuale.chiave === "ente" && (
@@ -859,17 +860,10 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
       </p>
 
       {/* Il testo per i bottoni di copia: invisibile, mai stampato. */}
-      {/* Il testo che copia il bottone in cima: quello del documento del
-          momento, non del reclamo. Se restasse legato al reclamo, il
-          bottone "Copia l'oggetto" accanto alla replica copierebbe
-          l'oggetto della lettera di sei settimane prima. */}
-      <textarea id="t-oggetto" hidden readOnly defaultValue={attuale.oggetto} />
-      <textarea id="t-corpo" hidden readOnly defaultValue={attuale.corpo} />
 
       { }
       <style dangerouslySetInnerHTML={{ __html: CSS_STAMPA }} />
       { }
-      <script dangerouslySetInnerHTML={{ __html: COPIONE }} />
     </Cornice>
   );
 }
@@ -891,40 +885,3 @@ const CSS_STAMPA = `
 }
 `;
 
-/**
- * La copia negli appunti. Niente framework: due bottoni, un listener.
- * Se la clipboard è negata (http, permessi), ripiega su select + copy;
- * se fallisce anche quello, lo dice invece di fingere.
- */
-const COPIONE = `
-(function () {
-  function trova(sel) { return document.querySelector(sel); }
-  document.querySelectorAll("[data-copia]").forEach(function (bottone) {
-    bottone.addEventListener("click", function () {
-      var area = trova(bottone.getAttribute("data-copia"));
-      if (!area) return;
-      var etichetta = bottone.querySelector("[data-etichetta]") || bottone;
-      var prima = etichetta.textContent;
-      function esito(ok) {
-        etichetta.textContent = ok ? "Copiato." : "Non riesco: copia a mano dal foglio";
-        setTimeout(function () { etichetta.textContent = prima; }, 2200);
-      }
-      function ripiego() {
-        var ok = false;
-        area.hidden = false;
-        area.select();
-        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
-        area.hidden = true;
-        esito(ok);
-      }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(area.value).then(function () { esito(true); }, ripiego);
-      } else {
-        ripiego();
-      }
-    });
-  });
-  var stampa = document.querySelector("[data-stampa]");
-  if (stampa) stampa.addEventListener("click", function () { window.print(); });
-})();
-`;

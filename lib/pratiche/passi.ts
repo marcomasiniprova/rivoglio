@@ -406,7 +406,11 @@ export function percorsoPratica(
       /* Ente e conciliazione: dal secondo no in poi, INSIEME alla
          replica, non al posto suo. */
       enteEConciliazione: stato === "enac" || giri.no >= NO_PRIMA_DELL_ENTE,
-      istruzioni: stato === "pagata" || stato === "pronta",
+      /* 🔴 «CE TUTTA LA PAGINA, CE TUTTE LE ISTRUZIONI»: le istruzioni
+         d'invio in due minuti restano, ma solo quando il passo attivo è
+         proprio mandare la lettera. In tutti gli altri momenti sono
+         testo che scorre sotto le dita di chi cerca altro. */
+      istruzioni: attivo === "lettera",
       scadenza: !reclamoPartito,
     },
   };

@@ -190,6 +190,28 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
   /* I giorni passati dall'invio: senza, i passi non sanno del silenzio e
      la pratica continua a dire "niente da fare" mentre il sollecito è
      già pronto (vedi passoDelSilenzio in lib/pratiche/passi.ts). */
+  /**
+   * 🔴 «I BOX DOVE SIAMO NON COMUNICANO MOLTO: troppo testo noioso tutto
+   * attaccato, sinceramente non è molto utile» (Valerio, 13/08).
+   *
+   * Aveva ragione: c'erano un titolo di stato («Pagata», «Inviata»), un
+   * paragrafo di spiegazione e un secondo paragrafo col prossimo passo.
+   * Tre blocchi di testo per dire una cosa sola, e quella cosa sola non
+   * era scritta da nessuna parte: DI CHI È LA PALLA, e cosa si tocca
+   * adesso.
+   *
+   * Adesso in cima c'è quella riga e basta. Il perché sta in un cassetto
+   * che si apre solo se uno lo cerca.
+   */
+  const RIGA_DEL_PASSO: Record<string, { tocca: boolean; riga: string }> = {
+    pagamento: { tocca: true, riga: "Manca il pagamento" },
+    lettera: { tocca: true, riga: "Tocca a te: manda il reclamo" },
+    attesa: { tocca: false, riga: "Aspetti la compagnia" },
+    replica: { tocca: true, riga: "Tocca a te: manda la replica" },
+    ente: { tocca: true, riga: "Tocca a te: scrivi all'ente" },
+    chiusa: { tocca: false, riga: "Pratica chiusa" },
+  };
+
   const percorso = percorsoPratica(
     pratica.stato,
     eventi,
@@ -204,6 +226,10 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
      nessuna risposta» (Valerio, 13/08). Adesso decide `chiaveTesto`, che
      guarda cosa è SUCCESSO. Vedi lib/pratiche/passi.ts. */
   const stato = C.stati[percorso.chiaveTesto] ?? C.stati[pratica.stato] ?? null;
+  const passoDelMomento = RIGA_DEL_PASSO[percorso.attivo] ?? {
+    tocca: true,
+    riga: stato?.nome ?? "La tua pratica",
+  };
   const attesa = attesaDopoInvio(pratica.inviata_il, pratica.stato);
   /* IL FASCICOLO (scelta di Valerio col popup, 13/08). Lo stesso che
      legge l'AI prima di scrivere una replica: se lo mostriamo a lei e non
@@ -338,24 +364,19 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
 
       {/* ------------------------------------------------ dove siamo */}
       <section className="rounded-2xl border border-bordo bg-white px-6 py-6">
-        <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-fumo-2">
-          {C.statoEtichetta}
+        <p
+          className={`text-[0.7rem] font-medium uppercase tracking-[0.16em] ${
+            passoDelMomento.tocca ? "text-verde" : "text-fumo-2"
+          }`}
+        >
+          {passoDelMomento.tocca ? "Tocca a te" : "In attesa"}
         </p>
-        <h2 className="mt-2 font-display text-2xl tracking-[-0.03em]">
-          {stato?.nome ?? pratica.stato}
+        <h2 className="mt-2 font-display text-2xl leading-tight tracking-[-0.03em]">
+          {passoDelMomento.riga}
         </h2>
-        {stato && (
-          <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
-            {stato.descrizione}
-          </p>
-        )}
 
         {stato && (
-          <div className="mt-5 border-t border-bordo pt-5">
-            <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-fumo-2">
-              {C.prossimoPassoEtichetta}
-            </p>
-            <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed">{stato.prossimoPasso}</p>
+          <div className="mt-4">
             {/* IL CONTO ALLA ROVESCIA (scelta di Valerio col popup, 12/08).
                 Premi "Ho inviato il reclamo" e sullo schermo non cambiava
                 quasi niente: restava il dubbio "e adesso?". Qui c'è la
@@ -373,6 +394,21 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
                 {attesa}
               </p>
             )}
+          </div>
+        )}
+
+        {/* 🔴 I DOCUMENTI STANNO PRIMA DELLA LETTERA, o non stanno.
+            Valerio, 13/08: «dice che il reclamo è pronto e subito sotto
+            c'è il box carica i tuoi documenti: che senso ha se è tutto
+            pronto da inviare? O prima o niente».
+            Aveva ragione: allegare la carta d'imbarco serve a rendere il
+            reclamo più solido, quindi o si fa PRIMA di mandarlo o non
+            serve a niente. Adesso sta qui, dentro il passo, sopra il
+            bottone che apre la lettera; e appena il reclamo è partito
+            sparisce per sempre. */}
+        {R.documentoExtra && percorso.attivo === "lettera" && (
+          <div className="mt-5 border-t border-bordo pt-5">
+            <CaricaDocumento praticaId={pratica.id} />
           </div>
         )}
 
@@ -447,6 +483,25 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           </p>
         )}
 
+        {/* Il perché, per chi lo cerca. Fuori dalla strada di chi deve
+            solo fare la cosa del momento. */}
+        {stato && (
+          <details className="group mt-5 border-t border-bordo pt-4">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium text-fumo marker:hidden">
+              Come mai?
+              <span aria-hidden="true" className="text-fumo-2 transition-transform group-open:rotate-45">
+                +
+              </span>
+            </summary>
+            <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
+              {stato.descrizione}
+            </p>
+            <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
+              {stato.prossimoPasso}
+            </p>
+          </details>
+        )}
+
         {/* LA GARANZIA, UNA RIGA E IN CIMA (scelta di Valerio col popup,
             12/08). Prima era un riquadro verde scuro a metà pagina: si
             notava, ma arrivava dopo la cronologia, cioè dopo che uno
@@ -481,14 +536,20 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
         />
       )}
 
-      {/* ------------------------------------------------ i documenti.
-          ⚠️ NON È PIÙ UN PASSO, e non blocca più niente (scelta di Valerio
-          col popup, 13/08). Era «PASSO 1 DI 2» e teneva grigio il bottone
-          della lettera un secondo dopo il pagamento. */}
-      {R.documentoExtra && <CaricaDocumento praticaId={pratica.id} />}
-
-      {/* ---------------------------------------------- il fascicolo */}
-      <Fascicolo dossier={dossier} />
+      {/* --------------------------------------- il fascicolo, in fondo.
+          Scelta di Valerio (13/08): resta raggiungibile ma non ingombra.
+          Serve quando si scrive o si contesta, non mentre si aspetta. */}
+      <details className="group rounded-2xl border border-bordo bg-white px-6 py-4">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-display text-lg tracking-[-0.03em] marker:hidden">
+          Il fascicolo del tuo caso
+          <span aria-hidden="true" className="text-fumo-2 transition-transform group-open:rotate-45">
+            +
+          </span>
+        </summary>
+        <div className="mt-3">
+          <Fascicolo dossier={dossier} />
+        </div>
+      </details>
 
       {/* ------------------------------------------------ come si invia */}
       {R.istruzioni && (
