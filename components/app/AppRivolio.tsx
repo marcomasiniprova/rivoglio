@@ -23,6 +23,13 @@ const T = COPY.appWeb;
 
 export type CardPratica = {
   id: string;
+  /** Di chi è la palla: è la cosa che si legge per prima. */
+  palla: "tua" | "loro" | "chiusa";
+  /** Il passo attivo, in parole corte: «Replica». */
+  passoNome: string;
+  /** «3 di 5»: a che punto è, senza doverlo aprire. */
+  passoIndice: number;
+  passoTotale: number;
   statoNome: string;
   statoClassi: string;
   fascia: string | null;
@@ -177,13 +184,35 @@ export default function AppRivolio({
                     key={p.id}
                     href={`/pratica/${p.id}`}
                     style={{ "--n": indice } as React.CSSProperties}
-                    className="pratica-entra group block rounded-3xl border border-bordo bg-white px-6 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-verde/40 hover:shadow-[0_18px_36px_-24px_rgba(5,46,31,0.35)]"
+                    /* 🔴 TRE PRATICHE ERANO TRE RETTANGOLI IDENTICI
+                       (Valerio, 13/08). Adesso la card porta il segno di
+                       chi ha la palla: una fascia colorata a sinistra,
+                       che si vede da tre metri e prima ancora di leggere
+                       una parola. Il bordo pieno resta solo su quella
+                       dove tocca a te. */
+                    className={`pratica-entra group block rounded-3xl border bg-white px-6 py-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_18px_36px_-24px_rgba(5,46,31,0.35)] ${
+                      p.palla === "tua"
+                        ? "border-sole/60 border-l-4 border-l-sole hover:border-sole"
+                        : p.palla === "chiusa"
+                          ? "border-bordo border-l-4 border-l-verde hover:border-verde/40"
+                          : "border-bordo border-l-4 border-l-bordo hover:border-verde/40"
+                    }`}
                   >
                     <div className="flex flex-wrap items-center gap-2">
                       <span
                         className={`inline-flex items-center rounded-pillola px-3 py-1 text-xs font-medium ${p.statoClassi}`}
                       >
-                        {p.statoNome}
+                        {/* Prima diceva lo stato tecnico ("Sollecito"),
+                            che è una parola nostra. Adesso dice cosa
+                            cambia per lui. */}
+                        {p.palla === "tua"
+                          ? T.pratiche.tocca
+                          : p.palla === "loro"
+                            ? T.pratiche.aspetta
+                            : p.statoNome}
+                      </span>
+                      <span className="numeri inline-flex items-center rounded-pillola border border-bordo px-3 py-1 text-xs text-fumo">
+                        {p.passoNome} · {p.passoIndice}/{p.passoTotale}
                       </span>
                       {p.fascia && (
                         <span

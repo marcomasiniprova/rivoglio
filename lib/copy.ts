@@ -136,6 +136,14 @@ export const COPY = {
       pratiche: "Le tue pratiche",
       profilo: "Profilo",
     },
+    /* ⚠️ SULLE CARD NON SI SCRIVE LO STATO TECNICO. "Sollecito" e
+       "Inviata" sono parole nostre: dicono a che punto è la macchina, non
+       cosa cambia per chi legge. Con tre pratiche in fila la sola domanda
+       vera è «su quale devo muovermi io». */
+    pratiche: {
+      tocca: "Tocca a te",
+      aspetta: "In attesa di risposta",
+    },
     ospite: {
       pratiche: {
         titolo: "Qui trovi le tue pratiche.",

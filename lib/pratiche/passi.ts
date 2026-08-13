@@ -79,6 +79,36 @@ export type Percorso = {
   riquadri: Riquadri;
 };
 
+/**
+ * DI CHI È LA PALLA.
+ *
+ * 🔴 Valerio, 13/08: «se ho 3 pratiche non si capisce lo stato di
+ * ognuna, ognuna sembra uguale, ha sempre gli stessi box stessi colori
+ * uguali, non si capisce nulla».
+ *
+ * La distinzione che serve davvero quando ne hai più di una non è lo
+ * stato tecnico (pagata, inviata, sollecito: sono parole nostre), è
+ * questa: **su quale devo fare qualcosa io, adesso?** Tre valori, tre
+ * colori, e si legge da tre metri.
+ */
+export type DiChiELaPalla = "tua" | "loro" | "chiusa";
+
+export function diChiELaPalla(attivo: ChiavePasso): DiChiELaPalla {
+  if (attivo === "chiusa") return "chiusa";
+  if (attivo === "attesa") return "loro";
+  return "tua";
+}
+
+/** A che punto sei, in due numeri: «3 di 5». */
+export function aChePunto(p: Percorso): { indice: number; totale: number; nome: string } {
+  const i = p.passi.findIndex((x) => x.stato === "adesso");
+  return {
+    indice: i + 1,
+    totale: p.passi.length,
+    nome: p.passi[i]?.nome ?? "",
+  };
+}
+
 /** L'ordine in cui si attraversano, e il nome che l'utente legge. */
 const NOMI: { chiave: ChiavePasso; nome: string }[] = [
   { chiave: "pagamento", nome: "Pratica aperta" },

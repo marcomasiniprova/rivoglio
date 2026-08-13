@@ -2,8 +2,10 @@ import AppRivolio, { type CardPratica } from "@/components/app/AppRivolio";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
+import { colonnaMancante } from "@/lib/supabase/colonne";
 import { COPY } from "@/lib/copy";
-import type { StatoPratica, TipoPratica } from "@/lib/pratiche/pratiche";
+import type { EventoPratica, StatoPratica, TipoPratica } from "@/lib/pratiche/pratiche";
+import { aChePunto, diChiELaPalla, percorsoPratica, type DiChiELaPalla } from "@/lib/pratiche/passi";
 
 /**
  * LA WEB APP: le stesse sezioni dell'app sul telefono (Controlla,
@@ -22,6 +24,7 @@ type RigaPratica = {
   volo_id: string | null;
   creata_il: string;
   aggiornata_il: string;
+  rifiuto_motivo?: string | null;
 };
 
 type VoloBreve = { volo_iata: string; data_locale: string };
@@ -37,12 +40,27 @@ const dataIt = (iso: string) =>
 const riempi = (template: string, valori: Record<string, string>) =>
   template.replace(/\{(\w+)\}/g, (tutto, chiave) => valori[chiave] ?? tutto);
 
-/** Lo stato, vestito: chiuso bene in verde, chiuso male in oro, il resto menta. */
-function classiStato(stato: StatoPratica): string {
+/**
+ * 🔴 QUI TUTTE LE PRATICHE APERTE AVEVANO LO STESSO VESTITO.
+ *
+ * Valerio, 13/08: «se ho 3 pratiche non si capisce lo stato di ognuna,
+ * ognuna sembra uguale, ha sempre gli stessi box stessi colori uguali».
+ * Aveva ragione: questa funzione dava `bg-menta-tenue` a TUTTO quello che
+ * non era chiuso, cioè a cinque stati diversi su nove. Tre pratiche in
+ * fila erano tre rettangoli identici.
+ *
+ * E il difetto non era il colore, era cosa il colore raccontava: lo stato
+ * tecnico ("pagata", "inviata", "sollecito") è una parola nostra. Quello
+ * che una persona con tre pratiche vuole sapere in mezzo secondo è
+ * **su quale deve muoversi lei**. Adesso il colore dice quello.
+ */
+function classiStato(palla: DiChiELaPalla, stato: StatoPratica): string {
   if (stato === "esito_pagata") return "bg-verde text-white";
   if (stato === "esito_rifiutata") return "bg-sole/25 text-inchiostro";
   if (stato === "rimborsata") return "bg-nebbia-2 text-fumo";
-  return "bg-menta-tenue text-verde-notte";
+  // Tocca a te: giallo, che è il colore di "guardami". Tocca a loro:
+  // grigio, che è il colore di "non fare niente".
+  return palla === "tua" ? "bg-sole/25 text-inchiostro" : "bg-nebbia-2 text-fumo";
 }
 
 export default async function PaginaApp() {
@@ -62,15 +80,42 @@ export default async function PaginaApp() {
 
   const supabase = await supabaseServer();
 
+  /* ⚠️ `rifiuto_motivo` arriva con la migrazione del 15/08: se non fosse
+     applicata, chiederla farebbe fallire TUTTA la lettura e l'elenco
+     resterebbe vuoto. Stessa rete della lettera e della scheda. */
+  const COLONNE = "id, stato, tipo, importo_fascia, volo_id, creata_il, aggiornata_il";
+  const elenco = async (colonne: string) =>
+    supabase.from("pratiche").select(colonne).order("aggiornata_il", { ascending: false });
+  const primoGiro = await elenco(`${COLONNE}, rifiuto_motivo`);
   const [{ data, error }, { data: profilo }] = await Promise.all([
-    supabase
-      .from("pratiche")
-      .select("id, stato, tipo, importo_fascia, volo_id, creata_il, aggiornata_il")
-      .order("aggiornata_il", { ascending: false }),
+    primoGiro.error && colonnaMancante(primoGiro.error.message)
+      ? await elenco(COLONNE)
+      : primoGiro,
     supabase.from("profili").select("nickname, classifica_optin").eq("id", utente.id).maybeSingle(),
   ]);
 
-  const righe = (data ?? []) as RigaPratica[];
+  const righe = (data ?? []) as unknown as RigaPratica[];
+
+  /* Gli eventi di TUTTE le pratiche in una lettura sola: servono a sapere
+     a che punto è ognuna (il passo dei documenti sta lì dentro). Una
+     query per pratica sarebbe una query per riga a ogni apertura
+     dell'elenco. */
+  const eventiPer = new Map<string, { tipo: string; nota: string | null; creato_il: string }[]>();
+  if (righe.length > 0) {
+    const { data: ev } = await supabase
+      .from("pratiche_eventi")
+      .select("pratica_id, tipo, nota, creato_il")
+      .in(
+        "pratica_id",
+        righe.map((p) => p.id),
+      )
+      .order("creato_il", { ascending: true });
+    for (const e of ev ?? []) {
+      const lista = eventiPer.get(e.pratica_id as string) ?? [];
+      lista.push({ tipo: e.tipo as string, nota: e.nota as string | null, creato_il: e.creato_il as string });
+      eventiPer.set(e.pratica_id as string, lista);
+    }
+  }
 
   /* I voli delle pratiche, in un colpo solo. Se la chiave di servizio manca
      l'elenco resta in piedi lo stesso: si mostra la data della pratica. */
@@ -90,10 +135,21 @@ export default async function PaginaApp() {
   const pratiche: CardPratica[] = righe.map((p) => {
     const stato = COPY.pratica.stati[p.stato] ?? null;
     const volo = p.volo_id ? voli.get(p.volo_id) : undefined;
+    const percorso = percorsoPratica(
+      p.stato,
+      (eventiPer.get(p.id) ?? []) as EventoPratica[],
+      p.rifiuto_motivo ?? null,
+    );
+    const palla = diChiELaPalla(percorso.attivo);
+    const punto = aChePunto(percorso);
     return {
       id: p.id,
+      palla,
+      passoNome: punto.nome,
+      passoIndice: punto.indice,
+      passoTotale: punto.totale,
       statoNome: stato?.nome ?? p.stato,
-      statoClassi: classiStato(p.stato),
+      statoClassi: classiStato(palla, p.stato),
       fascia:
         p.importo_fascia !== null
           ? riempi(C.fasciaTemplate, { importo: `${p.importo_fascia}€` })

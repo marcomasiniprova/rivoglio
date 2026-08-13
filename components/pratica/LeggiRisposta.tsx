@@ -148,7 +148,13 @@ export default function LeggiRisposta({
   /* ------------------------------------------------- il modulo vero */
   return (
     <div className="mt-4">
-      <div className="flex gap-2">
+      {/* ⚠️ IMPILATI SOTTO I 640 PUNTI. Affiancati, a 375 i due nomi
+          andavano a capo in mezzo ("Incolla il / testo"), e un bottone
+          con la scritta spezzata si legge come un difetto. Accorciare i
+          nomi era l'altra strada, ma "Incolla" e "Foto" non dicono cosa
+          fanno: qui la scelta fra le due modalità è la prima cosa che
+          l'utente deve capire. */}
+      <div className="flex flex-col gap-2 sm:flex-row">
         {(
           [
             ["testo", ClipboardPaste, "Incolla il testo"],
