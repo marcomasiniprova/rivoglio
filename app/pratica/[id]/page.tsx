@@ -12,6 +12,9 @@ import { utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import BarraPassi from "@/components/pratica/BarraPassi";
+import Fascicolo from "@/components/pratica/Fascicolo";
+import { costruisciDossier, type VoloDossier } from "@/lib/pratiche/dossier";
+import { colonnaMancante } from "@/lib/supabase/colonne";
 import { caricaPratica, eventiPratica, type StatoPratica } from "@/lib/pratiche/pratiche";
 import { percorsoPratica } from "@/lib/pratiche/passi";
 import { GIORNI_PRIMA_DEL_SOLLECITO, schedaRifiuto } from "@/lib/pratiche/rifiuto";
@@ -138,12 +141,32 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
   // che la pratica esiste. Stessa regola della lettera e dell'API.
   if (!pratica || !pratica.utente_id || pratica.utente_id !== utente.id) redirect("/app");
 
-  const { data: volo } = pratica.volo_id
-    ? ((await supabaseServizio()
-        .from("voli")
-        .select("volo_iata, data_locale")
-        .eq("id", pratica.volo_id)
-        .maybeSingle()) as { data: VoloBreve | null })
+  /* ⚠️ IL FASCICOLO NON PUÒ FAR SPARIRE LA PRATICA. Chiedere a Postgres
+     una colonna che non c'è non torna "campo vuoto": fa fallire TUTTA la
+     lettura. È già successo il 10/08 con `rifiuto_motivo`, e la pratica
+     spariva dall'app per un campo accessorio. Quindi si chiede tutto, e
+     se una colonna manca si riprova col minimo indispensabile: il
+     fascicolo esce con qualche riga in meno, la pratica esce sempre. */
+  const VOLO_BASE = "volo_iata, data_locale";
+  const VOLO_PIENO = `${VOLO_BASE}, vettore_operativo, km_ortodromica, fonte, arrivo_previsto_utc, arrivo_effettivo_utc, partenza_citta, arrivo_citta`;
+  const leggiVolo = (colonne: string) =>
+    supabaseServizio().from("voli").select(colonne).eq("id", pratica.volo_id!).maybeSingle();
+  let volo: (VoloBreve & VoloDossier) | null = null;
+  if (pratica.volo_id) {
+    const pieno = await leggiVolo(VOLO_PIENO);
+    volo = (
+      pieno.error && colonnaMancante(pieno.error.message)
+        ? (await leggiVolo(VOLO_BASE)).data
+        : pieno.data
+    ) as (VoloBreve & VoloDossier) | null;
+  }
+
+  const { data: verificaRiga } = pratica.verifica_id
+    ? await supabaseServizio()
+        .from("verifiche")
+        .select("importo, ritardo_minuti, motivo, versione_regole")
+        .eq("id", pratica.verifica_id)
+        .maybeSingle()
     : { data: null };
 
   const eventi = await eventiPratica(pratica.id);
@@ -156,6 +179,16 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
   const percorso = percorsoPratica(pratica.stato, eventi, pratica.rifiuto_motivo ?? null);
   const R = percorso.riquadri;
   const attesa = attesaDopoInvio(pratica.inviata_il, pratica.stato);
+  /* IL FASCICOLO (scelta di Valerio col popup, 13/08). Lo stesso che
+     legge l'AI prima di scrivere una replica: se lo mostriamo a lei e non
+     a lui, la trasparenza che vendiamo si ferma alla porta di casa. */
+  const dossier = costruisciDossier({
+    pratica,
+    volo,
+    verifica: verificaRiga,
+    eventi,
+    etichette: etichetteEventi,
+  });
 
   return (
     <Cornice>
@@ -314,6 +347,9 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           dopoInvio={R.documentoExtra}
         />
       )}
+
+      {/* ---------------------------------------------- il fascicolo */}
+      <Fascicolo dossier={dossier} />
 
       {/* ---------------------------- il no della compagnia, dichiarato */}
       {R.rifiuto && (

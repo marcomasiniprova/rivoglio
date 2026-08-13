@@ -281,6 +281,20 @@ export function generaSollecito(
    * metà. `null` o "silenzio" = nessuna risposta ricevuta.
    */
   motivoRifiuto: MotivoRifiuto | null = null,
+  /**
+   * IL PARAGRAFO SU MISURA, scritto sui fatti che la compagnia ha
+   * dichiarato nella SUA risposta (lib/ai/replica.ts). Arriva già
+   * controllato: se avesse citato una sentenza fuori dal nostro archivio
+   * o una cifra inventata sarebbe stato scartato prima, e qui arriverebbe
+   * `null`.
+   *
+   * ⚠️ SI AGGIUNGE, NON SOSTITUISCE. Il paragrafo fisso del motivo dice
+   * il principio di diritto ed è verificato a mano; questo dice perché
+   * quel principio si applica a QUELLO che hanno scritto loro. Togliere
+   * il primo per tenere il secondo vorrebbe dire far reggere tutta la
+   * replica su un testo generato.
+   */
+  paragrafoSuMisura: string | null = null,
 ): Lettera | null {
   if (verdetto.esito !== "idoneo") return null;
 
@@ -305,7 +319,7 @@ in data ${giornoInvio} vi ho inviato una richiesta di compensazione pecuniaria a
       : `un totale di ${euro(totale)} (${euro(verdetto.importo)} per ${n} passeggeri)`
   }.
 
-${scheda.replica}
+${scheda.replica}${paragrafoSuMisura ? `\n\n${paragrafoSuMisura.trim()}` : ""}
 
 Vi chiedo il pagamento, o una risposta scritta e motivata, entro 14 giorni dal ricevimento della presente.
 

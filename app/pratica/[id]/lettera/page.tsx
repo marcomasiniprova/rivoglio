@@ -8,8 +8,9 @@ import ApriEmail from "@/components/pratica/ApriEmail";
 import Foglio from "@/components/pratica/Foglio";
 import { Button } from "@/components/ui/button";
 import { colonnaMancante } from "@/lib/supabase/colonne";
-import { letteraSbloccata } from "@/lib/pratiche/documenti";
-import { eventiPratica } from "@/lib/pratiche/pratiche";
+import { eventiPratica, type StatoPratica } from "@/lib/pratiche/pratiche";
+import { paragrafoSuMisura } from "@/lib/pratiche/dossier";
+import { percorsoPratica } from "@/lib/pratiche/passi";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { compagniaPerVettore, modoInvio } from "@/lib/lettera/compagnie";
@@ -213,7 +214,14 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
      non basta: questo indirizzo si digita, sta nella cronologia del
      browser e finisce nei segnalibri. Chi arriva qui prima del tempo
      torna alla pratica, dove il passo c'è e si fa. */
-  if (!letteraSbloccata(await eventiPratica(pratica.id))) redirect(`/pratica/${pratica.id}`);
+  const eventi = await eventiPratica(pratica.id);
+  /* ⚠️ Il muro dei documenti vale solo prima che il reclamo parta: dopo,
+     aprire la lettera è un diritto già pagato. La regola sta in un posto
+     solo (lib/pratiche/passi.ts) e questa pagina la chiede a lui, invece
+     di riscriverla per conto suo come faceva prima. */
+  if (!percorsoPratica(pratica.stato as StatoPratica, eventi, pratica.rifiuto_motivo ?? null).riquadri.letteraApribile) {
+    redirect(`/pratica/${pratica.id}`);
+  }
 
   if (pratica.stato === "creata") {
     return (
@@ -364,6 +372,10 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           verdetto,
           pratica.inviata_il.slice(0, 10),
           motivoRifiuto,
+          /* Il paragrafo scritto sui fatti che LORO hanno dichiarato, se
+             il cliente ci ha dato la loro risposta e il controllo l'ha
+             lasciato passare. Senza, la replica resta quella fissa. */
+          paragrafoSuMisura(eventi),
         )
       : null;
 

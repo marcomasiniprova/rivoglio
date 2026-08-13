@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AlertTriangle, Check, FileText } from "lucide-react";
+import LeggiRisposta from "./LeggiRisposta";
 
 /**
  * "LA COMPAGNIA MI HA RISPOSTO NO."
@@ -11,10 +12,17 @@ import { AlertTriangle, Check, FileText } from "lucide-react";
  * calendario, chi si becca un rifiuto scritto la settimana dopo l'invio
  * resterebbe fermo a guardare per un mese e mezzo.
  *
- * Perché la scelta è chiusa. Il motivo decide la replica: a un guasto
- * tecnico si risponde in un modo, a uno sciopero del personale in un
- * altro. Un campo di testo libero sarebbe più comodo da scrivere e
- * inutile da usare.
+ * ⚠️ QUI C'ERA SCRITTO che la scelta a lista è chiusa perché «un campo di
+ * testo libero sarebbe più comodo da scrivere e inutile da usare». Non è
+ * più vero dal 13/08: adesso il testo libero (o lo screenshot) lo legge
+ * un modello, che riconosce il motivo da solo ed estrae i fatti che la
+ * compagnia dichiara. Quindi si parte da lì, che è meno lavoro per la
+ * persona e produce una replica migliore.
+ *
+ * La lista resta, un clic sotto, e serve a due casi veri: chi la risposta
+ * non ce l'ha sottomano (una telefonata, un'email su un altro telefono) e
+ * chi ha davanti un modello che non ha capito. Un prodotto con una strada
+ * sola è un prodotto che si ferma.
  *
  * Il testo della replica NON sta qui dentro: sta sul server. Nel browser
  * gira solo l'etichetta.
@@ -43,6 +51,11 @@ export default function DichiaraRifiuto({
   etichettaScelta?: string | null;
 }) {
   const [aperto, setAperto] = useState(false);
+  /* Si parte SEMPRE dalla lettura: incollare la risposta è meno lavoro
+     che leggersi otto voci e scegliere, e produce una replica migliore.
+     La lista resta un clic sotto, e diventa la strada principale se il
+     modello non ce la fa. */
+  const [lista, setLista] = useState(false);
   const [motivi, setMotivi] = useState<Motivo[]>([]);
   const [scelto, setScelto] = useState<string | null>(giaDichiarato ?? null);
   const [invio, setInvio] = useState(false);
@@ -132,7 +145,8 @@ export default function DichiaraRifiuto({
       </h2>
       <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
         Succede alla maggior parte dei reclami validi, e quasi sempre è un no che non regge.
-        Dimmi cosa ti hanno scritto e ti preparo la risposta, senza aspettare.
+        Incolla qui quello che ti hanno scritto, o fotografalo: lo leggo io e ti preparo la
+        risposta sui loro stessi fatti, senza aspettare.
       </p>
 
       {!aperto ? (
@@ -143,6 +157,26 @@ export default function DichiaraRifiuto({
         >
           Mi hanno risposto no
         </button>
+      ) : !lista ? (
+        <>
+          <LeggiRisposta
+            praticaId={praticaId}
+            onFallita={(messaggio) => {
+              setLista(true);
+              if (messaggio) setErrore(messaggio);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setLista(true);
+              setErrore("");
+            }}
+            className="mt-4 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
+          >
+            Non ho la loro risposta sottomano: scelgo dall&apos;elenco
+          </button>
+        </>
       ) : (
         <>
           <div className="mt-4 flex flex-col gap-2">

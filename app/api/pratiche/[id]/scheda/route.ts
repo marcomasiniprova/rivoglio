@@ -11,6 +11,7 @@ import {
 import { conciliazionePerPartenza, prontoPerConciliazione } from "@/lib/lettera/conciliazione";
 import { METEO_ATTIVO, fraseMeteo, meteoStorico } from "@/lib/meteo/openmeteo";
 import type { Passeggero, TipoPratica } from "@/lib/pratiche/pratiche";
+import { paragrafoSuMisura } from "@/lib/pratiche/dossier";
 import {
   GIORNI_PRIMA_DELL_ENTE,
   GIORNI_PRIMA_DEL_SOLLECITO,
@@ -269,7 +270,17 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
         };
 
         if (prontoPerSollecito(giorniDallInvio, motivo)) {
-          sollecito = generaSollecito(passeggeriPratica, fatto, verdetto, giornoInvio, motivo);
+          /* Anche l'app riceve la replica su misura: sito e telefono
+             devono mostrare la STESSA lettera, se no il cliente ne legge
+             due diverse dello stesso caso. */
+          sollecito = generaSollecito(
+            passeggeriPratica,
+            fatto,
+            verdetto,
+            giornoInvio,
+            motivo,
+            paragrafoSuMisura(eventi ?? []),
+          );
         }
         if (sollecito && giorniDallInvio >= GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE) {
           segnalazione = generaSegnalazioneEnte(
