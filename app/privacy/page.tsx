@@ -50,10 +50,25 @@ export default function PaginaPrivacy() {
           esecuzione del contratto (art. 6.1.b) e obblighi di legge (art. 6.1.c).
         </li>
         <li>
-          <strong>I documenti che carichi</strong> (carta d&apos;imbarco o email della
-          compagnia): li leggiamo per confrontarli coi dati verificati del volo e{" "}
-          <strong>non li salviamo</strong>. Il file viene letto, l&apos;esito del confronto
-          viene registrato nella pratica, il file viene scartato.
+          <strong>La carta d&apos;imbarco che carichi</strong>: la leggiamo per confrontarla
+          coi dati verificati del volo e <strong>non la salviamo</strong>. Il file viene
+          letto, l&apos;esito del confronto viene registrato nella pratica, il file viene
+          scartato.
+        </li>
+        {/* ⚠️ AGGIUNTO IL 13/08, ED ERA UN BUCO VERO. Da quel giorno chi
+            riceve un no dalla compagnia può incollarne la risposta (o
+            caricarne lo screenshot) e noi la LEGGIAMO E LA TENIAMO: è il
+            materiale con cui si scrive la replica, e serve poterla
+            rileggere. Ma la riga qui sopra diceva «non li salviamo», che
+            per quel testo non era più vero. Dichiarare quello che si
+            raccoglie è la cosa più facile da dimenticare e la più cara da
+            spiegare dopo. */}
+        <li>
+          <strong>La risposta della compagnia</strong>, se scegli di incollarla o
+          fotografarla: <strong>il testo lo conserviamo</strong> dentro la tua pratica, perché
+          serve a scrivere la replica su misura e a fartela rileggere. Se carichi
+          un&apos;immagine, l&apos;immagine viene letta e scartata: resta solo il testo. Puoi
+          chiederne la cancellazione quando vuoi, e sparisce con la pratica.
         </li>
         <li>
           <strong>La foto della carta d&apos;imbarco nell&apos;app</strong>: se scegli di
@@ -96,7 +111,8 @@ export default function PaginaPrivacy() {
         Per far funzionare il servizio usiamo fornitori che trattano i dati per nostro conto,
         come responsabili o autonomi titolari: Supabase (database e accessi, server
         nell&apos;Unione Europea), Netlify (hosting del sito), Resend (invio email), Mistral
-        (lettura del testo dei documenti che carichi, senza conservazione del file),
+        (lettura del testo dei documenti che carichi e stesura della replica sulla risposta
+        della compagnia; il file immagine non viene conservato),
         AeroDataBox (dati di volo: riceve solo numero di volo e data, mai la tua identità).
         Alcuni fornitori possono trovarsi fuori dall&apos;Unione Europea: in quel caso il
         trasferimento avviene con le garanzie previste dagli artt. 44 e seguenti del GDPR
