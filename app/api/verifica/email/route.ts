@@ -6,6 +6,7 @@ import { verdettoIdoneo } from "@/lib/email/verdetto";
 import { formattaMinuti } from "@/lib/regole/eu261";
 import { aeroporto } from "@/lib/voli/distanza";
 import { inItaliano } from "@/lib/voli/aeroporti";
+import { voloDimostrativo } from "@/lib/voli/fornitori/demo";
 
 /**
  * POST /api/verifica/email  {id, email}
@@ -73,6 +74,11 @@ async function inviaVerdetto(
       tratta,
       importo: riga.importo,
       ritardo: riga.ritardo_minuti ? formattaMinuti(riga.ritardo_minuti) : null,
+      /* Il bollo "esempio" arriva dal numero del volo e non dalla riga
+         del volo in archivio: i dimostrativi in quell'archivio non ci
+         entrano proprio (restano deterministici), quindi cercare lì la
+         fonte "demo" non troverebbe niente. */
+      demo: voloDimostrativo(riga.volo_iata),
     });
     if (!esito.ok) console.error("[verifica/email] email del verdetto non partita:", esito.motivo);
   } catch (e) {

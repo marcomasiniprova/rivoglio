@@ -37,6 +37,19 @@ type SagomaDemo = {
   arrivo?: string;
 };
 
+/**
+ * Vero se questo numero è un volo dimostrativo.
+ *
+ * Il segno è il prefisso ZZ, che nessuna compagnia vera usa. Esiste come
+ * funzione, e non come confronto scritto qua e là, perché il bollo
+ * "esempio" deve comparire su OGNI cosa che esce da qui, email comprese:
+ * un numero inventato che gira senza bollo è la regola 3 del progetto
+ * rotta a metà.
+ */
+export function voloDimostrativo(voloIata: string | null | undefined): boolean {
+  return typeof voloIata === "string" && voloIata.trim().toUpperCase().startsWith("ZZ");
+}
+
 export const VOLI_DEMO: SagomaDemo[] = [
   { voloIata: "ZZ250", copre: "idoneo, fascia 250 (corto raggio, 3h20 di ritardo)", stato: "atterrato", previstoOre: "20:00", ritardoMinuti: 200, km: 980 },
   { voloIata: "ZZ400", copre: "idoneo, fascia 400 (medio raggio, 3h30 di ritardo)", stato: "atterrato", previstoOre: "20:00", ritardoMinuti: 210, km: 2300 },

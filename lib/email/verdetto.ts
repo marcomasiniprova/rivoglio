@@ -57,6 +57,17 @@ export type DatiVerdetto = {
   importo: number;
   /** Il ritardo già scritto in parole ("3 ore e 52 minuti"). */
   ritardo: string | null;
+  /**
+   * 🔴 IL BOLLO SUI VOLI DIMOSTRATIVI, che qui dentro mancava.
+   *
+   * Trovato col collaudo del 13/08 leggendo l'email arrivata davvero: per
+   * il volo ZZ250 (che non esiste) partiva un'email che diceva «Il tuo
+   * volo vale 250€», identica a quella di un caso vero. Sulla pagina il
+   * bollo «Esempio dimostrativo» c'è; nell'email no, e l'email è la cosa
+   * che resta nella casella di posta e che uno rilegge fra un mese.
+   * È la regola 3 del progetto: mai un dato finto che sembra vero.
+   */
+  demo?: boolean;
 };
 
 /**
@@ -71,12 +82,22 @@ export function verdettoIdoneo(a: string, d: DatiVerdetto): Promise<Esito> {
     ? ` Il ritardo verificato all'arrivo è di <strong style="color:${C.inchiostro}">${d.ritardo}</strong>.`
     : "";
 
+  /* Il bollo si vede prima di tutto il resto: in cima al corpo, nel
+     titolo della finestra e davanti all'oggetto, che è l'unica riga che
+     una persona legge nell'elenco della posta. */
+  const bollo = d.demo
+    ? `<p style="margin:0 0 18px;padding:9px 14px;border-radius:11px;background:#fff6d8;font-family:${FONT};font-size:13px;font-weight:600;letter-spacing:.02em;color:#7a5a00;">Esempio dimostrativo: il volo ${d.volo} non esiste, serve a mostrare come funziona Rivolio.</p>`
+    : "";
+
   return spedisci({
     a,
-    oggetto: `${dove}: ti spettano ${euro(d.importo)}`,
+    oggetto: d.demo
+      ? `Esempio dimostrativo · ${dove}: ${euro(d.importo)}`
+      : `${dove}: ti spettano ${euro(d.importo)}`,
     html: vestito({
-      titolo: `${dove}: ${euro(d.importo)}`,
+      titolo: d.demo ? `Esempio · ${dove}: ${euro(d.importo)}` : `${dove}: ${euro(d.importo)}`,
       corpo:
+        bollo +
         h(`Il tuo volo vale ${euro(d.importo)}.`) +
         p(
           `${dove}, volo <strong style="color:${C.inchiostro}">${d.volo}</strong>.${ritardo} La fascia la fissa l'articolo 7 del Regolamento CE 261/2004, in base al ritardo e alla distanza della tratta.`,
@@ -93,7 +114,7 @@ export function verdettoIdoneo(a: string, d: DatiVerdetto): Promise<Esito> {
         ),
       coda: CODA,
     }),
-    testo: `Il tuo volo vale ${euro(d.importo)}.
+    testo: `${d.demo ? `ESEMPIO DIMOSTRATIVO: il volo ${d.volo} non esiste, serve a mostrare come funziona Rivolio.\n\n` : ""}Il tuo volo vale ${euro(d.importo)}.
 
 ${dove}, volo ${d.volo}.${d.ritardo ? ` Ritardo verificato all'arrivo: ${d.ritardo}.` : ""}
 La fascia la fissa l'articolo 7 del Regolamento CE 261/2004, in base al ritardo e alla distanza della tratta.
