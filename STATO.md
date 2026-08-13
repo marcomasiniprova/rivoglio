@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-11 (giro #58: il retrobottega diventa un
+**Aggiornato:** 2026-08-13 (giro #62: i nove punti del collaudo di
+Valerio, dalle email finte ai paletti della pratica, più l'AI che legge
+la risposta della compagnia e la pagina che spiega il motore · giro #58: il retrobottega diventa un
 gestionale, con la barra laterale e i grafici · giro #57: il pannello
 non si apriva perché
 Valerio non aveva il ruolo admin, e i cancelletti spariscono
@@ -69,6 +71,140 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #62 (13/08): I NOVE PUNTI DEL COLLAUDO DI VALERIO.** Aperti
+  provando una pratica vera dalla web app. Tutti chiusi, più tre difetti
+  veri trovati strada facendo che lui non aveva visto.
+  - 🔴 **GLI ACCOUNT NASCEVANO CON EMAIL FINTE, TEMPORANEE E SCRITTE
+    MALE.** Lo stesso controllo permissivo era **copiato in cinque
+    punti**, e lasciava passare `pippo@gmial.com`, `x@mailinator.com` e
+    qualunque dominio che non esiste. Su quell'indirizzo NASCE L'ACCOUNT
+    della pratica: il giorno del primo cliente pagante è un incasso e un
+    cliente che non riesce a entrare.
+    Adesso `lib/email/indirizzo.ts`, uno per tutto il sito, con quattro
+    cancelli: forma vera, caselle usa e getta (sottodomini compresi),
+    refuso di un dominio famoso, e il **DNS** che dice se quel dominio
+    riceve posta davvero.
+    ⚠️ **Il DNS sbaglia dalla parte di chi paga**: se non risponde, si
+    passa. Bloccare un indirizzo buono per un guasto nostro è peggio di
+    un'email che rimbalza.
+    ⚠️ **Il refuso si propone, non si impone**: `gmial.com` esiste
+    davvero come dominio, quindi il DNS lo lascerebbe passare; il
+    suggerimento arriva con un bottone che corregge, e "no, è giusto
+    così" fa passare lo stesso.
+    🔴 E lo scambio di due lettere contava **due** errori invece di uno:
+    con la distanza classica `gmial` dista 2 da `gmail`, cioè quanto un
+    dominio che non c'entra niente. Il caso per cui il controllo esiste
+    non veniva preso. Trovato da una prova al primo giro.
+  - 🔴 **«QUANDO CLICCO INVIATA RIMANE ANCORA IL BOX PER CARICARE I
+    DOCUMENTI. Sembra che il prodotto non abbia paletti e step
+    definiti.»** Aveva ragione, ed era strutturale: **tre liste di stati
+    scritte a mano** (`CONFERMABILE`, `DICHIARABILE`, `CON_LETTERA`), una
+    accanto a ogni riquadro, nessuna che sapeva delle altre. Potevano
+    accendersi tutte insieme e contraddirsi.
+    Adesso decide `lib/pratiche/passi.ts`, e garantisce **un passo attivo
+    alla volta**. In cima alla pratica c'è la barra dei passi.
+  - 🔴 **«HO CLICCATO MALTEMPO E NON È SUCCESSO NIENTE»: lo stesso
+    difetto, ed era il peggiore.** Dichiarato il no, la replica veniva
+    davvero preparata, ma **«Apri la lettera» restava grigio** perché il
+    muro dei documenti restava su anche dopo che la lettera era partita.
+    Cioè: il pezzo di prodotto che aveva pagato, nel momento in cui gli
+    serviva, era chiuso a chiave. Il muro adesso vale per la PRIMA
+    lettera e basta.
+    E il riquadro non dice più «Il loro no è registrato» (un fatto
+    nostro): dice **«La replica è pronta»** col bottone che la apre e il
+    motivo che ha in pancia.
+  - 🔴 **NON SI POTEVA DICHIARARE DI AVER MANDATO UNA LETTERA CHE NON SI
+    ERA POTUTA APRIRE**, e invece si poteva: il bottone «Ho inviato il
+    reclamo» compariva anche col muro dei documenti su, e la pratica
+    avanzava su un fatto non avvenuto. Trovato costruendo i passi.
+  - 🔴 **«PAGHI E VIENI FATTO USCIRE DALLA WEB APP.»** Due cause lontane.
+    La pagina del verdetto aveva **una sola uscita, `/`**, cioè la
+    landing di vendita: chi ha un account finiva sulla pagina che serve a
+    convincere gli estranei. E dopo il pagamento si passava **sempre** dal
+    link di accesso, che esce su supabase.co e rientra da
+    `/auth/conferma`.
+    ⚠️ **E lì c'era di peggio di quello che aveva visto**: quel link
+    accede come l'email lasciata sulla verifica, quindi con due indirizzi
+    in famiglia **ti cambiava account sotto i piedi senza dirtelo**.
+    Adesso se la sessione è già quella giusta si va dritti alla pratica.
+  - 🔴 **«PERCHÉ C'È ANCORA SHADOW MODE SE L'AVEVAMO TOLTO? E LE
+    REVISIONI SONO STORTE, LA PIÙ RECENTE È IN FONDO.»** Il 12/08 il
+    cancello è stato tolto dalla **cassa**, non dal **pannello**: la
+    schermata ha continuato a scrivere «finché non confermi, quei clienti
+    non possono pagare», che è una frase che fa lavorare con urgenza una
+    coda che non trattiene un euro.
+    Scelta col popup: la sezione **cambia mestiere**. Non è una coda che
+    sblocca, è un **controllo a campione**, **dal più recente**.
+    «Conferma» diventa **«Va bene»** (che è quello che fa: toglie la riga
+    dall'elenco) e non manda più l'email «ricontrollato a mano» a gente
+    che intanto poteva aver pagato. L'unica azione che pesa resta
+    **Correggi**, che ferma la vendita su quel caso sia dalla cassa sia
+    dal webhook.
+  - **«NON SI PUÒ FARE L'ANALISI BELLA FIGA CON AI? È TUTTO COSÌ RIGIDO
+    CON DOMANDE PREDEFINITE.»** Adesso **incolli l'email della compagnia
+    o ne carichi lo screenshot**: Mistral OCR legge l'immagine, il
+    modello riconosce da solo quale degli otto motivi è, estrae i fatti
+    che LORO dichiarano e scrive il paragrafo che risponde punto per
+    punto. La lista resta un clic sotto, per chi la risposta non ce l'ha
+    sottomano.
+    ⚠️ **E C'È IL CANCELLO, che è la parte che conta** (`lib/ai/replica.ts`).
+    La lettera la manda il cliente col nostro nome sopra: una sentenza
+    inventata è una figuraccia sua nel punto in cui ha ragione. Tutto
+    quello che esce dal modello passa da un controllo **deterministico**
+    che boccia sentenze fuori dal nostro archivio verificato, cifre non
+    presenti nel fascicolo, promesse di esito, «lo dice la
+    giurisprudenza» senza dire quale. Se non passa, vale il testo fisso.
+    E il paragrafo **si aggiunge** a quello verificato, non lo sostituisce.
+  - **«PER OGNI UTENTE NON VIENE SALVATO UN DOSSIER, QUINDI LA CONTRO
+    RISPOSTA NON AVRÀ CONTESTO.»** Vero a metà, ed è la metà che conta: i
+    dati c'erano tutti ma sparsi in quattro tabelle. Nasce
+    `lib/pratiche/dossier.ts`: volo, orari certificati, fascia e perché,
+    documenti, cosa ha risposto la compagnia parola per parola, storia.
+    Lo legge l'AI **prima** di scrivere, e lo vede anche l'utente sulla
+    pratica (scelta col popup).
+    ⚠️ **Dove non sappiamo scrive «non lo sappiamo»**: un fascicolo che
+    riempie i buchi è peggio di uno con dei buchi, perché il modello
+    legge anche quelli.
+    ⚠️ **Niente migrazione**: risposta e analisi vivono negli **eventi**
+    della pratica, che sono già la sua memoria. Chiedere una colonna che
+    non c'è fa fallire tutta la lettura, ed è già successo il 10/08.
+  - **«MISTRAL LO STIAMO USANDO?»** Sì, e non poteva vederlo: girava in
+    due punti soli, e nessuno dei due sta nel percorso che ha provato (la
+    foto della carta d'imbarco nel check, e l'autopilot degli scioperi
+    che gira di notte). Adesso è anche sulla risposta della compagnia.
+  - **«CON 3 PRATICHE NON SI CAPISCE LO STATO DI OGNUNA.»** Vero:
+    `classiStato` dava lo stesso menta a **cinque stati aperti su nove**.
+    E il difetto non era il colore, era cosa raccontava: «pagata»,
+    «inviata», «sollecito» sono parole nostre. Adesso ogni card dice **di
+    chi è la palla**: gialla «Tocca a te», grigia «In attesa di
+    risposta», verde chiusa. Più «Replica · 4/7».
+  - 🔴 **E LA BARRA DEI PASSI FACEVA SCORRERE LA PAGINA DI LATO** a tutte
+    e tre le larghezze: sette tappe col nome accanto sono mille punti in
+    una colonna che ne ha 768, e `overflow-x-auto` non basta perché in un
+    flex un figlio non si stringe sotto il proprio contenuto. Rifatta a
+    **segmenti**, col nome solo sulla tappa attiva: non può traboccare per
+    costruzione. Trovato guardando le schermate, non da una prova.
+  - **«SPIEGAMI PEZZO PER PEZZO COME LAVORA IL MOTORE, TUTTE LE FONTI,
+    DALLA A ALLA Z, LO STATO DEL DATABASE.»** Nasce **`/admin/motore`**,
+    dalla barra laterale e dal nodo della mappa. Le fonti sono **nove, e
+    quattro sono nostre**: AeroDataBox, la memoria dei voli, l'archivio
+    dei 9.016 scali, le regole scritte, le licenze dei vettori, gli
+    scioperi, Mistral OCR, Mistral che scrive, i canali di reclamo.
+    Per ognuna: cosa ci mette, cosa si rompe se sparisce, quanto costa.
+    Poi gli **otto passi** di un'analisi col file che li fa, le righe di
+    ogni tabella contate adesso, e i tre modi per guardarlo.
+    ⚠️ **I numeri si contano, non si scrivono**: la mappa dichiarava «58
+    casi» quando erano 53, copiati a mano dal diario di un giro
+    precedente. Una prova boccia qualunque quantità scritta a mano.
+  - Prove: **1254 verdi**, 6 saltate (la sveglia del 2027), zero rosse.
+    Le nuove sono 84: indirizzo email (14), passi della pratica (12),
+    controllo a campione (6), dentro la web app (7), cancello dell'AI e
+    fascicolo (25), motore spiegato (12), più le due aggiornate al
+    comportamento nuovo.
+    ⚠️ Una prova esistente ha bocciato la rotta nuova il giorno stesso in
+    cui è nata («ogni rotta che ci costa soldi passa dal cancello»):
+    l'esenzione è scritta col motivo, perché il suo cancello è più
+    stretto di quello del check, non più largo.
 - **GIRO #61 (12/08): IL DESTINATARIO C'È SEMPRE.** Cinque punti alzati da
   Valerio aprendo una pratica vera, tutti chiusi.
   - 🔴 **«IL DESTINATARIO NON C'È PERCHÉ?»** Non era pigrizia:

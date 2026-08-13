@@ -528,3 +528,29 @@ non altro codice.**
   domani si vuole blindare anche l'inline, è una CSP con nonce per richiesta
   (serve un middleware che genera il nonce e lo passa a Next). Non urgente:
   non c'è nessun punto dove un dato dell'utente finisce in uno script.
+
+## Dal giro #62 (13/08)
+
+- **A-mobile.** L'app sul telefono ha ancora la sua copia del controllo
+  email (`mobile/src/lib/sessione.tsx`, la regex permissiva di prima).
+  Non può importare da `lib/`: è un pacchetto a parte. Quindi da lì un
+  account con un'email inesistente si può ancora aprire. Va portata la
+  stessa logica, oppure l'app deve chiedere al sito (una rotta
+  `/api/email/controlla`), che è la strada più pulita perché tiene una
+  regola sola.
+- **A-costi.** La lettura della risposta della compagnia costa due giri
+  di modello (OCR + chat) per ogni no dichiarato. Oggi il tetto è 6 al
+  minuto per indirizzo e serve un account con una pratica pagata, quindi
+  il costo cresce coi clienti e non col traffico. Da riguardare il giorno
+  che le pratiche diventano decine al giorno.
+- **A-analisi.** `analizzaRifiuto` non ha mai girato contro Mistral vero
+  da questo ambiente: il cancello che boccia il testo generato è provato
+  a fondo (25 prove), ma il **prompt** no. Il primo giro vero va guardato
+  con una risposta di compagnia in mano, e va letto cosa scrive nei log
+  quando scarta un paragrafo.
+- **A-eventi.** Risposta e analisi stanno in `pratiche_eventi.nota` come
+  testo (l'analisi come JSON). Funziona e non richiede migrazioni, ma
+  quella colonna non ha un limite: una risposta di compagnia molto lunga
+  ci finisce intera (il taglio è a 12.000 caratteri lato rotta). Se un
+  domani si volesse cercare dentro le analisi, lì servirebbe una colonna
+  vera.
