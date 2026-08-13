@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { passUsabile } from "@/lib/check/cancello";
 import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { aeroportoPerIata } from "@/lib/voli/aeroporti";
@@ -52,7 +52,7 @@ export async function OPTIONS() {
 }
 
 export async function GET(req: Request) {
-  if (oltreIlLimite("tratta", ipDi(req), MASSIMO_AL_MINUTO)) {
+  if (await oltreIlLimiteCondiviso("tratta", ipDi(req), MASSIMO_AL_MINUTO)) {
     return NextResponse.json(
       { ok: false, errore: "Troppe richieste di fila. Aspetta un minuto e riprova." },
       { status: 429, headers: CORS },

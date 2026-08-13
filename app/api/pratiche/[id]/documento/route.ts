@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { caricaPratica, registraEvento } from "@/lib/pratiche/pratiche";
@@ -27,6 +28,18 @@ export async function POST(
   richiesta: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  /* ⚠️ QUI IL FRENO NON C'ERA. La rotta chiede l'account e la proprietà
+     della pratica, quindi non è aperta al mondo; ma ogni chiamata è un
+     giro di OCR a pagamento, e un cliente con una pratica vera che
+     ricarica in loop ce li fa spendere lo stesso. Sei al minuto bastano
+     a chiunque stia caricando la propria carta d'imbarco. */
+  if (await oltreIlLimiteCondiviso("documento", ipDi(richiesta), 6)) {
+    return NextResponse.json(
+      { ok: false, errore: "Troppe richieste di fila. Aspetta un minuto." },
+      { status: 429 },
+    );
+  }
+
   const { id } = await params;
 
   const utente = await utenteCollegato();

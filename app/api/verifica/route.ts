@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { scadenzaStimata } from "@/lib/regole/eu261";
 import { verificaVolo } from "@/lib/voli/verifica";
 import { inItaliano } from "@/lib/voli/aeroporti";
-import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { CHECK_A_PAGAMENTO, CORTESIA_SU_INCERTO } from "@/lib/check/ingresso";
 import { creditoFinito, passDi, rispostaMuro, segnaConsumo } from "@/lib/check/cancello";
 import { COOKIE_PASS, consumaPass } from "@/lib/check/pass";
@@ -40,7 +40,7 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  if (oltreIlLimite("verifica", ipDi(req), MASSIMO_AL_MINUTO)) {
+  if (await oltreIlLimiteCondiviso("verifica", ipDi(req), MASSIMO_AL_MINUTO)) {
     return NextResponse.json(
       {
         ok: false,

@@ -71,3 +71,90 @@ export const CORS = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Max-Age": "86400",
 } as const;
+
+/* ══════════════════════════════════════════════════════════════════════
+   IL FRENO VERO, CONDIVISO (scelta di Valerio col popup, 13/08).
+
+   🔴 IL PROBLEMA DEL CONTATORE QUI SOPRA, detto senza girarci intorno:
+   vive nella memoria di UNA copia della funzione. Netlify ne accende
+   molte in parallelo quando arriva gente, e ognuna riparte da zero.
+   Quindi il tetto di «20 al minuto» non è 20: è 20 per ogni copia
+   accesa, e con abbastanza copie diventa nessun tetto. Va bene contro il
+   curioso che ricarica; non vale niente il giorno che qualcuno decide di
+   farci bruciare i soldi dei dati di volo, che si pagano a chiamata.
+
+   La cura è un contatore che vive FUORI dalle funzioni, uno solo per
+   tutti. Upstash Redis va bene: si parla via richieste web normali,
+   quindi non serve installare niente, e il piano gratuito regge
+   10.000 comandi al giorno, cioè molto più di mille visite.
+
+   ⚠️ SI SBAGLIA DALLA PARTE DI CHI PAGA. Se il contatore non risponde
+   (rete lenta, servizio giù, variabili non configurate) NON si blocca
+   nessuno: si ripiega sul contatore in memoria. Un freno rotto che
+   chiude il sito a tutti fa più danni di un freno assente: il primo
+   ferma le vendite, il secondo costa qualche euro di chiamate.
+
+   ⚠️ NASCE SPENTO. Senza `UPSTASH_REDIS_REST_URL` e
+   `UPSTASH_REDIS_REST_TOKEN` su Netlify non cambia niente per nessuno:
+   resta esattamente il comportamento di oggi.
+   ══════════════════════════════════════════════════════════════════════ */
+
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+/** Vero se il freno condiviso è configurato. Lo mostra /admin/impostazioni. */
+export const FRENO_CONDIVISO = Boolean(REDIS_URL && REDIS_TOKEN);
+
+/**
+ * Quante richieste ha fatto questa chiave nell'ultimo minuto, contate da
+ * un contatore che vale per tutte le copie della funzione.
+ *
+ * Torna `null` quando non si è riusciti a chiedere: chi chiama ripiega
+ * sul contatore in memoria invece di bloccare.
+ */
+async function conteggioCondiviso(id: string): Promise<number | null> {
+  if (!FRENO_CONDIVISO) return null;
+  try {
+    /* Due comandi in un colpo: aumenta di uno, e se è il primo del minuto
+       fai scadere la riga dopo 60 secondi. Senza la scadenza il contatore
+       non si azzererebbe mai e dopo un'ora nessuno passerebbe più. */
+    const risposta = await fetch(`${REDIS_URL}/pipeline`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${REDIS_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([
+        ["INCR", id],
+        ["EXPIRE", id, "60", "NX"],
+      ]),
+      /* Un secondo e mezzo: oltre, l'attesa la paga l'utente che sta
+         aspettando il proprio verdetto, e non ne vale la pena. */
+      signal: AbortSignal.timeout(1500),
+    });
+    if (!risposta.ok) return null;
+    const dati = (await risposta.json()) as { result?: unknown }[];
+    const n = dati?.[0]?.result;
+    return typeof n === "number" ? n : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Il freno da usare sulle rotte CHE CI COSTANO SOLDI.
+ *
+ * Stessa domanda di `oltreIlLimite` (questo IP ha sforato?), ma la
+ * risposta arriva dal contatore condiviso quando c'è. Quando non c'è,
+ * ripiega su quello in memoria: il comportamento non peggiora mai.
+ */
+export async function oltreIlLimiteCondiviso(
+  chiave: string,
+  ip: string,
+  massimo: number,
+): Promise<boolean> {
+  const id = `freno:${chiave}:${ip}:${Math.floor(Date.now() / FINESTRA_MS)}`;
+  const n = await conteggioCondiviso(id);
+  if (n === null) return oltreIlLimite(chiave, ip, massimo);
+  return n > massimo;
+}

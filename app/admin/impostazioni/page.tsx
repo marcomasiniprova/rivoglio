@@ -154,10 +154,28 @@ function stato(): Voce[] {
     },
     {
       nome: "MOTORE_SEGRETO",
-      serve: "Chiude i lavori notturni (avvisi push, scioperi) a chi non è Netlify.",
-      seManca: "In produzione quelle rotte non si aprono: i lavori notturni non partono.",
+      serve:
+        "Chiude i lavori automatici a chi non è Netlify: gli scioperi di notte, gli avvisi del mattino e — dal 13/08 — i PROMEMORIA delle pratiche (il sollecito al giorno 42, l'ente al 56, «com'è andata?» al 90).",
+      seManca:
+        "In produzione quelle rotte non si aprono. Gli scioperi non si aggiornano e, quel che è peggio, NESSUN promemoria parte: i clienti restano fermi e non se ne accorge nessuno.",
       peso: "importante",
       ceSta: c(process.env.MOTORE_SEGRETO),
+    },
+    {
+      nome: "UPSTASH_REDIS_REST_URL",
+      serve:
+        "Il freno anti-abuso condiviso. Senza, il tetto di richieste al minuto vive nella memoria di ogni singola copia della funzione: Netlify ne accende molte insieme e il tetto smette di essere un tetto. È il pezzo che impedisce a un estraneo di farci bruciare i soldi dei dati di volo.",
+      seManca:
+        "Si ripiega sul contatore in memoria, cioè su quello di oggi: ferma un curioso, non chi ci prende di mira. Nessuno resta bloccato per sbaglio.",
+      peso: "importante",
+      ceSta: c(process.env.UPSTASH_REDIS_REST_URL),
+    },
+    {
+      nome: "UPSTASH_REDIS_REST_TOKEN",
+      serve: "La password del freno qui sopra. Servono tutte e due o non si accende.",
+      seManca: "Come sopra: freno in memoria.",
+      peso: "importante",
+      ceSta: c(process.env.UPSTASH_REDIS_REST_TOKEN),
     },
     {
       nome: "NEXT_PUBLIC_SITO",

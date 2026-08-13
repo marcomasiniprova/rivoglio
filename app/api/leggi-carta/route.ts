@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { passUsabile, rispostaMuro } from "@/lib/check/cancello";
 import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { estraiCampi, testoDaDocumento } from "@/lib/ocr/carta-imbarco";
@@ -39,7 +39,7 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  if (oltreIlLimite("carta", ipDi(req), MASSIMO_AL_MINUTO)) {
+  if (await oltreIlLimiteCondiviso("carta", ipDi(req), MASSIMO_AL_MINUTO)) {
     return NextResponse.json(
       { ok: false, errore: "Troppe foto di fila. Aspetta un minuto e riprova." },
       { status: 429, headers: CORS },

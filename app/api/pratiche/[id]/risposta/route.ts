@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
+import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { utenteDaRichiesta } from "@/lib/api/utente";
 import { analizzaRifiuto } from "@/lib/ai/replica";
 import {
@@ -69,7 +69,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   /* Il tetto è basso di proposito: ogni chiamata costa un giro di OCR e
      uno di modello. Sei al minuto bastano a chiunque stia lavorando la
      propria pratica, e non bastano a nessun altro. */
-  if (oltreIlLimite("risposta-compagnia", ipDi(req), MASSIMO_AL_MINUTO)) {
+  if (await oltreIlLimiteCondiviso("risposta-compagnia", ipDi(req), MASSIMO_AL_MINUTO)) {
     return NextResponse.json(
       { ok: false, errore: "Troppe richieste di fila. Aspetta un minuto." },
       { status: 429, headers: CORS },
