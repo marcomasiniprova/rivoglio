@@ -1,6 +1,7 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-13 (giro #63: i nove punti del collaudo di
+**Aggiornato:** 2026-08-13 (giro #64: il collaudo di dieci voli sul sito
+vero, e i sei difetti che ha trovato · giro #63: i nove punti del collaudo di
 Valerio, dalle email finte ai paletti della pratica, più l'AI che legge
 la risposta della compagnia e la pagina che spiega il motore · giro #62:
 il pagamento che finiva su localhost, il tempo in un posto solo,
@@ -21,6 +22,91 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #64 (13/08): DIECI VOLI SUL SITO VERO, DAL MODULO ALLA REPLICA.**
+  Cinque dimostrativi e cinque veri, ognuno da una finestra pulita, senza
+  scorciatoie: muro, cassa, verdetto, email, pratica, lettera. Sei
+  difetti, e i due che contano stanno sui soldi.
+  - 🔴 **CHI PAGAVA L'ANALISI TORNAVA E TROVAVA IL MODULO VUOTO.** Scrivi
+    il volo, compare il muro, vai alla cassa, paghi, torni sulla landing:
+    campi puliti, analisi ferma. E la cassa aveva appena scritto «poi
+    torni al check e l'analisi parte da sola». Nove casi su dieci.
+    È il punto peggiore in cui perdere una persona, perché ha appena
+    pagato: vede il modulo vuoto e pensa di aver buttato dei soldi.
+    ⚠️ **E non era un difetto della cassa di prova**: il venditore vero
+    riporta indietro allo stesso modo, quindi sarebbe nato identico il
+    giorno dell'incasso. Adesso il volo si mette da parte quando compare
+    il muro e l'analisi riparte da sola al ritorno (`lib/check/ripresa.ts`).
+    Tre prove, e due dicono quando NON deve ripartire: un'analisi che
+    riparte da sola consuma un credito pagato.
+  - 🔴 **«I 1,99 SI SCALANO DALLA PRATICA» NON SUCCEDEVA, DI NUOVO.**
+    Paghi 1,99, arrivi al verdetto e leggi «Prepara la pratica a 14,90€»:
+    totale 16,89, cioè il difetto che il 12/08 si credeva chiuso.
+    La causa non era nel conto, che c'è ed è giusto: era nella
+    **ricevuta**. Quel cookie dice due cose, «hai pagato» e «ti resta del
+    credito», e appena il credito finiva veniva buttato via tutto, prova
+    di pagamento compresa. Con un'analisi per pagamento il credito
+    finisce sempre al primo colpo: lo sconto non si applicava mai a
+    nessuno. Adesso arriva a zero e resta; a impedire una seconda analisi
+    ci pensa il registro nel database, non il cookie.
+    ⚠️ **E lo sconto si mostra solo se la cassa lo sa fare**: il link di
+    un venditore porta un prezzo fisso che dei 1,99 non sa niente. La
+    scelta da fare prima di accendere il venditore (due prodotti in più,
+    oppure togliere la promessa dal sito) è in LANCIO.md.
+    ⚠️ Una prova esistente **difendeva il difetto** («l'ultimo check
+    consumato chiude la ricevuta»): riscritta col motivo accanto.
+  - 🔴 **DUE MESSAGGI SBAGLIATI A CHI HA APPENA PAGATO.** Di due voli
+    veri il fornitore non sapeva niente, e la pagina rispondeva **«non
+    riconosciamo l'aeroporto di partenza»**: dava la colpa alla nostra
+    copertura degli scali per un volo di cui non avevamo NESSUN dato, e
+    chi legge non può farci niente. E la frase onesta sui voli appena
+    fatti («il dato arriva entro un giorno, oppure il numero non è quello
+    giusto») veniva scritta **dopo** il salvataggio: nel database finiva
+    quella grezza, e la pagina del verdetto legge il database. Scritta a
+    giugno per risolvere il «sembra rotto», non l'ha mai letta nessuno.
+    Il verdetto non cambia in nessuno dei due casi (incerto, che non si
+    vende): golden set **57 su 57, falsi positivi 0**.
+  - 🔴 **UN'EMAIL VERA PROMETTEVA 250€ PER UN VOLO CHE NON ESISTE.** Per
+    il dimostrativo ZZ250 partiva un'email identica a quella di un caso
+    vero. Sulla pagina il bollo «Esempio dimostrativo» c'è dal primo
+    giorno; nell'email no, ed è l'email la cosa che resta nella casella e
+    che uno rilegge fra un mese. Adesso il bollo sta nell'oggetto, nel
+    corpo e nella versione senza grafica.
+  - 🔴 **LA PAGINA DELLA LETTERA RIMANDAVA IL DOCUMENTO SBAGLIATO.** Dopo
+    un no si apriva ancora con «La tua lettera è pronta» e col bottone
+    verde che apriva l'email **del reclamo già mandato**, mentre la
+    replica stava sotto quattro riquadri e senza bottone per mandarla.
+    Adesso in cima c'è sempre il documento del momento, col suo bottone e
+    col motivo per cui dice quello che dice; quelli già mandati stanno in
+    un cassetto chiuso. Da 8.627 a 6.130 caratteri.
+  - 🔴 **E IL RIQUADRO DELL'AI SI CONTRADDICEVA COL RESTO DELLA PAGINA.**
+    Incollata la risposta della compagnia, diceva «ho letto la loro
+    risposta, vedi la replica» mentre trenta centimetri più su la stessa
+    pagina diceva «attesa risposta, niente da fare per ora, il sollecito
+    è pronto fra 42 giorni». Due verità opposte sulla stessa schermata.
+    Adesso si aggiorna la parte del server senza ricaricare, così il
+    riassunto della loro risposta resta dov'è.
+  - **Il gettone di accesso non resta più nell'indirizzo.** Dopo il
+    pagamento si atterrava su `/pratica/<id>?token_hash=...`: già
+    consumato, quindi non apre niente, ma è l'indirizzo che una persona
+    copia e manda a qualcuno. ⚠️ Sul server viene già costruito pulito e
+    **non basta**: qualcosa lungo la catena dei rimandi lo riattacca. Si
+    chiude dove il risultato è certo, cioè nel browser.
+  - **Quello che invece ha funzionato**, e va detto: il motore su dieci
+    voli (fasce 250/400/600, il non idoneo per un minuto, il cancellato
+    con le due domande, il volo senza dati), il cancello dell'AI che ha
+    **beccato una risposta di un altro volo** e si è fermato senza
+    scrivere niente, la lettura della risposta della compagnia col
+    riconoscimento del motivo e i fatti che dichiarano loro, l'email che
+    arriva davvero, e i passi della pratica che avanzano 2 → 3 → 4.
+  - ⚠️ **Lo stato del sito, che è una tua decisione e non un difetto:**
+    il muro è **acceso** (ogni check chiede 1,99) e l'unica cassa è
+    quella **di prova, aperta a chiunque**. Finché resta così il sito non
+    incassa un euro, e chi arrivasse da fuori vedrebbe un pagamento
+    finto. Il collaudo ha consumato una trentina di posti di lancio.
+  - Prove: **1434 verdi**, 6 saltate, zero rosse. Le nuove sono 15:
+    ripresa dopo la cassa (3), ricevuta e sconto (3), messaggi onesti
+    (3), bollo dimostrativo nelle email (3), indirizzo pulito (2), più
+    quella riscritta.
 - **GIRO #63 (13/08): I NOVE PUNTI DEL COLLAUDO DI VALERIO.** Aperti
   provando una pratica vera dalla web app. Tutti chiusi, più tre difetti
   veri trovati strada facendo che lui non aveva visto.
