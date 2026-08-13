@@ -161,6 +161,30 @@ export function valuta(f: FattoVolo): Verdetto {
     icao: f.partenzaIcao,
   };
   const arrivo = { iata: f.arrivoIata, paese: f.arrivoPaese, icao: f.arrivoIcao };
+
+  /* 🔴 QUANDO DEL VOLO NON SAPPIAMO NIENTE, NON SI DÀ LA COLPA
+     ALL'AEROPORTO.
+     Trovato col collaudo del 13/08 su due voli veri: il fornitore non
+     restituiva niente (nessuno scalo, nessun orario) e la persona si
+     sentiva rispondere "non riconosciamo l'aeroporto di partenza". È la
+     frase che aveva fatto arrabbiare Valerio a giugno, e qui non
+     c'entrava nemmeno: dava la colpa alla nostra copertura degli scali
+     quando il problema era un altro, cioè che di quel volo non abbiamo
+     nessun dato. Chi legge non può farci niente; col messaggio giusto sa
+     cosa controllare.
+     ⚠️ Il cancello territoriale resta il primo di tutti, che è il motivo
+     per cui esiste: qui si esce solo quando non c'è NIENTE su cui
+     applicarlo, e l'esito è incerto in tutti e due i casi. Un incerto non
+     si vende, quindi questa scorciatoia non può aprire la porta a un
+     falso positivo. */
+  const nienteDiPartenza = !partenza.iata && !partenza.paese && !partenza.icao;
+  const nienteDiArrivo = !arrivo.iata && !arrivo.paese && !arrivo.icao;
+  if (f.stato === "sconosciuto" && nienteDiPartenza && nienteDiArrivo) {
+    return incerto(
+      "Non abbiamo trovato dati affidabili su questo volo. Controlla numero e data; se sono giusti, riprova più tardi.",
+    );
+  }
+
   const ambito = ambitoCE261(
     partenza,
     arrivo,

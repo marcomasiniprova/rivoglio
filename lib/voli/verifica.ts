@@ -289,6 +289,43 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
   // ── Strato 3: le regole. Solo codice, mai AI. ────────────────────────
   let verdetto = valuta(fatto);
 
+  /* Il caso più comune di "incerto" è un volo APPENA fatto: l'orario
+     certificato arriva ore dopo l'atterraggio, e il messaggio generico
+     ("controlla numero e data") faceva credere a un errore dell'utente.
+     Qui, e solo qui, il motivo diventa una spiegazione onesta: il
+     verdetto resta identico, cambia la frase. Trovato nello stress test
+     dell'8/08: 10 voli freschi, tutti incerti, utente convinto che il
+     sito fosse rotto.
+
+     🔴 E QUESTA FRASE NON L'HA MAI LETTA NESSUNO FINO AL 13/08, perché
+     stava DOPO il salvataggio: nel database finiva il motivo grezzo, e
+     la pagina del verdetto legge il database, non la risposta della
+     rotta. Uno vedeva la frase buona per un istante sul riquadro del
+     check e poi, sulla pagina che resta, quella vecchia. Trovato col
+     collaudo, confrontando la risposta della rotta con la riga salvata.
+     ⚠️ Chi tocca questo pezzo si ricordi l'ordine: il motivo si finisce
+     PRIMA di scriverlo, perché la riga salvata è quella che la persona
+     legge davvero. */
+  const dueGiorniFa = new Date(Date.now() - 2 * 86_400_000).toISOString().slice(0, 10);
+  if (
+    verdetto.esito === "incerto" &&
+    fatto.stato === "sconosciuto" &&
+    fatto.dataLocale >= dueGiorniFa
+  ) {
+    verdetto = {
+      ...verdetto,
+      /* Due possibilità, e vanno dette tutte e due. Quella gentile (il
+         dato non è ancora arrivato) era l'unica scritta, e mandava a
+         "riprova domani" anche chi aveva semplicemente sbagliato a
+         scrivere il numero: domani quel volo non esisterà lo stesso.
+         Un refuso è comune quanto un volo fresco. */
+      motivo: seSiPaga(
+        "Di questo volo non abbiamo ancora l'orario di arrivo certificato. Può essere per due motivi: il volo è di ieri o dell'altro ieri e il dato arriva di solito entro un giorno, oppure il numero non è quello giusto. Controlla il numero sulla carta d'imbarco; se è corretto, ricontrolla domani. Questa analisi non si consuma: il credito resta, e se ci lasci l'email ti avvisiamo noi.",
+        "Di questo volo non abbiamo ancora l'orario di arrivo certificato. Può essere per due motivi: il volo è di ieri o dell'altro ieri e il dato arriva di solito entro un giorno, oppure il numero non è quello giusto. Controlla il numero sulla carta d'imbarco; se è corretto, ricontrolla domani. Il check resta gratuito, e se ci lasci l'email ti avvisiamo noi.",
+      ),
+    };
+  }
+
   // ── La memoria dell'imbuto: una riga in `verifiche` per ogni check ───
   let verificaId: string | null = null;
   if (sb) {
@@ -336,34 +373,6 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
   // Il payload grezzo resta nel database, non esce dall'orchestratore.
   const { payloadGrezzo: _scarta, ...fattoPulito } = fatto;
   void _scarta;
-
-  /* Il caso più comune di "incerto" è un volo APPENA fatto: l'orario
-     certificato arriva ore dopo l'atterraggio, e il messaggio generico
-     ("controlla numero e data") faceva credere a un errore dell'utente.
-     Qui, e solo qui, il motivo diventa una spiegazione onesta: il
-     verdetto resta identico, cambia la frase. Trovato nello stress test
-     dell'8/08: 10 voli freschi, tutti incerti, utente convinto che il
-     sito fosse rotto. */
-  const dueGiorniFa = new Date(Date.now() - 2 * 86_400_000).toISOString().slice(0, 10);
-  if (
-    verdetto.esito === "incerto" &&
-    fatto.stato === "sconosciuto" &&
-    fatto.dataLocale >= dueGiorniFa
-  ) {
-    verdetto = {
-      ...verdetto,
-      /* Due possibilità, e vanno dette tutte e due. Quella gentile (il
-         dato non è ancora arrivato) era l'unica scritta, e mandava a
-         "riprova domani" anche chi aveva semplicemente sbagliato a
-         scrivere il numero: domani quel volo non esisterà lo stesso.
-         Un refuso è comune quanto un volo fresco. */
-      motivo:
-        seSiPaga(
-          "Di questo volo non abbiamo ancora l'orario di arrivo certificato. Può essere per due motivi: il volo è di ieri o dell'altro ieri e il dato arriva di solito entro un giorno, oppure il numero non è quello giusto. Controlla il numero sulla carta d'imbarco; se è corretto, ricontrolla domani. Questa analisi non si consuma: il credito resta, e se ci lasci l'email ti avvisiamo noi.",
-          "Di questo volo non abbiamo ancora l'orario di arrivo certificato. Può essere per due motivi: il volo è di ieri o dell'altro ieri e il dato arriva di solito entro un giorno, oppure il numero non è quello giusto. Controlla il numero sulla carta d'imbarco; se è corretto, ricontrolla domani. Il check resta gratuito, e se ci lasci l'email ti avvisiamo noi.",
-        ),
-    };
-  }
 
   return { ok: true, verificaId, verdetto, fatto: fattoPulito, demo: fatto.fonte === "demo" };
 }
