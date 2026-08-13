@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Map,
   Activity,
+  Cog,
   ExternalLink,
   FolderOpen,
   Gavel,
@@ -36,6 +37,7 @@ import { SEZIONI, type ChiaveSezione } from "@/lib/admin/sezioni";
  */
 
 const ICONE: Record<ChiaveSezione, typeof LayoutDashboard> = {
+  motore: Cog,
   mappa: Map,
   panoramica: LayoutDashboard,
   verdetti: Gavel,

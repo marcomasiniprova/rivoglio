@@ -252,6 +252,16 @@ const MASSIMO = 8;
  * italiano e chi scrive "Rome" quasi sempre intende Fiumicino, non Rome
  * in Georgia. Non è un giudizio sul mondo, è dove sta il nostro utente.
  */
+/**
+ * Quanti scali conosciamo. Contati sull'archivio vero, non scritti a
+ * mano: l'autopilot del lunedì lo fa crescere da solo, e un numero
+ * scritto altrove resterebbe indietro senza che nessuno se ne accorga.
+ * (In testa a questo file c'era ancora "6.072": era il 2017.)
+ */
+export function quantiScali(): number {
+  return Object.keys(ELENCO).length;
+}
+
 export function cercaAeroporti(query: string, limite = MASSIMO): AeroportoTrovato[] {
   const q0 = piatto(query);
   if (q0.length < 2) return [];

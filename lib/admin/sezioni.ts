@@ -13,6 +13,7 @@
 
 export type ChiaveSezione =
   | "mappa"
+  | "motore"
   | "panoramica"
   | "verdetti"
   | "pratiche"
@@ -42,6 +43,17 @@ export const SEZIONI: Sezione[] = [
     sotto: "Tutto Rivolio in una schermata: il prodotto, i canali, dove entrano i soldi.",
   },
   {
+    /* Subito dopo la mappa, e prima dei numeri: la mappa dice com'è fatto
+       Rivolio, questa dice com'è fatto il pezzo che i soldi li giustifica.
+       Richiesta di Valerio, 13/08: «spiegami pezzo per pezzo come lavora
+       il nostro motore, indicami tutte le fonti, dalla A alla Z cosa
+       succede quando uno sta facendo il check». */
+    chiave: "motore",
+    href: "/admin/motore",
+    nome: "Il motore",
+    sotto: "Con cosa lavoriamo: le fonti una per una, il giro di un'analisi, e cosa c'è nel database.",
+  },
+  {
     chiave: "panoramica",
     href: "/admin",
     nome: "Panoramica",
@@ -51,7 +63,9 @@ export const SEZIONI: Sezione[] = [
     chiave: "verdetti",
     href: "/admin/verdetti",
     nome: "Verdetti",
-    sotto: "Gli idonei che aspettano la tua conferma: finché non la dai, nessuno paga.",
+    /* ⚠️ Diceva «finché non la dai, nessuno paga»: non è più vero dal
+       12/08, quando il cancello è stato tolto dalla cassa. */
+    sotto: "Gli ultimi idonei, dal più recente: un controllo a campione che il motore dica la verità.",
   },
   {
     chiave: "pratiche",

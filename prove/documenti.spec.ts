@@ -48,15 +48,26 @@ test.describe("Il passo dei documenti", () => {
   test("il muro sta anche sul server, non solo sul bottone", () => {
     /* L'indirizzo della lettera si digita, sta nella cronologia del
        browser e finisce nei segnalibri: spegnere il bottone sulla pagina
-       della pratica non è un controllo, è un suggerimento. */
+       della pratica non è un controllo, è un suggerimento.
+
+       ⚠️ QUESTA PROVA CERCAVA `letteraSbloccata` DENTRO LA PAGINA, e dal
+       13/08 non lo trova più: non perché il muro sia sparito, ma perché
+       la pagina ha smesso di riscriversi la regola per conto suo e la
+       chiede a `percorsoPratica`, che è l'unico posto dove vive. Il muro
+       è più solido di prima, non più debole; il comportamento vero (senza
+       documenti la lettera non si apre) è provato in prove/passi.spec.ts
+       chiamando la funzione, che è meglio che cercare una parola in un
+       file. Qui resta il controllo che il cancello ci sia e rimandi
+       indietro. */
     const pagina = leggi("app/pratica/[id]/lettera/page.tsx");
     expect(pagina, "la pagina della lettera deve controllare il passo 1").toContain(
-      "letteraSbloccata",
+      "letteraApribile",
     );
-    /* `lastIndexOf`: la prima occorrenza è la riga di import, e lì
-       accanto un redirect non c'è per definizione. */
-    const i = pagina.lastIndexOf("letteraSbloccata");
+    const i = pagina.lastIndexOf("letteraApribile");
     expect(pagina.slice(i, i + 200), "e deve rimandare alla pratica").toContain("redirect");
+    /* E la regola deve arrivare da lì, non da un `if` scritto a mano
+       accanto: due copie divergono al primo cambio. */
+    expect(pagina).toContain("percorsoPratica");
   });
 
   test("la porta di servizio esiste come rotta, e controlla di chi è la pratica", () => {

@@ -194,6 +194,10 @@ export const NODI: Nodo[] = [
     icona: "ingranaggio",
     x: 50,
     y: 22,
+    /* Dal 13/08 il motore ha la sua schermata: le nove fonti una per una,
+       il giro completo di un'analisi e cosa c'è nel database adesso.
+       Richiesta di Valerio: «spiegami pezzo per pezzo come lavora». */
+    dove: "/admin/motore",
   },
   {
     id: "dati",

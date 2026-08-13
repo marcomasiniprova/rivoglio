@@ -297,6 +297,8 @@ test.describe("Nessuna porta di servizio sul muro", () => {
       "indice degli scali, una sola rilevazione al giorno per otto aeroporti: il costo e' fisso e non cresce col traffico",
     "app/api/pratiche/[id]/documento/route.ts":
       "la seconda fonte dentro una pratica: serve l'account E la proprieta' della pratica (RLS), che si ottengono solo pagando. Trovata da questa prova l'11/08: nessuno l'aveva guardata.",
+    "app/api/pratiche/[id]/risposta/route.ts":
+      "legge la risposta della compagnia (OCR + modello) dentro una pratica GIA' PAGATA: serve l'account, la proprieta' della pratica e uno stato oltre 'pronta', cioe' un reclamo gia' partito. E' un cancello piu' stretto di quello del check, non piu' largo, e in piu' ha un tetto di 6 chiamate al minuto perche' ognuna costa due giri di modello. Trovata da questa prova il 13/08, il giorno stesso in cui la rotta e' nata.",
   };
 
   test("ogni rotta che ci costa soldi passa dal cancello", () => {

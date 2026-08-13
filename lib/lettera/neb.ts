@@ -217,6 +217,18 @@ const NEB_PER_PAESE: Record<string, Neb> = {
  * `null` quando quel paese non è in tabella: chi scrive la lettera deve
  * dirlo apertamente e rimandare all'elenco ufficiale, mai indovinare.
  */
+/**
+ * Quanti paesi hanno l'ente nazionale verificato in tabella.
+ *
+ * ⚠️ Esiste per un motivo solo: la pagina che spiega il motore
+ * (/admin/motore) deve dire un numero VERO. Scriverlo a mano lì vorrebbe
+ * dire averne due, e il secondo invecchia in silenzio al primo paese
+ * aggiunto. È la stessa lezione dei "58 casi" della mappa.
+ */
+export function quantiNeb(): number {
+  return Object.keys(NEB_PER_PAESE).length;
+}
+
 export function nebPerPaese(paese: string | null | undefined): Neb | null {
   if (!paese) return null;
   return NEB_PER_PAESE[paese.trim()] ?? null;
