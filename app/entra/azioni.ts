@@ -7,10 +7,34 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { benvenuto } from "@/lib/email/messaggi";
 import { percorsoInterno } from "@/lib/api/percorso";
+import { controllaIndirizzo } from "@/lib/email/dominio";
+import { controllaFormato } from "@/lib/email/indirizzo";
 
 export type Esito = { errore?: string; avviso?: string };
 
-const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/**
+ * DUE PESI, E SONO DUE MESTIERI DIVERSI.
+ *
+ * Chi ENTRA ha già un account: si controlla solo che l'indirizzo sia
+ * scritto come un indirizzo. Bloccarlo perché il suo dominio oggi non
+ * risponde al DNS vorrebbe dire chiudere fuori di casa un cliente che ha
+ * pagato, per un guasto altrui.
+ *
+ * Chi si REGISTRA (o entra col link, che l'account lo crea) passa da
+ * tutti i cancelli, DNS compreso: è lì che nascono gli account con
+ * indirizzi inesistenti.
+ */
+async function emailPerEntrare(grezza: string): Promise<{ ok: true; email: string } | Esito> {
+  const e = controllaFormato(grezza, { insisto: true });
+  if (!e.ok) return { errore: "Controlla l'indirizzo email." };
+  return { ok: true, email: e.email };
+}
+
+async function emailPerRegistrarsi(grezza: string): Promise<{ ok: true; email: string } | Esito> {
+  const e = await controllaIndirizzo(grezza);
+  if (!e.ok) return { errore: e.messaggio };
+  return { ok: true, email: e.email };
+}
 
 /** Da dove sta arrivando la richiesta: serve per costruire il link di ritorno. */
 async function origine() {
@@ -80,9 +104,10 @@ function inItaliano(messaggio: string): string {
 export async function accedi(_precedente: Esito, dati: FormData): Promise<Esito> {
   if (!SUPABASE_CONFIGURATO) return nonConfigurato();
 
-  const email = String(dati.get("email") ?? "").trim().toLowerCase();
+  const controllo = await emailPerEntrare(String(dati.get("email") ?? ""));
+  if (!("ok" in controllo)) return controllo;
+  const email = controllo.email;
   const password = String(dati.get("password") ?? "");
-  if (!EMAIL_OK.test(email)) return { errore: "Controlla l'indirizzo email." };
   if (!password) return { errore: "Scrivi la password." };
 
   const supabase = await supabaseServer();
@@ -102,9 +127,10 @@ export async function accedi(_precedente: Esito, dati: FormData): Promise<Esito>
 export async function registrati(_precedente: Esito, dati: FormData): Promise<Esito> {
   if (!SUPABASE_CONFIGURATO) return nonConfigurato();
 
-  const email = String(dati.get("email") ?? "").trim().toLowerCase();
+  const controllo = await emailPerRegistrarsi(String(dati.get("email") ?? ""));
+  if (!("ok" in controllo)) return controllo;
+  const email = controllo.email;
   const password = String(dati.get("password") ?? "");
-  if (!EMAIL_OK.test(email)) return { errore: "Controlla l'indirizzo email." };
   if (password.length < 8) return { errore: "La password deve avere almeno 8 caratteri." };
 
   const supabase = await supabaseServer();
@@ -135,8 +161,11 @@ export async function registrati(_precedente: Esito, dati: FormData): Promise<Es
 export async function linkMagico(_precedente: Esito, dati: FormData): Promise<Esito> {
   if (!SUPABASE_CONFIGURATO) return nonConfigurato();
 
-  const email = String(dati.get("email") ?? "").trim().toLowerCase();
-  if (!EMAIL_OK.test(email)) return { errore: "Controlla l'indirizzo email." };
+  /* Il link magico CREA l'account se non esiste: quindi qui si passa
+     dal controllo pieno, non da quello di chi entra. */
+  const controllo = await emailPerRegistrarsi(String(dati.get("email") ?? ""));
+  if (!("ok" in controllo)) return controllo;
+  const email = controllo.email;
 
   const poi = destinazioneSicura(dati.get("poi"));
   const supabase = await supabaseServer();

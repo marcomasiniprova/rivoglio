@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { controllaIndirizzo } from "@/lib/email/dominio";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { POSTA_ATTIVA } from "@/lib/email/posta";
 import { verdettoIdoneo } from "@/lib/email/verdetto";
@@ -15,8 +16,14 @@ import { inItaliano } from "@/lib/voli/aeroporti";
  * il check) può scriverci sopra la propria email, nient'altro.
  */
 
-/** Controllo volutamente permissivo: meglio un'email strana che perderne una buona. */
-const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/* 🔴 QUI C'ERA UN CONTROLLO "VOLUTAMENTE PERMISSIVO", e il commento che
+   lo giustificava diceva: meglio un'email strana che perderne una buona.
+   Era sbagliato, e Valerio l'ha scoperto provando (13/08): passavano
+   `pippo@gmial.com`, `x@mailinator.com` e qualsiasi dominio inesistente.
+   Su questo indirizzo poi NASCE L'ACCOUNT della pratica: un'email strana
+   non è un'email in più, è un cliente che paga e non entra.
+   Il controllo vero sta in lib/email/indirizzo.ts, uno solo per tutto il
+   sito. */
 const UUID_OK = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type RigaVerifica = {
@@ -81,20 +88,38 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, errore: "Richiesta non leggibile." }, { status: 400 });
   }
 
-  const { id, email } = (corpo ?? {}) as { id?: unknown; email?: unknown };
+  const { id, email, insisto } = (corpo ?? {}) as {
+    id?: unknown;
+    email?: unknown;
+    insisto?: unknown;
+  };
   if (typeof id !== "string" || !UUID_OK.test(id)) {
     return NextResponse.json(
       { ok: false, errore: "Manca l'identificativo della verifica." },
       { status: 400 },
     );
   }
-  const pulita = typeof email === "string" ? email.trim().toLowerCase() : "";
-  if (!EMAIL_OK.test(pulita)) {
+  /* I quattro cancelli: forma, casella temporanea, refuso di un dominio
+     famoso, e il DNS che dice se quel dominio riceve posta davvero.
+     `insisto` arriva dal bottone "no, è giusto così" del suggerimento:
+     un dominio legittimo che assomiglia a Gmail deve poter passare. */
+  const esito = await controllaIndirizzo(typeof email === "string" ? email : "", {
+    insisto: insisto === true,
+  });
+  if (!esito.ok) {
     return NextResponse.json(
-      { ok: false, errore: "Controlla l'indirizzo email: non mi torna." },
+      {
+        ok: false,
+        errore: esito.messaggio,
+        motivo: esito.motivo,
+        /* Il client lo mostra come bottone: correggere un refuso deve
+           costare un tocco, non una ridigitazione. */
+        suggerimento: esito.suggerimento ?? null,
+      },
       { status: 400 },
     );
   }
+  const pulita = esito.email;
 
   if (!SERVIZIO_ATTIVO) {
     return NextResponse.json(

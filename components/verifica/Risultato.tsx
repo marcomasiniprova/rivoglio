@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { COPY } from "@/lib/copy";
+import { controllaFormato } from "@/lib/email/indirizzo";
 import { LISTINO_BASE } from "@/lib/prezzi";
 import { formattaMinuti } from "@/lib/regole/eu261";
 import DomandeCancellato from "./DomandeCancellato";
@@ -214,9 +215,16 @@ function CatturaEmail({
   const [email, setEmail] = useState("");
   const [stato, setStato] = useState<"fermo" | "invio" | "fatto" | "demo" | "errore">("fermo");
   const [errore, setErrore] = useState("");
+  /* IL REFUSO SI PROPONE, NON SI IMPONE (13/08). `gmial.com` esiste
+     davvero come dominio, quindi il controllo del DNS lo lascia passare:
+     l'unico modo di prenderlo è dire all'utente "volevi dire gmail.com?".
+     Ma domini legittimi che assomigliano ai famosi esistono, quindi il
+     "no, è giusto così" deve esserci ed è un tocco solo. */
+  const [suggerito, setSuggerito] = useState<string | null>(null);
 
-  async function invia(evento: FormEvent) {
-    evento.preventDefault();
+  async function invia(evento: FormEvent | null, forza?: { email?: string; insisto?: boolean }) {
+    evento?.preventDefault();
+    const daMandare = forza?.email ?? email;
     /* ⚠️ IL COLLAUDATORE PASSA. Su un volo dimostrativo l'email non si
        salva, ed è giusto: non c'è niente da avvisare, e chi ci capita per
        caso non deve lasciare un indirizzo per un volo che non esiste. Ma
@@ -231,18 +239,30 @@ function CatturaEmail({
       return;
     }
     setStato("invio");
+    setSuggerito(null);
     try {
       const risposta = await fetch("/api/verifica/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: idVerifica, email }),
+        body: JSON.stringify({
+          id: idVerifica,
+          email: daMandare,
+          insisto: forza?.insisto === true,
+        }),
       });
       const corpo = (await risposta.json().catch(() => null)) as {
         ok?: boolean;
         errore?: string;
+        motivo?: string;
+        suggerimento?: string | null;
       } | null;
       if (risposta.ok && corpo?.ok) {
         setStato("fatto");
+        return;
+      }
+      if (corpo?.motivo === "refuso" && corpo.suggerimento) {
+        setSuggerito(corpo.suggerimento);
+        setStato("fermo");
         return;
       }
       setErrore(corpo?.errore ?? COPY.comune.erroreGenerico);
@@ -269,7 +289,7 @@ function CatturaEmail({
       {titolo && <h2 className="font-display text-xl tracking-[-0.03em]">{titolo}</h2>}
       <p className={`${titolo ? "mt-2" : ""} text-[0.95rem] leading-relaxed text-fumo`}>{testo}</p>
 
-      <form onSubmit={invia} className="mt-4 flex flex-col gap-3 sm:flex-row">
+      <form onSubmit={(e) => void invia(e)} className="mt-4 flex flex-col gap-3 sm:flex-row">
         <div className="flex-1">
           <Label htmlFor={idCampo} className="sr-only">
             {etichetta}
@@ -290,6 +310,35 @@ function CatturaEmail({
         </Button>
       </form>
 
+      {suggerito && (
+        <div
+          role="alert"
+          className="mt-3 rounded-xl border border-sole/40 bg-sole/10 px-3.5 py-3 text-sm leading-relaxed"
+        >
+          <p>
+            Volevi dire <strong className="font-medium">{suggerito}</strong>?
+          </p>
+          <div className="mt-2.5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail(suggerito);
+                void invia(null, { email: suggerito });
+              }}
+              className="h-9 rounded-bottone bg-verde px-3.5 text-[13px] font-semibold text-white transition-colors hover:bg-verde-scuro"
+            >
+              Sì, correggi
+            </button>
+            <button
+              type="button"
+              onClick={() => void invia(null, { insisto: true })}
+              className="h-9 rounded-bottone border border-bordo bg-white px-3.5 text-[13px] font-medium text-fumo transition-colors hover:text-inchiostro"
+            >
+              No, è giusto così
+            </button>
+          </div>
+        </div>
+      )}
       {stato === "errore" && (
         <p role="alert" className="mt-3 text-sm leading-relaxed text-red-600">
           {errore}
@@ -561,9 +610,16 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
       setRichiamo(true);
       return;
     }
-    if (serveEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) {
-      setErrore(COPY.catturaEmail.errore);
-      return;
+    if (serveEmail) {
+      /* Lo stesso controllo del server, meno il giro sul DNS (che nel
+         browser non si può fare). Serve a dire subito cosa non va invece
+         di far aspettare un viaggio andata e ritorno; il cancello vero
+         resta dentro /api/verifica/email. */
+      const forma = controllaFormato(email, { insisto: true });
+      if (!forma.ok) {
+        setErrore(forma.motivo === "formato" ? COPY.catturaEmail.errore : forma.messaggio);
+        return;
+      }
     }
     const destinazione = `/api/pratiche/checkout?verifica=${dati.idPagina}&tipo=${tipo}`;
 

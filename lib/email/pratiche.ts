@@ -173,6 +173,63 @@ export function praticaPronta(
   });
 }
 
+/* ------------------------------------------- conferma dell'invio */
+/**
+ * «Ho inviato il reclamo»: la ricevuta di quel gesto.
+ *
+ * Scelta di Valerio col popup del 12/08. Prima, premere quel bottone
+ * cambiava una riga nella cronologia e basta: chi aveva appena mandato
+ * la lettera restava senza niente in mano, nel momento in cui comincia
+ * l'attesa più lunga del percorso (le compagnie rispondono in otto-
+ * quattordici settimane).
+ *
+ * Questa email fa una cosa sola e la fa bene: mette per iscritto la
+ * data di partenza e il giorno in cui torniamo a farci vivi. Da quel
+ * momento il cliente non deve più controllare niente.
+ *
+ * ⚠️ Il giorno del sollecito non è scritto a mano: arriva da
+ * `SETTIMANE_SOLLECITO`, cioè dalla stessa costante che decide quando
+ * l'email del sollecito parte davvero.
+ */
+export function invioConfermato(
+  a: string,
+  d: { volo: string; dataInvio: string; giornoSollecito: string; link: string },
+): Promise<Esito> {
+  return spedisci({
+    a,
+    oggetto: `Reclamo ${d.volo}: registrato. Adesso tocca a loro.`,
+    html: vestito({
+      titolo: "Reclamo registrato",
+      corpo:
+        h("Il reclamo è partito. Da qui in poi ci pensiamo noi.") +
+        p(
+          `Hai segnato l'invio del reclamo per il volo <strong style="color:${C.inchiostro}">${d.volo}</strong> il ${dataIt(d.dataInvio)}. Da oggi la palla è alla compagnia.`,
+        ) +
+        scatola(
+          `<strong>Cosa succede adesso</strong><br>
+           Le compagnie rispondono in otto-quattordici settimane: il silenzio delle prime settimane è normale, non è un brutto segno.<br>
+           Se il <strong>${dataIt(d.giornoSollecito)}</strong> non avranno ancora risposto, ti scrivo io con il sollecito già pronto.<br>
+           Se invece rispondono <strong>no</strong> prima di allora, aprila e dimmi che motivo hanno dato: la replica parte subito, senza aspettare.`,
+        ) +
+        bottone("Apri la tua pratica", d.link) +
+        p(
+          "Non devi controllare niente e non devi ricordarti nessuna data: i passi li facciamo partire noi.",
+        ),
+      coda: CODA,
+    }),
+    testo: `Il reclamo è partito. Da qui in poi ci pensiamo noi.
+
+Hai segnato l'invio del reclamo per il volo ${d.volo} il ${dataIt(d.dataInvio)}.
+
+Cosa succede adesso:
+Le compagnie rispondono in otto-quattordici settimane, quindi il silenzio delle prime settimane è normale.
+Se il ${dataIt(d.giornoSollecito)} non avranno risposto, ti scrivo io col sollecito già pronto.
+Se rispondono no prima, aprila e dimmi che motivo hanno dato: la replica parte subito.
+
+La tua pratica: ${d.link}`,
+  });
+}
+
 /* ------------------------------------------------------------- T+2 */
 /** Pagata ma mai segnata come inviata: il promemoria che sblocca. */
 export function promemoriaInvio(

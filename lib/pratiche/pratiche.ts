@@ -1,4 +1,5 @@
 import { SERVIZIO_ATTIVO, supabaseServizio } from "../supabase/servizio";
+import { controllaFormato } from "../email/indirizzo";
 import { scadenzaStimata } from "../regole/eu261";
 
 /**
@@ -109,6 +110,20 @@ async function trovaOCreaUtente(
   email: string,
 ): Promise<{ ok: true; id: string; nuovo: boolean } | { ok: false; motivo: string }> {
   const db = supabaseServizio();
+
+  /* L'ULTIMO CANCELLO PRIMA DI APRIRE UN ACCOUNT (13/08).
+     Il controllo vero sta molto più a monte, sul campo del verdetto, ed è
+     lì che si prendono i refusi. Questo è la rete sotto: qui l'account
+     nasce DAVVERO, e un indirizzo scritto male diventa un cliente che ha
+     pagato e non riesce a entrare.
+     ⚠️ Niente DNS in questo punto: gira dentro il webhook di Polar, e un
+     DNS lento farebbe ritentare il pagamento all'infinito. La forma e le
+     caselle usa e getta si controllano senza toccare la rete. */
+  const controllo = controllaFormato(email, { insisto: true });
+  if (!controllo.ok) {
+    return { ok: false, motivo: `indirizzo non utilizzabile (${controllo.motivo}): ${email}` };
+  }
+  email = controllo.email;
 
   const creato = await db.auth.admin.createUser({ email, email_confirm: true });
   if (!creato.error && creato.data.user) {

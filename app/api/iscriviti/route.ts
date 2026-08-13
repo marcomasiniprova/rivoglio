@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { salvaIscritto } from "@/lib/archivio";
+import { controllaIndirizzo } from "@/lib/email/dominio";
 import { chiediConferma } from "@/lib/email/messaggi";
 import { traccia } from "@/lib/eventi/registra";
 
-/** Controllo volutamente permissivo: meglio un'email strana che perdere un iscritto. */
-const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+/* Stesso controllo del resto del sito (lib/email/indirizzo.ts). Qui il
+   guadagno è diverso ma reale: un indirizzo morto in lista è una email
+   che rimbalza, e i rimbalzi rovinano la reputazione del mittente per
+   TUTTI gli altri iscritti. */
 
 export async function POST(req: Request) {
   let corpo: unknown;
@@ -14,15 +17,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ errore: "Richiesta non leggibile." }, { status: 400 });
   }
 
-  const { email, comune } = (corpo ?? {}) as { email?: string; comune?: string };
-  const pulita = (email ?? "").trim().toLowerCase();
+  const { email, comune, insisto } = (corpo ?? {}) as {
+    email?: string;
+    comune?: string;
+    insisto?: boolean;
+  };
 
-  if (!EMAIL_OK.test(pulita)) {
+  const esito = await controllaIndirizzo(email ?? "", { insisto: insisto === true });
+  if (!esito.ok) {
     return NextResponse.json(
-      { errore: "Controlla l'indirizzo email: non mi torna." },
+      { errore: esito.messaggio, motivo: esito.motivo, suggerimento: esito.suggerimento ?? null },
       { status: 400 },
     );
   }
+  const pulita = esito.email;
 
   try {
     await salvaIscritto({
