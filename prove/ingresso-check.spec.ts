@@ -115,9 +115,22 @@ test.describe("La ricevuta del check", () => {
     expect(leggiPass("qualcosa")).toBeNull();
   });
 
-  test("l'ultimo check consumato chiude la ricevuta", () => {
+  test("l'ultimo check consumato porta la ricevuta a zero, ma non la butta", () => {
+    /* 🔴 QUESTA PROVA PRETENDEVA IL CONTRARIO, e difendeva un difetto sui
+       soldi: chiedeva che la ricevuta finita venisse buttata. Ma quel
+       foglietto dice due cose, "hai pagato" e "ti resta del credito", e
+       buttandolo si perdeva anche la prima: chi pagava 1,99 l'analisi si
+       vedeva chiedere la pratica a 14,90 pieni invece di 12,91, cioè la
+       promessa scritta in quattro punti del sito. Trovato col collaudo
+       del 13/08 sul sito vero.
+       A impedire una seconda analisi ci pensa il registro nel database
+       (`creditoFinito`), non la sparizione del cookie. */
     const uno = leggiPass(creaPass("ordine-5", 1))!;
-    expect(consumaPass(uno)).toBeNull();
+    const dopo = consumaPass(uno);
+    expect(dopo).not.toBeNull();
+    const spesa = leggiPass(dopo);
+    expect(spesa?.restano).toBe(0);
+    expect(spesa?.ordine).toBe("ordine-5");
   });
 
   test("con più check ne resta uno in meno", () => {
