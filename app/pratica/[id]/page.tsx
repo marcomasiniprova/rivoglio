@@ -7,6 +7,7 @@ import Logo from "@/components/Logo";
 import CaricaDocumento from "@/components/pratica/CaricaDocumento";
 import DichiaraRifiuto from "@/components/pratica/DichiaraRifiuto";
 import HoInviato from "@/components/pratica/HoInviato";
+import SpeseCura from "@/components/pratica/SpeseCura";
 import { Button } from "@/components/ui/button";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
@@ -176,7 +177,7 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
   const { data: verificaRiga } = pratica.verifica_id
     ? await supabaseServizio()
         .from("verifiche")
-        .select("importo, ritardo_minuti, motivo, versione_regole")
+        .select("importo, ritardo_minuti, motivo, versione_regole, caso_dichiarato")
         .eq("id", pratica.verifica_id)
         .maybeSingle()
     : { data: null };
@@ -535,6 +536,14 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           nuovoGiro={percorso.giri.no > 0 && percorso.giri.no === percorso.giri.replicheMandate}
         />
       )}
+
+      {/* --------------------------------- il diritto di cura (art. 9).
+          Si aggancia gratis al reclamo che il cliente ha già, quando la
+          lettera è disponibile. NON sul declassamento: lì hai volato, non
+          sei stato bloccato, e l'assistenza dell'art. 9 non c'entra. */}
+      {R.letteraVisibile &&
+        (verificaRiga as { caso_dichiarato?: string | null } | null)?.caso_dichiarato !==
+          "declassamento" && <SpeseCura praticaId={pratica.id} iniziale={pratica.cura_richiesta ?? false} />}
 
       {/* --------------------------------------- il fascicolo, in fondo.
           Scelta di Valerio (13/08): resta raggiungibile ma non ingombra.

@@ -67,6 +67,8 @@ type RigaPratica = {
   email: string | null;
   /** Il motivo del no della compagnia, se il cliente l'ha dichiarato. */
   rifiuto_motivo?: string | null;
+  /** Diritto di cura (art. 9): il cliente ha spese da farsi rimborsare. */
+  cura_richiesta?: boolean | null;
 };
 
 const COLONNE_PRATICA =
@@ -230,7 +232,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
      la lettura. Senza quel campo la lettera esce lo stesso. */
   const leggiPratica = (colonne: string) =>
     db.from("pratiche").select(colonne).eq("id", id).maybeSingle();
-  const primoGiro = await leggiPratica(`${COLONNE_PRATICA}, rifiuto_motivo`);
+  const primoGiro = await leggiPratica(`${COLONNE_PRATICA}, rifiuto_motivo, cura_richiesta`);
   const pratica = (
     primoGiro.error && colonnaMancante(primoGiro.error.message)
       ? (await leggiPratica(COLONNE_PRATICA)).data
@@ -387,7 +389,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
     { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo, email: pratica.email },
     fatto,
     verdetto,
-    { meteo, dichiarato },
+    { meteo, dichiarato, cura: pratica.cura_richiesta ?? false },
   );
 
   if (!lettera) {

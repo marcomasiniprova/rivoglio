@@ -118,4 +118,18 @@ test.describe("Il foglio della pratica", () => {
     expect(corpo).toMatch(/^IBAN: .+$/m);
     expect(corpo).toMatch(/^Intestato a: .+$/m);
   });
+
+  test("diritto di cura: il paragrafo dell'art. 9 compare solo se richiesto", () => {
+    /* Si aggancia al reclamo solo quando il cliente dichiara di avere
+       spese (art. 9). Senza, non deve comparire: chiedere il rimborso di
+       spese che non ci sono indebolisce la lettera. E non si scrive mai
+       un importo: le cifre le portano gli scontrini. */
+    const senza = generaReclamo(pratica, fatto, verdetto, {})!.corpo;
+    const con = generaReclamo(pratica, fatto, verdetto, { cura: true })!.corpo;
+    expect(senza).not.toContain("articolo 9");
+    expect(con).toContain("articolo 9");
+    expect(con).toContain("spese di assistenza");
+    // nessun importo inventato dentro il paragrafo delle spese
+    expect(con).not.toMatch(/spese di assistenza[\s\S]{0,400}\d+\s?(?:€|euro)/i);
+  });
 });

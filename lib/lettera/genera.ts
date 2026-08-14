@@ -206,7 +206,7 @@ export function generaReclamo(
      lib/lettera/dichiarati.ts). Senza questo ramo la lettera chiedeva
      400 euro citando la regola delle tre ore accanto a un ritardo di
      due e mezza: si contraddiceva da sola. */
-  extra?: { meteo?: string | null; dichiarato?: DatiDichiarazione | null },
+  extra?: { meteo?: string | null; dichiarato?: DatiDichiarazione | null; cura?: boolean },
 ): Lettera | null {
   if (verdetto.esito !== "idoneo") return null;
   /* Il negato imbarco non ha un orario d'arrivo da confrontare: chi non
@@ -268,7 +268,15 @@ ${
 
 ${passeggeri.map((p, i) => `${i + 1}. ${p}`).join("\n")}`
 }
-
+${
+  /* Diritto di cura (art. 9): si aggancia al reclamo solo se il cliente
+     dichiara di aver sostenuto spese di tasca sua. Non chiediamo un
+     importo: le cifre le portano le sue ricevute, e la compagnia le
+     verifica una per una. Vedi la scelta di Valerio del 14/08. */
+  extra?.cura
+    ? `\nChiedo inoltre, ai sensi dell'articolo 9 del Regolamento, il rimborso delle spese di assistenza (pasti e bevande, ed eventuale pernottamento con il relativo trasporto da e per l'aeroporto) che ho dovuto sostenere a causa del disservizio, non essendomi state offerte dal vettore. Le spese risultano dalle ricevute che allego alla presente.\n`
+    : ""
+}
 Il pagamento potrà essere effettuato con bonifico bancario sulle seguenti coordinate:
 Intestato a: ${famigliaSenzaNomi ? "[Nome e cognome dell'intestatario del conto]" : passeggeri[0]}
 IBAN: [qui il tuo IBAN]

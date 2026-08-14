@@ -58,6 +58,8 @@ type RigaPratica = {
   creata_il: string;
   /** Il motivo del no della compagnia, se il cliente l'ha dichiarato. */
   rifiuto_motivo?: string | null;
+  /** Diritto di cura (art. 9): il cliente ha spese da farsi rimborsare. */
+  cura_richiesta?: boolean | null;
 };
 
 const COLONNE_PRATICA =
@@ -123,7 +125,7 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
      senza: il no della compagnia non si sa, il resto sì. */
   const leggiPratica = (colonne: string) =>
     db.from("pratiche").select(colonne).eq("id", id).maybeSingle();
-  const primoGiro = await leggiPratica(`${COLONNE_PRATICA}, rifiuto_motivo`);
+  const primoGiro = await leggiPratica(`${COLONNE_PRATICA}, rifiuto_motivo, cura_richiesta`);
   const pratica = (
     primoGiro.error && colonnaMancante(primoGiro.error.message)
       ? (await leggiPratica(COLONNE_PRATICA)).data
@@ -230,7 +232,7 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
         { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo, email: pratica.email },
         fatto,
         verdetto,
-        { meteo },
+        { meteo, cura: pratica.cura_richiesta ?? false },
       );
 
       if (testo) {

@@ -1,7 +1,9 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-14 (giro #70: i connettori accesi e il primo caso
-nuovo per allargare il mercato, il declassamento art. 10 · giro #69: l'AI
+**Aggiornato:** 2026-08-14 (giro #71: il diritto di cura art. 9 agganciato
+al reclamo, e il declassamento collaudato sul sito vero · giro #70: i
+connettori accesi e il primo caso nuovo per allargare il mercato, il
+declassamento art. 10 · giro #69: l'AI
 che non capiva le risposte e il fascicolo che mentiva, la posizione persa
 dopo la cassa, il profilo, il modulo Ryanair morto · giro #68: gli undici
 punti del collaudo di
@@ -31,6 +33,35 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #71 (14/08): IL SECONDO CASO NUOVO, IL DIRITTO DI CURA (ART. 9),
+  AGGANCIATO GRATIS AL RECLAMO. E IL DECLASSAMENTO PROVATO SUL SITO VERO.**
+  Valerio: «prevenire i bug è meglio che curare, qualità massima non
+  velocità, collauda tutti i casi». Quattro scelte fini col popup, poi i
+  casi uno alla volta, ognuno verde e collaudato prima del prossimo.
+  - ✅ **DECLASSAMENTO COLLAUDATO SUL SITO VERO.** Volo reale AZ2133
+    Milano→Roma, declassamento involontario prezzo 200 → **idoneo, 60€**
+    (il 30% giusto su 470 km), con la motivazione dell'art. 10. Non in
+    laboratorio: sul database vero, poi i dati di prova cancellati.
+  - 🟢 **DIRITTO DI CURA (art. 9): costruito.** Dalle due ore di ritardo
+    la compagnia deve darti pasti (e hotel se dormi fuori); se paghi tu,
+    ti rimborsa con gli scontrini. **Non è una pratica a sé** (scelta di
+    Valerio): si aggancia GRATIS alla pratica che hai già. Sotto la
+    lettera del reclamo compare «Hai pagato pasti o hotel di tasca tua?»:
+    se dici di sì, la lettera guadagna il paragrafo dell'art. 9 e tu
+    alleghi gli scontrini. **L'importo non lo decidiamo noi**: le cifre
+    le portano le ricevute, la compagnia le verifica. Colonna
+    `cura_richiesta` aggiunta sul database vero col connettore. Non
+    compare sul declassamento: lì hai volato, l'assistenza non c'entra.
+  - **Le 4 scelte di Valerio in questo giro:** diritto di cura →
+    aggancio gratis; Reg. 1107 → gratis, per reputazione; coincidenza →
+    verifico entrambi i voli col fornitore; collaudo → fino alla pratica
+    sul sito vero, poi pulisco.
+  - **RESTANO DUE:** la coincidenza persa col motore che legge le due
+    tratte, e il Reg. CE 1107/2006 (mobilità ridotta) gratuito. Uno alla
+    volta, ognuno verde.
+  - Prove: **verify verde**. La nuova è in `prove/foglio.spec.ts` (il
+    paragrafo dell'art. 9 compare solo se richiesto, e senza cifre
+    inventate).
 - **GIRO #70 (14/08): I CONNETTORI ACCESI, E IL PRIMO CASO NUOVO PER
   ALLARGARE IL MERCATO (IL DECLASSAMENTO, ART. 10).** Valerio: «non
   possiamo solo fare ritardo sopra 3 ore, dobbiamo gestire TUTTO il

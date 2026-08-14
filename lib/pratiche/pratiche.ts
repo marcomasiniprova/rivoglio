@@ -59,6 +59,13 @@ export type Pratica = {
    */
   rifiuto_motivo?: MotivoRifiuto | null;
   rifiuto_il?: string | null;
+  /**
+   * Diritto di cura (art. 9): il cliente ha spese di assistenza
+   * (pasti/hotel) da farsi rimborsare, documentate dai suoi scontrini.
+   * Aggiunge un paragrafo alla lettera del reclamo, senza un secondo
+   * pagamento (scelta di Valerio, 14/08). NULL/false = niente spese.
+   */
+  cura_richiesta?: boolean | null;
   creata_il: string;
   aggiornata_il: string;
 };
