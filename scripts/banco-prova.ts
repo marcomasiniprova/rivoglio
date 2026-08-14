@@ -109,6 +109,11 @@ async function main() {
   const casi = leggiCasi(opz);
 
   const conChiave = Boolean(process.env.AERODATABOX_API_KEY);
+  const seconda = process.env.AVIATIONEDGE_API_KEY
+    ? "AviationEdge"
+    : process.env.AVIATIONSTACK_API_KEY
+      ? "AviationStack"
+      : null;
   console.log("");
   console.log(`BANCO DI PROVA — ${casi.length} casi`);
   console.log(
@@ -116,13 +121,18 @@ async function main() {
       ? "Archivio: AeroDataBox (dati veri)."
       : "⚠️  NESSUNA CHIAVE AERODATABOX: parte il fornitore dimostrativo e i verdetti NON valgono.",
   );
+  console.log(
+    seconda
+      ? `Seconda fonte per l'incrocio: ${seconda} (conferma gli orari, recupera incerti).`
+      : "Seconda fonte: nessuna (imposta AVIATIONEDGE_API_KEY per misurarne l'effetto).",
+  );
   console.log(`Pausa fra le chiamate: ${opz.pausa} ms. Ci vorranno circa ${Math.ceil((casi.length * opz.pausa) / 1000)} secondi.`);
   console.log("");
   console.log(
     riempi("VOLO", 9) + riempi("DATA", 12) + riempi("TRATTA", 30) +
-    riempi("RITARDO", 14) + riempi("VERDETTO", 9) + "IMPORTO",
+    riempi("RITARDO", 14) + riempi("VERDETTO", 9) + riempi("IMPORTO", 9) + "2ª FONTE",
   );
-  console.log("-".repeat(82));
+  console.log("-".repeat(96));
 
   const esiti: Record<string, unknown>[] = [];
   const conto = { idoneo: 0, incerto: 0, non_idoneo: 0, errore: 0 };
@@ -147,6 +157,16 @@ async function main() {
             : "—";
         const tratta = `${fatto.partenzaCitta ?? fatto.partenzaIata ?? "?"} → ${fatto.arrivoCitta ?? fatto.arrivoIata ?? "?"}`;
         const importo = verdetto.esito === "idoneo" ? `${verdetto.importo}€` : "";
+        /* Cosa ha fatto la seconda fonte: confermato l'orario (idoneo
+           recuperato) o contraddetto (resta incerto). Vuoto = non interpellata
+           o niente da dire. */
+        const incrocio = fatto.verificatoIncrociato
+          ? "confermato"
+          : fatto.fontiDiscordanti
+            ? "discorde"
+            : null;
+        const segno =
+          incrocio === "confermato" ? "✓ confermato" : incrocio === "discorde" ? "≠ discorde" : "";
         riga = {
           ...caso,
           esito: verdetto.esito,
@@ -158,12 +178,14 @@ async function main() {
           arrivoPrevisto: fatto.arrivoPrevistoUtc,
           arrivoEffettivo: fatto.arrivoEffettivoUtc,
           stato: fatto.stato,
+          incrocio,
           demo,
           motivo: verdetto.motivo,
         };
         console.log(
           riempi(caso.volo, 9) + riempi(caso.data, 12) + riempi(tratta, 30) +
-          riempi(ritardo, 14) + riempi(ETICHETTA[verdetto.esito] ?? verdetto.esito, 9) + importo,
+          riempi(ritardo, 14) + riempi(ETICHETTA[verdetto.esito] ?? verdetto.esito, 9) +
+          riempi(importo, 9) + segno,
         );
       }
     } catch (e) {
@@ -189,6 +211,17 @@ async function main() {
     .filter((e) => e.esito === "idoneo")
     .reduce((s, e) => s + (Number(e.importo) || 0), 0);
   console.log(`  Compensazione trovata in tutto: ${incassoPotenziale}€ (un passeggero per volo)`);
+  if (seconda) {
+    const recuperati = esiti.filter((e) => e.esito === "idoneo" && e.incrocio === "confermato");
+    const euroRecuperati = recuperati.reduce((s, e) => s + (Number(e.importo) || 0), 0);
+    const discordi = esiti.filter((e) => e.incrocio === "discorde").length;
+    console.log("");
+    console.log(
+      `  RECUPERATI dalla 2ª fonte (${seconda}): ${recuperati.length} idonei che senza sarebbero` +
+        ` rimasti "non lo so" (+${euroRecuperati}€).`,
+    );
+    console.log(`  Fonti in disaccordo (restano incerti, giusto così): ${discordi}.`);
+  }
   console.log("");
 
   const cartella = path.join(RADICE, "prove");

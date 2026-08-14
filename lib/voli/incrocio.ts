@@ -15,6 +15,15 @@ import { SOGLIA_MINUTI, type FattoVolo } from "@/lib/regole/eu261";
  * vendere. Quando le due NON concordano, il caso resta incerto (era già
  * così: è la rete che impedisce di vendere su un dato ballerino).
  *
+ * ⚠️ SI CONFRONTA IL RITARDO, NON L'ORARIO ASSOLUTO. È la chiave che rende
+ * l'incrocio a prova di fuso orario: il ritardo (arrivo effettivo meno
+ * previsto) è lo stesso identico numero sia che la fonte scriva gli orari in
+ * UTC sia che li scriva in ora locale, perché il fuso si annulla nella
+ * sottrazione. Confrontare gli orari assoluti, invece, farebbe risultare due
+ * fonti diverse di ORE su ogni volo appena una delle due è in ora locale, e
+ * il motore butterebbe in incerto tutti gli idonei: non un falso positivo,
+ * ma una strage di vendite vere. Così no.
+ *
  * ⚠️ LA REGOLA NUMERO UNO RESTA INTOCCABILE: mai un falso positivo. Per
  * questo la conferma NON scatta nella ZONA GRIGIA attorno alle 3 ore: lì un
  * errore di pochi minuti, magari condiviso da due fonti che leggono lo
@@ -24,9 +33,9 @@ import { SOGLIA_MINUTI, type FattoVolo } from "@/lib/regole/eu261";
  * (e lì non si vende comunque): confermare non rischia niente.
  */
 
-/** Oltre questo scarto (minuti) le due fonti si contraddicono: incerto. */
+/** Oltre questo scarto (minuti di ritardo) le due fonti si contraddicono. */
 export const SCARTO_DISCORDE_MIN = 15;
-/** Entro questo scarto (minuti) le due fonti si confermano a vicenda. */
+/** Entro questo scarto (minuti di ritardo) le due fonti si confermano. */
 export const SCARTO_CONFERMA_MIN = 10;
 /** La zona grigia sopra la soglia in cui NON si conferma per incrocio. */
 export const MARGINE_INCROCIO_MIN = 20;
@@ -41,24 +50,31 @@ export type EsitoIncrocio = {
 const NIENTE: EsitoIncrocio = { discordanti: false, confermato: false };
 
 /**
- * Confronta l'arrivo EFFETTIVO del primario con quello della seconda fonte.
- * `secondaEffettivoUtc` è l'unico dato che serve dalla seconda fonte: il suo
- * orario di arrivo effettivo (null se non l'ha o se il volo non è concluso).
+ * Confronta il RITARDO del primario con quello della seconda fonte.
+ *
+ * Dalla seconda fonte servono DUE orari, il previsto e l'effettivo: il loro
+ * scarto è il suo ritardo, e si confronta con quello del primario. Se manca
+ * uno dei quattro orari (due per fonte) non si può fare il conto: NIENTE.
+ * Gli orari della seconda fonte possono essere in qualunque fuso, purché i
+ * suoi due siano nello stesso (lo sono sempre: stesso aeroporto, stesso
+ * arrivo).
  */
 export function incrociaFonti(
   primario: FattoVolo,
+  secondaPrevistoUtc: string | null | undefined,
   secondaEffettivoUtc: string | null | undefined,
 ): EsitoIncrocio {
-  const a = primario.arrivoEffettivoUtc;
-  const b = secondaEffettivoUtc ?? null;
-  if (!a || !b) return NIENTE;
-  const ta = Date.parse(a);
-  const tb = Date.parse(b);
-  if (!Number.isFinite(ta) || !Number.isFinite(tb)) return NIENTE;
+  const pPrev = primario.arrivoPrevistoUtc ? Date.parse(primario.arrivoPrevistoUtc) : NaN;
+  const pEff = primario.arrivoEffettivoUtc ? Date.parse(primario.arrivoEffettivoUtc) : NaN;
+  const sPrev = secondaPrevistoUtc ? Date.parse(secondaPrevistoUtc) : NaN;
+  const sEff = secondaEffettivoUtc ? Date.parse(secondaEffettivoUtc) : NaN;
+  if (![pPrev, pEff, sPrev, sEff].every((n) => Number.isFinite(n))) return NIENTE;
 
-  const scarto = Math.abs(ta - tb) / 60_000;
+  const ritardoPrimario = (pEff - pPrev) / 60_000;
+  const ritardoSeconda = (sEff - sPrev) / 60_000;
+  const scarto = Math.abs(ritardoPrimario - ritardoSeconda);
 
-  // Si contraddicono: non si vende (comportamento storico, invariato).
+  // Si contraddicono sul ritardo: non si vende (comportamento storico).
   if (scarto > SCARTO_DISCORDE_MIN) return { discordanti: true, confermato: false };
 
   // Concordano, ma non abbastanza stretto per promuovere un fatto a certo.
@@ -67,14 +83,14 @@ export function incrociaFonti(
   // Il primario era già certo di suo: non c'è niente da confermare.
   if (primario.orarioVerificato === true) return NIENTE;
 
-  // Serve l'orario previsto per sapere se siamo vicini alla soglia.
-  const previsto = primario.arrivoPrevistoUtc ? Date.parse(primario.arrivoPrevistoUtc) : NaN;
-  if (!Number.isFinite(previsto)) return NIENTE;
-  const ritardo = (ta - previsto) / 60_000;
-
   /* La zona grigia: da 180 a 200 minuti. Qui un incrocio non basta, perché
      un errore di pochi minuti cambierebbe l'esito. Si resta incerti. */
-  if (ritardo >= SOGLIA_MINUTI && ritardo < SOGLIA_MINUTI + MARGINE_INCROCIO_MIN) return NIENTE;
+  if (
+    ritardoPrimario >= SOGLIA_MINUTI &&
+    ritardoPrimario < SOGLIA_MINUTI + MARGINE_INCROCIO_MIN
+  ) {
+    return NIENTE;
+  }
 
   return { discordanti: false, confermato: true };
 }

@@ -23,6 +23,7 @@ import { colonnaMancante } from "@/lib/supabase/colonne";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { aerodatabox } from "./fornitori/aerodatabox";
 import { aviationstack } from "./fornitori/aviationstack";
+import { aviationedge } from "./fornitori/aviationedge";
 import { demo } from "./fornitori/demo";
 import { incrociaFonti } from "./incrocio";
 import { scioperoInData } from "@/lib/scioperi/scioperi";
@@ -147,13 +148,15 @@ function fornitoreAttivo(voloIata: string): FornitoreVoli {
 }
 
 /**
- * La SECONDA fonte per l'incrocio, se configurata. Provider-agnostica: oggi
- * AviationStack, domani un'altra (basta impostarne la chiave), senza toccare
- * la logica dell'incrocio. Torna null se nessuna riserva è impostata: allora
- * niente incrocio, e il verdetto resta severo come sempre (nessuna
- * regressione, il giorno che manca la chiave).
+ * La SECONDA fonte per l'incrocio, se configurata. Provider-agnostica: si
+ * preferisce AviationEdge quando c'è la sua chiave (scelta di Valerio del
+ * 14/08, con lo storico che copre i voli passati), altrimenti AviationStack.
+ * Torna null se nessuna riserva è impostata: allora niente incrocio, e il
+ * verdetto resta severo come sempre (nessuna regressione, il giorno che manca
+ * la chiave).
  */
 function secondaFonte(): FornitoreVoli | null {
+  if (process.env.AVIATIONEDGE_API_KEY) return aviationedge;
   if (process.env.AVIATIONSTACK_API_KEY) return aviationstack;
   return null;
 }
@@ -232,8 +235,11 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
          un fatto del primario VERO, mai sulla demo. */
       const seconda = fatto.fonte === "aerodatabox" ? secondaFonte() : null;
       if (seconda) {
-        const altra = await seconda.cerca(volo.valore, data.valore);
-        const incrocio = incrociaFonti(fatto, altra?.arrivoEffettivoUtc);
+        const altra = await seconda.cerca(volo.valore, data.valore, {
+          partenzaIata: fatto.partenzaIata,
+          arrivoIata: fatto.arrivoIata,
+        });
+        const incrocio = incrociaFonti(fatto, altra?.arrivoPrevistoUtc, altra?.arrivoEffettivoUtc);
         if (incrocio.discordanti) {
           fatto = { ...fatto, fontiDiscordanti: true };
         } else if (incrocio.confermato) {
