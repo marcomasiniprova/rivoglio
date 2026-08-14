@@ -59,6 +59,14 @@ export const VOLI_DEMO: SagomaDemo[] = [
   { voloIata: "ZZ10", copre: "non idoneo, arrivato in anticipo", stato: "atterrato", previstoOre: "20:00", ritardoMinuti: -5, km: 1200 },
   { voloIata: "ZZ777", copre: "cancellato: esito incerto, non si vende", stato: "cancellato", km: 1100 },
   { voloIata: "ZZ404", copre: "dati non trovati: esito incerto", stato: "sconosciuto" },
+  /* La COPPIA della coincidenza a due tratte, per poterla provare (e filmare)
+     senza voli veri: ZZ501 è il primo volo, con un ritardo piccolo (40 min:
+     da solo non idoneo) che fa perdere la coincidenza ZZ502. ZZ501 atterra a
+     Parigi alle 13:40, quando ZZ502 (Parigi → New York) è già partito, alle
+     13:20. Il motore, leggendo i due voli, prova che il ritardo del primo ti
+     ha fatto perdere il secondo, e calcola la fascia sul viaggio intero. */
+  { voloIata: "ZZ501", copre: "coincidenza persa: primo volo, 40 min di ritardo (non idoneo da solo)", stato: "atterrato", previstoOre: "13:00", ritardoMinuti: 40, km: 640, partenza: "BGY", arrivo: "CDG" },
+  { voloIata: "ZZ502", copre: "coincidenza persa: la coincidenza persa, Parigi → New York", stato: "atterrato", previstoOre: "15:20", ritardoMinuti: 0, km: 5800, partenza: "CDG", arrivo: "JFK" },
 ];
 
 /** "2026-08-14" + "20:00" + 200 minuti → ISO UTC dell'arrivo effettivo. */

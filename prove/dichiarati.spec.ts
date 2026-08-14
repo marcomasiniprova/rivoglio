@@ -103,4 +103,27 @@ test.describe("Casi dichiarati", () => {
     });
     expect(r.status()).toBe(400);
   });
+
+  /* La coppia demo della coincidenza a due tratte (ZZ501 perde ZZ502): serve
+     a provarla e a filmarla senza voli veri. Il motore legge i due voli,
+     prova la causa e calcola la fascia sul viaggio intero (Bergamo → New
+     York, paese terzo certo → 600). */
+  test("coincidenza a due tratte demo: ZZ501 perde ZZ502, idoneo 600 sul viaggio", async ({
+    request,
+  }) => {
+    const r = await request.post("/api/verifica/dichiara", {
+      data: {
+        volo: "ZZ501",
+        data: "05/08/2026",
+        caso: "coincidenza",
+        unica: "si",
+        ritardoFinale: "oltre4",
+        secondoVolo: "ZZ502",
+      },
+    });
+    expect(r.ok()).toBeTruthy();
+    const d = await r.json();
+    expect(d.esito).toBe("idoneo");
+    expect(d.importo).toBe(600);
+  });
 });
