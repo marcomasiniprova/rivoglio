@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-14 (giro #71: il diritto di cura art. 9 agganciato
+**Aggiornato:** 2026-08-14 (giro #72: la coincidenza persa che il motore
+verifica sui DUE voli, e la pagina aperta sui diritti di chi vola con
+mobilità ridotta (Reg. 1107) · giro #71: il diritto di cura art. 9 agganciato
 al reclamo, e il declassamento collaudato sul sito vero · giro #70: i
 connettori accesi e il primo caso nuovo per allargare il mercato, il
 declassamento art. 10 · giro #69: l'AI
@@ -33,6 +35,57 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #72 (14/08): LA COINCIDENZA A DUE TRATTE, E LA PAGINA APERTA SUI
+  DIRITTI DI CHI VOLA CON MOBILITÀ RIDOTTA (REG. 1107).** Il via finale di
+  Valerio: «gli ultimi due casi, fatti benissimo, come un ingegnere senior.
+  Riprendi dalla coincidenza a due tratte, e dopo proviamo insieme ogni
+  singola parte del prodotto». Costruiti uno alla volta, ognuno verde prima
+  del prossimo.
+  - **LA COINCIDENZA PERSA ADESSO IL MOTORE LA LEGGE DAVVERO.** Prima
+    chiedeva solo «dov'eri diretto» e si fidava della parola. Ora sul sito
+    chiede il **numero del volo di coincidenza** e lo verifica: dagli orari
+    prova in modo severo che è stato il primo ritardo a fartelo perdere (il
+    primo deve essere atterrato DOPO che la coincidenza era già partita). Se
+    sulla carta era ancora prendibile, resta incerto e non paghi.
+  - 🔴 **LA FASCIA SI CALCOLAVA SUL PEZZO SBAGLIATO.** Il vecchio codice
+    guardava lo scalo di COINCIDENZA, non la destinazione finale: un
+    Milano → Francoforte → New York con 4 ore di ritardo finale usciva 400
+    invece di 600. Adesso la fascia è sul **viaggio intero** (partenza del
+    primo → arrivo del secondo). ⚠️ **E la fascia da 600 si apre SOLO se la
+    destinazione finale è un paese terzo CERTO**: su un dato incerto resta
+    400. Un falso positivo sull'importo è vietato anche verso l'alto, ed è
+    esattamente il rischio che il vecchio approccio avrebbe potuto aprire su
+    una destinazione ignota.
+  - **IL VECCHIO PERCORSO RESTA PER L'APP.** L'app manda ancora la
+    destinazione dichiarata: la rotta la accetta come prima, così non si
+    rompe niente. Aggiunto `partenzaPrevistoUtc` alla filiera (fornitori,
+    cache, colonna `voli.partenza_previsto_utc` già migrata) come campo
+    **opzionale**: una riga vecchia senza quel dato fa uscire incerta la
+    coincidenza, mai un errore. 13 prove nuove
+    (`coincidenza-due-tratte.spec.ts` + 2 sulla rotta), fra cui quella che
+    dimostra che su una destinazione ignota NON si sale a 600.
+  - **NASCE `/mobilita-ridotta`: I DIRITTI DI CHI VOLA CON DIFFICOLTÀ DI
+    MOVIMENTO** (Reg. CE 1107/2006, scelta di Valerio: pagina dedicata
+    aperta, gratis, per reputazione). Senza account e senza pagamento: non è
+    una pratica che vendiamo, è un canale di acquisizione. Spiega i diritti
+    e dà la **lettera di reclamo che si adatta** a tre situazioni, ognuna
+    con l'articolo giusto: assistenza non fornita (art. 7 e allegati I-II),
+    imbarco rifiutato per la disabilità (artt. 3-4), sedia a rotelle o
+    ausilio perso o danneggiato (art. 12, col campo IBAN). Ogni lettera dice
+    a chi mandarla (gestore dell'aeroporto, compagnia, e in escalation ENAC
+    ai sensi degli artt. 14-15). Il documento lo scrive la persona: niente
+    parte dalla pagina, tutto resta nel browser. 10 prove nuove.
+  - ⚠️ **I CONTATTI ENAC E CONCILIAWEB VANNO RILETTI DAL PC DI VALERIO.**
+    L'indirizzo `pax.disabili@enac.gov.it` e la pagina reclami dell'ENAC
+    vengono dai risultati di ricerca sui domini ufficiali, ma da questo
+    ambiente `enac.gov.it` e `autorita-trasporti.it` sono bloccati dal
+    proxy: non ho potuto aprirli e confermarli parola per parola. In "Serve
+    Valerio".
+  - Registrata in sitemap, nel footer (colonna Domande) e fra le pagine che
+    si aprono a parte dalla landing. Build di produzione verde, pagina
+    pre-generata come HTML statico.
+  - Prove: **23 nuove**, tutte verdi. Restano le 2 note dell'Osservatorio,
+    rosse solo in sandbox (l'egress non raggiunge Supabase).
 - **GIRO #71 (14/08): IL SECONDO CASO NUOVO, IL DIRITTO DI CURA (ART. 9),
   AGGANCIATO GRATIS AL RECLAMO. E IL DECLASSAMENTO PROVATO SUL SITO VERO.**
   Valerio: «prevenire i bug è meglio che curare, qualità massima non
@@ -2557,6 +2610,12 @@ social rifatta (era rimasta al prodotto viaggi).
    Poi 30 casi reali a mano per il golden set.
 5. **Dominio** per Rivolio (slot gratuito Hostinger da configurare) e
    account social `@rivolio`.
+5-ter. **Conferma i contatti ENAC della pagina `/mobilita-ridotta`.** Dal
+   tuo PC apri la pagina reclami dei passeggeri a mobilità ridotta
+   dell'ENAC e controlla che l'indirizzo `pax.disabili@enac.gov.it` e il
+   link siano ancora quelli giusti: da qui `enac.gov.it` è bloccato dal
+   proxy, quindi li ho presi dai risultati di ricerca ma non li ho potuti
+   aprire. Se sono cambiati, dimmelo e li correggo in un minuto.
 4-bis. **L'autopilot degli scioperi, primo giro a mano.** Dopo il deploy
    apri una volta `https://<il-sito>/api/motore/scioperi?segreto=<MOTORE_SEGRETO>`
    e guarda cosa risponde: dice quante fonti si sono aperte e quante righe

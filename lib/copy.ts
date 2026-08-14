@@ -1277,6 +1277,7 @@ export const COPY = {
         pratica_di_prova: "Pratica di collaudo, nessun pagamento",
         documento_incrociato: "Documento confrontato con i dati del volo",
         documento_saltato: "Nessun documento caricato, per scelta",
+        cura: "Spese di pasti o hotel segnalate",
         email_invio: "Email di conferma dell'invio inviata",
         // I nomi vecchi delle stesse tappe: le pratiche di prima li hanno
         // ancora scritti in cronologia e devono restare leggibili.
