@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-13 (giro #67: la skill video-review e il giro in
+**Aggiornato:** 2026-08-14 (giro #68: gli undici punti del collaudo di
+Valerio, e il vero motivo per cui l'overbooking non apriva la pratica ·
+giro #67: la skill video-review e il giro in
 un video solo · giro #66: gli undici rami mai camminati,
 filmati uno per uno · giro #65: il freno, un tetto sulla spesa ·
 giro #64: il collaudo di dieci voli sul sito vero, e i sei difetti che ha
@@ -25,6 +27,88 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #68 (14/08): GLI UNDICI PUNTI DEL COLLAUDO DI VALERIO, E IL VERO
+  MOTIVO PER CUI L'OVERBOOKING NON APRIVA LA PRATICA.** Valerio ha
+  percorso il prodotto da utente e ha alzato undici cose in un messaggio
+  solo (PROCEDI LOCK IN). Dieci erano modifiche, la undicesima un video.
+  - 🔴 **«NON FA PAGARE»: i bottoni d'acquisto non si accendevano sulle
+    casistiche vere.** Overbooking e coincidenza, su un volo reale,
+    davano il verdetto giusto ma poi «il pagamento non è ancora attivo»,
+    niente bottone, niente famiglia. Il motivo:
+    `compraSingola`/`compraFamiglia` in `Risultato.tsx` si accendevano
+    solo per i voli demo o con Polar; su un volo vero senza Polar
+    restavano spenti. Adesso seguono anche la cassa di prova
+    (`dati.cassaProva`, letta da `cassaDiProvaAperta()` sulla pagina del
+    verdetto). Il bottone famiglia torna così su tutte le casistiche.
+  - 🔴 **«NON APRE LA PRATICA E SI BLOCCA»: era un secondo difetto,
+    più nascosto.** Anche con il bottone acceso, premuto su un volo VERO
+    la pratica non si apriva: `/api/pratiche/prova` la creava solo sui
+    voli demo (ZZ), e un volo vero veniva rimbalzato su «pagamento non
+    attivo». Ma il muro vero è già sopra (`inCollaudo`): lì arriva solo
+    chi porta la chiave del collaudatore, cioè Valerio. Il filtro sul
+    numero del volo non aggiungeva sicurezza, gli toglieva solo la
+    possibilità di percorrere il prodotto fino ai quattro fogli su un
+    volo scelto a caso, che è la ragione per cui quella cassa esiste
+    (il file lo diceva già nell'intestazione: «voglio mettere un volo
+    casuale... arrivare fino al ricorso»). Tolto. La pratica di prova
+    resta distinguibile da una vera per il MARCHIO (evento
+    `pratica_di_prova`, prezzo a zero), non per il numero del volo.
+    Provato sul sito vero: AZ2133 Milano→Roma, overbooking dichiarato →
+    **idoneo, 250€**, scadenza 2028, `demo:false`. La lettera esce già
+    nella variante giusta (negato imbarco, non ritardo): quel ramo
+    c'era dall'11/08.
+  - 🔴 **LA SCADENZA «fino al 6 agosto 2031» ERA SBAGLIATA.** Applicava
+    i 5 anni (il termine spagnolo) a tutti. In Italia il termine per la
+    compensazione è di **2 anni** dal volo. Ora `scadenzaStimata` mette
+    sempre il termine più corto, con l'avvertenza che in qualche paese
+    è diverso: mai sovrastimare, perché un utente che crede di avere
+    tempo perde il diritto. Non è un parere legale, e lo dice.
+  - **L'OCR DELLA FOTO NON FA PIÙ PAGARE E NON TOGLIE IL PROGRESSO.**
+    «Carico la foto per il check e mi fa pagare e mi toglie quello che
+    avevo messo.» Leggere la carta d'imbarco è un modo di scrivere volo
+    e data, non l'analisi che si vende: paywallarlo faceva pagare per
+    compilare un modulo e ripartire da zero. Il muro è stato tolto da
+    `/api/leggi-carta` (resta il freno per IP, così non diventa un OCR
+    gratis a nostre spese). Il muro vero resta sull'analisi.
+  - **LA DOMANDA DEL CASO DICHIARATO ERA UN INDOVINELLO.** «Ti hanno
+    lasciato a terra o hai perso una coincidenza? Sono casi che gli
+    archivi non vedono» non si capiva. Ora: «A volte il volo risulta
+    puntuale ma tu sei rimasto a terra lo stesso. È il tuo caso?», e le
+    due scelte sono «Non mi hanno fatto salire (overbooking)» e «Ho
+    perso il volo dopo per colpa di questo».
+  - **«MENO DI UN CAFFÈ» È DIVENTATO «MENO DI UN CAPPUCCINO AL BAR»**
+    (parole di Valerio), in tutti e quattro i punti dove compariva.
+  - **VIA `valerio@artecai.it`, DENTRO `team@rivolio.it`** nel footer e
+    in ogni posizione (pagine legali, app, cookie, privacy, allarmi del
+    motore). Le email però continuano ad arrivare «da Valerio del team
+    di Rivolio»: sembra una squadra, e lui è uno della squadra, come
+    chiesto. ⚠️ Su Netlify va messo `RESEND_MITTENTE` =
+    `"Valerio dal team di Rivolio <team@send.rivolio.it>"` (e
+    `<team@rivolio.it>` dopo la verifica del dominio); il codice porta
+    già il valore giusto come ripiego.
+  - **L'EMAIL DI CONFERMA ERA STRANA.** L'oggetto «Reclamo ZZ600:
+    registrato. Adesso tocca a loro.» è diventato «Reclamo inviato:
+    adesso la palla è alla compagnia».
+  - ⚠️ **IL VIDEO DEI PASSI 5 E 6 NON L'HO POTUTO GIRARE IO, e il motivo
+    è una serratura che ho messo io.** Creare una pratica (anche di
+    prova) passa da `inCollaudo`, che vuole la **chiave del
+    collaudatore** in un cookie firmato: ce l'ha il browser di Valerio
+    (l'ha presa una volta da `/api/check/prova/chiave?s=...`), non il
+    mio registratore. Sul sito vero `COLLAUDO_APERTO` è spento e in
+    questa sandbox non c'è Supabase, quindi da qui la pratica non nasce
+    in nessun modo. Due strade per il video: Valerio mette
+    `COLLAUDO_APERTO=1` su Netlify per cinque minuti (apre la cassa a
+    qualunque browser: il sito non lo conosce nessuno, è la sua stessa
+    scelta del 12/08) e io filmo tutto il giro; oppure lo cammina lui,
+    che la chiave ce l'ha già, ora che il blocco della pratica è tolto.
+    Fino ad allora è un limite del mio ambiente, non del prodotto: il
+    giro overbooking è provato sul sito vero fino al verdetto e al
+    bottone; la pratica la apre la stessa rotta del venditore.
+  - Prove: **verify verde** (build, tipi, lint e l'intera suite
+    Playwright, zero rosse). Le nuove stanno in
+    `prove/casistiche-pratica.spec.ts`: blindano i due fix (bottoni con
+    la sola cassa di prova, e la pratica che si apre anche su un volo
+    vero) perché si riaprono togliendo una parola.
 - **GIRO #67 (13/08): LA SKILL `video-review` E IL GIRO IN UN VIDEO SOLO.**
   Valerio, guardando gli undici filmati del giro prima: «perché
   moltissimi video sono uguali e si ripetono? Perché molti sono inutili,
