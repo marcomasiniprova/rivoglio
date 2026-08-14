@@ -5,20 +5,30 @@
  * nel reclamo con le condizioni REALI all'ora d'arrivo la neutralizza in
  * anticipo. Nessun concorrente italiano lo fa.
  *
- * INTERRUTTORE: l'API gratuita di Open-Meteo è per uso NON commerciale
- * (terms: "You may only use the free API services for non-commercial
- * purposes"). Il nostro è commerciale, e ATTENZIONE: l'endpoint storico
- * (archive) è incluso solo dal piano API Professional in su, circa
- * 99 USD/mese, non basta lo Standard da 29 (pricing ufficiale, verificato
- * 2026-08-08 dal sorgente del sito open-meteo). Il modulo resta SPENTO
- * finché Valerio non sottoscrive e non imposta OPENMETEO_COMMERCIALE=1.
- * Scelta sua dell'8/08, popup. Senza variabile, ogni chiamata restituisce
- * null e la lettera esce senza la riga meteo. Con l'abbonamento andrà
- * usato l'endpoint dedicato customer-archive-api.open-meteo.com con la
- * API key.
+ * INTERRUTTORE. Due strade, e il modulo resta SPENTO finché non se ne
+ * imposta una (senza, ogni chiamata torna null e la lettera esce senza la
+ * riga meteo: mai un errore).
+ *   1. OPENMETEO_URL: un Open-Meteo TUO, self-hosted (scelta di Valerio del
+ *      14/08, sul suo VPS). Es. "https://meteo.tuodominio.it". È compatibile
+ *      con l'API pubblica: stesso percorso /v1/archive, nessuna chiave. È la
+ *      via da preferire, perché non costa niente in più.
+ *   2. OPENMETEO_COMMERCIALE=1: l'API a pagamento di Open-Meteo. L'archivio
+ *      storico è incluso solo dal piano Professional in su, circa 99 USD/mese
+ *      (non basta lo Standard da 29, pricing ufficiale verificato 2026-08-08).
+ *      Con l'abbonamento va usato l'host dedicato, impostato in OPENMETEO_URL.
+ * A cosa serve, di nuovo: smontare la scusa del maltempo nella lettera di
+ * RISPOSTA a un no. Non cambia MAI un verdetto del check.
  */
 
-export const METEO_ATTIVO = process.env.OPENMETEO_COMMERCIALE === "1";
+/** La base dell'API meteo: il VPS di Valerio se impostato, altrimenti l'host
+ *  pubblico (che vale come ripiego solo con l'abbonamento commerciale). */
+const BASE_METEO = (process.env.OPENMETEO_URL ?? "https://archive-api.open-meteo.com").replace(
+  /\/+$/,
+  "",
+);
+
+export const METEO_ATTIVO =
+  Boolean(process.env.OPENMETEO_URL) || process.env.OPENMETEO_COMMERCIALE === "1";
 
 export type MeteoOrario = {
   descrizione: string;
@@ -60,7 +70,7 @@ export async function meteoStorico(
   if (!METEO_ATTIVO) return null;
   try {
     const url =
-      `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}` +
+      `${BASE_METEO}/v1/archive?latitude=${lat}&longitude=${lon}` +
       `&start_date=${dataIso}&end_date=${dataIso}` +
       `&hourly=temperature_2m,precipitation,windspeed_10m,weathercode&timezone=UTC`;
     const r = await fetch(url, { signal: AbortSignal.timeout(8000) });
