@@ -5,7 +5,7 @@ import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { headers } from "next/headers";
 import Risultato, { type DatiVerifica } from "@/components/verifica/Risultato";
-import { inCollaudo, passDi } from "@/lib/check/cancello";
+import { cassaDiProvaAperta, inCollaudo, passDi } from "@/lib/check/cancello";
 import { prezzoPagatoPerIlCheck, scontoDaCheck } from "@/lib/check/ingresso";
 import { COPY } from "@/lib/copy";
 import { listinoCorrente } from "@/lib/prezzi-server";
@@ -197,6 +197,7 @@ async function datiDemo(
         ? scadenzaStimata(fatto.dataLocale, fatto.vettoreOperativo)
         : null,
     checkout: checkoutConfigurato(),
+    cassaProva: cassaDiProvaAperta(),
     avvisoCheckout,
   };
 }
@@ -379,6 +380,15 @@ export default async function PaginaVerifica({
         ? scadenzaStimata(riga.data_locale, riga.voli?.vettore_operativo ?? riga.volo_iata)
         : null,
     checkout: cassePronte,
+    /* 🔴 LA CASSA DI PROVA VALE PER I VOLI VERI, NON SOLO PER GLI ZZ.
+       Valerio, 13/08: overbooking e coincidenza persa su un volo reale
+       (FR4001) davano il verdetto ma poi «pagamento non attivo», nessuna
+       pratica, nessun bottone famiglia. Il motivo: la pratica si apriva
+       solo per i demo o con Polar (che non c'è). Con la cassa di prova
+       aperta (COLLAUDO_APERTO) il checkout di un volo vero passa già di
+       lì; mancava solo dirlo al client, che qui sotto sblocca il flusso
+       completo — pratica, famiglia, cassa — anche fuori dai demo. */
+    cassaProva: cassaDiProvaAperta(),
     avvisoCheckout,
   };
 

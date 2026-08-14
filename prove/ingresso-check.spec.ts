@@ -298,6 +298,8 @@ test.describe("Nessuna porta di servizio sul muro", () => {
    * Aggiungere una voce qui è una decisione, non una svista.
    */
   const ESENTI: Record<string, string> = {
+    "app/api/leggi-carta/route.ts":
+      "l'OCR della carta d'imbarco è LIBERO di proposito (13/08): leggere la foto è compilazione, non l'analisi che si vende, e paywallarla faceva pagare per riempire un modulo e perdere il progresso dopo. Il muro scatta dopo, su /api/verifica. Mistral OCR costa pochissimo e la rotta resta dietro il freno per IP.",
     "app/api/motore/avvisa/route.ts":
       "lavoro notturno di Netlify, chiuso da MOTORE_SEGRETO: non lo chiama un utente",
     "app/api/motore/raccogli/route.ts":

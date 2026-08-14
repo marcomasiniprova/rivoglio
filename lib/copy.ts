@@ -33,7 +33,7 @@ import { euro } from "@/lib/prezzi";
  * sito promette gratis quello che fa pagare, o il contrario: sono la
  * stessa riga di codice.
  *
- * L'angolo, scelto da Valerio l'11/08: **meno di un caffè**. Il prezzo
+ * L'angolo, scelto da Valerio l'11/08: **meno di un cappuccino al bar**. Il prezzo
  * non si nasconde, si mette accanto alla cifra che vale il volo, dove
  * diventa piccolo da solo.
  */
@@ -192,7 +192,7 @@ export const COPY = {
     occhiello: "Lo scanner dei rimborsi",
     titolo: "Hai preso un volo nell'ultimo anno?",
     sottotitolo: seSiPaga(
-      `Forse ti devono fino a 600€. Scoprilo in 30 secondi: l'analisi costa ${PREZZO}, meno di un caffè.`,
+      `Forse ti devono fino a 600€. Scoprilo in 30 secondi: l'analisi costa ${PREZZO}, meno di un cappuccino al bar.`,
       "Forse ti devono fino a 600€. Controllalo gratis in 30 secondi.",
     ),
     /** Apre il "fino a 600€". */
@@ -228,7 +228,7 @@ export const COPY = {
       },
     },
     puntiFiducia: [
-      seSiPaga(`L'analisi costa ${PREZZO}: meno di un caffè`, "Il check è gratis, sempre"),
+      seSiPaga(`L'analisi costa ${PREZZO}: meno di un cappuccino al bar`, "Il check è gratis, sempre"),
       "Nessuna percentuale sulla compensazione",
       "Se la compagnia non paga, non paghi neanche tu",
     ],
@@ -394,7 +394,7 @@ export const COPY = {
         prezzo: seSiPaga(PREZZO, "0€"),
         periodo: seSiPaga("per volo", "per sempre"),
         rassicurazione: seSiPaga(
-          "Meno di un caffè. E se poi apri la pratica, questi euro si scalano dal prezzo: il totale non cambia.",
+          "Meno di un cappuccino al bar. E se poi apri la pratica, questi euro si scalano dal prezzo: il totale non cambia.",
           "Niente carta, niente account. Paghi solo se decidi di aprire la pratica.",
         ),
         descrizione:
@@ -702,11 +702,14 @@ export const COPY = {
      * gate: si apre da un invito discreto sotto il verdetto.
      */
     dichiara: {
-      invito: "Ti hanno lasciato a terra o hai perso una coincidenza?",
+      /* 🔴 Le due domande non si capivano (Valerio, 13/08): «il tuo aereo
+         può risultare in orario» è vero ma astratto, e «ho perso una
+         coincidenza» non dice di che coincidenza. Riscritte concrete. */
+      invito: "A volte il volo risulta puntuale ma tu sei rimasto a terra lo stesso. È il tuo caso?",
       invitoSotto:
-        "Sono casi che gli archivi di volo non vedono: il tuo aereo può risultare in orario. Dimmelo tu e ti dico se ti spetta qualcosa.",
+        "Succede in due modi, e la legge te li riconosce entrambi. Dimmi quale, e ti dico se ti spetta qualcosa.",
       negato: {
-        scheda: "Mi hanno lasciato a terra",
+        scheda: "Non mi hanno fatto salire (overbooking)",
         titolo: "Negato imbarco",
         presenza: {
           domanda: "Ti sei presentato all'imbarco in orario, con prenotazione confermata?",
@@ -731,7 +734,7 @@ export const COPY = {
         },
       },
       coincidenza: {
-        scheda: "Ho perso una coincidenza",
+        scheda: "Ho perso il volo dopo per colpa di questo",
         titolo: "Coincidenza persa",
         unica: {
           domanda: "I voli erano sulla stessa prenotazione?",
@@ -1413,7 +1416,7 @@ export const COPY = {
     disclaimer:
       "Rivolio genera documenti a partire da dati di volo verificati. Non è un intermediario, non offre consulenza legale, non incassa per conto tuo e non chiede la cessione del credito. Il reclamo lo invii tu, dalla tua email. Gli importi indicati sono le fasce del Regolamento CE 261/2004: l'esito della richiesta dipende dalla compagnia.",
     /** L'indirizzo vivo oggi: si cambia in uno @rivolio quando c'è il dominio. */
-    supporto: { etichetta: "Supporto", email: "valerio@artecai.it" },
+    supporto: { etichetta: "Supporto", email: "team@rivolio.it" },
     copyright: "© 2026 Rivolio",
   },
 } as const;

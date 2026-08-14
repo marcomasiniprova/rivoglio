@@ -29,16 +29,28 @@ const RADICE = join(__dirname, "..");
 const leggi = (p: string) => readFileSync(join(RADICE, p), "utf8");
 
 test.describe("Il muro, anche di lato", () => {
-  test("le porte laterali chiedono al REGISTRO, non al cookie", () => {
-    for (const file of ["app/api/leggi-carta/route.ts", "app/api/voli-tratta/route.ts"]) {
-      const testo = leggi(file);
-      expect(testo, `${file} deve usare passUsabile, che consulta il registro`).toContain(
-        "passUsabile",
-      );
-      /* `passDi` da solo guarda il cookie e basta: su queste due porte
-         non deve più comparire. */
-      expect(testo, `${file} non deve fidarsi del solo cookie`).not.toMatch(/\bpassDi\s*\(/);
-    }
+  test("la ricerca per tratta chiede al REGISTRO, non al cookie", () => {
+    /* ⚠️ /api/leggi-carta NON è più in questa lista, ed è voluto: dal
+       13/08 l'OCR della carta d'imbarco è LIBERO. Leggere la foto non è
+       l'analisi che si vende, è solo un modo di scrivere volo e data;
+       paywallarla faceva pagare per compilare un modulo e perdere il
+       progresso dopo (Valerio, 13/08). Resta protetta dal freno per IP,
+       non dal muro. Il muro vero è sull'analisi (/api/verifica) e sulla
+       ricerca per tratta, che espone gli orari veri. */
+    const file = "app/api/voli-tratta/route.ts";
+    const testo = leggi(file);
+    expect(testo, `${file} deve usare passUsabile, che consulta il registro`).toContain(
+      "passUsabile",
+    );
+    expect(testo, `${file} non deve fidarsi del solo cookie`).not.toMatch(/\bpassDi\s*\(/);
+  });
+
+  test("l'OCR della carta d'imbarco è libero ma con freno per IP", () => {
+    /* Libero di proposito, ma non spalancato: un tetto per IP impedisce
+       che diventi un servizio OCR gratuito a nostre spese. */
+    const testo = leggi("app/api/leggi-carta/route.ts");
+    expect(testo, "l'OCR non deve più avere il muro").not.toContain("passUsabile");
+    expect(testo, "l'OCR resta dietro il freno per IP").toContain("oltreIlLimiteCondiviso");
   });
 
   test("passUsabile esiste e passa dal registro", () => {

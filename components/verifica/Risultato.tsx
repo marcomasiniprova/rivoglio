@@ -92,6 +92,14 @@ export type DatiVerifica = {
   scadenza: { dataStimata: string; avvertenza: string } | null;
   /** Quali checkout link Polar sono configurati lato server. */
   checkout: { singola: boolean; famiglia: boolean };
+  /**
+   * La cassa di prova è aperta (COLLAUDO_APERTO o CASSA_PROVA_SEGRETO).
+   * Quando è vera, la pratica si può aprire anche su un volo VERO senza
+   * Polar: il checkout passa dalla cassa finta. Senza questo, overbooking
+   * e coincidenza persa su un volo reale mostravano «pagamento non
+   * attivo» e non aprivano niente (Valerio, 13/08).
+   */
+  cassaProva: boolean;
   /** Rimbalzo dalla rotta di checkout: cosa dire e perché. */
   avvisoCheckout: "demo" | "non-attivo" | "errore" | "recesso" | null;
 };
@@ -400,7 +408,7 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
       ? riempi(t.titoloTemplate, { ritardo })
       : null;
   const avviso = dati.avvisoCheckout;
-  const compraSingola = dati.demo || dati.checkout.singola;
+  const compraSingola = dati.demo || dati.checkout.singola || dati.cassaProva;
 
   const testoAvviso =
     avviso === "demo"
@@ -611,7 +619,7 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
      (senza riga nel database) non c'è niente a cui agganciarla. */
   const serveEmail = Boolean(dati.idVerifica) && !dati.emailGiaData;
 
-  const compraFamiglia = dati.demo || dati.checkout.famiglia;
+  const compraFamiglia = dati.demo || dati.checkout.famiglia || dati.cassaProva;
 
   async function vai(tipo: "singola" | "famiglia") {
     if (inCorso) return;

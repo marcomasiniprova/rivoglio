@@ -25,7 +25,7 @@ export default function PaginaPrivacy() {
       <h2>Chi è il titolare</h2>
       <p>
         Il titolare del trattamento è il gestore di Rivolio, contattabile all&apos;indirizzo{" "}
-        <a href="mailto:valerio@artecai.it">valerio@artecai.it</a>. Rivolio è un progetto in
+        <a href="mailto:team@rivolio.it">team@rivolio.it</a>. Rivolio è un progetto in
         fase di avvio: questa informativa sarà integrata con i dati societari completi appena
         l&apos;attività sarà formalizzata.
       </p>
@@ -144,7 +144,7 @@ export default function PaginaPrivacy() {
         Hai il diritto di chiederci l&apos;accesso ai tuoi dati, la rettifica, la
         cancellazione, la limitazione del trattamento, la portabilità, e di opporti al
         trattamento (artt. 15-22 GDPR). Per esercitarli scrivi a{" "}
-        <a href="mailto:valerio@artecai.it">valerio@artecai.it</a>: rispondiamo entro 30
+        <a href="mailto:team@rivolio.it">team@rivolio.it</a>: rispondiamo entro 30
         giorni. Se pensi che qualcosa non vada, hai anche il diritto di presentare reclamo al
         Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" target="_blank" rel="noopener noreferrer">garanteprivacy.it</a>).
       </p>

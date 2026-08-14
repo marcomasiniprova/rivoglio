@@ -91,7 +91,7 @@ export default function PaginaRimborsi() {
       </ul>
       <p>
         In tutti questi casi scrivi a{" "}
-        <a href="mailto:valerio@artecai.it">valerio@artecai.it</a> con il numero del volo e la
+        <a href="mailto:team@rivolio.it">team@rivolio.it</a> con il numero del volo e la
         data. Rispondiamo entro 5 giorni lavorativi e, se il rimborso spetta, i soldi tornano
         sullo stesso metodo con cui hai pagato entro 14 giorni.
       </p>

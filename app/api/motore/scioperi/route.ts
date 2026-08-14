@@ -26,7 +26,7 @@ import { mandaTelegram, TELEGRAM_ATTIVO } from "@/lib/telegram";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const DESTINATARIO = process.env.ALERT_EMAIL ?? "valerio@artecai.it";
+const DESTINATARIO = process.env.ALERT_EMAIL ?? "team@rivolio.it";
 
 async function avvisa(oggetto: string, righe: string[]) {
   const testo = righe.join("\n");

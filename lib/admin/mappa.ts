@@ -368,7 +368,7 @@ export const NODI: Nodo[] = [
     titolo: "Le email",
     riga: "Resend su send.rivolio.it. Da verificare.",
     dentro:
-      "Servono per la conferma dell'Osservatorio, per l'accesso senza password e per le tappe della pratica. ⚠️ Finché il dominio non è verificato partono SOLO verso valerio@artecai.it: lo decide Resend, non il nostro codice. E finché non c'è il gancio di Supabase, le email di accesso hanno un tetto di 2 all'ora per tutto il progetto.",
+      "Servono per la conferma dell'Osservatorio, per l'accesso senza password e per le tappe della pratica. ⚠️ Finché il dominio non è verificato partono SOLO verso la casella che possiede l'account Resend: lo decide Resend, non il nostro codice. E finché non c'è il gancio di Supabase, le email di accesso hanno un tetto di 2 all'ora per tutto il progetto.",
     stato: "spento",
     icona: "busta",
     x: 78,

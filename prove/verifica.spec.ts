@@ -99,7 +99,8 @@ test.describe("La pagina del risultato (id demo, senza chiavi)", () => {
     // il ritardo, bene in vista nel titolo (200 minuti, formato leggibile)
     await expect(page.getByText(/3 h e 20 min/).first()).toBeVisible();
     // la scadenza è una stima DICHIARATA: l'avvertenza del motore c'è
-    await expect(page.getByText(/Stima prudente/).first()).toBeVisible();
+    // (dal 13/08 il termine è 2 anni, il più corto: mai sovrastimare)
+    await expect(page.getByText(/termine.*2 anni|non è un parere legale/i).first()).toBeVisible();
     // il badge demo, onesto e visibile
     await expect(page.getByText(COPY.comune.demo).first()).toBeVisible();
     // la card condivisibile col suo bottone

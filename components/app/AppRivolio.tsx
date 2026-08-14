@@ -327,7 +327,7 @@ export default function AppRivolio({
                 {P.voci.condizioni}
               </Link>
               <a
-                href="mailto:valerio@artecai.it"
+                href="mailto:team@rivolio.it"
                 className="text-fumo transition-colors hover:text-inchiostro"
               >
                 {P.voci.supporto}

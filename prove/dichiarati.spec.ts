@@ -68,7 +68,7 @@ test.describe("Casi dichiarati", () => {
   test("l'invito compare sotto un verdetto non idoneo", async ({ page }) => {
     await page.goto("/verifica/demo-ZZ180-2026-08-05");
     await expect(
-      page.getByText("Ti hanno lasciato a terra o hai perso una coincidenza?"),
+      page.getByText("sei rimasto a terra lo stesso", { exact: false }),
     ).toBeVisible({ timeout: 15_000 });
   });
 });

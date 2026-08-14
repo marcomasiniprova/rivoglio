@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
-import { passUsabile, rispostaMuro } from "@/lib/check/cancello";
-import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { estraiCampi, testoDaDocumento } from "@/lib/ocr/carta-imbarco";
 
 /**
@@ -46,18 +44,21 @@ export async function POST(req: Request) {
     );
   }
 
-  /* IL CANCELLO. Questa rotta non dà verdetti, ma **costa a chiamata**:
-     ogni foto è una richiesta a Mistral che paghiamo noi. Lasciata aperta
-     col muro acceso, Rivolio diventa un servizio di lettura documenti
-     gratuito per chiunque, e il conto arriva a noi. Il tetto per IP non
-     basta: vive nella memoria della singola funzione Netlify, quindi con
-     dieci istanze in parallelo sono dieci tetti diversi. */
-  /* 🔴 QUI SI GUARDAVA IL SOLO COOKIE, e il cookie si copia: bastava
-     salvarne il valore prima di usare l'analisi e rimetterlo dopo per
-     avere trenta giorni di letture illimitate, che paghiamo a chiamata.
-     `passUsabile` chiede al REGISTRO se quel credito è ancora vivo.
-     Trovato dall'ispezione del 12/08. */
-  if (CHECK_A_PAGAMENTO && !(await passUsabile(req))) return rispostaMuro(req);
+  /* 🔴 QUI PRIMA C'ERA IL MURO, e faceva perdere tutto il progresso.
+     Valerio, 13/08: «quando carico la foto per il check mi fa pagare e mi
+     toglie il progresso fatto all'inizio». Aveva ragione, ed era un
+     difetto di prodotto, non solo di UX: leggere la carta d'imbarco NON è
+     l'analisi che si vende, è solo un modo di scrivere volo e data al
+     posto tuo. Paywallarla vuol dire farti pagare per compilare un
+     modulo, e per giunta prima di sapere se il volo è idoneo. Se poi
+     l'OCR sbaglia, hai pagato per niente.
+     Adesso l'OCR è libero: legge la foto, riempie volo e data, e il muro
+     scatta DOPO, sull'analisi vera (/api/verifica), esattamente come per
+     chi scrive il numero a mano. Così il percorso è uno solo: metti i
+     dati (a mano o da foto) → muro → paghi → l'analisi riparte da dove
+     eri, coi dati già dentro (vedi lib/check/ripresa.ts).
+     ⚠️ Resta protetta dall'abuso: il tetto per IP (`carta`, freno
+     condiviso) e il fatto che Mistral qui legge solo carte d'imbarco. */
 
   let corpo: unknown;
   try {

@@ -196,9 +196,14 @@ export function invioConfermato(
 ): Promise<Esito> {
   return spedisci({
     a,
-    oggetto: `Reclamo ${d.volo}: registrato. Adesso tocca a loro.`,
+    /* 🔴 L'OGGETTO GUIDAVA COL CODICE DEL VOLO («Reclamo ZZ600:
+       registrato»), che è un codice da pilota: nessuno legge «ZZ600» e
+       capisce di che si tratta (Valerio, 13/08: «non si capisce un
+       cazzo»). Regola del progetto: parlare di cose, non di codici. Ora
+       l'oggetto dice cosa è successo, in italiano. */
+    oggetto: "Reclamo inviato: adesso la palla è alla compagnia",
     html: vestito({
-      titolo: "Reclamo registrato",
+      titolo: "Reclamo inviato",
       corpo:
         h("Il reclamo è partito. Da qui in poi ci pensiamo noi.") +
         p(

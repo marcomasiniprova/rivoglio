@@ -21,7 +21,7 @@ export default function PaginaCondizioni() {
       <p>
         Queste condizioni regolano l&apos;uso di Rivolio. Usando il sito le accetti. Sono
         scritte per essere capite: se qualcosa non torna, scrivici a{" "}
-        <a href="mailto:valerio@artecai.it">valerio@artecai.it</a>.
+        <a href="mailto:team@rivolio.it">team@rivolio.it</a>.
       </p>
 
       <h2>Cosa fa Rivolio</h2>

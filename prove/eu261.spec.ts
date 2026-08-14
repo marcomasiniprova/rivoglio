@@ -79,13 +79,17 @@ test.describe("Motore EU261 — golden set", () => {
     }
   });
 
-  test("la scadenza è una stima dichiarata, con l'avvertenza", () => {
+  test("🔴 la scadenza è SEMPRE il termine più corto (2 anni), mai 5", () => {
+    /* Cinque anni era il termine spagnolo applicato a chiunque non fosse
+       italiano: a un volo soggetto alla legge italiana (2 anni) prometteva
+       tre anni di troppo, e chi si fidava perdeva il diritto. Adesso il
+       termine è 2 anni per tutti. */
     const ita = scadenzaStimata("2026-07-15", "AZ");
     expect(ita.anni).toBe(2);
     expect(ita.dataStimata).toBe("2028-07-15");
     const estero = scadenzaStimata("2024-08-01", "FR");
-    expect(estero.anni).toBe(5);
-    expect(estero.dataStimata).toBe("2029-08-01");
+    expect(estero.anni).toBe(2);
+    expect(estero.dataStimata).toBe("2026-08-01");
     expect(ita.avvertenza.length).toBeGreaterThan(10);
   });
 });

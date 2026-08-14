@@ -23,28 +23,30 @@ const CHIAVE = process.env.RESEND_API_KEY ?? "";
 export const POSTA_ATTIVA = Boolean(CHIAVE);
 
 /**
- * Il mittente. Il NOME mostrato è una persona, non un marchio (scelta di
- * Valerio, 9/08): "Valerio di Rivolio" apre più di "Rivolio", e chi
- * risponde trova qualcuno dall'altra parte.
+ * Il mittente.
  *
- * L'INDIRIZZO invece resta quello di prova di Resend finché il dominio
- * non è verificato: da lì si può spedire solo al proprietario
- * dell'account.
+ * 🔴 IL NOME È «Valerio dal team di Rivolio», NON «Valerio di Rivolio»
+ * (scelta di Valerio, 13/08). Il perché è preciso: «Valerio di Rivolio»
+ * fa sembrare che dietro ci sia una persona sola, e chi si arrabbia gli
+ * scrive addosso trentamila email personali. «dal team di Rivolio» tiene
+ * il tocco umano (c'è un nome, non un marchio anonimo) ma dice che c'è
+ * una squadra, e nessuna casella personale finisce sotto gli occhi.
  *
- * 🔴 E IL DOMINIO VERIFICATO NON È `rivolio.it`, È `send.rivolio.it`.
- * Qui sopra c'era scritto di mettere `valerio@rivolio.it`, e sarebbe
- * stato il modo più veloce di fermare TUTTE le email del progetto:
- * Resend spedisce solo da un dominio che ha verificato, e quello
- * verificato il 12/08 è il sottodominio. Un mittente sul dominio
- * principale si becca un rifiuto secco a ogni invio, e siccome
- * `spedisci` non lancia mai, il rifiuto finirebbe solo nei log: nessuno
- * riceve niente e nessuno se ne accorge.
+ * L'INDIRIZZO è `team@rivolio.it` (casella condivisa, inoltrata a
+ * Valerio). Prima era `valerio@...`, che è esattamente quello che non
+ * vogliamo far vedere.
  *
- * Su Netlify va quindi:
- *   RESEND_MITTENTE = "Valerio di Rivolio <valerio@send.rivolio.it>"
+ * ⚠️ Resend spedisce solo da un dominio che ha verificato. Il 12/08 il
+ * verificato era `send.rivolio.it`; il giorno che `rivolio.it` è
+ * verificato l'indirizzo diventa `team@rivolio.it`. Un mittente su un
+ * dominio non verificato si becca un rifiuto a ogni invio, e siccome
+ * `spedisci` non lancia mai, nessuno riceve niente e nessuno se ne
+ * accorge. Quindi il valore vero lo mette Valerio su Netlify:
+ *   RESEND_MITTENTE = "Valerio dal team di Rivolio <team@send.rivolio.it>"
+ * e, quando rivolio.it è verificato, "<team@rivolio.it>".
  */
 export const MITTENTE =
-  process.env.RESEND_MITTENTE ?? "Valerio di Rivolio <onboarding@resend.dev>";
+  process.env.RESEND_MITTENTE ?? "Valerio dal team di Rivolio <onboarding@resend.dev>";
 
 /**
  * DOVE ARRIVA LA RISPOSTA, che è una cosa diversa da chi manda.

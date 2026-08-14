@@ -322,17 +322,33 @@ export function scadenzaStimata(dataVolo: string, vettoreOperativo: string): {
   dataStimata: string;
   avvertenza: string;
 } {
-  const v = vettoreOperativo.toUpperCase();
-  // Vettori con sede in Italia: prescrizione biennale (art. 949 cod. nav.).
-  const italiani = ["AZ", "ITA", "XZ", "AEROITALIA", "ITA AIRWAYS"];
-  const anni = italiani.some((c) => v.includes(c)) ? 2 : 5;
+  /* 🔴 PRIMA QUI USCIVA «5 ANNI» PER QUASI TUTTI, ed era un errore che
+     poteva far perdere il diritto a un cliente. Cinque anni è il termine
+     SPAGNOLO, sommato alla cieca a chiunque non fosse una compagnia
+     italiana: a un volo soggetto alla legge italiana, dove la
+     prescrizione è di DUE anni (art. 2951 c.c. per il trasporto, in
+     linea con l'art. 35 della Convenzione di Montreal), diceva che aveva
+     tre anni in più di quelli veri. Se uno si fida di quella data e
+     aspetta, il termine scade e i soldi svaniscono. Segnalato da Valerio
+     il 13/08.
+
+     La regola scelta (col popup): si mostra SEMPRE il termine più corto
+     che può applicarsi, mai uno più lungo. Sottostimare fa solo muovere
+     prima; sovrastimare fa perdere il diritto. Per il nostro mercato
+     (voli che toccano l'Italia) il termine è 2 anni, ed è anche il più
+     prudente per gli altri casi: il paese esatto e il giudice competente
+     non li sappiamo qui, e non si tira a indovinare al rialzo.
+     ⚠️ Non dipende più dalla compagnia: `vettoreOperativo` resta nella
+     firma solo per non toccare i chiamanti, ma non decide più niente. */
+  void vettoreOperativo;
+  const anni = 2;
   const d = new Date(dataVolo + "T12:00:00Z");
   d.setUTCFullYear(d.getUTCFullYear() + anni);
   return {
     anni,
     dataStimata: d.toISOString().slice(0, 10),
     avvertenza:
-      "Stima prudente: i termini dipendono dal paese della compagnia e dal giudice competente. Non è un parere legale.",
+      "In Italia il termine per chiedere la compensazione è di 2 anni dal volo. In qualche paese è più corto: se il tuo volo non parte né arriva in Italia, muoviti presto. Non è un parere legale.",
   };
 }
 

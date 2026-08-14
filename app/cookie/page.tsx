@@ -58,7 +58,7 @@ export default function PaginaCookie() {
         anonimizzate), prima aggiorneremo questa pagina e ti chiederemo il consenso con un
         banner, come prevede la legge. La versione e la data in testa alla pagina ti dicono
         sempre cosa stai leggendo. Per domande:{" "}
-        <a href="mailto:valerio@artecai.it">valerio@artecai.it</a>.
+        <a href="mailto:team@rivolio.it">team@rivolio.it</a>.
       </p>
     </PaginaLegale>
   );
