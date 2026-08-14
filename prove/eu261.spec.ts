@@ -64,6 +64,12 @@ test.describe("Motore EU261 — golden set", () => {
       ZZ10: { esito: "non_idoneo" },
       ZZ777: { esito: "incerto" },
       ZZ404: { esito: "incerto" },
+      /* La coppia della coincidenza a due tratte (14/08): DA SOLI sono tutti
+         e due non idonei (ZZ501 ha 40 minuti di ritardo, sotto soglia; ZZ502
+         è in orario). La coincidenza persa vale solo leggendoli INSIEME, ed è
+         provata in coincidenza-due-tratte.spec.ts, non qui. */
+      ZZ501: { esito: "non_idoneo" },
+      ZZ502: { esito: "non_idoneo" },
     };
     expect(Object.keys(attesi).sort()).toEqual(VOLI_DEMO.map((v) => v.voloIata).sort());
 
