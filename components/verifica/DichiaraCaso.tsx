@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { COPY } from "@/lib/copy";
 
@@ -96,6 +97,7 @@ export default function DichiaraCaso({
   const [invio, setInvio] = useState(false);
   const [esito, setEsito] = useState<Esito | null>(null);
   const [errore, setErrore] = useState("");
+  const router = useRouter();
 
   /* Il prezzo digitato, in numero: la virgola all'italiana compresa. */
   const prezzoNum = Number(prezzo.replace(/[^\d.,]/g, "").replace(",", "."));
@@ -130,7 +132,13 @@ export default function DichiaraCaso({
         return;
       }
       if (idVerifica && d.esito !== "incerto") {
-        window.location.reload();
+        /* 🔴 PRIMA QUI C'ERA window.location.reload(), e rifaceva partire
+           la scenetta dello scanner del biglietto per qualche secondo:
+           sembrava un bug o un crash (Valerio, 14/08). Adesso è un
+           aggiornamento morbido: il server rilegge il verdetto appena
+           dichiarato e la pagina si aggiorna sul posto, senza ricaricare e
+           senza rimontare le animazioni. */
+        router.refresh();
         return;
       }
       setEsito({ esito: d.esito, motivo: d.motivo, importo: d.importo });

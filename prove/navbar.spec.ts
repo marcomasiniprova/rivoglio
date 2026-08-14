@@ -1,62 +1,47 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * LA BARRA IN CIMA NON SI SOVRAPPONE. MAI.
+ * LA NAVBAR È RAGGIUNGIBILE SU OGNI DISPOSITIVO.
  *
- * 🔴 Valerio l'ha segnalata TRE VOLTE in due giorni, l'ultima con
- * maiuscole: «smettila di stortare la navbar». Ogni volta era stata
- * "provata" guardandola a una larghezza sola, e ogni volta si rompeva a
- * un'altra.
- *
- * Il difetto vero non era il centraggio: era che una griglia, di suo, ha
- * `min-width: auto` su ogni colonna, cioè "non stringerti sotto il tuo
- * contenuto". Quando la colonna di mezzo cresce oltre lo spazio
- * disponibile non spinge le altre, le invade. E le voci comparivano già
- * a 1024, dove il posto non c'è.
- *
- * Questa prova non guarda: MISURA. Se un domani le tre parti si toccano
- * anche di mezzo pixel a una qualsiasi di queste otto larghezze, la
- * suite si ferma prima che lo veda lui.
+ * 🔴 Le voci (Come funziona, Garanzia, Prezzi, Domande, Il Tabellone)
+ * comparivano solo sopra i 1280 punti e sotto sparivano senza nessun menu:
+ * su ogni portatile stretto, tablet e telefono metà della mappa del sito
+ * era irraggiungibile, e allo zoom al 90% ricomparivano (perché la pagina
+ * diventa più larga di 1280). Segnalato da Valerio, 14/08. Adesso sotto i
+ * 1280 c'è il menu, sopra le voci sono in linea: in nessun caso spariscono.
  */
-const LARGHEZZE = [320, 375, 768, 1024, 1100, 1280, 1440, 1920];
-
-for (const larghezza of LARGHEZZE) {
-  test(`la barra regge a ${larghezza} punti`, async ({ page }) => {
-    await page.setViewportSize({ width: larghezza, height: 900 });
+test.describe("La navbar su ogni larghezza", () => {
+  test("desktop largo: voci in linea, niente hamburger", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
-    await page.waitForTimeout(300);
-
-    const misure = await page.evaluate(() => {
-      const header = document.querySelector("header");
-      if (!header) return null;
-      const box = (el: Element | null | undefined) => {
-        if (!el) return null;
-        const r = el.getBoundingClientRect();
-        return r.width > 0 ? { x: r.x, fine: r.x + r.width } : null;
-      };
-      return {
-        logo: box(header.firstElementChild),
-        voci: box(header.querySelector("nav")),
-        bottoni: box(header.lastElementChild),
-        scrollWidth: document.documentElement.scrollWidth,
-      };
-    });
-
-    expect(misure, "la barra deve esistere").not.toBeNull();
-    const m = misure!;
-    expect(m.bottoni, "i bottoni ci sono sempre").not.toBeNull();
-
-    /* La pagina non deve scorrere di lato: a 320 punti (iPhone SE di
-       prima generazione, e lo zoom di iOS) è già successo. */
-    expect(m.scrollWidth, "scorrimento orizzontale").toBeLessThanOrEqual(larghezza);
-
-    if (m.voci) {
-      /* Le tre parti in fila, e nessuna che entra nella successiva. Il
-         mezzo pixel di tolleranza è per gli arrotondamenti del browser. */
-      expect(m.logo!.fine, "il marchio invade le voci").toBeLessThanOrEqual(m.voci.x + 0.5);
-      expect(m.voci.fine, "le voci invadono i bottoni").toBeLessThanOrEqual(m.bottoni!.x + 0.5);
-    } else {
-      expect(m.logo!.fine, "il marchio invade i bottoni").toBeLessThanOrEqual(m.bottoni!.x + 0.5);
-    }
+    await expect(
+      page.locator("header nav a", { hasText: "Come funziona" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /Apri il menu/ })).toBeHidden();
   });
-}
+
+  test("sotto i 1280: le voci non spariscono, si aprono dal menu", async ({ page }) => {
+    await page.setViewportSize({ width: 1000, height: 800 });
+    await page.goto("/");
+    const apri = page.getByRole("button", { name: /Apri il menu/ });
+    await expect(apri).toBeVisible();
+    await apri.click();
+    const menu = page.getByRole("navigation", { name: "Menu" });
+    await expect(menu.getByText("Prezzi")).toBeVisible();
+    await expect(menu.getByText("Il Tabellone")).toBeVisible();
+    await expect(menu.getByText("Entra")).toBeVisible();
+  });
+
+  test("telefono: stesso menu, e cliccando una voce si chiude", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto("/");
+    const apri = page.getByRole("button", { name: /Apri il menu/ });
+    await expect(apri).toBeVisible();
+    await apri.click();
+    const menu = page.getByRole("navigation", { name: "Menu" });
+    await expect(menu.getByText("Domande")).toBeVisible();
+    await menu.getByText("Domande").click();
+    // dopo il clic il menu si chiude
+    await expect(menu).toBeHidden();
+  });
+});

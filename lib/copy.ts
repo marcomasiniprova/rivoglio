@@ -49,6 +49,11 @@ export const COPY = {
     regolamento: "Regolamento CE 261/2004",
     caricamento: "Un attimo.",
     erroreGenerico: "Qualcosa non ha funzionato. Riprova tra poco.",
+    /* Il messaggio CALMO quando il collegamento è lento o cade: niente
+       "qualcosa non ha funzionato" in rosso, che si legge come un crash
+       (Valerio, 14/08). Il check riprova già da solo una volta prima di
+       mostrarlo, e resta un bottone per riprovare a mano. */
+    erroreRete: "Il collegamento è lento in questo momento. Ci riprovo, e se vuoi puoi riprovare tu tra un attimo.",
     riprova: "Riprova",
     chiudi: "Chiudi",
     apriIlConto: "Come nasce questa cifra",

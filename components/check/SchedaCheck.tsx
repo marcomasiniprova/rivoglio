@@ -33,6 +33,50 @@ type Modo = "tratta" | "numero";
 
 const attesa = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * LA RICHIESTA CHE NON SI ARRENDE AL PRIMO INTOPPO.
+ *
+ * 🔴 «NON DEVE MAI RICEVERE ERRORI ROSSI E BUG O CRASH» (Valerio, 14/08,
+ * con lo screenshot di FR4001 che dà "Qualcosa non ha funzionato").
+ *
+ * Il collegamento può essere lento o cadere per un attimo, e su Netlify una
+ * funzione lenta viene interrotta: senza rete di sicurezza l'utente vede un
+ * errore rosso da crash proprio dopo aver premuto un bottone. Questo
+ * involucro dà un tetto di tempo alla richiesta e, se salta per la rete o
+ * per un guasto passeggero del server (5xx), riprova UNA volta da solo
+ * prima di arrendersi.
+ *
+ * ⚠️ Un 4xx (muro, volo non trovato, troppe richieste) NON è un guasto: è
+ * una risposta vera del server, e riprovare non cambierebbe niente. Quello
+ * torna subito al chiamante, che lo mostra con calma.
+ */
+const TIMEOUT_MS = 20_000;
+
+async function richiestaResiliente(url: string, opzioni: RequestInit): Promise<Response> {
+  let ultimo: unknown = null;
+  for (let tentativo = 0; tentativo < 2; tentativo++) {
+    if (tentativo > 0) await attesa(700);
+    const ctrl = new AbortController();
+    const stop = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+    try {
+      const r = await fetch(url, { ...opzioni, signal: ctrl.signal });
+      clearTimeout(stop);
+      /* 5xx = guasto passeggero del server: al primo colpo vale la pena
+         riprovare; al secondo si consegna comunque, e lo gestisce il
+         chiamante con un messaggio calmo. */
+      if (r.status >= 500 && tentativo === 0) {
+        ultimo = new Error(`http ${r.status}`);
+        continue;
+      }
+      return r;
+    } catch (e) {
+      clearTimeout(stop);
+      ultimo = e; // rete giù o timeout: si riprova, se restano tentativi
+    }
+  }
+  throw ultimo ?? new Error("richiesta fallita");
+}
+
 /* L'analisi profonda (scelta di Valerio, 8/08): la sequenza non si taglia
    MAI, nemmeno se il server risponde subito. */
 const PASSO_MS = 2400;
@@ -210,7 +254,13 @@ export default function SchedaCheck() {
      Se un giorno il muro dipendesse da una decisione presa nel browser,
      lo scavalcherebbe chiunque apra gli strumenti per sviluppatori. */
   const [muro, setMuro] = useState<DatiMuro | null>(null);
-  const [avviso, setAvviso] = useState<{ testo: string; demo: boolean } | null>(null);
+  /* `riprova`: presente solo quando ha senso riprovare (rete o guasto
+     passeggero del server), non su un volo che non esiste. */
+  const [avviso, setAvviso] = useState<{
+    testo: string;
+    demo: boolean;
+    riprova?: () => void;
+  } | null>(null);
   const inCorso = useRef(false);
 
   // il numero
@@ -270,7 +320,7 @@ export default function SchedaCheck() {
     })();
 
     try {
-      const r = await fetch("/api/verifica", {
+      const r = await richiestaResiliente("/api/verifica", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ volo: voloDaControllare.trim(), data: giornoIso }),
@@ -319,8 +369,19 @@ export default function SchedaCheck() {
       }
 
       if (!r.ok || !dati?.ok) {
+        /* 🔴 Niente più riga rossa da crash. Se il volo non si trova (o il
+           server dice il perché con calma), si mostra quel messaggio; se è
+           un guasto passeggero del server (5xx), si offre di riprovare,
+           perché lì riprovare serve davvero. Mai rosso, mai "qualcosa non
+           ha funzionato". */
         setFase("campo");
-        setErrore(typeof dati?.errore === "string" ? dati.errore : COPY.comune.erroreGenerico);
+        const guasto = r.status >= 500;
+        setAvviso({
+          testo:
+            typeof dati?.errore === "string" && !guasto ? dati.errore : COPY.comune.erroreRete,
+          demo: false,
+          riprova: guasto ? () => void avvia(voloDaControllare, giornoIso) : undefined,
+        });
         inCorso.current = false;
         return;
       }
@@ -345,8 +406,14 @@ export default function SchedaCheck() {
       sessionStorage.setItem("rivolio-scan-fatto", "1");
       router.push(destinazione);
     } catch {
+      /* Rete giù o timeout, anche dopo la riprova automatica: messaggio
+         calmo col bottone per riprovare a mano. Mai rosso. */
       setFase("campo");
-      setErrore(COPY.comune.erroreGenerico);
+      setAvviso({
+        testo: COPY.comune.erroreRete,
+        demo: false,
+        riprova: () => void avvia(voloDaControllare, giornoIso),
+      });
       inCorso.current = false;
     }
   }
@@ -396,6 +463,7 @@ export default function SchedaCheck() {
   async function cercaTratta(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErrore(null);
+    setAvviso(null);
     setTrovati(null);
     if (!da) return setErrore(CHECK.tratta.errori.partenza);
     if (!a) return setErrore(CHECK.tratta.errori.arrivo);
@@ -404,20 +472,23 @@ export default function SchedaCheck() {
 
     setCercaInCorso(true);
     try {
-      const r = await fetch(
+      const r = await richiestaResiliente(
         `/api/voli-tratta?da=${da.iata}&a=${a.iata}&data=${encodeURIComponent(giorno)}`,
+        {},
       );
       const j = await r.json().catch(() => null);
       setCercaInCorso(false);
       if (!r.ok || !j?.ok) {
-        setErrore(typeof j?.errore === "string" ? j.errore : COPY.comune.erroreGenerico);
+        /* Un messaggio del server (es. scalo non riconosciuto) si mostra;
+           altrimenti il messaggio calmo, mai "qualcosa non ha funzionato". */
+        setErrore(typeof j?.errore === "string" ? j.errore : COPY.comune.erroreRete);
         return;
       }
       setTrovati(j.voli as VoloTrovato[]);
       setTrattaDemo(Boolean(j.demo));
     } catch {
       setCercaInCorso(false);
-      setErrore(COPY.comune.erroreGenerico);
+      setErrore(COPY.comune.erroreRete);
     }
   }
 
@@ -433,7 +504,7 @@ export default function SchedaCheck() {
         lettore.onerror = () => reject(lettore.error);
         lettore.readAsDataURL(file);
       });
-      const r = await fetch("/api/leggi-carta", {
+      const r = await richiestaResiliente("/api/leggi-carta", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ immagine: base64, tipo: file.type || "image/jpeg" }),
@@ -445,7 +516,7 @@ export default function SchedaCheck() {
          preme "Analizza". Così la foto riempie volo e data e non fa
          perdere niente: da qui in poi è identico a chi scrive a mano. */
       if (!r.ok || !j?.ok) {
-        setErrore(typeof j?.errore === "string" ? j.errore : COPY.comune.erroreGenerico);
+        setErrore(typeof j?.errore === "string" ? j.errore : COPY.comune.erroreRete);
         return;
       }
       setModo("numero");
@@ -461,7 +532,7 @@ export default function SchedaCheck() {
       }
     } catch {
       setLeggoCarta(false);
-      setErrore(COPY.comune.erroreGenerico);
+      setErrore(COPY.comune.erroreRete);
     }
   }
 
@@ -660,6 +731,7 @@ export default function SchedaCheck() {
             onClick={() => {
               setModo(m);
               setErrore(null);
+              setAvviso(null);
             }}
             aria-pressed={modo === m}
             /* ⚠️ 44 PUNTI SUL TELEFONO, e solo lì. Questo è il comando
@@ -675,6 +747,36 @@ export default function SchedaCheck() {
           </button>
         ))}
       </div>
+
+      {/* L'AVVISO CALMO, condiviso dai due modi. Prima viveva solo dentro
+          il modo "numero", quindi un intoppo partito dalla ricerca per
+          tratta non lo mostrava. Qui lo vedono tutti, e non è mai rosso:
+          è una nota, non un allarme. Col guasto passeggero del server porta
+          anche il bottone per riprovare. */}
+      {avviso && (
+        <motion.div
+          role="status"
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 rounded-xl border border-bordo bg-nebbia p-4"
+        >
+          {avviso.demo && (
+            <span className="mb-2 inline-block rounded-pillola border border-bordo bg-white px-2.5 py-0.5 text-[11px] font-medium text-fumo">
+              {COPY.comune.demo}
+            </span>
+          )}
+          <p className="text-[13.5px] leading-relaxed text-inchiostro/85">{avviso.testo}</p>
+          {avviso.riprova && (
+            <button
+              type="button"
+              onClick={avviso.riprova}
+              className="mt-3 inline-flex h-10 items-center rounded-bottone bg-verde px-4 text-[14px] font-medium text-white transition-colors hover:bg-verde-scuro"
+            >
+              {COPY.comune.riprova}
+            </button>
+          )}
+        </motion.div>
+      )}
 
       {modo === "tratta" ? (
         <form onSubmit={cercaTratta} noValidate>
@@ -707,7 +809,7 @@ export default function SchedaCheck() {
               role="alert"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-3 text-[14px] font-medium text-red-600"
+              className="mt-3 text-[14px] font-medium text-amber-700"
             >
               {errore}
             </motion.p>
@@ -813,26 +915,10 @@ export default function SchedaCheck() {
               role="alert"
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-3 text-[14px] font-medium text-red-600"
+              className="mt-3 text-[14px] font-medium text-amber-700"
             >
               {errore}
             </motion.p>
-          )}
-
-          {avviso && (
-            <motion.div
-              role="status"
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-3 rounded-xl border border-bordo bg-nebbia p-4"
-            >
-              {avviso.demo && (
-                <span className="mb-2 inline-block rounded-pillola border border-bordo bg-white px-2.5 py-0.5 text-[11px] font-medium text-fumo">
-                  {COPY.comune.demo}
-                </span>
-              )}
-              <p className="text-[13.5px] leading-relaxed text-inchiostro/85">{avviso.testo}</p>
-            </motion.div>
           )}
 
           <button

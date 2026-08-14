@@ -1,4 +1,5 @@
 import Logo from "./Logo";
+import MenuMobile from "./MenuMobile";
 import { COPY } from "@/lib/copy";
 import { apreAParte } from "@/lib/link";
 
@@ -67,12 +68,15 @@ export default function Nav() {
 
         <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-3">
           {/* la porta della web app: dall'8/08 è di nuovo linkata dal sito.
-              Pillola di vetro, non testo nudo: ogni bottone è un bottone. */}
+              Pillola di vetro, non testo nudo: ogni bottone è un bottone.
+              ⚠️ Sotto i 1280 "Entra" vive nel menu (MenuMobile), non nella
+              barra: così sul telefono restano logo + azione + menu, senza
+              affollare, e "Entra" resta comunque raggiungibile ovunque. */}
           <a
             /* Dritto al login (scelta di Valerio, 9/08): prima portava alla web
                app, dove c'era un ALTRO "Entra". Chi vuole entrare, entra. */
             href="/entra"
-            className="vetro-bottone inline-flex items-center rounded-bottone px-4 py-2.5 text-[13.5px] font-medium text-inchiostro transition-all duration-300 hover:-translate-y-0.5 sm:px-5 sm:py-3 sm:text-[14.5px]"
+            className="vetro-bottone hidden items-center rounded-bottone px-4 py-2.5 text-[13.5px] font-medium text-inchiostro transition-all duration-300 hover:-translate-y-0.5 sm:px-5 sm:py-3 sm:text-[14.5px] xl:inline-flex"
           >
             {COPY.nav.entra}
           </a>
@@ -93,6 +97,9 @@ export default function Nav() {
               →
             </span>
           </a>
+          {/* Il menu del telefono e del tablet: sotto i 1280 raccoglie le
+              voci che in linea non ci sono e "Entra". Sopra i 1280 sparisce. */}
+          <MenuMobile />
         </div>
       </header>
     </div>
