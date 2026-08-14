@@ -99,7 +99,11 @@ export type FattoVolo = {
 export type Verdetto =
   | {
       esito: "idoneo";
-      importo: 250 | 300 | 400 | 600;
+      /* Il ritardo, il negato imbarco e la coincidenza usano le fasce
+         dell'art. 7 (250/300/400/600); il declassamento (art. 10) è una
+         quota del prezzo del biglietto, quindi un importo qualsiasi. Per
+         questo qui è `number` e non la lista chiusa delle fasce. */
+      importo: number;
       ritardoMinuti: number;
       motivo: string;
       versioneRegole: string;

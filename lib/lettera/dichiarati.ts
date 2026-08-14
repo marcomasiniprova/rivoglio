@@ -1,5 +1,6 @@
 import { compagniaPerVettore } from "./compagnie";
-import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
+import { dentroLoSpazioEuropeo, type FattoVolo, type Verdetto } from "@/lib/regole/eu261";
+import { percentualeArt10 } from "@/lib/regole/dichiarati";
 
 /**
  * LE LETTERE DEI CASI DICHIARATI: negato imbarco e coincidenza persa.
@@ -40,7 +41,7 @@ import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
  * cadere una richiesta per intero.
  */
 
-export type CasoDichiarato = "negato" | "coincidenza";
+export type CasoDichiarato = "negato" | "coincidenza" | "declassamento";
 
 export type DatiDichiarazione = {
   caso: CasoDichiarato;
@@ -48,6 +49,8 @@ export type DatiDichiarazione = {
   ritardoFinale?: string | null;
   /** Solo coincidenza: lo scalo finale dichiarato. */
   destinazioneFinale?: string | null;
+  /** Solo declassamento: il prezzo del biglietto dichiarato, in euro. */
+  prezzo?: number | null;
 };
 
 /** "fra3e4" → la frase che va in una lettera. Mai un numero inventato. */
@@ -66,9 +69,11 @@ export function oggettoDichiarato(
   voloIata: string,
   giornoVolo: string,
 ): string {
-  return caso === "negato"
-    ? `Richiesta di compensazione pecuniaria ex artt. 4 e 7 Reg. (CE) 261/2004, negato imbarco, volo ${voloIata} del ${giornoVolo}`
-    : `Richiesta di compensazione pecuniaria ex art. 7 Reg. (CE) 261/2004, coincidenza persa, volo ${voloIata} del ${giornoVolo}`;
+  if (caso === "negato")
+    return `Richiesta di compensazione pecuniaria ex artt. 4 e 7 Reg. (CE) 261/2004, negato imbarco, volo ${voloIata} del ${giornoVolo}`;
+  if (caso === "declassamento")
+    return `Richiesta di rimborso ex art. 10, par. 2, Reg. (CE) 261/2004, sistemazione in classe inferiore, volo ${voloIata} del ${giornoVolo}`;
+  return `Richiesta di compensazione pecuniaria ex art. 7 Reg. (CE) 261/2004, coincidenza persa, volo ${voloIata} del ${giornoVolo}`;
 }
 
 /**
@@ -95,6 +100,23 @@ export function corpoDichiarato(
 Ai sensi dell'articolo 4, paragrafo 3, del Regolamento (CE) n. 261/2004, il vettore che nega l'imbarco a un passeggero contro la sua volontà è tenuto a corrispondere immediatamente la compensazione pecuniaria prevista dall'articolo 7. La compensazione non è subordinata ad alcuna condizione sul ritardo all'arrivo: è dovuta per il fatto stesso del negato imbarco.
 
 Sulla base della distanza della tratta, l'articolo 7 fissa la compensazione in ${euro(verdetto.importo)} a passeggero.`;
+  }
+
+  if (caso === "declassamento") {
+    const kmVolo = fatto.kmOrtodromica ?? 0;
+    const perc = kmVolo > 0 ? percentualeArt10(kmVolo, dentroLoSpazioEuropeo(fatto)) : 30;
+    const prezzo = typeof dati.prezzo === "number" ? dati.prezzo : null;
+    return `Per questo volo avevo acquistato un biglietto in una classe di servizio superiore, e sono stato sistemato in una classe inferiore senza il mio consenso e senza aver accettato alcun beneficio in cambio.${
+      fatto.kmOrtodromica ? ` La tratta misura ${km(fatto.kmOrtodromica)}.` : ""
+    }
+
+Ai sensi dell'articolo 10, paragrafo 2, del Regolamento (CE) n. 261/2004, quando un passeggero è sistemato in una classe inferiore a quella per cui è stato acquistato il biglietto, il vettore rimborsa entro sette giorni una quota del prezzo del biglietto pari al ${perc}% per la tratta in questione.
+
+${
+      prezzo !== null
+        ? `Il prezzo del biglietto per la tratta interessata è di ${euro(prezzo)}: la quota del ${perc}% corrisponde pertanto a ${euro(verdetto.importo)}.`
+        : `La quota applicabile alla tratta è pertanto del ${perc}% del prezzo del biglietto.`
+    }`;
   }
 
   const dove = dati.destinazioneFinale ? ` (${dati.destinazioneFinale})` : "";

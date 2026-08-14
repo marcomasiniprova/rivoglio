@@ -67,8 +67,16 @@ test.describe("Casi dichiarati", () => {
 
   test("l'invito compare sotto un verdetto non idoneo", async ({ page }) => {
     await page.goto("/verifica/demo-ZZ180-2026-08-05");
+    /* Dal 14/08 l'invito copre tre casi (rimasto a terra, coincidenza,
+       declassamento), quindi il testo è più largo. */
     await expect(
-      page.getByText("sei rimasto a terra lo stesso", { exact: false }),
+      page.getByText("a te è andata diversamente", { exact: false }),
     ).toBeVisible({ timeout: 15_000 });
+  });
+
+  test("declassamento involontario: rimborso = quota del prezzo", async ({ request }) => {
+    const d = await dichiara(request, { caso: "declassamento", volonta: "involontario", prezzo: 200 });
+    expect(d.esito).toBe("idoneo");
+    expect(d.importo).toBe(60); // ZZ180: 800 km → 30% di 200
   });
 });

@@ -176,20 +176,28 @@ export default function DichiaraCaso({
   idVerifica: string | null;
   demo: boolean;
 }) {
-  const [aperto, setAperto] = useState<"negato" | "coincidenza" | null>(null);
+  const [aperto, setAperto] = useState<"negato" | "coincidenza" | "declassamento" | null>(null);
   const [presenza, setPresenza] = useState<string | null>(null);
   const [volonta, setVolonta] = useState<string | null>(null);
   const [unica, setUnica] = useState<string | null>(null);
   const [ritardoFinale, setRitardoFinale] = useState<string | null>(null);
   const [destinazione, setDestinazione] = useState<Scalo | null>(null);
+  const [volontaDecl, setVolontaDecl] = useState<string | null>(null);
+  const [prezzo, setPrezzo] = useState("");
   const [invio, setInvio] = useState(false);
   const [esito, setEsito] = useState<Esito | null>(null);
   const [errore, setErrore] = useState("");
 
+  /* Il prezzo digitato, in numero: la virgola all'italiana compresa. */
+  const prezzoNum = Number(prezzo.replace(/[^\d.,]/g, "").replace(",", "."));
+  const prezzoOk = Number.isFinite(prezzoNum) && prezzoNum > 0;
+
   const pronto =
     aperto === "negato"
       ? presenza !== null && volonta !== null
-      : unica !== null && ritardoFinale !== null && destinazione !== null;
+      : aperto === "declassamento"
+        ? volontaDecl !== null && prezzoOk
+        : unica !== null && ritardoFinale !== null && destinazione !== null;
 
   async function manda() {
     if (!aperto || !pronto || invio) return;
@@ -199,7 +207,9 @@ export default function DichiaraCaso({
       const corpo =
         aperto === "negato"
           ? { caso: "negato", presenza, volonta }
-          : { caso: "coincidenza", unica, ritardoFinale, destinazioneFinale: destinazione?.iata };
+          : aperto === "declassamento"
+            ? { caso: "declassamento", volonta: volontaDecl, prezzo: prezzoNum }
+            : { caso: "coincidenza", unica, ritardoFinale, destinazioneFinale: destinazione?.iata };
       const r = await fetch("/api/verifica/dichiara", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -248,12 +258,13 @@ export default function DichiaraCaso({
       <p className="text-[15.5px] font-semibold text-inchiostro">{T.invito}</p>
       <p className="mt-1.5 text-[13.5px] leading-relaxed text-fumo">{T.invitoSotto}</p>
 
-      {/* le due schede: negato imbarco / coincidenza persa */}
-      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+      {/* le tre schede: negato imbarco / coincidenza persa / declassamento */}
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
         {(
           [
             ["negato", T.negato.scheda],
             ["coincidenza", T.coincidenza.scheda],
+            ["declassamento", T.declassamento.scheda],
           ] as const
         ).map(([chiave, testo]) => (
           <button
@@ -294,6 +305,42 @@ export default function DichiaraCaso({
                 scelta={volonta as never}
                 scegli={setVolonta}
               />
+            </>
+          ) : aperto === "declassamento" ? (
+            <>
+              <Scelte
+                domanda={T.declassamento.volonta.domanda}
+                voci={T.declassamento.volonta.voci}
+                scelta={volontaDecl as never}
+                scegli={setVolontaDecl}
+              />
+              <div>
+                <label htmlFor="prezzo-decl" className="text-[15px] font-semibold text-inchiostro">
+                  {T.declassamento.prezzo.domanda}
+                </label>
+                <p className="mt-1 text-[13px] leading-relaxed text-fumo">
+                  {T.declassamento.prezzo.aiuto}
+                </p>
+                <div className="relative mt-2.5">
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[16px] text-fumo-2"
+                  >
+                    €
+                  </span>
+                  <input
+                    id="prezzo-decl"
+                    type="text"
+                    inputMode="decimal"
+                    value={prezzo}
+                    onChange={(e) => setPrezzo(e.target.value)}
+                    placeholder={T.declassamento.prezzo.segnaposto}
+                    /* 16px sul telefono, come gli altri campi: sotto quella
+                       misura iOS zooma la pagina da solo. */
+                    className="h-12 w-full rounded-xl border border-bordo bg-white pl-9 pr-4 text-[16px] outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/10 sm:text-[15px]"
+                  />
+                </div>
+              </div>
             </>
           ) : (
             <>

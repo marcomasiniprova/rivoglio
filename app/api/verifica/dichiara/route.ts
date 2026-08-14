@@ -4,8 +4,10 @@ import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { verificaCoerente, cancelloDelSeguito } from "@/lib/check/cancello";
 import {
   rispostaCoincidenzaValida,
+  rispostaDeclassamentoValida,
   rispostaNegatoValida,
   valutaCoincidenza,
+  valutaDeclassamento,
   valutaNegato,
 } from "@/lib/regole/dichiarati";
 import { verificaVolo } from "@/lib/voli/verifica";
@@ -64,7 +66,7 @@ export async function POST(req: Request) {
       { status: 400, headers: CORS },
     );
   }
-  if (c.caso !== "negato" && c.caso !== "coincidenza") {
+  if (c.caso !== "negato" && c.caso !== "coincidenza" && c.caso !== "declassamento") {
     return NextResponse.json(
       { ok: false, errore: "Caso non riconosciuto." },
       { status: 400, headers: CORS },
@@ -102,6 +104,25 @@ export async function POST(req: Request) {
     }
     verdetto = valutaNegato(fatto, r);
     dichiarazione = { caso: "negato", ...r };
+  } else if (c.caso === "declassamento") {
+    /* Il prezzo può arrivare come numero o come stringa "129,90": si
+       normalizza qui, la virgola all'italiana compresa. */
+    const grezzo =
+      typeof c.prezzo === "number"
+        ? c.prezzo
+        : Number(String(c.prezzo ?? "").replace(/[^\d.,]/g, "").replace(",", "."));
+    const r = { volonta: c.volonta, prezzo: grezzo };
+    if (!rispostaDeclassamentoValida(r)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          errore: "Dimmi se il declassamento l'hai scelto tu o no, e quanto avevi pagato il biglietto.",
+        },
+        { status: 400, headers: CORS },
+      );
+    }
+    verdetto = valutaDeclassamento(fatto, r);
+    dichiarazione = { caso: "declassamento", volonta: r.volonta, prezzo: r.prezzo };
   } else {
     const r = { unica: c.unica, ritardoFinale: c.ritardoFinale };
     if (!rispostaCoincidenzaValida(r)) {

@@ -709,9 +709,9 @@ export const COPY = {
       /* 🔴 Le due domande non si capivano (Valerio, 13/08): «il tuo aereo
          può risultare in orario» è vero ma astratto, e «ho perso una
          coincidenza» non dice di che coincidenza. Riscritte concrete. */
-      invito: "A volte il volo risulta puntuale ma tu sei rimasto a terra lo stesso. È il tuo caso?",
+      invito: "A volte il volo risulta a posto ma a te è andata diversamente. È un tuo caso?",
       invitoSotto:
-        "Succede in due modi, e la legge te li riconosce entrambi. Dimmi quale, e ti dico se ti spetta qualcosa.",
+        "Sei rimasto a terra, hai perso la coincidenza per colpa di questo volo, o ti hanno messo in una classe più bassa di quella che avevi pagato: la legge te li riconosce tutti. Dimmi quale, e ti dico se ti spetta qualcosa.",
       negato: {
         scheda: "Non mi hanno fatto salire (overbooking)",
         titolo: "Negato imbarco",
@@ -761,6 +761,23 @@ export const COPY = {
             { valore: "oltre4", testo: "Più di 4 ore" },
             { valore: "nonRicordo", testo: "Non me lo ricordo" },
           ],
+        },
+      },
+      declassamento: {
+        scheda: "Mi hanno messo in una classe più bassa",
+        titolo: "Declassamento",
+        volonta: {
+          domanda: "Il declassamento l'hai scelto tu?",
+          voci: [
+            { valore: "involontario", testo: "No, mi hanno spostato loro senza chiedermelo" },
+            { valore: "volontario", testo: "Sì, ho accettato io in cambio di qualcosa" },
+          ],
+        },
+        prezzo: {
+          domanda: "Quanto avevi pagato il biglietto (la tratta declassata)?",
+          aiuto:
+            "Serve a calcolare il rimborso: ti spetta una quota di questo prezzo. Lo trovi nell'email di acquisto del biglietto.",
+          segnaposto: "es. 240",
         },
       },
       bottone: "Scopri il verdetto",

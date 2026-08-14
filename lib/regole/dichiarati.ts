@@ -224,3 +224,74 @@ export function valutaCoincidenza(
     versioneRegole: VERSIONE_REGOLE,
   };
 }
+
+/* --------------------------------------------- declassamento (art. 10) */
+
+/**
+ * DECLASSAMENTO (art. 10 par. 2 CE 261/2004): hai pagato una classe
+ * (business, premium) e ti hanno messo in una più bassa senza che tu
+ * l'abbia scelto. Non è una compensazione a fasce fisse come il ritardo:
+ * è una percentuale del PREZZO del biglietto, e la percentuale segue la
+ * stessa geometria dell'art. 7 (30/50/75 al posto di 250/400/600).
+ *
+ * Il prezzo lo sappiamo solo dall'utente: il fornitore ci dà il volo, non
+ * quanto l'hai pagato. Quindi il prezzo è un dato dichiarato, e il motivo
+ * lo dice chiaro ("sul prezzo che hai indicato"). La compagnia, quando
+ * paga, guarda comunque il prezzo vero del biglietto: se l'utente sbaglia
+ * in eccesso, il conto lo corregge lei, non noi.
+ *
+ * ⚠️ La base è il prezzo del VOLO declassato (art. 10 par. 2 + art. 2
+ * lett. f, causa C-255/15 Mennens): non l'intero itinerario, se il
+ * declassamento è stato su una tratta sola. Qui chiediamo il prezzo della
+ * tratta interessata.
+ */
+export type RisposteDeclassamento = {
+  /** Involontario: se hai accettato tu lo scambio, non spetta. */
+  volonta: Volonta;
+  /** Il prezzo del biglietto (o della tratta declassata), in euro. */
+  prezzo: number;
+};
+
+export function rispostaDeclassamentoValida(r: unknown): r is RisposteDeclassamento {
+  const x = r as RisposteDeclassamento | null;
+  return (
+    !!x &&
+    (["involontario", "volontario"] as const).includes(x.volonta) &&
+    typeof x.prezzo === "number" &&
+    Number.isFinite(x.prezzo) &&
+    x.prezzo > 0 &&
+    x.prezzo <= 100000
+  );
+}
+
+/**
+ * La percentuale del rimborso, art. 10 par. 2:
+ * 30% fino a 1.500 km; 50% da 1.500 a 3.500 km e su TUTTE le tratte
+ * intracomunitarie oltre 1.500; 75% sul resto del lungo raggio.
+ * Stessa identica soglia dell'art. 7, cambia solo il numero.
+ */
+export function percentualeArt10(km: number, dentroSpazioEuropeo: boolean): 30 | 50 | 75 {
+  if (km <= 1500) return 30;
+  if (km <= 3500) return 50;
+  return dentroSpazioEuropeo ? 50 : 75;
+}
+
+export function valutaDeclassamento(f: FattoVolo, r: RisposteDeclassamento): Verdetto {
+  if (r.volonta === "volontario") {
+    return nonIdoneo(
+      "Hai accettato tu il posto in classe più bassa in cambio di qualcosa: in quel caso il rimborso dell'art. 10 non spetta, vale quello che avete concordato al momento.",
+    );
+  }
+  const blocco = paletti(f, f.kmOrtodromica);
+  if (blocco) return blocco;
+  const km = f.kmOrtodromica as number;
+  const perc = percentualeArt10(km, dentroLoSpazioEuropeo(f));
+  const importo = Math.round((perc / 100) * r.prezzo);
+  return {
+    esito: "idoneo",
+    importo,
+    ritardoMinuti: 0,
+    motivo: `Ti hanno messo in una classe più bassa di quella che avevi pagato, senza che tu l'abbia scelto: l'art. 10 par. 2 prevede il rimborso del ${perc}% del prezzo del biglietto, da pagare entro 7 giorni. Su una tratta di ${Math.round(km)} km la percentuale è ${perc}%, e sul prezzo che hai indicato (${r.prezzo}€) fa ${importo}€. La compagnia verifica il prezzo vero del biglietto: è quello che conta.`,
+    versioneRegole: VERSIONE_REGOLE,
+  };
+}

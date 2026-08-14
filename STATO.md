@@ -1,8 +1,10 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-14 (giro #69: l'AI che non capiva le risposte e il
-fascicolo che mentiva, la posizione persa dopo la cassa, il profilo, il
-modulo Ryanair morto · giro #68: gli undici punti del collaudo di
+**Aggiornato:** 2026-08-14 (giro #70: i connettori accesi e il primo caso
+nuovo per allargare il mercato, il declassamento art. 10 · giro #69: l'AI
+che non capiva le risposte e il fascicolo che mentiva, la posizione persa
+dopo la cassa, il profilo, il modulo Ryanair morto · giro #68: gli undici
+punti del collaudo di
 Valerio, e il vero motivo per cui l'overbooking non apriva la pratica ·
 giro #67: la skill video-review e il giro in
 un video solo · giro #66: gli undici rami mai camminati,
@@ -29,6 +31,49 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #70 (14/08): I CONNETTORI ACCESI, E IL PRIMO CASO NUOVO PER
+  ALLARGARE IL MERCATO (IL DECLASSAMENTO, ART. 10).** Valerio: «non
+  possiamo solo fare ritardo sopra 3 ore, dobbiamo gestire TUTTO il
+  pacchetto». Ha acceso i connettori e chiesto di implementare i casi
+  nuovi, con ricerca vera da fonti ufficiali e quattro domande col popup.
+  - ✅ **CONNETTORI VIVI E CONFERMATI:** Supabase (progetto `rivolio`
+    `znwpzkzavzsktyfxwuye`, attivo), Resend (**`send.rivolio.it`
+    verificato, invio abilitato**: le email vere possono partire, non
+    solo a valerio@artecai.it), Netlify (connesso). Usati in questo giro:
+    la migrazione del database l'ho applicata io col connettore.
+  - **RICERCA FATTA, con le fonti:** declassamento art. 10 (30% fino a
+    1500 km, 50% da 1500 a 3500, 75% oltre, sul prezzo del volo
+    declassato, entro 7 giorni); diritto di cura art. 9 (pasti dalle 2
+    ore, hotel se pernotti, rimborso con scontrini); coincidenza persa
+    (Folkerts C-11/11, biglietto unico, arrivo finale a 3h+); Reg. CE
+    1107/2006 (mobilità ridotta).
+  - **LE 4 SCELTE DI VALERIO:** declassamento → calcolo completo;
+    diritto di cura → lettera + scontrini dell'utente; coincidenza → il
+    motore verifica le due tratte; Reg. 1107 → flusso completo.
+  - 🟢 **COSTRUITO E ONLINE: IL DECLASSAMENTO (art. 10), il primo dei
+    quattro.** È un caso dichiarato come negato imbarco e coincidenza,
+    ma con una differenza: non è una fascia fissa, è una **percentuale
+    del prezzo del biglietto** (30/50/75 con la stessa geometria
+    dell'art. 7). L'utente dichiara che l'hanno declassato senza il suo
+    consenso e scrive quanto aveva pagato; il motore calcola la
+    percentuale sulla distanza e la applica al prezzo. Ha la sua lettera
+    (cita l'art. 10 par. 2, la percentuale, i 7 giorni), la sua terza
+    scheda sotto il verdetto («Mi hanno messo in una classe più bassa»),
+    la sua prova che blinda il conto.
+    ⚠️ **Il prezzo lo dà l'utente** (il fornitore ci dà il volo, non
+    quanto l'hai pagato): la lettera lo dice, e la compagnia guarda
+    comunque il prezzo vero del biglietto. Migrazione del vincolo
+    `caso_dichiarato` applicata sul database vero (adesso accetta anche
+    declassamento, cura, prm).
+  - **RESTANO TRE, e sono il prossimo lavoro** (scelti da Valerio, con la
+    ricerca già fatta): il diritto di cura (art. 9, lettera + scontrini),
+    la coincidenza col motore che legge le due tratte, e il Reg. CE
+    1107/2006 a flusso completo. Si costruiscono uno alla volta, ognuno
+    verde prima del prossimo: un caso legale mezzo fatto è una lettera
+    sbagliata mandata col nostro nome sopra.
+  - Prove: **verify verde** (build, tipi, lint, l'intera suite). Le nuove
+    stanno in `prove/declassamento.spec.ts` (la percentuale per distanza,
+    il conto, la virgola all'italiana, il rifiuto senza prezzo).
 - **GIRO #69 (14/08): L'AI CHE NON CAPIVA, IL FASCICOLO CHE MENTIVA, LA
   POSIZIONE PERSA DOPO LA CASSA.** Secondo collaudo di Valerio, undici
   cose in un messaggio (PROCEDI LOCK IN), con gli screenshot. Quattro

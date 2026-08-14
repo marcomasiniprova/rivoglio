@@ -121,6 +121,13 @@ function leggiDichiarazione(d: unknown, campo: string): string | null {
   return typeof v === "string" && v ? v : null;
 }
 
+/** Il prezzo del declassamento, che nella dichiarazione è un numero. */
+function leggiPrezzo(d: unknown): number | null {
+  if (!d || typeof d !== "object") return null;
+  const v = (d as Record<string, unknown>).prezzo;
+  return typeof v === "number" && Number.isFinite(v) && v > 0 ? v : null;
+}
+
 const dataIt = (iso: string) =>
   new Date(`${iso}T12:00:00Z`).toLocaleDateString("it-IT", {
     day: "numeric",
@@ -278,15 +285,13 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         .maybeSingle()) as { data: RigaVerifica | null })
     : { data: null };
 
-  const importo =
-    verifica && ([250, 300, 400, 600] as const).find((i) => i === verifica.importo);
-
   /* 🔴 IL CASO DICHIARATO CAMBIA LA LETTERA, e non è un dettaglio.
      Negato imbarco e coincidenza persa hanno una norma diversa da quella
      del ritardo: fino all'11/08 finivano tutti nella lettera del ritardo
      e uscivano così, chiedendo 400 euro accanto a «ritardo 2 h e 35» e
      citando la regola delle TRE ore. Una lettera che si contraddice da
-     sola, pagata 14,90. */
+     sola, pagata 14,90. Il declassamento (art. 10) ha la SUA lettera e
+     un importo che non è una fascia ma una quota del prezzo. */
   const dichiarato =
     verifica?.caso_dichiarato === "negato" || verifica?.caso_dichiarato === "coincidenza"
       ? {
@@ -294,7 +299,21 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           ritardoFinale: leggiDichiarazione(verifica.dichiarazione, "ritardoFinale"),
           destinazioneFinale: leggiDichiarazione(verifica.dichiarazione, "destinazioneFinale"),
         }
-      : null;
+      : verifica?.caso_dichiarato === "declassamento"
+        ? { caso: "declassamento" as const, prezzo: leggiPrezzo(verifica.dichiarazione) }
+        : null;
+
+  /* L'importo: per ritardo, negato e coincidenza è una delle fasce note;
+     per il declassamento è una quota del prezzo, quindi un numero
+     qualsiasi positivo. Il controllo sulle fasce esiste per non far
+     uscire una lettera con un importo sballato, ma su una quota va tolto,
+     se no il declassamento non passerebbe mai. */
+  const importo =
+    dichiarato?.caso === "declassamento"
+      ? typeof verifica?.importo === "number" && verifica.importo > 0
+        ? verifica.importo
+        : undefined
+      : verifica && ([250, 300, 400, 600] as const).find((i) => i === verifica.importo);
 
   /* Il ritardo serve SOLO alla lettera del ritardo: per un negato
      imbarco non esiste un arrivo da confrontare, e pretenderlo qui
