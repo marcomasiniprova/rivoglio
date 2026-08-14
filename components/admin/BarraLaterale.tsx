@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Map,
   Activity,
+  Calculator,
   Cog,
   ExternalLink,
   FolderOpen,
@@ -40,6 +41,7 @@ const ICONE: Record<ChiaveSezione, typeof LayoutDashboard> = {
   motore: Cog,
   mappa: Map,
   panoramica: LayoutDashboard,
+  economia: Calculator,
   verdetti: Gavel,
   pratiche: FolderOpen,
   traffico: TrendingUp,
