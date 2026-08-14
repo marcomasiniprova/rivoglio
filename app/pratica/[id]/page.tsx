@@ -538,18 +538,16 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
 
       {/* --------------------------------------- il fascicolo, in fondo.
           Scelta di Valerio (13/08): resta raggiungibile ma non ingombra.
-          Serve quando si scrive o si contesta, non mentre si aspetta. */}
-      <details className="group rounded-2xl border border-bordo bg-white px-6 py-4">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-display text-lg tracking-[-0.03em] marker:hidden">
-          Il fascicolo del tuo caso
-          <span aria-hidden="true" className="text-fumo-2 transition-transform group-open:rotate-45">
-            +
-          </span>
-        </summary>
-        <div className="mt-3">
-          <Fascicolo dossier={dossier} />
-        </div>
-      </details>
+          Serve quando si scrive o si contesta, non mentre si aspetta.
+          🔴 QUI C'ERA UN DOPPIONE (Valerio, 14/08: «il fascicolo dice di
+          chiuderlo quando è già chiuso»): questo riquadro era un
+          collapsible «Il fascicolo del tuo caso» che dentro ne conteneva
+          un ALTRO identico, perché `Fascicolo` è già di suo un
+          apri/chiudi con lo stesso titolo. Aprendo il primo comparivano
+          due «Il fascicolo del tuo caso» uno dentro l'altro, uno che
+          diceva «chiudi» e uno «×». Tolto il guscio: il componente si
+          apre e si chiude da solo. */}
+      <Fascicolo dossier={dossier} />
 
       {/* ------------------------------------------------ come si invia */}
       {R.istruzioni && (

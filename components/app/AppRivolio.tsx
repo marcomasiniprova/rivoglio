@@ -74,6 +74,14 @@ export default function AppRivolio({
   const O = COPY.appWeb.ospite;
   const P = COPY.appWeb.profilo;
 
+  /* Il profilo era «troppo vuoto» (Valerio, 14/08): oltre all'email e al
+     nome, adesso dice a colpo d'occhio come stanno le tue pratiche, con
+     gli stessi dati che la scheda «Le tue pratiche» ha già in mano. */
+  const toccaTe = pratiche.filter((p) => p.palla === "tua").length;
+  const inAttesa = pratiche.filter((p) => p.palla === "loro").length;
+  const chiuse = pratiche.filter((p) => p.palla === "chiusa").length;
+  const iniziali = (nickname || email || "?").trim().slice(0, 2).toUpperCase();
+
   return (
     <div className="flex flex-col gap-7">
       {/* ------------------------------------------------ le linguette
@@ -261,11 +269,60 @@ export default function AppRivolio({
           <Invito titolo={O.profilo.titolo} testo={O.profilo.testo} azione={O.profilo.azione} />
         ) : (
           <div className="flex flex-col gap-6">
+            {/* chi sei: la faccia dell'account, non solo l'indirizzo */}
+            <div className="flex items-center gap-4 rounded-3xl border border-bordo bg-white p-6 sm:p-8">
+              <span
+                aria-hidden="true"
+                className="grid size-14 shrink-0 place-items-center rounded-full bg-verde font-display text-xl text-white"
+              >
+                {iniziali}
+              </span>
+              <span className="min-w-0">
+                {nickname && (
+                  <span className="block font-display text-xl tracking-[-0.02em]">{nickname}</span>
+                )}
+                <span className="block truncate text-sm text-fumo">{email}</span>
+              </span>
+            </div>
+
+            {/* le tue pratiche a colpo d'occhio */}
             <div className="rounded-3xl border border-bordo bg-white p-6 sm:p-8">
-              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-fumo-2">
-                {P.email}
-              </p>
-              <p className="mt-1 font-display text-xl tracking-[-0.02em]">{email}</p>
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="font-display text-xl tracking-[-0.03em]">Le tue pratiche</h2>
+                {pratiche.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setPannello("pratiche")}
+                    className="text-sm font-medium text-verde transition-colors hover:text-verde-scuro"
+                  >
+                    Aprile →
+                  </button>
+                )}
+              </div>
+              {pratiche.length === 0 ? (
+                <p className="mt-2 text-sm leading-relaxed text-fumo">
+                  Non ne hai ancora nessuna. Il primo controllo è nella scheda «Controlla», qui
+                  sopra.
+                </p>
+              ) : (
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  {[
+                    { n: toccaTe, testo: "Tocca a te" },
+                    { n: inAttesa, testo: "In attesa" },
+                    { n: chiuse, testo: "Chiuse" },
+                  ].map((s) => (
+                    <div
+                      key={s.testo}
+                      className="rounded-2xl border border-bordo bg-nebbia px-3 py-4 text-center"
+                    >
+                      <span className="block font-display text-2xl tracking-[-0.02em] text-inchiostro">
+                        {s.n}
+                      </span>
+                      <span className="mt-0.5 block text-xs leading-snug text-fumo">{s.testo}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <form
@@ -304,6 +361,11 @@ export default function AppRivolio({
                   </span>
                 </span>
               </label>
+              <p className="mt-3 max-w-xl text-xs leading-relaxed text-fumo-2">
+                Il tuo nome resta salvato da subito. La classifica vera e propria si accende quando
+                ci sono abbastanza vincite da mostrare: da quel giorno ci sei già dentro, senza
+                rifare niente.
+              </p>
 
               {salvataggio.errore && (
                 <p role="alert" className="mt-4 text-sm font-medium text-[#C2410C]">

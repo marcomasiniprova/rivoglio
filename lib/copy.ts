@@ -643,6 +643,10 @@ export const COPY = {
     /** La striscia coi dati VERI (#25): indice ritardi per aeroporto. */
     ritardi: {
       titolo: "Gli aeroporti italiani, adesso",
+      /** Cosa deve capire uno che passa di qui (Valerio, 14/08: «cosa
+          comunica? cosa dovrebbe capire un utente?»). */
+      spiega:
+        "Com'è messo oggi il tuo aeroporto: se i voli stanno arrivando in orario o in ritardo. È un dato vero, non una previsione, e se il tuo scalo oggi è messo male è un buon momento per controllare il tuo volo.",
       indiceEtichetta: "indice ritardi",
       medianaTemplate: "mediana {minuti} min",
       cancellatiTemplate: "{n} cancellati",
@@ -653,7 +657,7 @@ export const COPY = {
         giornataStorta: "Giornata storta",
       },
       /** Ogni numero mostrato è apribile o spiegato: questa è la spiegazione. */
-      nota: "Indice da 0 (tutto in orario) a 5 sugli arrivi delle ultime due ore, dal tracciamento AeroDataBox. Si aggiorna al massimo una volta al giorno.",
+      nota: "Il voto va da 0 (tutti in orario) a 5 (giornata storta) e guarda i voli arrivati nelle ultime due ore. Lo prendiamo dal tracciamento dei voli e lo aggiorniamo ogni giorno.",
       rilevatoTemplate: "Ultima rilevazione: {quando}",
     },
   },

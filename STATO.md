@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-14 (giro #68: gli undici punti del collaudo di
+**Aggiornato:** 2026-08-14 (giro #69: l'AI che non capiva le risposte e il
+fascicolo che mentiva, la posizione persa dopo la cassa, il profilo, il
+modulo Ryanair morto · giro #68: gli undici punti del collaudo di
 Valerio, e il vero motivo per cui l'overbooking non apriva la pratica ·
 giro #67: la skill video-review e il giro in
 un video solo · giro #66: gli undici rami mai camminati,
@@ -27,6 +29,71 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #69 (14/08): L'AI CHE NON CAPIVA, IL FASCICOLO CHE MENTIVA, LA
+  POSIZIONE PERSA DOPO LA CASSA.** Secondo collaudo di Valerio, undici
+  cose in un messaggio (PROCEDI LOCK IN), con gli screenshot. Quattro
+  domande col popup prima di costruire; le sue scelte tra parentesi.
+  - 🔴 **L'AI «NON CAPIVA» LE RISPOSTE PERCHÉ USAVA IL MODELLO PIÙ
+    PICCOLO.** Incollata una risposta della compagnia («c'erano
+    turbolenze»), usciva «Ho salvato la loro risposta ma non sono
+    riuscito a capirla da solo». Girava su `mistral-small`. Leggere una
+    email di rifiuto e riconoscere quale degli otto motivi è, è un lavoro
+    di comprensione: **adesso `mistral-large`** (scelta di Valerio),
+    con l'istruzione di scegliere sempre il motivo più vicino invece di
+    mollare, e il fascicolo completo sempre sotto gli occhi. Il cancello
+    deterministico che impedisce all'AI di inventare sentenze e cifre
+    resta identico: un modello più bravo non ha più libertà, ha solo più
+    comprensione.
+  - 🔴 **IL FASCICOLO DICEVA «NON HANNO RISPOSTO PROPRIO» MENTRE LA
+    RISPOSTA C'ERA.** Due strade scrivevano sullo stesso fascicolo senza
+    guardarsi: quando l'AI non capiva, la lista degli otto motivi
+    lasciava scegliere «silenzio», e nasceva una pratica che si
+    contraddiceva da sola, con una replica per il silenzio mandata dove
+    un silenzio non c'era. Adesso, se una risposta è stata incollata,
+    «non hanno risposto» **non è più un'opzione**: né nella lista (la
+    voce sparisce), né sul server (la rotta la rifiuta), né nel fascicolo
+    (che con una risposta caricata non mostra mai «non hanno risposto»,
+    anche sulle pratiche vecchie già rotte).
+  - 🔴 **DOPO IL PAGAMENTO SI TORNAVA SULLA HERO DEL SITO, COL MODULO
+    VUOTO** (e chi partiva dalla web app veniva sbattuto fuori: era anche
+    il «la web app ti rimanda sempre al sito»). Un difetto solo: la cassa
+    riportava sempre su `/`. Adesso l'origine (landing o `/app`) e il
+    modo si mettono da parte insieme al volo, e la cassa riporta lì, coi
+    dati pronti e l'analisi che riparte da sola.
+  - 🔴 **IL «FASCICOLO DEL TUO CASO» ERA DOPPIO** (Valerio: «dice di
+    chiuderlo quando è già chiuso»): un riquadro apri/chiudi che dentro
+    ne conteneva un altro identico, perché il componente è già di suo un
+    apri/chiudi con lo stesso titolo. Tolto il guscio.
+  - 🔴 **IL MODULO RYANAIR PORTAVA A «NON AUTORIZZATO».** Il bottone
+    apriva un ARTICOLO profondo del centro assistenza, che per un utente
+    già dentro il suo account Ryanair rimbalzava sul portale e falliva.
+    Adesso punta alla home pubblica del centro assistenza (scelta di
+    Valerio: copia la lettera + apri la pagina pubblica dei reclami). ⚠️
+    L'indirizzo esatto del modulo va confermato dal suo browser, che è
+    loggato: da qui la rete verso ryanair.com è bloccata. In «Serve
+    Valerio».
+  - **IL PROFILO DELLA WEB APP NON È PIÙ VUOTO** (scelta di Valerio: il
+    check nella web app + il profilo, tutti e due). Adesso ha la faccia
+    dell'account (le iniziali), le tue pratiche a colpo d'occhio (quante
+    tocca a te, quante in attesa, quante chiuse) e una riga onesta sulla
+    classifica. **Controllato quello che ha chiesto:** il nome per la
+    classifica **si salva** (tabella profilo, `nickname` +
+    `classifica_optin`); la classifica **è costruita ma spenta di
+    proposito** (`CLASSIFICA_ATTIVA` non impostata), aspetta abbastanza
+    vincite vere per non nascere vuota. Si accende con una variabile su
+    Netlify.
+  - **L'OSSERVATORIO SPIEGA COSA COMUNICA** (scelta di Valerio: lo tengo
+    e lo rendo chiaro). Una riga sotto il titolo: «com'è messo oggi il
+    tuo aeroporto, se i voli arrivano in orario o in ritardo, è un dato
+    vero». **Funziona ed è fresco**: la rilevazione porta la data di
+    oggi.
+  - Prove: **verify verde** (build, tipi, lint e 1476 prove Playwright,
+    zero rosse).
+  - ⚠️ **IL VIDEO resta appeso alla stessa mossa del giro #68**: creare
+    una pratica per filmarla chiede la chiave del collaudatore
+    (`CASSA_PROVA_SEGRETO`, solo su Netlify) o `COLLAUDO_APERTO=1`. E in
+    questa sessione il browser del registratore non esce in rete (solo i
+    comandi). Vedi «Serve Valerio».
 - **GIRO #68 (14/08): GLI UNDICI PUNTI DEL COLLAUDO DI VALERIO, E IL VERO
   MOTIVO PER CUI L'OVERBOOKING NON APRIVA LA PRATICA.** Valerio ha
   percorso il prodotto da utente e ha alzato undici cose in un messaggio

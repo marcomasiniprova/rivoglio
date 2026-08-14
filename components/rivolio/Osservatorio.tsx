@@ -95,6 +95,9 @@ function StrisciaRitardi() {
       <p className="text-center text-[12.5px] font-medium uppercase tracking-[0.18em] text-menta/70">
         {SEZIONE.ritardi.titolo}
       </p>
+      <p className="mx-auto mt-3 max-w-xl text-center text-[14px] leading-relaxed text-white/70">
+        {SEZIONE.ritardi.spiega}
+      </p>
       <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {conIndice.map((r) => {
           const indice = r.indice ?? 0;

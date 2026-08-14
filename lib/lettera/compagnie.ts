@@ -124,7 +124,18 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     paese: "IE",
     canale:
       "Modulo EU261 nel centro assistenza ufficiale (sezione Passenger Rights). Ryanair lavora solo i reclami inviati direttamente dal passeggero: un reclamo di terzi senza il tuo reclamo diretto non viene processato (condizioni, art. 15.2.2).",
-    url: "https://help.ryanair.com/hc/en-us/articles/360017825538-EU-261-Passenger-Rights",
+    /* 🔴 QUESTO ERA UN LINK MORTO (Valerio, 14/08: apriva una pagina
+       myRyanair «You're not authorized to access this page»). Era un
+       ARTICOLO profondo del centro assistenza (…/articles/360017825538…):
+       un utente già dentro il suo account Ryanair veniva rimbalzato sul
+       portale, che senza una prenotazione selezionata dà «non
+       autorizzato». Adesso punta alla HOME pubblica del centro
+       assistenza, che non chiede login e da cui si raggiunge il modulo
+       EU261: una pagina di base non marcisce come un articolo.
+       ⚠️ L'indirizzo ESATTO del modulo va confermato dal browser di
+       Valerio, che è loggato (vedi «Serve Valerio»): da qui la rete
+       verso ryanair.com è bloccata e non lo posso verificare. */
+    url: "https://help.ryanair.com/hc/en-gb",
     email: null,
     pec: null,
     indirizzoPostale: "Ryanair DAC, Airside Business Park, Swords, Co. Dublin, Irlanda",
@@ -132,7 +143,7 @@ export const COMPAGNIE: CanaleCompagnia[] = [
     verificato: true,
     verificatoIl: VERIFICATO_IL,
     fonte:
-      "Ricerca web 2026-08-08: articoli 'EU-261 Passenger Rights' e 'Applying for Compensation' su help.ryanair.com; modulo diretto onlineform.ryanair.com/ee/en/eu-261 (il segmento paese/lingua cambia). Policy anti-intermediari dalle T&C ufficiali, art. 15.2.2: 14 giorni alla compagnia prima di incaricare terzi, pagamento solo al passeggero.",
+      "Ricerca web 2026-08-08: centro assistenza help.ryanair.com (sezione EU-261 Passenger Rights), modulo diretto onlineform.ryanair.com (segmento paese/lingua variabile). L'articolo profondo 360017825538 il 14/08/2026 rispondeva 403/redirect al portale: si punta alla home del centro assistenza. Policy anti-intermediari dalle T&C ufficiali, art. 15.2.2: 14 giorni alla compagnia prima di incaricare terzi, pagamento solo al passeggero.",
     // Il gruppo Ryanair vola con numeri FR anche via Malta Air, Lauda e
     // Buzz: il canale reclami del gruppo è quello di Ryanair.
     chiavi: ["RYANAIR", "MALTA AIR", "LAUDA", "BUZZ"],
