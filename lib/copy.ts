@@ -610,7 +610,7 @@ export const COPY = {
       {
         domanda: "Quali voli posso controllare?",
         risposta:
-          "Verifichiamo i voli coperti dal Regolamento CE 261/2004: in partenza da un aeroporto UE, o in arrivo nell'UE con una compagnia europea. Copriamo il ritardo di 3 ore o più all'arrivo, il volo cancellato, il dirottamento, il negato imbarco, la coincidenza persa e il declassamento in una classe più bassa di quella pagata. Sul ritardo il verdetto è automatico; negli altri casi il check ti fa una o due domande a risposta chiusa, perché quei fatti negli archivi non ci sono. Se resti nel dubbio non paghi.",
+          "Verifichiamo i voli coperti dal Regolamento CE 261/2004: in partenza da un aeroporto UE, o in arrivo nell'UE con una compagnia europea. Copriamo il ritardo di 3 ore o più all'arrivo, il volo cancellato, il dirottamento, il negato imbarco, la coincidenza persa e il declassamento in una classe più bassa di quella pagata. Se sei rimasto a terra a lungo e hai pagato pasti o hotel di tasca tua, alla pratica si aggiunge gratis il diritto di cura (art. 9). Sul ritardo il verdetto è automatico; negli altri casi il check ti fa una o due domande a risposta chiusa, perché quei fatti negli archivi non ci sono. Se resti nel dubbio non paghi. E se voli con una disabilità o a mobilità ridotta, c'è una guida gratuita con la lettera pronta su /mobilita-ridotta.",
       },
       {
         /* ⚠️ QUESTA DOMANDA VIENE DALLA SEZIONE "COSA COPRE", tolta dalla
