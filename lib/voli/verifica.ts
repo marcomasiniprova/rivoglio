@@ -24,6 +24,7 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { aerodatabox } from "./fornitori/aerodatabox";
 import { aviationstack } from "./fornitori/aviationstack";
 import { demo } from "./fornitori/demo";
+import { incrociaFonti } from "./incrocio";
 import { scioperoInData } from "@/lib/scioperi/scioperi";
 import { normalizzaData, normalizzaVolo } from "./normalizza";
 import type { FattoConPayload, FornitoreVoli } from "./tipi";
@@ -145,6 +146,18 @@ function fornitoreAttivo(voloIata: string): FornitoreVoli {
   return process.env.AERODATABOX_API_KEY ? aerodatabox : demo;
 }
 
+/**
+ * La SECONDA fonte per l'incrocio, se configurata. Provider-agnostica: oggi
+ * AviationStack, domani un'altra (basta impostarne la chiave), senza toccare
+ * la logica dell'incrocio. Torna null se nessuna riserva è impostata: allora
+ * niente incrocio, e il verdetto resta severo come sempre (nessuna
+ * regressione, il giorno che manca la chiave).
+ */
+function secondaFonte(): FornitoreVoli | null {
+  if (process.env.AVIATIONSTACK_API_KEY) return aviationstack;
+  return null;
+}
+
 export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Promise<EsitoVerifica> {
   // ── Strato 1: normalizzazione ────────────────────────────────────────
   const volo = normalizzaVolo(voloGrezzo);
@@ -212,15 +225,19 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
         fonte: primario.nome,
       };
     } else {
-      // Doppia fonte SOLO se esistono entrambe le chiavi (SPEC §4).
-      if (process.env.AERODATABOX_API_KEY && process.env.AVIATIONSTACK_API_KEY) {
-        const seconda = await aviationstack.cerca(volo.valore, data.valore);
-        if (fatto.arrivoEffettivoUtc && seconda?.arrivoEffettivoUtc) {
-          const scartoMinuti = Math.abs(
-            (Date.parse(fatto.arrivoEffettivoUtc) - Date.parse(seconda.arrivoEffettivoUtc)) /
-              60_000,
-          );
-          if (scartoMinuti > 15) fatto.fontiDiscordanti = true;
+      /* L'INCROCIO DELLE FONTI (lib/voli/incrocio.ts). Con una seconda fonte
+         configurata: due orari d'accordo CONFERMANO un volo che il solo
+         AeroDataBox lascerebbe incerto (recupera vendite vere), due orari in
+         disaccordo lo lasciano incerto (niente false promesse). Gira solo su
+         un fatto del primario VERO, mai sulla demo. */
+      const seconda = fatto.fonte === "aerodatabox" ? secondaFonte() : null;
+      if (seconda) {
+        const altra = await seconda.cerca(volo.valore, data.valore);
+        const incrocio = incrociaFonti(fatto, altra?.arrivoEffettivoUtc);
+        if (incrocio.discordanti) {
+          fatto = { ...fatto, fontiDiscordanti: true };
+        } else if (incrocio.confermato) {
+          fatto = { ...fatto, orarioVerificato: true, verificatoIncrociato: true };
         }
       }
 

@@ -953,18 +953,23 @@ export const COPY = {
       },
     },
 
-    /** INCERTO: non si vende MAI. Si spiega e ci si ferma. */
+    /** INCERTO: non si vende MAI. Si spiega, con fiducia, e non si fa pagare. */
     incerto: {
       occhiello: "Verifica completata",
-      titolo: "Il dato non è abbastanza solido. Qui ci fermiamo.",
+      /* 🔴 Prima diceva «Il dato non è abbastanza solido. Qui ci fermiamo.»,
+         che si legge come «non siamo capaci» (Valerio, 14/08: «uno paga e
+         gli diciamo che non siamo riusciti a fare l'analisi»). Non è così:
+         è una scelta di qualità, e quasi sempre è solo un volo troppo
+         recente. Il titolo lo dice con fiducia, e il «per ora» è la verità. */
+      titolo: "Per ora su questo volo non abbiamo una prova a prova di compagnia.",
       motivi: {
         fontiDiscordanti:
-          "Le nostre due fonti non concordano sugli orari di questo volo.",
+          "Le due fonti che incrociamo non danno lo stesso orario per questo volo: aspettiamo che siano d'accordo prima di darti un verdetto.",
         datoMancante:
-          "Non abbiamo trovato l'orario effettivo di atterraggio di questo volo.",
+          "Non è ancora arrivato l'orario ufficiale di atterraggio. Se il volo è di oggi o di ieri, di solito arriva entro un giorno.",
       },
       testo:
-        "Vendiamo solo su fatti verificati. Quando il fatto non è certo, non ti facciamo pagare.",
+        "Ti paghiamo solo quando il dato regge davanti alla compagnia aerea, e per questo volo non è ancora così. Non ti facciamo pagare per un forse: lascia la mail qui sotto e ti avvisiamo appena diventa certo.",
       alternativa:
         "Puoi comunque fare reclamo da solo, gratis: il modulo è nella sezione assistenza del sito della compagnia.",
       avviso: {

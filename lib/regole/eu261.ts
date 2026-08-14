@@ -22,7 +22,7 @@ import { seSiPaga } from "@/lib/check/ingresso";
 export const VERSIONE_REGOLE = "2026.08.8";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
-const SOGLIA_MINUTI = 180;
+export const SOGLIA_MINUTI = 180;
 /** Sopra questa distanza, un ritardo di 3-4h vale il 50% (300€, non 600€). */
 const SOGLIA_LUNGO_RAGGIO_KM = 3500;
 const SOGLIA_CORTO_RAGGIO_KM = 1500;
@@ -83,6 +83,15 @@ export type FattoVolo = {
    * reale di Valerio: senza Live niente vendita).
    */
   orarioVerificato?: boolean;
+  /**
+   * Vero quando l'orario è stato reso certo NON dal "Live" del primario, ma
+   * dall'accordo con una SECONDA fonte indipendente (vedi lib/voli/incrocio.ts).
+   * Due fonti che concordano sull'arrivo effettivo sono un fatto solido quanto
+   * un tracciamento: serve a vendere voli che il solo AeroDataBox lascerebbe
+   * incerti, senza aprire falsi positivi. È metadato, non cambia il verdetto:
+   * quello lo decide `orarioVerificato`.
+   */
+  verificatoIncrociato?: boolean;
   /**
    * Vero quando il numero è venduto in codeshare e il fornitore non sa dire
    * chi ha OPERATO il volo: il reclamo andrebbe alla compagnia sbagliata.
