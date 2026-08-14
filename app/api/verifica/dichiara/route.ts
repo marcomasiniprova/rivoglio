@@ -7,13 +7,14 @@ import {
   rispostaDeclassamentoValida,
   rispostaNegatoValida,
   valutaCoincidenza,
+  valutaCoincidenzaDueTratte,
   valutaDeclassamento,
   valutaNegato,
 } from "@/lib/regole/dichiarati";
 import { verificaVolo } from "@/lib/voli/verifica";
 import { aeroportoPerIata, inItaliano } from "@/lib/voli/aeroporti";
 import { kmFraAeroporti } from "@/lib/voli/distanza";
-import { scadenzaStimata } from "@/lib/regole/eu261";
+import { scadenzaStimata, VERSIONE_REGOLE } from "@/lib/regole/eu261";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 
 /**
@@ -29,7 +30,11 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
  *   { volo, data, verificaId?, caso: "negato",
  *     presenza, volonta }
  *   { volo, data, verificaId?, caso: "coincidenza",
- *     unica, ritardoFinale, destinazioneFinale }   // IATA
+ *     unica, ritardoFinale, secondoVolo, secondaData? }  // sito: legge 2 voli
+ *   { volo, data, verificaId?, caso: "coincidenza",
+ *     unica, ritardoFinale, destinazioneFinale }          // app: IATA finale
+ *   { volo, data, verificaId?, caso: "declassamento",
+ *     volonta, prezzo }
  *
  * Come per i cancellati: il fatto (distanza, sciopero, codeshare) viene
  * dai NOSTRI dati, mai dal browser; le dichiarazioni si scrivono sulla
@@ -131,22 +136,80 @@ export async function POST(req: Request) {
         { status: 400, headers: CORS },
       );
     }
-    /* La distanza dell'INTERO viaggio: partenza del volo controllato →
-       destinazione finale dichiarata. Il codice IATA arriva dal campo di
-       ricerca (lo stesso del check per tratta) e si valida qui. */
-    const iataFinale =
-      typeof c.destinazioneFinale === "string" ? c.destinazioneFinale.trim().toUpperCase() : "";
-    const scalo = iataFinale ? aeroportoPerIata(iataFinale) : null;
-    if (!scalo) {
-      return NextResponse.json(
-        { ok: false, errore: "Dimmi l'aeroporto della destinazione finale." },
-        { status: 400, headers: CORS },
+    if (typeof c.secondoVolo === "string" && c.secondoVolo.trim()) {
+      /* IL SECONDO VOLO, la coincidenza persa letta a DUE TRATTE (sito, dal
+         14/08). Il motore lo LEGGE (scelta di Valerio: «verifico entrambi i
+         voli»): serve la sua partenza per provare che il primo ritardo l'ha
+         fatto perdere, e il suo arrivo per la distanza dell'intero viaggio.
+         Se manca la data, si prova lo stesso giorno del primo volo, che è il
+         caso normale di una coincidenza. */
+      const nVolo = normalizzaVolo(c.secondoVolo);
+      if (!nVolo.ok) {
+        return NextResponse.json(
+          { ok: false, errore: "Dimmi il numero del volo di coincidenza, quello che hai perso." },
+          { status: 400, headers: CORS },
+        );
+      }
+      const secondaDataGrezza =
+        typeof c.secondaData === "string" && c.secondaData ? c.secondaData : c.data;
+      const nData = normalizzaData(secondaDataGrezza);
+      const esitoSecondo = await verificaVolo(
+        nVolo.valore,
+        nData.ok ? nData.valore : secondaDataGrezza,
       );
+      if (!esitoSecondo.ok) {
+        /* Non troviamo la coincidenza: non si vende su un dato che non c'è.
+           Non è un errore della richiesta, è un verdetto incerto onesto. */
+        verdetto = {
+          esito: "incerto",
+          motivo:
+            "Non riesco a trovare il volo di coincidenza che mi hai indicato: controlla numero e data. Senza leggerlo non posso provare che il ritardo del primo volo te l'ha fatto perdere, e non ti faccio pagare per un forse.",
+          versioneRegole: VERSIONE_REGOLE,
+        };
+        dichiarazione = { caso: "coincidenza", ...r, secondoVolo: nVolo.valore };
+      } else {
+        const secondo = esitoSecondo.fatto;
+        const kmViaggio =
+          fatto.partenzaIata && secondo.arrivoIata
+            ? kmFraAeroporti(fatto.partenzaIata, secondo.arrivoIata)
+            : null;
+        verdetto = valutaCoincidenzaDueTratte(fatto, secondo, r, kmViaggio);
+        dichiarazione = {
+          caso: "coincidenza",
+          ...r,
+          secondoVolo: secondo.voloIata,
+          secondaData: secondo.dataLocale,
+          destinazioneFinale: secondo.arrivoIata ?? null,
+        };
+        destinazione = secondo.arrivoIata
+          ? { iata: secondo.arrivoIata, citta: inItaliano(secondo.arrivoCitta) ?? secondo.arrivoIata }
+          : null;
+      }
+    } else {
+      /* IL VECCHIO PERCORSO, a DESTINAZIONE DICHIARATA. Lo usa ancora l'app
+         mobile e chi non passa il secondo volo: la fascia si calcola sul
+         viaggio intero (partenza del primo → destinazione finale scelta a
+         mano), e il ritardo finale lo dichiara l'utente. Resta perché
+         togliere il campo destinazione romperebbe l'app senza aggiungere
+         niente: il verdetto è lo stesso motore, solo con un dato in meno. */
+      const iataFinale =
+        typeof c.destinazioneFinale === "string" ? c.destinazioneFinale.trim().toUpperCase() : "";
+      const scalo = iataFinale ? aeroportoPerIata(iataFinale) : null;
+      if (!scalo) {
+        return NextResponse.json(
+          {
+            ok: false,
+            errore: "Dimmi il volo di coincidenza o l'aeroporto della destinazione finale.",
+          },
+          { status: 400, headers: CORS },
+        );
+      }
+      const kmViaggio = fatto.partenzaIata ? kmFraAeroporti(fatto.partenzaIata, scalo.iata) : null;
+      verdetto = valutaCoincidenza(fatto, r, kmViaggio);
+      dichiarazione = { caso: "coincidenza", ...r, destinazioneFinale: scalo.iata };
+      /* scalo.citta è già in italiano (aeroportoPerIata lo traduce). */
+      destinazione = { iata: scalo.iata, citta: scalo.citta };
     }
-    const kmViaggio = fatto.partenzaIata ? kmFraAeroporti(fatto.partenzaIata, scalo.iata) : null;
-    verdetto = valutaCoincidenza(fatto, r, kmViaggio);
-    dichiarazione = { caso: "coincidenza", ...r, destinazioneFinale: scalo.iata };
-    destinazione = { iata: scalo.iata, citta: inItaliano(scalo.citta) ?? scalo.citta };
   }
 
   /* La prova: dichiarazione ed esito sulla riga della verifica. */

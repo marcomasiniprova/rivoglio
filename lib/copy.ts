@@ -753,6 +753,16 @@ export const COPY = {
           domanda: "Qual era la destinazione finale del viaggio?",
           segnaposto: "Città o aeroporto",
         },
+        /* Dal 14/08 il sito chiede il NUMERO del volo di coincidenza, non
+           più la sola destinazione: il motore legge davvero quel volo e
+           prova, dagli orari, che il primo ritardo te l'ha fatto perdere.
+           La destinazione finale la ricava dal volo stesso. */
+        secondoVolo: {
+          domanda: "Qual è il volo che hai perso?",
+          aiuto:
+            "Il numero del volo che dovevi prendere subito dopo, quello che ti è scappato. Lo trovi sulla carta d'imbarco o nell'email: due lettere e dei numeri, tipo LH1892.",
+          segnaposto: "es. LH1892",
+        },
         ritardo: {
           domanda: "Con quanto ritardo sei arrivato alla destinazione finale?",
           voci: [

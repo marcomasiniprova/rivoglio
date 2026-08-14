@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import { COPY } from "@/lib/copy";
 
@@ -14,18 +14,16 @@ import { COPY } from "@/lib/copy";
  * e il verdetto lo dà il motore sul server: qui non c'è nessuna regola
  * da poter falsificare.
  *
- * La coincidenza chiede anche la DESTINAZIONE FINALE, perché la fascia
- * si calcola sull'intero viaggio: il campo cerca sugli stessi 6.072
- * scali del check per tratta (/api/aeroporti).
+ * La coincidenza chiede il NUMERO del volo che hai perso: il motore lo
+ * legge davvero, prova dagli orari che il primo ritardo te l'ha fatto
+ * perdere, e ricava la destinazione finale (e quindi la fascia) dal volo
+ * stesso. Chi non ha il numero sotto mano resta incerto e non paga.
  */
 
 const T = COPY.risultato.dichiara;
 const CURVA = [0.16, 1, 0.3, 1] as const;
 
 type Esito = { esito: "idoneo" | "incerto" | "non_idoneo"; motivo: string; importo?: number };
-/* Come lo manda /api/aeroporti. `etichetta` è il nome pronto da
-   mostrare: "Milano Malpensa". Vedi lib/voli/aeroporti.ts. */
-type Scalo = { iata: string; citta: string; nome: string; etichetta: string };
 
 function Scelte<V extends string>({
   domanda,
@@ -76,95 +74,6 @@ function Scelte<V extends string>({
   );
 }
 
-/** La destinazione finale: si scrive la città, si sceglie lo scalo. */
-function CampoDestinazione({
-  scelto,
-  scegli,
-}: {
-  scelto: Scalo | null;
-  scegli: (s: Scalo | null) => void;
-}) {
-  const [testo, setTesto] = useState("");
-  const [trovati, setTrovati] = useState<Scalo[]>([]);
-  /* La tendina si mostra solo quando ha senso: svuotarla con un setState
-     dentro l'effetto innescava un giro di render inutile. */
-  const visibili = scelto || testo.trim().length < 2 ? [] : trovati;
-  const vivo = useRef(true);
-  useEffect(() => {
-    vivo.current = true;
-    return () => {
-      vivo.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (scelto || testo.trim().length < 2) return;
-    const id = setTimeout(() => {
-      fetch(`/api/aeroporti?q=${encodeURIComponent(testo.trim())}`)
-        .then((r) => (r.ok ? r.json() : null))
-        .then((d) => {
-          if (vivo.current && Array.isArray(d?.aeroporti)) setTrovati(d.aeroporti.slice(0, 5));
-        })
-        .catch(() => {});
-    }, 220);
-    return () => clearTimeout(id);
-  }, [testo, scelto]);
-
-  return (
-    <div>
-      <p className="text-[15px] font-semibold text-inchiostro">{T.coincidenza.destinazione.domanda}</p>
-      {scelto ? (
-        <div className="mt-2.5 flex items-center justify-between gap-3 rounded-xl border border-verde bg-menta-tenue px-4 py-2.5">
-          <p className="text-[14px] font-medium text-inchiostro">
-            {scelto.etichetta} <span className="numeri text-[12px] text-fumo">({scelto.iata})</span>
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              scegli(null);
-              setTesto("");
-            }}
-            className="text-[13px] font-medium text-verde-scuro underline decoration-dotted underline-offset-4"
-          >
-            {COPY.check.tratta.cambia}
-          </button>
-        </div>
-      ) : (
-        <div className="relative mt-2.5">
-          <input
-            type="text"
-            value={testo}
-            onChange={(e) => setTesto(e.target.value)}
-            placeholder={T.coincidenza.destinazione.segnaposto}
-            /* ⚠️ 16px sul telefono: sotto quella misura iOS ingrandisce la
-               pagina da solo appena si tocca il campo, e da lì in poi il
-               verdetto resta zoomato e storto. Stesso difetto già trovato
-               sul login e sul pannello. */
-            className="h-12 w-full rounded-xl border border-bordo bg-white px-4 text-[16px] outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/10 sm:text-[15px]"
-          />
-          {visibili.length > 0 && (
-            <ul className="absolute inset-x-0 top-[52px] z-20 overflow-hidden rounded-xl border border-bordo bg-white shadow-[0_18px_44px_-20px_rgba(5,46,31,.35)]">
-              {visibili.map((s) => (
-                <li key={s.iata}>
-                  <button
-                    type="button"
-                    onClick={() => scegli(s)}
-                    className="flex w-full items-baseline gap-2 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-menta-tenue"
-                  >
-                    <span className="font-medium text-inchiostro">{s.etichetta}</span>
-                    <span className="truncate text-[12.5px] text-fumo">{s.nome}</span>
-                    <span className="numeri ml-auto text-[12px] text-fumo-2">{s.iata}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function DichiaraCaso({
   volo,
   dataVolo,
@@ -181,7 +90,7 @@ export default function DichiaraCaso({
   const [volonta, setVolonta] = useState<string | null>(null);
   const [unica, setUnica] = useState<string | null>(null);
   const [ritardoFinale, setRitardoFinale] = useState<string | null>(null);
-  const [destinazione, setDestinazione] = useState<Scalo | null>(null);
+  const [secondoVolo, setSecondoVolo] = useState("");
   const [volontaDecl, setVolontaDecl] = useState<string | null>(null);
   const [prezzo, setPrezzo] = useState("");
   const [invio, setInvio] = useState(false);
@@ -197,7 +106,7 @@ export default function DichiaraCaso({
       ? presenza !== null && volonta !== null
       : aperto === "declassamento"
         ? volontaDecl !== null && prezzoOk
-        : unica !== null && ritardoFinale !== null && destinazione !== null;
+        : unica !== null && ritardoFinale !== null && secondoVolo.trim().length >= 3;
 
   async function manda() {
     if (!aperto || !pronto || invio) return;
@@ -209,7 +118,7 @@ export default function DichiaraCaso({
           ? { caso: "negato", presenza, volonta }
           : aperto === "declassamento"
             ? { caso: "declassamento", volonta: volontaDecl, prezzo: prezzoNum }
-            : { caso: "coincidenza", unica, ritardoFinale, destinazioneFinale: destinazione?.iata };
+            : { caso: "coincidenza", unica, ritardoFinale, secondoVolo: secondoVolo.trim() };
       const r = await fetch("/api/verifica/dichiara", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -351,7 +260,26 @@ export default function DichiaraCaso({
                 scelta={unica as never}
                 scegli={setUnica}
               />
-              <CampoDestinazione scelto={destinazione} scegli={setDestinazione} />
+              <div>
+                <label htmlFor="volo-coincidenza" className="text-[15px] font-semibold text-inchiostro">
+                  {T.coincidenza.secondoVolo.domanda}
+                </label>
+                <p className="mt-1 text-[13px] leading-relaxed text-fumo">
+                  {T.coincidenza.secondoVolo.aiuto}
+                </p>
+                <input
+                  id="volo-coincidenza"
+                  type="text"
+                  autoCapitalize="characters"
+                  spellCheck={false}
+                  value={secondoVolo}
+                  onChange={(e) => setSecondoVolo(e.target.value)}
+                  placeholder={T.coincidenza.secondoVolo.segnaposto}
+                  /* 16px sul telefono, come gli altri campi: sotto quella
+                     misura iOS zooma la pagina da solo. */
+                  className="mt-2.5 h-12 w-full rounded-xl border border-bordo bg-white px-4 text-[16px] outline-none transition-all duration-200 focus:border-verde/60 focus:ring-4 focus:ring-verde/10 sm:text-[15px]"
+                />
+              </div>
               <Scelte
                 domanda={T.coincidenza.ritardo.domanda}
                 voci={T.coincidenza.ritardo.voci}

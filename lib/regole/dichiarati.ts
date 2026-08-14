@@ -1,4 +1,4 @@
-import { ambitoCE261, vettoreConLicenzaUE } from "./territorio";
+import { ambitoCE261, vettoreConLicenzaUE, zonaDiScalo } from "./territorio";
 import {
   VERSIONE_REGOLE,
   dentroLoSpazioEuropeo,
@@ -292,6 +292,131 @@ export function valutaDeclassamento(f: FattoVolo, r: RisposteDeclassamento): Ver
     importo,
     ritardoMinuti: 0,
     motivo: `Ti hanno messo in una classe più bassa di quella che avevi pagato, senza che tu l'abbia scelto: l'art. 10 par. 2 prevede il rimborso del ${perc}% del prezzo del biglietto, da pagare entro 7 giorni. Su una tratta di ${Math.round(km)} km la percentuale è ${perc}%, e sul prezzo che hai indicato (${r.prezzo}€) fa ${importo}€. La compagnia verifica il prezzo vero del biglietto: è quello che conta.`,
+    versioneRegole: VERSIONE_REGOLE,
+  };
+}
+
+/* ------------------------------ coincidenza persa, verificata a due tratte */
+
+/**
+ * COINCIDENZA PERSA, letta sui DUE voli (scelta di Valerio, 14/08:
+ * «il motore verifica le due tratte»). È la versione oggettiva della
+ * coincidenza: invece di fidarsi della sola dichiarazione, legge il primo
+ * volo (in ritardo) e la coincidenza, e prova in modo SEVERO che il ritardo
+ * del primo ha fatto perdere il secondo.
+ *
+ * La prova severa: il primo volo deve essere ATTERRATO (orario effettivo)
+ * DOPO che la coincidenza era già PARTITA (orario previsto). Se sulla carta
+ * la coincidenza era ancora prendibile, esce incerto: forse l'hai persa per
+ * code o controlli, e senza un legame chiaro col ritardo la compagnia lo
+ * contesterebbe.
+ *
+ * ⚠️ QUELLO CHE RESTA DICHIARATO, e non si può leggere: con quanto ritardo
+ * sei ARRIVATO alla destinazione finale. Dipende dal volo di riprotezione su
+ * cui ti hanno rimesso, che il fornitore non conosce. Lo dici tu a fasce, e
+ * la fascia dell'art. 7 si calcola sull'intero viaggio.
+ */
+export function valutaCoincidenzaDueTratte(
+  primo: FattoVolo,
+  secondo: FattoVolo,
+  r: RisposteCoincidenza,
+  kmViaggio: number | null,
+): Verdetto {
+  if (r.unica === "no") {
+    return nonIdoneo(
+      "I due voli erano su biglietti separati: per il Regolamento ogni volo va giudicato da solo, e la coincidenza persa fra prenotazioni diverse non dà compensazione. Controlla il primo volo per il suo ritardo: quello resta valutabile.",
+    );
+  }
+  if (r.unica === "nonSo") {
+    return incerto(
+      "Serve sapere se i voli stavano sulla stessa prenotazione: guarda l'email di conferma, se c'è un solo codice di prenotazione per tutti i voli la risposta è sì. Finché non si sa, il caso resta incerto e non paghi niente.",
+    );
+  }
+  if (r.ritardoFinale === "nonRicordo") {
+    return incerto(
+      "Manca il dato che decide: con quanto ritardo sei arrivato alla destinazione finale? Sotto le 3 ore la compensazione non spetta, da 3 in su sì. Ritrova l'orario d'arrivo del volo che hai preso davvero e torna a rispondere.",
+    );
+  }
+  if (r.ritardoFinale === "meno3") {
+    return nonIdoneo(
+      "Sei arrivato alla destinazione finale con meno di 3 ore di ritardo: per la coincidenza persa la Corte di giustizia guarda l'arrivo finale, e sotto le 3 ore la compensazione non spetta.",
+    );
+  }
+
+  /* Del secondo volo non abbiamo letto niente di usabile (numero sbagliato,
+     data sbagliata, o dato non ancora disponibile): non è "non si
+     collegano" (quello è quando i due voli esistono ma partono da scali
+     diversi), è che quel volo non lo troviamo. Si chiede di ricontrollare,
+     e non si vende. */
+  const secondoIgnoto =
+    secondo.stato === "sconosciuto" ||
+    (!secondo.partenzaIata && !secondo.arrivoIata && !secondo.partenzaPrevistoUtc);
+  if (secondoIgnoto) {
+    return incerto(
+      "Non riesco a leggere il volo di coincidenza che mi hai indicato: controlla il numero e la data. Senza quel volo non posso provare che il ritardo del primo te l'ha fatto perdere, e non ti faccio pagare per un forse.",
+    );
+  }
+
+  /* I due voli devono collegarsi DAVVERO: il primo deve atterrare nello
+     stesso scalo da cui parte la coincidenza. Se no, non è la coppia
+     giusta e non ci si può ragionare sopra. */
+  const scaloComune =
+    !!primo.arrivoIata &&
+    !!secondo.partenzaIata &&
+    primo.arrivoIata.toUpperCase() === secondo.partenzaIata.toUpperCase();
+  if (!scaloComune) {
+    return incerto(
+      "Questi due voli non si collegano: il primo atterra in uno scalo e la coincidenza parte da un altro. Controlla i numeri: il secondo è il volo che dovevi prendere dallo scalo dove arriva il primo.",
+    );
+  }
+
+  /* LA CAUSA, severa: il primo è atterrato DOPO che la coincidenza era già
+     partita? Solo allora il ritardo ha fatto perdere il volo in modo che
+     nessuno può contestare. */
+  const arrivoPrimo = primo.arrivoEffettivoUtc;
+  const partenzaSecondo = secondo.partenzaPrevistoUtc;
+  if (!arrivoPrimo || !partenzaSecondo) {
+    return incerto(
+      "Non ho gli orari certi per confrontare l'arrivo del primo volo con la partenza della coincidenza. Riprova più tardi: questa analisi non consuma il credito.",
+    );
+  }
+  if (Date.parse(arrivoPrimo) <= Date.parse(partenzaSecondo)) {
+    return incerto(
+      "Dagli orari, il tuo primo volo è atterrato prima che la coincidenza partisse: sulla carta avresti potuto prenderla. Se l'hai persa lo stesso, per code o controlli, può darsi che ti spetti, ma senza un legame chiaro col ritardo la compagnia lo contesterebbe, e non te lo vendiamo come sicuro.",
+    );
+  }
+
+  const blocco = paletti(primo, kmViaggio);
+  if (blocco) return blocco;
+  const km = kmViaggio as number;
+
+  /* LA FASCIA SUL VIAGGIO INTERO, non sul primo volo. Il tetto di 400
+     dell'art. 7 par. 2 lett. b) cade solo se il viaggio esce DAVVERO dallo
+     spazio europeo, e "esce davvero" lo diciamo solo quando la destinazione
+     finale è un paese terzo CERTO. Su un dato incerto (o sulla Svizzera) si
+     resta a 400, che è la direzione che non fa mai chiedere più del dovuto:
+     un falso positivo sull'importo è la cosa che la regola numero uno
+     vieta. Passare `dentroLoSpazioEuropeo(primo)` sarebbe stato sbagliato
+     due volte: guardava lo scalo di COINCIDENZA invece della destinazione
+     finale, quindi teneva a 400 anche un Milano → Francoforte → New York
+     (dove spettano 600), e su una destinazione ignota avrebbe potuto aprire
+     la fascia da 600 senza esserne certo. */
+  const zonaFinale = zonaDiScalo({
+    iata: secondo.arrivoIata,
+    paese: secondo.arrivoPaese,
+    icao: secondo.arrivoIcao,
+  });
+  const importo = fasciaArt7(km, zonaFinale !== "terzo", r.ritardoFinale === "fra3e4");
+
+  return {
+    esito: "idoneo",
+    importo,
+    ritardoMinuti: 0,
+    motivo: `Il tuo primo volo è atterrato dopo che la coincidenza era già partita: il ritardo ti ha fatto perdere il secondo volo, su un'unica prenotazione, e alla destinazione finale sei arrivato con ${
+      r.ritardoFinale === "fra3e4" ? "3-4 ore" : "più di 4 ore"
+    } di ritardo. La compensazione si calcola sull'intero viaggio, ${Math.round(
+      km,
+    )} km, fascia ${importo}€, e il reclamo va alla compagnia del primo volo. Restano da verificare le circostanze straordinarie, che può invocare solo la compagnia.`,
     versioneRegole: VERSIONE_REGOLE,
   };
 }

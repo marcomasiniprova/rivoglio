@@ -169,6 +169,7 @@ export const aerodatabox: FornitoreVoli = {
         volo.arrival?.airport?.municipalityName ?? volo.arrival?.airport?.name ?? null,
       arrivoPaese: volo.arrival?.airport?.countryCode ?? null,
       arrivoIcao: volo.arrival?.airport?.icao ?? null,
+      partenzaPrevistoUtc: utcIso(volo.departure?.scheduledTime),
       arrivoPrevistoUtc: utcIso(volo.arrival?.scheduledTime),
       arrivoEffettivoUtc: stato === "atterrato" ? effettivo : null,
       stato,

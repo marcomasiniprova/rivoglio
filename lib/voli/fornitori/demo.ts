@@ -96,6 +96,13 @@ export const demo: FornitoreVoli = {
       partenzaCitta: "Scalo demo A",
       arrivoIata: sagoma.arrivo ?? "PMO",
       arrivoCitta: "Scalo demo B",
+      /* Partenza demo: due ore prima dell'arrivo previsto. Non è realistica
+         per la fascia (che usa i km), serve solo a dare un orario di
+         partenza alla coincidenza a due tratte. */
+      partenzaPrevistoUtc:
+        sagoma.stato === "sconosciuto" || !sagoma.previstoOre
+          ? null
+          : orarioUtc(dataLocale, sagoma.previstoOre, -120),
       arrivoPrevistoUtc: sagoma.stato === "sconosciuto" ? null : previsto,
       arrivoEffettivoUtc: effettivo,
       stato: sagoma.stato,

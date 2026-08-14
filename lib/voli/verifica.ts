@@ -52,6 +52,9 @@ type RigaVolo = {
   partenza_citta: string | null;
   arrivo_iata: string | null;
   arrivo_citta: string | null;
+  /* Opzionale: una riga di cache salvata prima della migrazione non ce
+     l'ha, e va bene così (la coincidenza a due tratte esce incerta). */
+  partenza_previsto_utc?: string | null;
   arrivo_previsto_utc: string | null;
   arrivo_effettivo_utc: string | null;
   stato: FattoVolo["stato"];
@@ -82,6 +85,7 @@ function fattoDaRiga(riga: RigaVolo): FattoVolo {
     arrivoPaese: riga.arrivo_paese ?? null,
     partenzaIcao: riga.partenza_icao ?? null,
     arrivoIcao: riga.arrivo_icao ?? null,
+    partenzaPrevistoUtc: riga.partenza_previsto_utc ?? null,
     arrivoPrevistoUtc: riga.arrivo_previsto_utc,
     arrivoEffettivoUtc: riga.arrivo_effettivo_utc,
     stato: riga.stato,
@@ -126,7 +130,7 @@ export function rigaUsabile(riga: RigaVolo): boolean {
 }
 
 const COLONNE_CACHE_BASE =
-  "id, volo_iata, data_locale, vettore_operativo, vettore_marketing, partenza_iata, partenza_citta, arrivo_iata, arrivo_citta, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, orario_verificato, vettore_da_determinare";
+  "id, volo_iata, data_locale, vettore_operativo, vettore_marketing, partenza_iata, partenza_citta, arrivo_iata, arrivo_citta, partenza_previsto_utc, arrivo_previsto_utc, arrivo_effettivo_utc, stato, km_ortodromica, fonte, fonti_discordanti, orario_verificato, vettore_da_determinare";
 const COLONNE_CACHE = `${COLONNE_CACHE_BASE}, partenza_paese, arrivo_paese, partenza_icao, arrivo_icao`;
 
 /**
@@ -231,6 +235,7 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
             partenza_citta: fatto.partenzaCitta ?? null,
             arrivo_iata: fatto.arrivoIata ?? null,
             arrivo_citta: fatto.arrivoCitta ?? null,
+            partenza_previsto_utc: fatto.partenzaPrevistoUtc ?? null,
             arrivo_previsto_utc: fatto.arrivoPrevistoUtc,
             arrivo_effettivo_utc: fatto.arrivoEffettivoUtc,
             stato: fatto.stato,

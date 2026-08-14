@@ -58,6 +58,16 @@ export type FattoVolo = {
   arrivoPaese?: string | null;
   partenzaIcao?: string | null;
   arrivoIcao?: string | null;
+  /**
+   * L'orario di PARTENZA previsto (UTC). Serve a un caso solo: la
+   * coincidenza persa a due tratte, dove per provare in modo severo che
+   * il primo ritardo ti ha fatto perdere il secondo volo bisogna
+   * confrontare l'arrivo effettivo del primo con la PARTENZA prevista del
+   * secondo. Opzionale di proposito: un volo che non ce l'ha (una riga di
+   * cache vecchia) non rompe niente, fa solo uscire incerta la
+   * coincidenza, che è la direzione sicura.
+   */
+  partenzaPrevistoUtc?: string | null;
   arrivoPrevistoUtc: string | null;
   arrivoEffettivoUtc: string | null;
   stato: "atterrato" | "cancellato" | "dirottato" | "sconosciuto";
