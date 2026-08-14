@@ -100,10 +100,21 @@ test.describe("Accesso", () => {
 
   test("Entra porta al login, la web app resta nel footer (9/08)", async ({ page }) => {
     /* Il 9/08 Valerio ha chiuso il labirinto: "Entra" in nav va DRITTO
-       alla pagina di accesso, niente doppio Entra. La web app resta
-       raggiungibile dal footer ("La web app") e dal check, senza account. */
+       alla pagina di accesso (href=/entra), niente doppio Entra. La web app
+       resta raggiungibile dal footer ("La web app") e dal check.
+       Dal 14/08 sotto i 1280 "Entra" vive nel menu a panino (MenuMobile):
+       la sostanza è identica (stesso href), cambia solo che su schermo
+       stretto prima si apre il menu. La prova segue il dispositivo. */
     await page.goto("/");
-    await expect(page.locator('header a[href="/entra"]').first()).toBeVisible();
+    const larghezza = page.viewportSize()?.width ?? 0;
+    if (larghezza >= 1280) {
+      // Desktop: "Entra" è nella barra, visibile, e punta al login.
+      await expect(page.locator('header a[href="/entra"]').first()).toBeVisible();
+    } else {
+      // Telefono e tablet: "Entra" è nel menu a panino, stesso href.
+      await page.getByRole("button", { name: "Apri il menu" }).click();
+      await expect(page.locator('#menu-mobile a[href="/entra"]')).toBeVisible();
+    }
     await expect(page.locator('footer a[href="/app"]').first()).toHaveCount(1);
   });
 });

@@ -48,6 +48,7 @@ export default defineConfig({
         env: {
           AERODATABOX_API_KEY: "",
           AVIATIONSTACK_API_KEY: "",
+          AVIATIONEDGE_API_KEY: "",
         },
       },
 });

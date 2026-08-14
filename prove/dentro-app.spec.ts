@@ -61,14 +61,18 @@ test.describe("Dopo il pagamento", () => {
 
 test.describe("La pagina del verdetto sa chi sta guardando", () => {
   test("l'uscita in alto porta alla web app se sei collegato, alla landing se no", () => {
-    const testo = leggi("app/verifica/[id]/page.tsx");
+    // Dal 14/08 il cuore della pagina è in contenuto.tsx (indirizzo pulito):
+    // /verifica/[id] è un guscio che lo richiama. Il comportamento è lì.
+    const testo = leggi("app/verifica/contenuto.tsx");
     expect(testo).toContain('href={collegato ? "/app" : "/"}');
   });
 
   test("il collegamento si legge dalla sessione, non da un parametro nell'indirizzo", () => {
     /* Un `?da=app` si perde al primo rimbalzo e si falsifica a mano.
        Chi sta guardando lo dice la sessione. */
-    const testo = leggi("app/verifica/[id]/page.tsx");
+    // Dal 14/08 il cuore della pagina è in contenuto.tsx (indirizzo pulito):
+    // /verifica/[id] è un guscio che lo richiama. Il comportamento è lì.
+    const testo = leggi("app/verifica/contenuto.tsx");
     expect(testo).toContain("await utenteCollegato()");
   });
 });

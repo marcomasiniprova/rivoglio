@@ -30,7 +30,8 @@ test.describe("Le altre casistiche hanno lo stesso flusso del ritardo", () => {
   });
 
   test("la pagina del verdetto dichiara se la cassa di prova è aperta", () => {
-    const pagina = leggi("app/verifica/[id]/page.tsx");
+    // Dal 14/08 il cuore della pagina vive in contenuto.tsx (indirizzo pulito).
+    const pagina = leggi("app/verifica/contenuto.tsx");
     /* Deve arrivare dalla stessa funzione del cancello, non da un flag a
        mano: `cassaDiProvaAperta()`. Se un domani sparisce, il flusso si
        rimura sui voli veri. */
