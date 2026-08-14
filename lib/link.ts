@@ -27,6 +27,7 @@ const A_PARTE = [
   "/aeroporto",
   "/guida-bagagli",
   "/giudice-di-pace",
+  "/mobilita-ridotta",
 ];
 
 /**

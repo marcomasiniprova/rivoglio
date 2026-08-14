@@ -1420,6 +1420,7 @@ export const COPY = {
           { testo: "Cosa pago, esattamente?", ancora: "#domande" },
           { testo: "Bagaglio perso o in ritardo?", ancora: "/guida-bagagli" },
           { testo: "La compagnia non paga?", ancora: "/giudice-di-pace" },
+          { testo: "Voli e disabilità?", ancora: "/mobilita-ridotta" },
           { testo: "Tutte le risposte", ancora: "#domande" },
         ],
       },

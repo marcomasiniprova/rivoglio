@@ -76,7 +76,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     })),
     // le guide: contenuto da ricerca, vale più delle pagine legali
-    ...["/guida-bagagli", "/giudice-di-pace"].map((percorso) => ({
+    ...["/guida-bagagli", "/giudice-di-pace", "/mobilita-ridotta"].map((percorso) => ({
       url: `${casa}${percorso}`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
