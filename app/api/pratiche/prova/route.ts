@@ -77,23 +77,23 @@ export async function GET(req: NextRequest) {
   if (error) return NextResponse.json({ errore: error.message }, { status: 500 });
   if (!verifica) return NextResponse.json({ errore: "Verifica inesistente." }, { status: 404 });
 
-  /* ⚠️ SOLO SUI VOLI DIMOSTRATIVI. Una pratica di prova su un volo VERO
-     finirebbe nell'elenco delle pratiche accanto a quelle dei clienti, e
-     il giorno che ne arriva una davvero non si distinguerebbero più.
-     I voli demo cominciano per ZZ, ed è la stessa regola di sempre. */
-  if (!(verifica.volo_iata ?? "").toUpperCase().startsWith("ZZ")) {
-    /* 🔴 QUI USCIVA UNA PAGINA BIANCA CON DENTRO DEL JSON. Niente
-       testata, niente marchio, nessun modo di tornare indietro: l'unica
-       via d'uscita era il tasto indietro del browser. E non capitava
-       solo a chi collauda: col portone aperto ci finisce chiunque
-       controlli un volo VERO e prema il bottone d'acquisto.
-       Adesso si torna sulla pagina del verdetto, che il messaggio
-       onesto («il pagamento non è ancora attivo») lo sa già dare.
-       Trovato dall'ispezione del 12/08. */
-    return NextResponse.redirect(
-      versoCasa(`/verifica/${verifica.id}?checkout=non-attivo`, req),
-    );
-  }
+  /* ⚠️ ANCHE SU UN VOLO VERO, e non è un allentamento: è la ragione per
+     cui questa cassa esiste (Valerio, 13/08, aprendo una pratica di
+     overbooking su un volo reale: «NON APRE LA PRATICA E SI BLOCCA»).
+     Prima qui i voli non-ZZ venivano rimbalzati su «il pagamento non è
+     ancora attivo»: il bottone d'acquisto adesso si accende (giro
+     precedente), ma premuto non apriva niente. Il muro vero è già sopra:
+     `inCollaudo(req)` ha già risposto 404 a chiunque non porti la chiave
+     del collaudatore, quindi qui arriva SOLO Valerio. Bloccare anche lui
+     era la cosa che gli impediva di percorrere il prodotto fino ai
+     quattro fogli su un volo scelto a caso, che è esattamente quello che
+     voleva fare fin dall'inizio (vedi l'intestazione di questo file).
+
+     Quello che rende sicuro tenerla aperta sui voli veri non è il numero
+     del volo, è il MARCHIO: la pratica nasce con l'evento
+     `pratica_di_prova` e `prezzo_pagato` a zero (più sotto), quindi non
+     si confonde con una vera e non entra negli incassi. Un volo ZZ non è
+     più sicuro di un volo vero marcato: è solo più finto. */
   if (verifica.esito !== "idoneo") {
     return NextResponse.json(
       { errore: `Si apre una pratica solo su un verdetto idoneo (questo è "${verifica.esito}").` },

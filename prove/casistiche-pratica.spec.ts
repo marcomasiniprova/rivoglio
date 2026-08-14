@@ -46,4 +46,25 @@ test.describe("Le altre casistiche hanno lo stesso flusso del ritardo", () => {
     expect(rotta).toContain("caso_dichiarato");
     expect(rotta).toMatch(/esito:\s*verdetto\.esito/);
   });
+
+  test("la cassa di prova apre la pratica ANCHE su un volo vero, non solo ZZ", () => {
+    /* 🔴 IL SECONDO PEZZO DEL FIX (Valerio, 13/08: «NON APRE LA PRATICA E
+       SI BLOCCA»). Il bottone d'acquisto si accendeva, ma premuto su un
+       volo VERO la rotta rimbalzava su «pagamento non attivo» perché
+       apriva la pratica solo sui voli demo (ZZ). Il muro vero è
+       `inCollaudo`, già sopra: qui non deve esserci nessun cancello sul
+       numero del volo, se no Valerio non arriva mai ai quattro fogli su
+       un volo scelto a caso. */
+    const rotta = leggi("app/api/pratiche/prova/route.ts");
+    expect(
+      rotta,
+      "la rotta non deve più rimbalzare i voli non-ZZ su checkout=non-attivo",
+    ).not.toMatch(/startsWith\(["']ZZ["']\)[\s\S]{0,200}checkout=non-attivo/);
+    /* La sicurezza non sta nel numero del volo ma nel marchio: la pratica
+       di prova nasce marcata e a prezzo zero. Se sparisce il marchio, una
+       pratica di prova su un volo vero diventa indistinguibile da una
+       vera. */
+    expect(rotta).toContain("pratica_di_prova");
+    expect(rotta).toMatch(/prezzo_pagato:\s*0/);
+  });
 });
