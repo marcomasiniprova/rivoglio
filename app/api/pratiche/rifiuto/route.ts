@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimite } from "@/lib/api/limite";
 import { utenteDaRichiesta } from "@/lib/api/utente";
 import { RIFIUTI, schedaRifiuto } from "@/lib/pratiche/rifiuto";
-import { registraEvento, transizionePratica } from "@/lib/pratiche/pratiche";
+import { eventiPratica, registraEvento, transizionePratica } from "@/lib/pratiche/pratiche";
+import { EVENTO_TESTO_RIFIUTO } from "@/lib/pratiche/dossier";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 
 /**
@@ -108,6 +109,29 @@ export async function POST(req: Request) {
       { ok: false, errore: "Il reclamo non risulta ancora inviato." },
       { status: 409, headers: CORS },
     );
+  }
+
+  /* 🔴 «NON HANNO RISPOSTO» NON SI PUÒ SCEGLIERE SE UNA RISPOSTA C'È
+     (Valerio, 14/08: il fascicolo diceva «Non hanno risposto proprio»
+     mentre lui la loro risposta l'aveva incollata). Le due strade
+     scrivevano sullo stesso fascicolo senza guardarsi: quando l'AI non
+     capiva un testo, la lista dei motivi lasciava scegliere "silenzio",
+     e nasceva una pratica che si contraddiceva da sola, con una replica
+     per il silenzio mandata dove un silenzio non c'era. Il testo
+     incollato è il fatto: se c'è, il silenzio non è un'opzione. */
+  if (scheda.motivo === "silenzio") {
+    const eventi = await eventiPratica(praticaId);
+    const rispostaCaricata = eventi.some((e) => e.tipo === EVENTO_TESTO_RIFIUTO && e.nota);
+    if (rispostaCaricata) {
+      return NextResponse.json(
+        {
+          ok: false,
+          errore:
+            "Hai già caricato la loro risposta, quindi «non hanno risposto» non si applica. Scegli il motivo che descrive cosa hanno scritto.",
+        },
+        { status: 409, headers: CORS },
+      );
+    }
   }
 
   const { error } = await sb

@@ -41,7 +41,16 @@ import { dossierInParole } from "../pratiche/dossier";
  * il modello, viene aggiunto dopo, uguale per tutti.
  */
 
-const MODELLO = "mistral-small-latest";
+/* ⚠️ IL MODELLO GRANDE, non il piccolo (scelta di Valerio, 14/08:
+   «l'AI non capisce le risposte»). Leggere una email di rifiuto scritta
+   di fretta, riconoscere quale degli otto motivi è, ed estrarre i fatti
+   che loro dichiarano è un lavoro di comprensione, non di forma: il
+   modello piccolo mollava e diceva «non ho capito». Costa qualche
+   centesimo in più a lettura, e sono poche letture per pratica: è il
+   punto dove sbagliare fa la figura peggiore, perché la replica la manda
+   il cliente col nostro nome sopra. Il cancello deterministico più sotto
+   resta identico: un modello più bravo non ha più libertà di inventare. */
+const MODELLO = "mistral-large-latest";
 
 export type AnalisiRifiuto = {
   /** Il motivo riconosciuto, fra gli otto. */
@@ -271,6 +280,7 @@ Campi richiesti:
 - "motivo": uno esatto fra questi otto codici, quello che descrive la loro risposta:
 ${RIFIUTI.map((r) => `  - "${r.motivo}": ${r.aiuto}`).join("\n")}
 - "sicurezza": "alta" se la risposta dice chiaramente il motivo, "media" se lo lascia intuire, "bassa" se non si capisce.
+  ⚠️ Il campo "motivo" NON è mai vuoto: se hai un dubbio scegli comunque il codice PIÙ VICINO fra gli otto e metti "sicurezza": "bassa". "silenzio" si usa SOLO se il testo non è affatto una risposta della compagnia (una nota tua, una pagina bianca): se c'è una qualunque risposta, il motivo è uno degli altri sette.
 - "fattiLoro": array di stringhe brevi, i fatti CHE LORO DICHIARANO (date, orari, eventi, numeri di pratica, nomi). Solo quello che c'è scritto nella loro risposta. Array vuoto se non dichiarano nulla di concreto.
 - "riassunto": UNA frase in italiano, massimo 25 parole, che spiega al passeggero cosa gli hanno risposto. Dai del tu.
 - "paragrafo": il paragrafo centrale della replica, in italiano, dal punto di vista del PASSEGGERO che scrive alla compagnia ("la vostra risposta...", "vi chiedo...").

@@ -292,8 +292,16 @@ export default function SchedaCheck() {
         setMuro(dati.muro as DatiMuro);
         /* Il volo si mette da parte PRIMA di mandare qualcuno alla cassa:
            al ritorno l'analisi riparte da sola, invece di ritrovarsi un
-           modulo vuoto dopo aver pagato (vedi lib/check/ripresa.ts). */
-        sospendiCheck(voloDaControllare, giornoIso);
+           modulo vuoto dopo aver pagato (vedi lib/check/ripresa.ts).
+           Con sé porta anche il MODO e la PAGINA da cui si parte: così
+           chi fa il check dentro la web app ci torna, invece di finire
+           sulla hero del sito (Valerio, 14/08). */
+        sospendiCheck(
+          voloDaControllare,
+          giornoIso,
+          modo,
+          typeof window !== "undefined" ? window.location.pathname : "/",
+        );
         /* ⚠️ QUI NON SI SCROLLA, e prima si scrollava. C'era un
            `scrollIntoView` che riportava la pagina in cima al riquadro
            del check: sulla carta serviva a non far comparire la cifra
@@ -366,7 +374,7 @@ export default function SchedaCheck() {
        spegnerebbe la ripresa proprio in quel giro. A non farla partire
        due volte ci pensa già il segnaposto qui sopra. */
     setTimeout(() => {
-      setModo("numero");
+      setModo(sospeso.modo === "tratta" ? "tratta" : "numero");
       setVolo(sospeso.volo);
       setData(sospeso.data);
       void avvia(sospeso.volo, sospeso.data);

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, Lock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/Logo";
-import { RITORNO_DALLA_CASSA } from "@/lib/check/ripresa";
+import { ritornoDallaCassa } from "@/lib/check/ripresa";
 
 /**
  * LA CASSA DI PROVA: quello che si vede.
@@ -83,12 +83,14 @@ export default function CassaProva({
         setInCorso(false);
         return;
       }
-      /* Torna al check con la ricevuta già nel cookie E col segno che fa
-         ripartire l'analisi sul volo di prima: senza, si tornava su un
-         modulo vuoto subito dopo aver pagato (vedi lib/check/ripresa.ts).
+      /* Torna DOVE SI ERA (landing o web app) con la ricevuta già nel
+         cookie E col segno che fa ripartire l'analisi sul volo di prima:
+         senza, si tornava su un modulo vuoto sulla hero del sito subito
+         dopo aver pagato, anche a chi era partito dalla web app (Valerio,
+         14/08). L'origine l'ha messa da parte `sospendiCheck`.
          ⚠️ Il venditore vero dovrà riportare indietro sullo STESSO
          indirizzo, se no il difetto rinasce il giorno dell'incasso. */
-      router.push(RITORNO_DALLA_CASSA);
+      router.push(ritornoDallaCassa());
       router.refresh();
     } catch {
       setErrore("Non ha funzionato. Riprova.");

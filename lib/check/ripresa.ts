@@ -33,13 +33,48 @@ const VALE_MS = 60 * 60 * 1000;
 
 export type CheckSospeso = { volo: string; data: string };
 
-/** Dove torna chi ha pagato: il check, con l'ordine di riprendere. */
+/**
+ * ⚠️ SI TORNA DOVE SI ERA, non sempre sulla landing (Valerio, 14/08:
+ * «quando fai l'analisi dalla web app ti rimanda sempre al sito, alla
+ * hero; e dopo aver pagato ti ritrovi tutto da zero»). Erano due facce
+ * dello stesso difetto: la cassa riportava sempre su `/`, quindi chi
+ * partiva dalla web app (`/app`) veniva sbattuto sul sito, e il volo che
+ * aveva scritto spariva. Adesso l'origine si mette da parte insieme al
+ * volo, e la cassa ci riporta lì. */
+const ORIGINI_OK = new Set(["/", "/app"]);
+const pulisciOrigine = (p: unknown): string =>
+  typeof p === "string" && ORIGINI_OK.has(p) ? p : "/";
+
+/** Fallback: se non sappiamo da dove veniva, torna sulla landing. */
 export const RITORNO_DALLA_CASSA = `/?${SEGNO}=1#controllo`;
 
-/** Mette da parte il volo davanti al quale è comparso il muro. */
-export function sospendiCheck(volo: string, data: string): void {
+/**
+ * Dove torna chi ha pagato l'analisi: l'origine messa da parte (la
+ * landing o la web app), con l'ordine di riprendere. NON cancella
+ * l'appunto: a cancellarlo è `riprendiCheck` una volta arrivati.
+ */
+export function ritornoDallaCassa(): string {
   try {
-    sessionStorage.setItem(CHIAVE, JSON.stringify({ volo, data, quando: Date.now() }));
+    const grezzo = sessionStorage.getItem(CHIAVE);
+    if (!grezzo) return RITORNO_DALLA_CASSA;
+    const d = JSON.parse(grezzo) as { origine?: unknown };
+    return `${pulisciOrigine(d.origine)}?${SEGNO}=1#controllo`;
+  } catch {
+    return RITORNO_DALLA_CASSA;
+  }
+}
+
+/**
+ * Mette da parte il volo davanti al quale è comparso il muro, insieme al
+ * modo (numero/tratta) e alla pagina da cui si partiva, così al ritorno
+ * si ricompone tutto com'era.
+ */
+export function sospendiCheck(volo: string, data: string, modo?: string, origine?: string): void {
+  try {
+    sessionStorage.setItem(
+      CHIAVE,
+      JSON.stringify({ volo, data, modo, origine: pulisciOrigine(origine), quando: Date.now() }),
+    );
   } catch {
     /* Navigazione privata o memoria piena: si perde la ripresa, non la
        pagina. Meglio un modulo da riempire di una schermata rotta. */
@@ -51,15 +86,20 @@ export function sospendiCheck(volo: string, data: string): void {
  * Si cancella subito di proposito: un appunto che resta è un'analisi che
  * riparte quando non deve.
  */
-export function riprendiCheck(): CheckSospeso | null {
+export function riprendiCheck(): (CheckSospeso & { modo?: string }) | null {
   try {
     const grezzo = sessionStorage.getItem(CHIAVE);
     sessionStorage.removeItem(CHIAVE);
     if (!grezzo) return null;
-    const d = JSON.parse(grezzo) as { volo?: unknown; data?: unknown; quando?: unknown };
+    const d = JSON.parse(grezzo) as {
+      volo?: unknown;
+      data?: unknown;
+      modo?: unknown;
+      quando?: unknown;
+    };
     if (typeof d.volo !== "string" || typeof d.data !== "string") return null;
     if (typeof d.quando !== "number" || Date.now() - d.quando > VALE_MS) return null;
-    return { volo: d.volo, data: d.data };
+    return { volo: d.volo, data: d.data, modo: typeof d.modo === "string" ? d.modo : undefined };
   } catch {
     return null;
   }

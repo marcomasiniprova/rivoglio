@@ -64,6 +64,11 @@ export default function DichiaraRifiuto({
      La lista resta un clic sotto, e diventa la strada principale se il
      modello non ce la fa. */
   const [lista, setLista] = useState(false);
+  /* Vero se siamo finiti sulla lista DOPO aver caricato una risposta che
+     il modello non ha classificato: in quel caso «non hanno risposto» non
+     è un'opzione, la risposta c'è. Lo stesso paletto vive anche sul
+     server (Valerio, 14/08). */
+  const [rispostaCaricata, setRispostaCaricata] = useState(false);
   const [motivi, setMotivi] = useState<Motivo[]>([]);
   const [scelto, setScelto] = useState<string | null>(nuovoGiro ? null : (giaDichiarato ?? null));
   const [invio, setInvio] = useState(false);
@@ -196,6 +201,9 @@ export default function DichiaraRifiuto({
             praticaId={praticaId}
             onFallita={(messaggio) => {
               setLista(true);
+              /* La risposta l'ha caricata: «non hanno risposto» sparisce
+                 dalla lista, se no si torna alla contraddizione di prima. */
+              setRispostaCaricata(true);
               if (messaggio) setErrore(messaggio);
             }}
           />
@@ -203,6 +211,7 @@ export default function DichiaraRifiuto({
             type="button"
             onClick={() => {
               setLista(true);
+              setRispostaCaricata(false);
               setErrore("");
             }}
             className="mt-3 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
@@ -213,7 +222,9 @@ export default function DichiaraRifiuto({
       ) : (
         <>
           <div className="mt-4 flex flex-col gap-2">
-            {motivi.map((m) => {
+            {motivi
+              .filter((m) => !(rispostaCaricata && m.motivo === "silenzio"))
+              .map((m) => {
               const attivo = scelto === m.motivo;
               return (
                 <button

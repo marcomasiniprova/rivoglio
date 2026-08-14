@@ -10,7 +10,9 @@ import SchedaCheck from "@/components/check/SchedaCheck";
  */
 export default function CheckRapido() {
   return (
-    <div className="rounded-3xl border border-bordo bg-white p-5 sm:p-7">
+    /* id="controllo": al ritorno dalla cassa (?ripresa=1#controllo) la
+       pagina scorre qui, come sulla landing. Vedi lib/check/ripresa.ts. */
+    <div id="controllo" className="scroll-mt-24 rounded-3xl border border-bordo bg-white p-5 sm:p-7">
       <SchedaCheck />
     </div>
   );

@@ -252,13 +252,25 @@ export function costruisciDossier({
       documentoSaltato: eventi.some((e) => e.tipo === EVENTO_SALTATO),
       documentoEsito: notaDocumento,
     },
-    rifiuto: {
-      motivo: (pratica.rifiuto_motivo as MotivoRifiuto | null) ?? null,
-      etichetta: scheda?.etichetta ?? null,
-      peso: scheda?.peso ?? null,
-      dichiaratoIl: pratica.rifiuto_il ?? null,
-      testoLoro: ultimaNota(eventi, EVENTO_TESTO_RIFIUTO),
-    },
+    rifiuto: (() => {
+      const testoLoro = ultimaNota(eventi, EVENTO_TESTO_RIFIUTO);
+      /* ⚠️ «silenzio» e una risposta incollata non convivono. Se una
+         vecchia pratica porta la contraddizione (motivo «silenzio» ma il
+         testo della loro risposta c'è), a valere è il TESTO, che è un
+         fatto: il silenzio era una scelta, e sbagliata. Da qui il difetto
+         non nasce più (lo blocca la rotta del rifiuto), ma il fascicolo
+         non deve MAI dire «non hanno risposto» con la loro risposta lì
+         sotto (Valerio, 14/08). */
+      const incoerente = testoLoro !== null && pratica.rifiuto_motivo === "silenzio";
+      const sch = incoerente ? null : scheda;
+      return {
+        motivo: incoerente ? null : ((pratica.rifiuto_motivo as MotivoRifiuto | null) ?? null),
+        etichetta: sch?.etichetta ?? null,
+        peso: sch?.peso ?? null,
+        dichiaratoIl: pratica.rifiuto_il ?? null,
+        testoLoro,
+      };
+    })(),
     storia: eventi.map((e) => ({
       quando: oraIt(e.creato_il) ?? e.creato_il,
       cosa: etichette[e.tipo] ?? e.tipo,
