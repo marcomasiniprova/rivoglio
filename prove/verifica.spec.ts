@@ -201,4 +201,14 @@ test.describe("La pagina del risultato (id demo, senza chiavi)", () => {
     );
     expect(sfora).toBe(false);
   });
+
+  test("/verifica pulito senza risultato recente: pannello calmo, mai un errore", async ({
+    page,
+  }) => {
+    /* L'indirizzo pulito (scelta di Valerio, 14/08): aperto a mano, senza il
+       cookie dell'ultima verifica, spiega con calma invece di rompersi. */
+    await page.goto("/verifica");
+    await expect(page.getByText(COPY.risultato.nessunRecente.titolo)).toBeVisible();
+    await expect(page.getByRole("link", { name: COPY.risultato.nessunRecente.cta })).toBeVisible();
+  });
 });

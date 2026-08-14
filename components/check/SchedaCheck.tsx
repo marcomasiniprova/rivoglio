@@ -386,8 +386,12 @@ export default function SchedaCheck() {
         return;
       }
 
+      /* Indirizzo PULITO per un verdetto vero: si va su /verifica e basta,
+         l'id lo porta il cookie scritto da /api/verifica (Valerio, 14/08:
+         niente più /verifica/<uuid> lungo). La demo tiene il suo indirizzo
+         esplicito, che serve a ricostruirla senza database. */
       const destinazione = dati.id
-        ? `/verifica/${dati.id}`
+        ? "/verifica"
         : dati.demo === true
           ? `/verifica/demo-${canonico(voloDaControllare)}-${giornoIso}`
           : null;

@@ -1018,6 +1018,15 @@ export const COPY = {
       testo:
         "C'è un problema tecnico dal nostro lato. Il link resta valido: riprova tra qualche minuto.",
     },
+
+    /** Si è aperto /verifica (indirizzo pulito) ma il cookie dell'ultimo
+        risultato non c'è più: si spiega e si rimanda al check. */
+    nessunRecente: {
+      titolo: "Non trovo un risultato recente.",
+      testo:
+        "Il risultato di un controllo resta a portata per un'ora su questo dispositivo. Fanne uno nuovo: bastano il numero del volo e la data.",
+      cta: "Controlla un volo",
+    },
   },
 
   /** Arriva DOPO il reveal, mai prima (SPEC §3: regola d'oro del funnel). */

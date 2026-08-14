@@ -12,6 +12,7 @@ import {
   segnaConsumo,
 } from "@/lib/check/cancello";
 import { COOKIE_PASS, consumaPass } from "@/lib/check/pass";
+import { COOKIE_ULTIMA_VERIFICA, ULTIMA_VERIFICA_VALE_S } from "@/lib/check/verifica-cookie";
 import { traccia } from "@/lib/eventi/registra";
 
 /**
@@ -197,5 +198,16 @@ export async function POST(req: Request) {
      Adesso arriva a zero e resta: a impedire una seconda analisi ci
      pensa il registro nel database, non il cookie. */
   if (pass && daConsumare) risposta.cookies.set(COOKIE_PASS, daConsumare, BISCOTTO);
+
+  /* L'id dell'ultima verifica in un cookie: così il risultato si apre su
+     /verifica (indirizzo pulito) invece che su /verifica/<uuid> (Valerio,
+     14/08). Vale un'ora, come la ripresa dopo la cassa. Solo per i verdetti
+     veri: la demo ha un suo indirizzo esplicito. */
+  if (esito.verificaId) {
+    risposta.cookies.set(COOKIE_ULTIMA_VERIFICA, esito.verificaId, {
+      ...BISCOTTO,
+      maxAge: ULTIMA_VERIFICA_VALE_S,
+    });
+  }
   return risposta;
 }
