@@ -13,7 +13,7 @@ const VOLO = { volo: "ZZ180", data: "05/08/2026" }; // demo: atterrato, 800 km
 
 async function dichiara(
   request: import("@playwright/test").APIRequestContext,
-  corpo: Record<string, string>,
+  corpo: Record<string, string | number>,
 ) {
   const r = await request.post("/api/verifica/dichiara", { data: { ...VOLO, ...corpo } });
   expect(r.ok()).toBeTruthy();
