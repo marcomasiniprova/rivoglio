@@ -59,9 +59,18 @@ const dormi = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * picco di mille errori resta un messaggio solo.
  */
 function allarmeFornitore(etichetta: string, stato: number): void {
+  /* 🔴 LA CHIAVE DEL SILENZIATORE DEV'ESSERE STABILE, non per-volo. L'audit
+     del 14/08 ha trovato che era `fornitore-${etichetta}`, e l'etichetta è
+     "aerodatabox FR1234 2026-08-06": UNICA per ogni volo. Così mille voli
+     distinti che falliscono nel picco facevano mille messaggi Telegram e
+     mille insert 'guasto', proprio mentre il DB è già sotto stress (STATO
+     diceva "mille errori = un messaggio solo": era falso). La chiave ora è
+     per FORNITORE + stato (il fornitore è la prima parola dell'etichetta);
+     la riga del volo resta nel MESSAGGIO, dove serve. */
+  const chiave = `fornitore-${etichetta.split(" ")[0]}-${stato}`;
   dopo(() =>
     tinGuasto(
-      `fornitore-${etichetta}`,
+      chiave,
       stato === 0
         ? `Il fornitore dei dati di volo non risponde (${etichetta}).\nI check escono "incerto": nessuno paga per un verdetto sbagliato, ma le vendite si fermano.`
         : `Il fornitore dei dati di volo risponde ${stato} (${etichetta}).\n${stato === 429 ? "È il tetto delle richieste al secondo: sta arrivando troppa gente insieme." : "È un guasto dalla loro parte."}`,

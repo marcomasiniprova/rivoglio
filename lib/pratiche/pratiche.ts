@@ -168,7 +168,8 @@ export async function creaPratica({
   tipo?: TipoPratica;
   passeggeri?: Passeggero[];
 }): Promise<
-  { ok: true; pratica: Pratica; utenteNuovo: boolean } | { ok: false; motivo: string }
+  | { ok: true; pratica: Pratica; utenteNuovo: boolean; giaEsisteva?: boolean }
+  | { ok: false; motivo: string }
 > {
   if (!SERVIZIO_ATTIVO) return { ok: false, motivo: "SUPABASE_SECRET_KEY assente." };
 
@@ -228,6 +229,18 @@ export async function creaPratica({
       .select()
       .single();
     if (errP || !pratica) {
+      /* IDEMPOTENZA A LIVELLO DATABASE (audit 14/08, insieme all'indice unico
+         pratiche_verifica_unica della migrazione 2026-08-14-scala.sql). Due
+         consegne dello stesso pagamento Polar in parallelo passano entrambe il
+         controllo "esiste già?" e provano a creare: l'indice unico fa fallire
+         la seconda con 23505. Non è un errore, la pratica c'è: la rileggiamo e
+         lo diciamo (giaEsisteva), così il webhook che ha perso la corsa NON
+         manda una seconda email di benvenuto. Se la migrazione non è ancora
+         applicata, il 23505 non scatta e il comportamento resta identico. */
+      if (errP?.code === "23505") {
+        const esistente = await praticaPerVerifica(verificaId);
+        if (esistente) return { ok: true, pratica: esistente, utenteNuovo: false, giaEsisteva: true };
+      }
       return { ok: false, motivo: `pratica non creata: ${errP?.message ?? "?"}` };
     }
 

@@ -161,6 +161,38 @@ function secondaFonte(): FornitoreVoli | null {
   return null;
 }
 
+/**
+ * DEDUPLICA DELLE CHIAMATE AL FORNITORE (single-flight), per NON moltiplicare
+ * il costo quando molti controllano lo STESSO volo nello stesso istante.
+ *
+ * Scenario dell'audit del 14/08: un video porta 500 persone a controllare lo
+ * stesso volo virale. La cache `voli` è ancora vuota (nessuno l'ha chiesto
+ * prima), quindi senza questo ogni richiesta concorrente chiama AeroDataBox,
+ * bruciando il tetto di 3 richieste/secondo su un volo solo. Qui le richieste
+ * concorrenti per lo stesso volo+data CONDIVIDONO una sola chiamata: la prima
+ * chiama, le altre aspettano il suo risultato.
+ *
+ * ⚠️ Vale DENTRO una macchina Netlify (coalizza le richieste che la stessa
+ * istanza gestisce insieme). Fra istanze diverse non aiuta: servirebbe un
+ * lock condiviso, più complesso; questo è il primo taglio, a costo e rischio
+ * zero. Ogni check resta la SUA verifica (riga propria in `verifiche`): qui si
+ * condivide solo il FATTO del volo, non l'esito dell'utente.
+ */
+const inVolo = new Map<string, Promise<FattoConPayload | null>>();
+
+function cercaCoalescata(
+  primario: FornitoreVoli,
+  voloIata: string,
+  dataLocale: string,
+): Promise<FattoConPayload | null> {
+  const chiave = `${primario.nome}:${voloIata}:${dataLocale}`;
+  const gia = inVolo.get(chiave);
+  if (gia) return gia;
+  const p = primario.cerca(voloIata, dataLocale).finally(() => inVolo.delete(chiave));
+  inVolo.set(chiave, p);
+  return p;
+}
+
 export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Promise<EsitoVerifica> {
   // ── Strato 1: normalizzazione ────────────────────────────────────────
   const volo = normalizzaVolo(voloGrezzo);
@@ -212,7 +244,7 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
   // ── Strato 2b: il fornitore ──────────────────────────────────────────
   if (!fatto) {
     const primario = fornitoreAttivo(volo.valore);
-    fatto = await primario.cerca(volo.valore, data.valore);
+    fatto = await cercaCoalescata(primario, volo.valore, data.valore);
 
     if (!fatto) {
       // Nessun dato: fatto sconosciuto, il motore dirà incerto. Niente cache.

@@ -181,6 +181,14 @@ export async function POST(req: NextRequest) {
     }
     pratica = creata.pratica;
 
+    /* Corsa di webhook (audit 14/08): un'altra consegna dello stesso pagamento
+       ha vinto la creazione, questa ha perso sull'indice unico. Quella che ha
+       vinto sta già facendo transizione ed email: ci fermiamo qui, così non
+       partono un secondo benvenuto né una seconda pratica. */
+    if (creata.giaEsisteva) {
+      return NextResponse.json({ ok: true, pratica: pratica.id, nota: "Già gestito (corsa)." });
+    }
+
     /* #21: la firma della rinuncia al recesso entra nella cronologia della
        pratica. Il checkout la esige, quindi se qui manca è un'anomalia
        (link Polar girato a mano?): si logga forte e si segna, per l'admin. */
