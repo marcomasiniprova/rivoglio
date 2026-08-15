@@ -37,6 +37,7 @@ import {
   giornoPiu,
 } from "@/lib/tempo";
 import { COPY } from "@/lib/copy";
+import LasciaRecensione from "@/components/rivolio/LasciaRecensione";
 
 /**
  * Il tracker della pratica: la linea del tempo dagli eventi, lo stato
@@ -589,6 +590,15 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           </p>
         </section>
       )}
+
+      {/* La recensione della pratica: chi è arrivato qui ha pagato, quindi
+          ha un'esperienza vera da raccontare. Una per pratica (indice unico),
+          e sblocca un'analisi gratis. */}
+      <LasciaRecensione
+        eventoTipo="pratica"
+        eventoRif={pratica.id}
+        titolo="Com'è andata con Rivolio? Lascia una recensione"
+      />
 
       <Link
         href="/app"
