@@ -14,11 +14,6 @@ import { seSiPaga } from "@/lib/check/ingresso";
  *   4. accesso senza password          → linkMagico
  * Le email della PRATICA (T+0/2/15/30/60) stanno in `pratiche.ts`.
  *
- * EREDITÀ del prodotto viaggi (5-8: ricercaAttiva, alert, creditiFiniti,
- * ricevuta): nessun flusso di Rivolio le manda più; le richiama solo il
- * vecchio ramo ricerche/alert, da spegnere (voce in ARRETRATI). Non
- * riusarle per testi nuovi.
- *
  * Nessuna di queste lancia eccezioni: se l'email non parte, l'azione
  * dell'utente è comunque riuscita. Una registrazione fallita perché la
  * posta era giù sarebbe un disastro.

@@ -1,42 +1,41 @@
 @STATO.md
+@INIZIA-QUI.md
 
-# Rivolio — le regole (contesto pieno: PROGETTO.md)
+# Rivolio — le regole
+Recuperiamo i soldi che le compagnie devono ai passeggeri (Reg. CE 261/2004):
+check del volo → verdetto → pratica di reclamo. Dominio: rivolio.it. Contesto pieno: PROGETTO.md.
 
 ## Con me
-1. Ogni prompt: 4 domande popup prima di costruire, sempre — anche dopo
-   "vai/procedi/lock in", anche su richieste piccole. La consigliata
-   marcata "(consigliato)".
-2. Consegna a pezzi: fai, dillo, continua — niente riassunti di cosa
-   stai per fare. Ogni consegna: fatto / manca / prossimo pezzo.
-3. Una mia decisione resta finché non la cambio io. Se ti pare sbagliata
-   dimmelo in una riga, poi eseguila comunque.
+1. Ogni prompt: 4 domande popup PRIMA di costruire, sempre, anche dopo "vai/procedi". La consigliata per prima, marcata "(consigliato)".
+2. Consegna a pezzi: fai, dillo, continua. Ogni consegna: cosa è fatto / cosa manca / prossimo pezzo.
+3. Non fare di testa tua: una mia decisione resta finché non la cambio io. Se ti pare sbagliata, dimmelo in una riga e poi eseguila.
 4. Niente agenti o workflow paralleli se non li chiedo io.
-5. Più richieste in un messaggio: skill copertura-prompt, chiudi col
-   blocco COPERTURA.
-6. Task lungo o rilevante: andare con calma farlo tutto bene alla perfezione punto per punto farlo in una unica seduta.
+5. Più richieste in un messaggio: skill copertura-prompt, chiudi col blocco COPERTURA.
 
-## "Fatto" — prova obbligatoria, non un'opinione
-7. "Fatto"/"collaudato" solo con DUE prove insieme: output esatto del
-   verify (copia-incolla, mai riassunto) + screenshot o link aperto
-   sul sito vero. Manca anche una sola: scrivi "NON VERIFICATO", mai
-   "fatto".
-8. Sandbox non raggiunge il sito/servizio vero: prova un secondo modo
-   di verificare (altro endpoint, log, chiamata diretta) prima di
-   arrenderti. Solo se fallisce anche quello, dichiaralo — mai
-   spacciarlo per successo.
-9. Tocca solo il pezzo chiesto. Zero refactoring. Un fix non rompe altro.
-10. Modifica visiva: guardala a 360/768/1024/1280/1440, non solo i tre
-    soliti. Mai `absolute` dove serve layout vero. Skill art-director.
-11. Numeri: fonte o "stima". Dati finti solo `demo`, mai in produzione.
-    Segreti solo in `.env.local`. Fine sessione: STATO, verify, commit.
+## "Fatto" = provato (la regola che conta di più)
+6. Mai "fatto"/"collaudato" senza DUE prove insieme: `npm run verify` verde (output incollato, mai riassunto) + schermata o link sul sito vero. Se non puoi, scrivi "NON VERIFICATO". Se la sandbox non arriva, prova un secondo modo (log, altro endpoint) prima di arrenderti.
+
+## I paletti di Rivolio
+7. MAI un falso positivo: vendere un diritto che non c'è è la cosa numero uno vietata. Nel dubbio il verdetto esce "incerto", e l'incerto non si vende.
+8. Il motore decide (lib/regole), l'AI mai. Numeri con fonte o "stima". Dati finti solo `demo`, mai in produzione. Segreti solo in `.env.development.local`.
+
+## Quando costruisci
+9. Tocca solo il pezzo chiesto, zero refactoring, un fix non rompe altro.
+10. Modifica visiva a 360/768/1024/1280/1440 (anche DOVE cambiano i breakpoint). Mai `build` mentre gira `dev`. Skill art-director per ogni superficie.
 
 ## Come parli
-12. A me: zero gergo senza traduzione, spiegazioni in chat, mai in un file.
-13. All'utente: dieci persone normali, del tu, frasi corte, mai il
-    trattino lungo, ogni numero apribile.
+11. A me: zero gergo senza traduzione, spiegazioni in chat mai in un file. Fine sessione: STATO, verify, commit.
+12. All'utente: dieci persone normali, del tu, frasi corte, MAI il trattino lungo, ogni numero apribile.
 
 ## Chiedi PRIMA
-14. Soldi, domini, software di sistema, pubblicare, cose irreversibili. se qualcosa non è chiaro fai domande. e riguardo al tuo sandbox alla tua proxy dimmi se con accesso alla mia vps diventi piu libero e lavorerai meglio?.
+13. Soldi, domini, software di sistema, pubblicare, cose irreversibili.
+
+## La mappa dei file
+- INIZIA-QUI.md — parti da qui: setup locale, mappa, stato, cosa collaudare.
+- STATO.md — il diario giro per giro (l'ultimo in cima). PROGETTO.md — protocollo e regole operative.
+- ARRETRATI.md e promemoria.md — le cose da fare, mie e tue. MOTORE.md — come gira il motore. SPEC.md — cosa fa il prodotto.
+- LANCIO.md e PAGAMENTI.md — blocchi al lancio e la cassa (Polar ha detto no). docs/ — riferimento e ricerca (BRAND, sentenze, riforma, Polar...).
+- Codice: lib/regole = il motore · lib/check = il muro · lib/pratiche = la pratica · lib/recensioni = il codice dell'analisi gratis.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

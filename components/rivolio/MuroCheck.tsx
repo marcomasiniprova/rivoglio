@@ -190,7 +190,7 @@ export default function MuroCheck({
               className="flex items-center gap-2 text-[13.5px] font-medium text-verde-scuro underline decoration-bordo underline-offset-4 hover:text-verde"
             >
               <Ticket className="size-4" aria-hidden="true" />
-              Hai un codice dell&apos;analisi gratis?
+              Hai un codice della recensione?
             </button>
           ) : (
             <div>

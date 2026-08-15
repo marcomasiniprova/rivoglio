@@ -83,8 +83,8 @@ ZZ, ogni risposta marcata `demo`).
 - `lib/pratiche/` — la macchina della pratica (`passi.ts` è gli stati,
   `pratiche.ts` le transizioni, `dossier.ts` il fascicolo).
 - `lib/lettera/` — la lettera di reclamo (compagnie, enti, conciliazione).
-- `lib/email/` — le email (Resend). ⚠️ Dentro `messaggi.ts` c'è anche
-  codice del vecchio prodotto viaggi (eredità), da non usare.
+- `lib/email/` — le email (Resend): iscrizione all'Osservatorio, accesso,
+  benvenuto. Le email della pratica (T+0/2/…) stanno in `lib/pratiche/`.
 - `components/rivolio/` — le superfici visive della landing.
 - `components/pratica/` — i pezzi della pagina pratica.
 - `prove/` — le prove Playwright. `prove/eu261.spec.ts` è l'eval del motore.
@@ -119,12 +119,22 @@ provale davvero:
    pratica chiusa.
 5. **Un solo bottone** nella card prezzi.
 
+### Il vecchio prodotto viaggi: RIMOSSO (15/08)
+
+Il sottosistema del vecchio prodotto viaggi ("Viaggio Anche Io") è stato
+tolto: `lib/offerte/`, `lib/alert/`, `lib/destinazioni.ts`,
+`lib/costruttore.ts`, `lib/motore/esegui.ts`, le ricerche in
+`components/app/`, i 18 componenti landing morti (`Hero`, `Faq`, `Prezzi`…),
+le funzioni email viaggi in `lib/email/messaggi.ts` e le prove relative.
+`npm run verify` verde dopo la rimozione.
+
+**Unico residuo rimasto, innocuo:** dentro `mobile/src/lib/testi.ts` restano
+alcune chiavi di testo del vecchio prodotto (parlano di "destinazioni a
+settimana"). Nessuna schermata viva le legge, quindi non compaiono da
+nessuna parte; il mobile è verde. Si possono togliere in un giro dedicato
+al mobile (chiavi dentro un dizionario condiviso: meglio con calma e
+`npm run` mobile a ogni passo, non insieme ad altro).
+
 ### Ancora da fare (non fatto)
 
-- **Togliere il codice del vecchio prodotto viaggi**: è un sottosistema
-  intero (`lib/offerte/`, `lib/alert/invia.ts`, `lib/motore/esegui.ts`, le
-  ricerche in `components/app/`, le email viaggi in `lib/email/messaggi.ts`,
-  `prove/motore.spec.ts`). Va tolto in un giro suo con build verde: alcuni
-  pezzi sono agganciati a file condivisi. In locale è più sicuro (puoi
-  girare `npm run verify` a ogni passo).
 - Le voci aperte in `promemoria.md` e `ARRETRATI.md`.

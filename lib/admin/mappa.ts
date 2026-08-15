@@ -189,7 +189,7 @@ export const NODI: Nodo[] = [
          `CASI_ORO.length` e con `VERSIONE_REGOLE`: se il motore cresce e
          la riga resta indietro, la suite si ferma. Trovato
          dall'ispezione del 12/08. */
-      "Regole scritte del Regolamento CE 261/2004, versione 2026.08.8, provate su 53 casi etichettati a mano con zero falsi positivi. Tre risposte possibili: idoneo, incerto, non idoneo. Un caso incerto non si vende mai: è la regola che tiene in piedi tutto, perché vendere una lettera per un diritto che non esiste vuol dire rimborsare e prendersi una stella.",
+      "Regole scritte del Regolamento CE 261/2004, versione 2026.08.9, provate su 55 casi etichettati a mano con zero falsi positivi. Tre risposte possibili: idoneo, incerto, non idoneo. Un caso incerto non si vende mai: è la regola che tiene in piedi tutto, perché vendere una lettera per un diritto che non esiste vuol dire rimborsare e prendersi una stella.",
     stato: "fatto",
     icona: "ingranaggio",
     x: 50,

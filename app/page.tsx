@@ -23,7 +23,7 @@ import { COPY } from "@/lib/copy";
  * che azzera il rischio; SUBITO DOPO i numeri del problema (è l'argomento
  * che convince, prima stava sepolto sotto i prezzi); chi fa cosa; il gancio
  * retroattivo; i prezzi col confronto; le domande e l'Osservatorio. I vecchi
- * componenti viaggi restano nel repository ma la pagina non li importa più.
+ * componenti del prodotto viaggi sono stati rimossi dal repository (15/08).
  *
  * ⚠️ "COSA COPRE" È STATA TOLTA (Valerio, 12/08: «elimina tutta questa
  * sezione»). Era tre colonne che elencavano riga per riga cosa il motore

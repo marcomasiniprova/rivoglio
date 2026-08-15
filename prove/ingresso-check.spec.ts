@@ -302,10 +302,6 @@ test.describe("Nessuna porta di servizio sul muro", () => {
       "l'OCR della carta d'imbarco è LIBERO di proposito (13/08): leggere la foto è compilazione, non l'analisi che si vende, e paywallarla faceva pagare per riempire un modulo e perdere il progresso dopo. Il muro scatta dopo, su /api/verifica. Mistral OCR costa pochissimo e la rotta resta dietro il freno per IP.",
     "app/api/motore/avvisa/route.ts":
       "lavoro notturno di Netlify, chiuso da MOTORE_SEGRETO: non lo chiama un utente",
-    "app/api/motore/raccogli/route.ts":
-      "lavoro notturno di Netlify, chiuso da MOTORE_SEGRETO: non lo chiama un utente",
-    "app/api/motore/abbina/route.ts":
-      "lavoro notturno di Netlify, chiuso da MOTORE_SEGRETO: non lo chiama un utente",
     "app/api/motore/segui/route.ts":
       "lavoro notturno di Netlify, chiuso da MOTORE_SEGRETO: non lo chiama un utente",
     "app/api/motore/coda/route.ts":
@@ -409,13 +405,22 @@ test.describe("Nessuna promessa di check gratuito fuori dall'interruttore", () =
        questa variabile il check torna gratuito per tutti", perché è
        esattamente la diagnosi che serve. Non è una promessa a un
        cliente: è un cruscotto. */
+    /* I commenti multi-riga vanno tolti PRIMA di andare riga per riga: il
+       controllo sotto prende la riga d'apertura di un blocco, ma non le
+       righe di mezzo e di chiusura, e lì dentro finiscono le spiegazioni
+       del codice del buono ("l'analisi gratis: si incolla nel muro") che
+       non le legge nessun utente. Si svuota il contenuto del blocco
+       tenendo gli a-capo, così i numeri di riga del rapporto restano veri. */
+    const senzaBlocchi = (t: string) =>
+      t.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "));
+
     const colpevoli: string[] = [];
     for (const f of file) {
       if (f.startsWith("app/admin/")) continue;
-      const righe = readFileSync(join(process.cwd(), f), "utf8").split("\n");
+      const righe = senzaBlocchi(readFileSync(join(process.cwd(), f), "utf8")).split("\n");
       righe.forEach((riga, i) => {
         const spoglio = riga.trim();
-        // i commenti non li legge nessun utente (anche quelli JSX: `{/* ... */}`)
+        // i commenti di riga non li legge nessun utente
         if (/^(\*|\/\/|\/\*|\{\/\*)/.test(spoglio)) return;
         if (!/gratis|gratuit/i.test(riga)) return;
         // la promessa: "gratis" a meno di 60 caratteri da una parola del check

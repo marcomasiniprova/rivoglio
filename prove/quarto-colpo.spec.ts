@@ -336,7 +336,7 @@ test.describe("Ogni sentenza citata per quello che dice", () => {
     /* Se qualcuno aggiunge una causa nuova alle repliche, deve anche
        aggiungerla a SENTENZE-DA-CONTROLLARE.md, se no nessuno la
        rileggera' mai sulla fonte. */
-    const doc = readFileSync(join(process.cwd(), "SENTENZE-DA-CONTROLLARE.md"), "utf8");
+    const doc = readFileSync(join(process.cwd(), "docs", "SENTENZE-DA-CONTROLLARE.md"), "utf8");
     const cause = new Set<string>();
     for (const s of RIFIUTI) {
       for (const m of s.riferimenti.join(" ").matchAll(/C-\d+\/\d+/g)) cause.add(m[0]);

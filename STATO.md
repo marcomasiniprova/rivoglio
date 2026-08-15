@@ -1,6 +1,8 @@
 # STATO — Rivolio
 
-**Aggiornato:** 2026-08-14 (giro #72: la coincidenza persa che il motore
+**Aggiornato:** 2026-08-15 (giro #75: il buono dell'analisi gratis da cookie
+a codice usa e getta, la garanzia col no scritto, il box esito fuso, e il
+bancone pulito per il passaggio in locale · giro #72: la coincidenza persa che il motore
 verifica sui DUE voli, e la pagina aperta sui diritti di chi vola con
 mobilità ridotta (Reg. 1107) · giro #71: il diritto di cura art. 9 agganciato
 al reclamo, e il declassamento collaudato sul sito vero · giro #70: i
@@ -35,6 +37,62 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #75 (15/08): IL BUONO A CODICE, LA GARANZIA COL NO SCRITTO, E IL
+  BANCONE PULITO PER IL PASSAGGIO IN LOCALE.** Valerio prepara una sessione
+  di Claude che gira **in locale sul suo PC**: clonerà la repo e ripartirà
+  da lì, senza i limiti del cloud. Questo giro chiude i difetti che aveva
+  trovato collaudando e ripulisce tutto per la consegna.
+  - 🔴 **IL BUONO DELL'ANALISI GRATIS ERA ROTTO: DAVA ANALISI INFINITE.**
+    Valerio: «cosa gravissima». Era un cookie, e un cookie sta nel browser:
+    chi rimetteva a mano il valore di prima tornava ad avere il buono; e un
+    verdetto incerto non lo consumava. Ora è un **codice `RIV-XXXXX` usa e
+    getta** (scelta di Valerio col popup): la recensione lo mostra, si
+    incolla al muro del check, e il registro (`buoni_analisi.codice`,
+    `usato_il`) lo brucia al **primo** verdetto, anche incerto. Chi decide
+    se vale è il database, non il cookie. Migrazione della colonna `codice`
+    applicata sul database vero. ⚠️ **Il giro end-to-end NON è stato
+    provato** (la sandbox non arrivava a Supabase): è la prima cosa da
+    collaudare in locale (istruzioni in INIZIA-QUI).
+  - 🔴 **LA GARANZIA SI POTEVA FRODARE.** Chi era stato pagato poteva
+    comunque chiedere il rimborso. Ora `/api/pratiche/[id]/esito` non
+    concede il rimborso senza un **no scritto** della compagnia registrato
+    (`rifiuto_motivo`): niente prova del rifiuto, niente garanzia.
+  - 🔴 **IL BOX DELL'ESITO ERA DOPPIO E SI CONTRADDICEVA.** Fuso in uno:
+    «Come è andata con la compagnia?» con due bottoni (mi hanno pagato /
+    mi hanno detto no). Il tasto per il rimborso della garanzia compare
+    solo dopo un no registrato.
+  - **ART. 9 (pasti e hotel) NON È PIÙ SEMPRE DI MEZZO:** compare solo
+    prima dell'invio del reclamo e sparisce a pratica chiusa. E la card
+    prezzi ha **un solo bottone** (erano due).
+  - **NAVBAR PC E CHECKBOX:** controllati coi righelli (1024→1440 per la
+    navbar, il movimento delle checkbox misurato a 0px): erano già a
+    posto. Il difetto segnalato non si riproduceva.
+  - **PREPARATO IL PASSAGGIO IN LOCALE:** `CLAUDE.md` riscritto corto (14
+    regole, con `@STATO` e `@INIZIA-QUI`), **`INIZIA-QUI.md`** (setup,
+    mappa dei file, cosa collaudare, e i limiti del cloud spiegati come
+    NON più validi in locale), `.env.example` completo, `PROGETTO.md` con
+    le regole operative.
+  - **VIA IL VECCHIO PRODOTTO VIAGGI ("Viaggio Anche Io").** Tolto il
+    sottosistema (`lib/offerte/`, `lib/alert/`, `lib/motore/esegui.ts`,
+    `lib/destinazioni.ts`, `lib/costruttore.ts`, le ricerche in
+    `components/app/`, le funzioni email viaggi, le prove relative), 84MB
+    di immagini raw, `HANDOFF.md`; 13 documenti spostati in `docs/`.
+  - 🔴 **IL GIRO FINALE HA BECCATO DUE COSE MIE.** (a) Una prova rossa: la
+    prova che vieta di promettere il check «gratis» fuori dall'interruttore
+    non leggeva i commenti su più righe e segnava come colpevoli quattro
+    commenti del codice del buono. Sistemata: ora strappa i blocchi
+    `/* */` prima di leggere, tenendo i numeri di riga giusti. (b) 16
+    componenti landing morti del vecchio viaggi (`Hero`, `Faq`, `Prezzi`…,
+    zero import) ancora nel repo: tolti. ⚠️ **Prima ne avevo tolti 18 e ho
+    rotto il build:** `BadgeStore` e `MenuMobile` erano VIVI, importati da
+    `Footer` e `Nav` con un percorso relativo (`./BadgeStore`) che la mia
+    ricerca non aveva visto. Rimessi. **Il verify li ha beccati**, che è
+    esattamente il suo mestiere. E INIZIA-QUI diceva che il viaggi era
+    «ancora da togliere» elencando file già cancellati: corretto.
+  - Prove: **verify verde**: build, tipi, lint (0 errori, 8 avvisi
+    vecchi), **1634 prove, 6 saltate, 0 rosse**. Le 6 saltate sono le 4
+    della sveglia del 2027 e le 2 dell'Osservatorio (in sandbox non arriva
+    a Supabase, sul PC di Valerio passano).
 - **GIRO #74 (15/08): LA PAGINA FANTASMA, LO SCIOPERO FURBO, LA CODA, E IL
   SISTEMA DELLE RECENSIONI.** Sessione lunga, in pezzi, ognuno verde e
   spinto prima del prossimo. Le migrazioni le ho applicate io col connettore.

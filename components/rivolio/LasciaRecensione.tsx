@@ -158,7 +158,7 @@ export default function LasciaRecensione({
               {codice}
             </p>
             <p className="mt-1.5 text-[12.5px] leading-relaxed text-fumo">
-              Incollalo nel check, alla voce «Hai un codice dell&apos;analisi gratis?».
+              Incollalo nel check, alla voce «Hai un codice della recensione?».
             </p>
           </div>
         )}

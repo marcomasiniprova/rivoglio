@@ -43,7 +43,9 @@ test.describe("Lo stesso volo non si paga due volte", () => {
     /* È il cuore della riparazione: prima girava per primo, quindi non
        poteva distinguere «un'analisi nuova» da «la stessa rifatta». */
     const r = senzaCommenti(leggi("app/api/verifica/route.ts"));
-    const iVolo = r.indexOf("const { volo, data }");
+    // Il volo si legge dal corpo qui: dopo l'aggiunta del codice del buono
+    // la destrutturazione porta anche `codice`, ma il punto è lo stesso.
+    const iVolo = r.indexOf("(corpo ?? {})");
     const iCredito = r.indexOf("creditoFinito(pass)");
     expect(iVolo, "la rotta deve leggere il volo").toBeGreaterThan(-1);
     expect(iCredito, "la rotta deve controllare il credito").toBeGreaterThan(-1);
