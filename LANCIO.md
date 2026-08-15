@@ -11,7 +11,7 @@ mai da una stima travestita da fatto.*
 
 | | Stato |
 |---|---|
-| Il motore che decide (CE 261/2004) | 🟢 **collaudato**: 58 casi d'oro, 58 su 58, falsi positivi 0 |
+| Il motore che decide (CE 261/2004) | 🟢 **collaudato**: 55 casi d'oro, 55 su 55, falsi positivi 0 |
 | Il muro del check | 🟢 **invalicabile**, provato attaccandolo sul sito vero |
 | Il registro delle analisi pagate | 🟢 **applicato sul database vero e collaudato online**: la ricevuta riusata riceve 402 |
 | I testi (mai "check gratis" col muro acceso) | 🟢 **setacciato tutto**, con una prova che lo tiene fermo per sempre |

@@ -183,7 +183,7 @@ cosa fra un'email che parte e una che si perde:
 ---
 
 ## Fatto di recente (così non lo richiediamo)
-- Collaudo del motore: 57 casi d'oro + 81 sui rami, zero falsi positivi.
+- Collaudo del motore: 55 casi d'oro + 81 sui rami, zero falsi positivi.
 - Seconda fonte AviationEdge collegata (spenta finché non metti la chiave),
   incrocio a prova di fuso orario.
 - Meteo pronto a leggere dal VPS.

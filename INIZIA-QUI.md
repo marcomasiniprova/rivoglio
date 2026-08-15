@@ -38,7 +38,7 @@ prove). Gli script utili stanno in `package.json`:
 - `npm run verify` — la prova completa (verde = si può dire fatto)
 - `npm run tipi` — solo TypeScript, veloce
 - `npm run prove` — solo Playwright
-- `npm run eval` — il golden set del motore (57 casi, falsi positivi 0)
+- `npm run eval` — il golden set del motore (55 casi, falsi positivi 0)
 - `npm run banco` — passa voli veri dentro il motore (serve la rete)
 
 ## 3. Le variabili d'ambiente
