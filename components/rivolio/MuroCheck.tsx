@@ -49,12 +49,15 @@ export default function MuroCheck({
   dati,
   onPaga,
   onRiscatta,
+  erroreRiscatto = null,
   inCorso = false,
 }: {
   dati: DatiMuro;
   onPaga: () => void;
   /** Riscatta il codice dell'analisi gratis (da recensione). */
   onRiscatta?: (codice: string) => void;
+  /** Avviso dal server quando il codice riscattato non vale (finto/speso). */
+  erroreRiscatto?: string | null;
   inCorso?: boolean;
 }) {
   const { prezzoTesto, prezzoPienoTesto, inLancio } = dati;
@@ -63,7 +66,9 @@ export default function MuroCheck({
      uno. Il campo sta chiuso di default (la maggior parte non ce l'ha) e si
      apre con un clic. La forma la controlliamo qui per dare un errore
      subito; se il codice è finto o già speso, lo dice il server. */
-  const [apri, setApri] = useState(false);
+  /* Se il server ha appena bocciato un codice, il campo nasce già aperto
+     con l'avviso: la persona ha appena provato, non deve ri-cercare dov'era. */
+  const [apri, setApri] = useState(Boolean(erroreRiscatto));
   const [codice, setCodice] = useState("");
   const [erroreCodice, setErroreCodice] = useState("");
 
@@ -221,9 +226,9 @@ export default function MuroCheck({
                   Usa il codice
                 </Button>
               </div>
-              {erroreCodice && (
+              {(erroreRiscatto || erroreCodice) && (
                 <p role="alert" className="mt-2 text-[13px] text-amber-700">
-                  {erroreCodice}
+                  {erroreRiscatto || erroreCodice}
                 </p>
               )}
             </div>

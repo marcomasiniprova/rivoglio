@@ -4,6 +4,7 @@ import { utenteDaRichiesta } from "@/lib/api/utente";
 import { analizzaRifiuto, coerenzaRisposta } from "@/lib/ai/replica";
 import {
   EVENTO_ANALISI_RIFIUTO,
+  EVENTO_RIFIUTO_DOCUMENTO,
   EVENTO_TESTO_RIFIUTO,
   costruisciDossier,
 } from "@/lib/pratiche/dossier";
@@ -117,6 +118,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   /* ---------------------------------------- 1. il testo della risposta */
   let rispostaLoro = typeof testo === "string" ? testo.trim().slice(0, MAX_TESTO) : "";
+
+  /* 🔴 IL "NO" ARRIVA DA UN DOCUMENTO VERO O DA TESTO SCRITTO A MANO? Serve
+     alla garanzia (Valerio, 15/08: col testo scritto a mano si truffava il
+     rimborso). Si guarda ORA, prima che l'OCR riempia `rispostaLoro`: testo
+     vuoto + un'immagine in arrivo = documento. Il testo scritto a mano
+     prepara comunque la replica, ma non fa scattare il rimborso. */
+  const daDocumento = rispostaLoro.length === 0 && typeof base64 === "string";
 
   if (!rispostaLoro && typeof base64 === "string" && typeof tipoMime === "string") {
     if (!MIME_OK.includes(tipoMime)) {
@@ -249,6 +257,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     "rifiuto",
     `La compagnia ha risposto no: ${scheda?.etichetta ?? analisi.motivo} (letto dalla loro risposta)`,
   );
+  /* Se il no è arrivato come DOCUMENTO vero (foto/email/PDF), lo si segna:
+     è questo evento, e non il solo `rifiuto_motivo`, che sblocca la
+     garanzia dei 14,90. Un testo scritto a mano non lo lascia. */
+  if (daDocumento) {
+    await registraEvento(
+      pratica.id,
+      EVENTO_RIFIUTO_DOCUMENTO,
+      "La risposta della compagnia è stata caricata come documento (foto o PDF).",
+    );
+  }
   if (pratica.stato === "inviata") {
     await transizionePratica(pratica.id, "sollecito", "Risposta della compagnia letta: replica pronta.");
   }

@@ -19,6 +19,7 @@ import { caricaPratica, eventiPratica, type StatoPratica } from "@/lib/pratiche/
 import { percorsoPratica } from "@/lib/pratiche/passi";
 import {
   EVENTO_ANALISI_RIFIUTO,
+  EVENTO_RIFIUTO_DOCUMENTO,
   EVENTO_TESTO_RIFIUTO,
 } from "@/lib/pratiche/dossier";
 import { GIORNI_PRIMA_DEL_SOLLECITO, schedaRifiuto } from "@/lib/pratiche/rifiuto";
@@ -59,7 +60,11 @@ type VoloBreve = { volo_iata: string; data_locale: string };
 
 /** Gli eventi che servono a noi e non dicono niente a chi ha pagato.
  *  Restano nel database e nel fascicolo; fuori dalla cronologia. */
-const EVENTI_TECNICI = new Set<string>([EVENTO_TESTO_RIFIUTO, EVENTO_ANALISI_RIFIUTO]);
+const EVENTI_TECNICI = new Set<string>([
+  EVENTO_TESTO_RIFIUTO,
+  EVENTO_ANALISI_RIFIUTO,
+  EVENTO_RIFIUTO_DOCUMENTO,
+]);
 
 /* 🔴 QUI C'ERANO TRE LISTE DI STATI SCRITTE A MANO (`CONFERMABILE`,
    `DICHIARABILE`, `CON_LETTERA`), una accanto al riquadro che
@@ -535,6 +540,9 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
         <DichiaraEsito
           praticaId={pratica.id}
           rifiutoRegistrato={Boolean(pratica.rifiuto_motivo)}
+          /* La garanzia parte solo se il no è un DOCUMENTO vero caricato,
+             non testo scritto a mano (anti-frode, Valerio 15/08). */
+          rifiutoProvato={eventi.some((e) => e.tipo === EVENTO_RIFIUTO_DOCUMENTO)}
           giaDichiarato={pratica.rifiuto_motivo ?? null}
           etichettaScelta={schedaRifiuto(pratica.rifiuto_motivo)?.etichetta ?? null}
           nuovoGiro={percorso.giri.no > 0 && percorso.giri.no === percorso.giri.replicheMandate}

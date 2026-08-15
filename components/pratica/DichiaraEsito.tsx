@@ -31,6 +31,7 @@ import DichiaraRifiuto from "./DichiaraRifiuto";
 export default function DichiaraEsito({
   praticaId,
   rifiutoRegistrato = false,
+  rifiutoProvato = false,
   giaDichiarato = null,
   etichettaScelta = null,
   nuovoGiro = false,
@@ -38,6 +39,9 @@ export default function DichiaraEsito({
   praticaId: string;
   /** Vero se un no scritto della compagnia è già registrato sulla pratica. */
   rifiutoRegistrato?: boolean;
+  /** Vero se il no è arrivato come DOCUMENTO vero (foto/email), non testo
+   *  scritto a mano: è quello che fa scattare la garanzia (anti-frode). */
+  rifiutoProvato?: boolean;
   giaDichiarato?: string | null;
   etichettaScelta?: string | null;
   nuovoGiro?: boolean;
@@ -117,26 +121,37 @@ export default function DichiaraEsito({
             nuovoGiro={nuovoGiro}
           />
 
-          {/* LA CHIUSURA CON GARANZIA compare SOLO con un no già registrato:
-              è il paletto anti-frode. Senza un no scritto sulla pratica non
-              c'è (e il server lo rifiuta comunque). */}
-          {rifiutoRegistrato && (
+          {/* LA CHIUSURA CON GARANZIA compare SOLO se il no è un DOCUMENTO
+              vero caricato (foto/email): è il paletto anti-frode. Un no
+              scritto a mano prepara la replica ma NON fa scattare il
+              rimborso (Valerio, 15/08: «metto testo semplice e mi dà il
+              rimborso»). Il server lo ricontrolla comunque. */}
+          {rifiutoProvato ? (
             <div className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5">
               <p className="text-[0.95rem] leading-relaxed text-inchiostro">
                 Se dopo la replica e i solleciti non hai visto un euro, chiudo la pratica e faccio
                 partire la garanzia: ti rimborsiamo i 14,90 che hai pagato.
               </p>
+              {/* ⚠️ h-auto + whitespace-normal: prima il testo era su una
+                  riga sola e si tagliava ai bordi sul telefono (Valerio,
+                  15/08). Adesso va a capo e il bottone cresce. */}
               <Button
                 type="button"
                 variant="scuro"
-                className="mt-3 w-full"
+                className="mt-3 h-auto w-full whitespace-normal py-3 leading-snug"
                 disabled={inCorso}
                 onClick={() => void dichiara("non_pagata")}
               >
-                {inCorso ? "Un attimo…" : "Chiudi con la garanzia (rimborso 14,90€)"}
+                {inCorso ? "Un attimo…" : "Chiudi e chiedi il rimborso (14,90€)"}
               </Button>
             </div>
-          )}
+          ) : rifiutoRegistrato ? (
+            <p className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5 text-[0.9rem] leading-relaxed text-fumo">
+              Per far partire la garanzia dei 14,90€ serve la risposta VERA della compagnia:
+              caricala qui sopra come foto o email («Carica lo screenshot»). Il testo scritto a
+              mano prepara la replica, ma non basta per il rimborso.
+            </p>
+          ) : null}
         </div>
       )}
 

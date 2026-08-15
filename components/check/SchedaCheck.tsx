@@ -254,6 +254,9 @@ export default function SchedaCheck() {
      Se un giorno il muro dipendesse da una decisione presa nel browser,
      lo scavalcherebbe chiunque apra gli strumenti per sviluppatori. */
   const [muro, setMuro] = useState<DatiMuro | null>(null);
+  /* L'avviso del muro quando un codice della recensione non vale (finto o
+     già speso): lo capiamo perché il server rimanda il 402 su un riscatto. */
+  const [erroreRiscatto, setErroreRiscatto] = useState<string | null>(null);
   /* `riprova`: presente solo quando ha senso riprovare (rete o guasto
      passeggero del server), non su un volo che non esiste. */
   const [avviso, setAvviso] = useState<{
@@ -306,6 +309,13 @@ export default function SchedaCheck() {
     inCorso.current = true;
     setErrore(null);
     setAvviso(null);
+    /* 🔴 IL MURO SI AZZERA QUI, e prima non lo faceva: premendo "Usa il
+       codice" partiva l'analisi ma `muro` restava, e il render mostra il
+       muro PRIMA del teatro, quindi non succedeva niente di visibile
+       (Valerio, 15/08). Azzerandolo, il teatro compare; se poi il codice
+       non vale, il 402 lo rimette con l'avviso. */
+    setMuro(null);
+    setErroreRiscatto(null);
     setInAnalisi({ volo: voloDaControllare.trim().toUpperCase(), data: giornoIso });
     setFase("teatro");
     setPasso(0);
@@ -346,6 +356,10 @@ export default function SchedaCheck() {
       if (r.status === 402 && dati?.serveIlPass) {
         setFase("campo");
         setMuro(dati.muro as DatiMuro);
+        /* Se stavamo riscattando un codice e il muro torna, quel codice
+           non valeva (finto o già speso): lo diciamo sul muro stesso,
+           invece di lasciare la persona a chiedersi perché non è partito. */
+        if (codice) setErroreRiscatto("Questo codice non è valido o è già stato usato.");
         /* Il volo si mette da parte PRIMA di mandare qualcuno alla cassa:
            al ritorno l'analisi riparte da sola, invece di ritrovarsi un
            modulo vuoto dopo aver pagato (vedi lib/check/ripresa.ts).
@@ -584,6 +598,7 @@ export default function SchedaCheck() {
              si apre e parte l'analisi; se no, il muro resta con l'avviso. */
           void avvia(inAnalisi.volo, inAnalisi.data, codice);
         }}
+        erroreRiscatto={erroreRiscatto}
       />
     );
   }

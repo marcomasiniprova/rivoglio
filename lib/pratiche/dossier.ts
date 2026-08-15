@@ -92,6 +92,18 @@ export const EVENTO_TESTO_RIFIUTO = "rifiuto_testo";
 export const EVENTO_ANALISI_RIFIUTO = "rifiuto_analisi";
 
 /**
+ * IL NO DELLA COMPAGNIA È ARRIVATO COME DOCUMENTO VERO (foto/email/PDF).
+ *
+ * 🔴 IL PALETTO ANTI-FRODE DELLA GARANZIA (Valerio, 15/08: «posso truffare,
+ * metto testo semplice e mi dà il rimborso»). Un "no" scritto a mano nel
+ * campo del testo fa scattare la replica, ma NON basta per il rimborso: uno
+ * potrebbe essere stato pagato dalla compagnia e inventarsi un no. La
+ * garanzia dei 14,90 parte solo se c'è questo evento, cioè se la persona ha
+ * caricato la risposta VERA (foto o email), che poi Valerio controlla.
+ */
+export const EVENTO_RIFIUTO_DOCUMENTO = "rifiuto_documento";
+
+/**
  * L'ultima nota di un tipo di evento.
  *
  * ⚠️ L'ULTIMA, non la prima: se il cliente incolla una seconda risposta

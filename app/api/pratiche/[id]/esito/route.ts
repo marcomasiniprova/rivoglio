@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { CORS } from "@/lib/api/limite";
 import { utenteDaRichiesta } from "@/lib/api/utente";
 import { SERVIZIO_ATTIVO } from "@/lib/supabase/servizio";
-import { caricaPratica, transizionePratica } from "@/lib/pratiche/pratiche";
+import { caricaPratica, eventiPratica, transizionePratica } from "@/lib/pratiche/pratiche";
+import { EVENTO_RIFIUTO_DOCUMENTO } from "@/lib/pratiche/dossier";
 import { tin } from "@/lib/eventi/telegram";
 
 /**
@@ -110,6 +111,22 @@ export async function POST(req: Request, contesto: { params: Promise<{ id: strin
         {
           errore:
             "Per la garanzia serve prima il no scritto della compagnia: registralo qui sopra («Mi hanno risposto no»), lo leggiamo noi.",
+        },
+        { status: 409, headers: CORS },
+      );
+    }
+
+    /* 🔴 E IL NO DEVE VENIRE DA UN DOCUMENTO VERO, non da testo scritto a
+       mano (Valerio, 15/08: «metto testo semplice e mi dà il rimborso»).
+       Uno potrebbe essere stato pagato dalla compagnia e inventarsi un no.
+       La garanzia parte solo se la loro risposta è stata CARICATA come
+       foto/email (evento EVENTO_RIFIUTO_DOCUMENTO), che poi controlliamo. */
+    const eventi = await eventiPratica(id);
+    if (!eventi.some((e) => e.tipo === EVENTO_RIFIUTO_DOCUMENTO)) {
+      return NextResponse.json(
+        {
+          errore:
+            "Per la garanzia serve la risposta VERA della compagnia: carica la foto o l'email del loro no («Carica lo screenshot»). Il testo scritto a mano prepara la replica, ma non basta per il rimborso.",
         },
         { status: 409, headers: CORS },
       );
