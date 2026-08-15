@@ -46,6 +46,36 @@ const ATTESA_MASSIMA_MS = 1_500;
 const dormi = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /**
+ * IL FRENO D'EMERGENZA (un "interruttore automatico"), audit 14/08.
+ *
+ * Quando il fornitore va in "troppe richieste" a raffica (un video virale su
+ * voli DIVERSI: la cache non aiuta e si sfondano i 3 al secondo), riprovare
+ * per 8 secondi non serve e fa PEGGIO: tiene la funzione occupata mentre ne
+ * arrivano altre, finché non si accumulano e la piattaforma inizia a
+ * rispondere 503 a tutti. Qui, dopo qualche 429 di fila, si "apre il
+ * circuito": per qualche secondo le chiamate escono SUBITO come "troppe
+ * richieste", senza chiamare né aspettare. La funzione si libera all'istante,
+ * il check esce onesto (incerto, e con la coda-email lo si potrà recuperare),
+ * e la piena non travolge la concorrenza. Passata l'ondata, si richiude da
+ * solo. Vale per macchina Netlify: ognuna protegge sé stessa.
+ */
+const FRENO_SOGLIA_429 = 4; // dopo 4 "troppe richieste" di fila...
+const FRENO_COOLDOWN_MS = 3_000; // ...si esce subito per 3 secondi
+let conta429 = 0;
+let frenoApertoFino = 0;
+
+function frenoAperto(): boolean {
+  return Date.now() < frenoApertoFino;
+}
+function segna429(): void {
+  conta429 += 1;
+  if (conta429 >= FRENO_SOGLIA_429) frenoApertoFino = Date.now() + FRENO_COOLDOWN_MS;
+}
+function azzeraFreno(): void {
+  conta429 = 0; // una risposta buona vuol dire che l'ondata è passata
+}
+
+/**
  * Il fornitore ha smesso di rispondere: fai squillare il telefono.
  *
  * ⚠️ SOLO QUANDO I TENTATIVI SONO FINITI, e mai su un 404. Un volo che
@@ -134,6 +164,12 @@ export async function chiamaConRitentativo(
   etichetta: string,
   budgetMs = BUDGET_MS,
 ): Promise<EsitoChiamata> {
+  /* IL FRENO D'EMERGENZA, prima ancora del tetto: se il circuito è aperto
+     (troppe "troppe richieste" appena adesso) si esce all'istante, senza
+     chiamare né toccare il database. È quello che libera le funzioni sotto
+     un picco. */
+  if (frenoAperto()) return { ok: false, stato: 429 };
+
   /* IL TETTO SULLA SPESA, prima di tutto il resto.
      Sta qui e non nelle rotte perché qui passa OGNI chiamata che
      paghiamo, comprese quelle delle tre rotte del seguito (cancellato,
@@ -185,7 +221,10 @@ export async function chiamaConRitentativo(
        prima lo gestiva a parte e nel rifacimento si era perso: l'ha
        ripreso una prova. */
     if (risposta.status === 204) return { ok: false, stato: 204 };
-    if (risposta.ok) return { ok: true, risposta };
+    if (risposta.ok) {
+      azzeraFreno(); // una risposta buona: l'ondata è passata, il freno si scarica
+      return { ok: true, risposta };
+    }
 
     if (!daRiprovare(risposta.status)) {
       /* 404 e 204 non sono guasti: quel volo su quella data non ce
@@ -203,6 +242,7 @@ export async function chiamaConRitentativo(
         continue;
       }
     }
+    if (risposta.status === 429) segna429(); // conta verso il freno d'emergenza
     allarmeFornitore(etichetta, risposta.status);
     return { ok: false, stato: risposta.status };
   }
