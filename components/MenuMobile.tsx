@@ -52,7 +52,7 @@ export default function MenuMobile() {
   }, [aperto]);
 
   return (
-    <div ref={guscio} className="relative xl:hidden">
+    <div ref={guscio} className="relative lg:hidden">
       <button
         type="button"
         aria-label={aperto ? "Chiudi il menu" : "Apri il menu"}

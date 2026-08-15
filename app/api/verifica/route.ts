@@ -68,13 +68,46 @@ export async function POST(req: Request) {
      che vive solo nel browser lo scavalca chiunque apra gli strumenti
      per sviluppatori, e ogni check scavalcato è una chiamata pagata da
      noi. */
+  /* Il corpo si legge PRIMA del cancello: serve anche a ritrovare il buono
+     di riserva (vedi sotto). */
+  let corpo: unknown;
+  try {
+    corpo = await req.json();
+  } catch {
+    return NextResponse.json(
+      { ok: false, errore: "Richiesta non leggibile." },
+      { status: 400, headers: CORS },
+    );
+  }
+  const {
+    volo,
+    data,
+    buono: buonoDalCorpo,
+  } = (corpo ?? {}) as { volo?: unknown; data?: unknown; buono?: unknown };
+
   const pass = passDi(req);
   /* IL BUONO ANALISI GRATIS (da recensione) apre il cancello quando non
-     c'è un pass pagato: è il premio di chi ha lasciato una recensione. Si
-     legge solo col muro acceso e senza pass, e a spenderlo serve un
-     verdetto vero (come il pass). La validità la decide il registro nel
-     database, non il cookie: un cookie si copia. */
-  const buonoId = CHECK_A_PAGAMENTO && !pass ? leggiBuonoCookie(cookieDi(req, COOKIE_BUONO)) : null;
+     c'è un pass pagato: è il premio di chi ha lasciato una recensione. A
+     spenderlo serve un verdetto vero (come il pass), e la validità la
+     decide il registro nel database, non il cookie.
+     ⚠️ DUE STRADE PER LO STESSO BUONO, e non è un buco. Primaria: il cookie
+     firmato. Riserva: l'id nel corpo della richiesta, che il browser porta
+     da solo quando ha guadagnato il buono. Serve perché un browser può
+     scartare il cookie (Brave, cookie ripuliti, salto fra schede) e allora
+     un'analisi già guadagnata sparirebbe: è esattamente quello che è
+     successo a Valerio il 15/08 (buono creato e LIBERO nel database, ma il
+     muro compariva lo stesso perché il cookie non arrivava). La riserva non
+     regala niente: il buono è un UUID che il registro segna usato una volta
+     sola, quindi vale come il cookie, né più né meno. */
+  const buonoDalBody =
+    typeof buonoDalCorpo === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(buonoDalCorpo.trim())
+      ? buonoDalCorpo.trim()
+      : null;
+  const buonoId =
+    CHECK_A_PAGAMENTO && !pass
+      ? (leggiBuonoCookie(cookieDi(req, COOKIE_BUONO)) ?? buonoDalBody)
+      : null;
   const buonoOk = buonoId ? await buonoUsabile(buonoId) : false;
   /* ⚠️ Chi sbatte sul muro conta ANCHE come "ha lanciato un'analisi": se
      no il cruscotto mostrerebbe più muri che analisi, cioè un imbuto che
@@ -85,16 +118,6 @@ export async function POST(req: Request) {
     return rispostaMuro(req);
   }
 
-  let corpo: unknown;
-  try {
-    corpo = await req.json();
-  } catch {
-    return NextResponse.json(
-      { ok: false, errore: "Richiesta non leggibile." },
-      { status: 400, headers: CORS },
-    );
-  }
-  const { volo, data } = (corpo ?? {}) as { volo?: unknown; data?: unknown };
   if (typeof volo !== "string" || typeof data !== "string") {
     return NextResponse.json(
       {
@@ -166,8 +189,9 @@ export async function POST(req: Request) {
   /* Il buono si spende come il pass: su un verdetto vero (mai sull'incerto,
      che non è una risposta comprata) e una volta sola. È il registro a
      segnarlo usato, quindi un cookie copiato non lo fa rivivere. */
+  let buonoConsumato = false;
   if (buonoOk && buonoId && !(CORTESIA_SU_INCERTO && verdetto.esito === "incerto")) {
-    await consumaBuono(buonoId, esito.verificaId);
+    buonoConsumato = await consumaBuono(buonoId, esito.verificaId);
   }
 
   const risposta = NextResponse.json(
@@ -193,6 +217,9 @@ export async function POST(req: Request) {
         km: fatto.kmOrtodromica,
       },
       demo: esito.demo,
+      /* Il buono è stato speso ora: il browser che lo teneva di riserva lo
+         cancella, così non crede di avere ancora un'analisi gratis. */
+      ...(buonoConsumato ? { buonoConsumato: true } : {}),
       // La prescrizione è una STIMA dichiarata (SPEC §4), e solo dove ha senso.
       ...(verdetto.esito === "idoneo"
         ? {

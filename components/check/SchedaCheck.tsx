@@ -7,6 +7,7 @@ import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
 import { COPY } from "@/lib/copy";
 import MuroCheck, { type DatiMuro } from "@/components/rivolio/MuroCheck";
 import { riprendiCheck, sospendiCheck, tornatoDallaCassa } from "@/lib/check/ripresa";
+import { CHIAVE_BUONO_LOCALE } from "@/lib/check/chiave-buono";
 
 /**
  * LA SCHEDA DEL CHECK: lo standard, identico ovunque.
@@ -319,13 +320,36 @@ export default function SchedaCheck() {
       await attesa(PAUSA_FINALE_MS);
     })();
 
+    /* IL BUONO DI RISERVA. Se il browser ha scartato il cookie firmato del
+       buono (Brave, cookie ripuliti), il suo id parte da qui col check e il
+       muro non riappare su un'analisi già guadagnata. Il server lo valida
+       sul registro: se è già speso non serve a niente. */
+    const buono =
+      typeof window !== "undefined"
+        ? (localStorage.getItem(CHIAVE_BUONO_LOCALE) ?? undefined)
+        : undefined;
+
     try {
       const r = await richiestaResiliente("/api/verifica", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ volo: voloDaControllare.trim(), data: giornoIso }),
+        body: JSON.stringify({
+          volo: voloDaControllare.trim(),
+          data: giornoIso,
+          ...(buono ? { buono } : {}),
+        }),
       });
       const dati = await r.json().catch(() => null);
+
+      /* Buono speso: il browser lo dimentica, così non crede di averne
+         ancora uno e non lo rimanda a vuoto la prossima volta. */
+      if (dati?.buonoConsumato && typeof window !== "undefined") {
+        try {
+          localStorage.removeItem(CHIAVE_BUONO_LOCALE);
+        } catch {
+          /* niente */
+        }
+      }
 
       if (dati?.ok && dati.dato) {
         setLetto({
@@ -611,14 +635,22 @@ export default function SchedaCheck() {
           />
         </div>
 
+        {/* ⚠️ I PASSI SONO RIGHE RIGIDE: dot + testo, e basta. Prima sotto
+            il passo attivo compariva una riga di dettaglio che si montava e
+            smontava, e il pallino attivo pulsava CAMBIANDO dimensione:
+            ogni volta la riga cambiava altezza e spingeva su e giù tutte le
+            altre. Da telefono il testo andava a capo e i pallini
+            "traballavano forte" (Valerio, 15/08). Adesso il dettaglio vive
+            in UN solo slot ad altezza fissa qui sotto, e il pallino pulsa
+            solo di opacità, non di dimensione: le righe non si muovono. */}
         <ol className="mt-4 space-y-3">
           {TEATRO.passi.map((testo, i) => {
             const fatto = i < passo;
             const attivo = i === passo;
             return (
-              <li key={testo} className="flex items-start gap-3.5">
+              <li key={testo} className="flex items-center gap-3.5">
                 <span
-                  className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${
+                  className={`grid h-8 w-8 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${
                     fatto
                       ? "border-verde bg-verde text-white"
                       : attivo
@@ -640,41 +672,45 @@ export default function SchedaCheck() {
                   ) : attivo ? (
                     <motion.span
                       className="h-2.5 w-2.5 rounded-full bg-verde"
-                      animate={{ opacity: [1, 0.25, 1], scale: [1, 0.8, 1] }}
-                      transition={{ duration: 1.1, repeat: Infinity, ease: "easeInOut" }}
+                      animate={{ opacity: [1, 0.4, 1] }}
+                      transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
                     />
                   ) : (
                     <span className="h-2.5 w-2.5 rounded-full bg-bordo" />
                   )}
                 </span>
-                <span className="min-w-0">
-                  <span
-                    className={`block text-[15.5px] transition-colors duration-300 ${
-                      fatto || attivo ? "font-medium text-inchiostro" : "text-fumo-2"
-                    }`}
-                  >
-                    {testo}
-                  </span>
-                  <AnimatePresence initial={false}>
-                    {attivo && TEATRO.dettagli[i] && (
-                      <motion.span
-                        key="dettaglio"
-                        initial={{ opacity: 0, y: -3 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.35 }}
-                        className="mt-0.5 block text-[13px] leading-snug text-fumo"
-                      >
-                        {TEATRO.dettagli[i]}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
+                <span
+                  className={`min-w-0 text-[15.5px] leading-snug transition-colors duration-300 ${
+                    fatto || attivo ? "font-medium text-inchiostro" : "text-fumo-2"
+                  }`}
+                >
+                  {testo}
                 </span>
               </li>
             );
           })}
         </ol>
-        <p className="mt-4 border-t border-bordo/70 pt-3 text-[12.5px] leading-relaxed text-fumo">
+
+        {/* Lo slot del dettaglio: altezza fissa, allineato sotto il testo dei
+            passi (spaziatore largo come il pallino). Cambia solo il testo,
+            mai l'altezza. */}
+        <div className="mt-3 flex min-h-[2.5rem] items-start gap-3.5">
+          <span className="h-8 w-8 shrink-0" aria-hidden="true" />
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={Math.min(passo, TEATRO.dettagli.length - 1)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="block text-[13px] leading-snug text-fumo"
+            >
+              {TEATRO.dettagli[Math.min(passo, TEATRO.dettagli.length - 1)]}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+
+        <p className="mt-3 border-t border-bordo/70 pt-3 text-[12.5px] leading-relaxed text-fumo">
           {TEATRO.nota}
         </p>
       </div>

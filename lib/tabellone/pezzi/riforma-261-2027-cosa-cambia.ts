@@ -81,7 +81,7 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "p",
       testo:
-        "Durante il negoziato si è discusso di alzare la soglia del ritardo da tre a quattro ore, e in alcune versioni fino a sei. Sarebbe stato il colpo più duro per i passeggeri: **la maggior parte dei ritardi che oggi valgono una compensazione sta fra le tre e le quattro ore**, e spostare l'asticella li avrebbe cancellati in blocco.",
+        "Durante il negoziato si è discusso di alzare la soglia del ritardo da tre a quattro ore, e in alcune versioni fino a sei. Sarebbe stato il colpo più duro per i passeggeri: avrebbe cancellato in un colpo i ritardi appena sopra le tre ore, che secondo le stime del settore sono una quota molto alta dei reclami di oggi. È il motivo per cui la proposta è stata fra le più contestate del negoziato.",
     },
     {
       tipo: "elenco",

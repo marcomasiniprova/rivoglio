@@ -44,22 +44,27 @@ export default function Nav() {
              predefinito di una griglia: vuol dire "non stringerti sotto
              il tuo contenuto". Quando la colonna di mezzo cresce oltre
              il posto disponibile, non spinge le altre: le invade.
-          Adesso le voci partono da 1280, dove ci stanno con margine, e
-          tutte e tre le colonne possono stringersi (`min-w-0`). Con
-          queste due la sovrapposizione non è più possibile per
-          costruzione, non "provata a una misura". */}
-      <header className="mx-auto grid h-[60px] max-w-[1200px] grid-cols-[auto_1fr] items-center gap-3 rounded-pillola xl:gap-6 border border-white/60 bg-white/60 px-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] xl:grid-cols-[1fr_auto_1fr]">
+          Le voci partivano da 1280, e lì stava il difetto: un portatile
+          Windows normale, con lo zoom di sistema al 125-150%, a zoom del
+          browser 100% ha una larghezza CSS appena SOTTO i 1280, quindi i
+          link sparivano e la barra sembrava vuota (Valerio, 15/08, con lo
+          screenshot). Adesso partono da 1024, dove un PC vero ci sta
+          sempre, e per starci a 1024 senza sovrapporsi le spaziature e il
+          corpo si stringono un filo sotto i 1280, e "Entra" nella fascia
+          1024-1280 diventa un bottone compatto. Misurato a 1024, 1152,
+          1280, 1440: le tre colonne restano separate a ogni larghezza. */}
+      <header className="mx-auto grid h-[60px] max-w-[1200px] grid-cols-[auto_1fr] items-center gap-3 rounded-pillola lg:gap-4 xl:gap-6 border border-white/60 bg-white/60 px-2 shadow-[0_8px_28px_-14px_rgba(5,46,31,.28)] backdrop-blur-xl sm:h-[68px] lg:grid-cols-[1fr_auto_1fr]">
         <div className="min-w-0 pl-1 sm:pl-4">
           <Logo />
         </div>
 
-        <nav className="hidden min-w-0 items-center justify-center gap-6 xl:flex">
+        <nav className="hidden min-w-0 items-center justify-center gap-4 lg:flex xl:gap-6">
           {COPY.nav.voci.map((v) => (
             <a
               key={v.ancora}
               href={v.ancora}
               {...apreAParte(v.ancora)}
-              className="whitespace-nowrap text-[15px] text-fumo transition-colors hover:text-inchiostro"
+              className="whitespace-nowrap text-[14px] text-fumo transition-colors hover:text-inchiostro xl:text-[15px]"
             >
               {v.testo}
             </a>
@@ -69,14 +74,14 @@ export default function Nav() {
         <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-3">
           {/* la porta della web app: dall'8/08 è di nuovo linkata dal sito.
               Pillola di vetro, non testo nudo: ogni bottone è un bottone.
-              ⚠️ Sotto i 1280 "Entra" vive nel menu (MenuMobile), non nella
+              ⚠️ Sotto i 1024 "Entra" vive nel menu (MenuMobile), non nella
               barra: così sul telefono restano logo + azione + menu, senza
               affollare, e "Entra" resta comunque raggiungibile ovunque. */}
           <a
             /* Dritto al login (scelta di Valerio, 9/08): prima portava alla web
                app, dove c'era un ALTRO "Entra". Chi vuole entrare, entra. */
             href="/entra"
-            className="vetro-bottone hidden items-center rounded-bottone px-4 py-2.5 text-[13.5px] font-medium text-inchiostro transition-all duration-300 hover:-translate-y-0.5 sm:px-5 sm:py-3 sm:text-[14.5px] xl:inline-flex"
+            className="vetro-bottone hidden items-center rounded-bottone px-3 py-2.5 text-[13px] font-medium text-inchiostro transition-all duration-300 hover:-translate-y-0.5 lg:inline-flex xl:px-5 xl:py-3 xl:text-[14.5px]"
           >
             {COPY.nav.entra}
           </a>
@@ -97,8 +102,8 @@ export default function Nav() {
               →
             </span>
           </a>
-          {/* Il menu del telefono e del tablet: sotto i 1280 raccoglie le
-              voci che in linea non ci sono e "Entra". Sopra i 1280 sparisce. */}
+          {/* Il menu del telefono e del tablet: sotto i 1024 raccoglie le
+              voci che in linea non ci sono e "Entra". Sopra i 1024 sparisce. */}
           <MenuMobile />
         </div>
       </header>

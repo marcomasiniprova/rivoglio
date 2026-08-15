@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { seSiPaga } from "@/lib/check/ingresso";
+import { CHIAVE_BUONO_LOCALE } from "@/lib/check/chiave-buono";
 import type { EventoRecensito } from "@/lib/recensioni/recensioni";
 
 /**
@@ -28,6 +29,10 @@ const GRAZIE = seSiPaga(
   "Grazie. Hai sbloccato un'analisi gratis: il tuo prossimo controllo è offerto.",
   "Grazie. La tua recensione ci aiuta a farci conoscere.",
 );
+
+/* Vero se il muro è acceso: serve per non promettere l'analisi gratis nel
+   raro caso in cui il server non sia riuscito a emettere il buono. */
+const MURO_ACCESO = seSiPaga(true, false);
 
 function Stella({ piena, ...props }: { piena: boolean } & React.ComponentProps<"button">) {
   return (
@@ -68,6 +73,7 @@ export default function LasciaRecensione({
   const [motivo, setMotivo] = useState("");
   const [nome, setNome] = useState("");
   const [stato, setStato] = useState<"fermo" | "invio" | "fatto" | "gia" | "errore">("fermo");
+  const [sbloccato, setSbloccato] = useState(false);
   const [errore, setErrore] = useState("");
 
   const pronto = stelle >= 1 && motivo.trim().length >= 3;
@@ -87,12 +93,24 @@ export default function LasciaRecensione({
         ok?: boolean;
         errore?: string;
         giaFatta?: boolean;
+        sbloccata?: boolean;
+        buonoId?: string | null;
       } | null;
       if (!r.ok || !d?.ok) {
         setErrore(d?.errore ?? "Non sono riuscito a salvare. Riprova.");
         setStato("errore");
         return;
       }
+      /* Il buono DI RISERVA nel browser: se il cookie non arriverà al
+         check, l'id parte da qui e l'analisi gratis vale lo stesso. */
+      if (!d.giaFatta && d.buonoId && typeof window !== "undefined") {
+        try {
+          localStorage.setItem(CHIAVE_BUONO_LOCALE, d.buonoId);
+        } catch {
+          // localStorage negato (navigazione privata stretta): resta il cookie.
+        }
+      }
+      setSbloccato(Boolean(d.sbloccata));
       setStato(d.giaFatta ? "gia" : "fatto");
     } catch {
       setErrore("Non sono riuscito a salvare. Riprova.");
@@ -129,7 +147,9 @@ export default function LasciaRecensione({
                 "Questa l'avevi già recensita: l'analisi gratis è già tua, non se ne aggiunge un'altra.",
                 "Questa l'avevi già recensita: grazie di nuovo.",
               )
-            : GRAZIE}
+            : MURO_ACCESO && !sbloccato
+              ? "Grazie, la tua recensione è salvata. L'analisi gratis non è partita: riprova più tardi."
+              : GRAZIE}
         </p>
       </motion.div>
     );

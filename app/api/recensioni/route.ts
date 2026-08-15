@@ -111,11 +111,21 @@ export async function POST(req: Request) {
   }
 
   const risposta = NextResponse.json(
-    { ok: true, giaFatta: false, sbloccata: Boolean(esito.buonoId) },
+    {
+      ok: true,
+      giaFatta: false,
+      sbloccata: Boolean(esito.buonoId),
+      /* L'id del buono torna anche al browser, che lo tiene di riserva e lo
+         rimanda col check se il cookie non arriva (vedi /api/verifica). È
+         un UUID che il registro segna usato una volta sola: la riserva non
+         regala niente, mette solo il buono al riparo da un browser che
+         scarta i cookie. */
+      buonoId: esito.buonoId,
+    },
     { headers: CORS },
   );
 
-  // Il cookie del buono: la consegna. Il permesso vero lo tiene il database.
+  // Il cookie del buono: la consegna primaria. Il permesso vero lo tiene il database.
   if (esito.buonoId) {
     const cookie = creaBuonoCookie(esito.buonoId);
     if (cookie) risposta.cookies.set(COOKIE_BUONO, cookie, BISCOTTO);
