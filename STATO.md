@@ -1,5 +1,12 @@
 # STATO — Rivolio
 
+> ⚠️ **PRIMA DI FIDARTI DI QUESTO DIARIO.** Il check del volo **si paga**
+> (1,99, interruttore `NEXT_PUBLIC_CHECK_PREZZO_ATTIVO` acceso su Netlify).
+> I giri qui sotto spesso dicono "check gratis": era vero da interruttore
+> spento, non adesso. Anche "pagamento Polar" e "shadow mode" sono superati
+> (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
+> sta in `INIZIA-QUI.md`, non nei giri datati.
+
 **Aggiornato:** 2026-08-15 (giro #75: il buono dell'analisi gratis da cookie
 a codice usa e getta, la garanzia col no scritto, il box esito fuso, e il
 bancone pulito per il passaggio in locale · giro #72: la coincidenza persa che il motore
@@ -25,9 +32,9 @@ diventa un gestionale · giro #57: il pannello non si apriva perché
 Valerio non aveva il ruolo admin · giro #56: il cruscotto e il TIN ·
 giro #52: il check si paga · giro #45: il dopo-lettera)
 **RIVOLIO È COSTRUITO E ONLINE.** Il prodotto definito dal documento di
-Valerio esiste da capo a fondo: check gratuito sul web col dato oggettivo,
-verdetto a tre stati dal motore deterministico, pagamento Polar, lettera di
-reclamo pronta, sequenza di follow-up, tracker, admin in shadow mode.
+Valerio esiste da capo a fondo: check del volo a pagamento (1,99 di lancio)
+col dato oggettivo, verdetto a tre stati dal motore deterministico, lettera
+di reclamo pronta, sequenza di follow-up, tracker, admin.
 Rifinito con impeccable, taste e seo. Tagline: *Riprenditi i soldi che ti
 devono.* Valerio ha messo online una copia su rivoglioo.netlify.app (suo
 account) e ha scelto il **logo definitivo: la lente con l'aereo e le barre**

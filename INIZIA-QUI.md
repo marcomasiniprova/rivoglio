@@ -16,11 +16,23 @@ limite di sandbox).
 
 Prende i soldi che le compagnie aeree devono ai passeggeri (Regolamento CE
 261/2004: ritardo di 3 ore o più, volo cancellato, negato imbarco,
-coincidenza persa, declassamento). Flusso: **check gratuito/economico** sul
-volo → **verdetto** a tre stati da un motore deterministico (idoneo /
-incerto / non idoneo) → **pratica** a 14,90 con la lettera di reclamo
-pronta → follow-up, replica ai no, conciliazione. Tagline: *Riprenditi i
-soldi che ti devono.* Dominio ufficiale: **rivolio.it**. Online su Netlify.
+coincidenza persa, declassamento). Flusso: **check del volo a pagamento**
+(1,99 di lancio, si scala dalla pratica) → **verdetto** a tre stati da un
+motore deterministico (idoneo / incerto / non idoneo) → **pratica** a 14,90
+con la lettera di reclamo pronta → follow-up, replica ai no, conciliazione.
+Tagline: *Riprenditi i soldi che ti devono.* Dominio ufficiale:
+**rivolio.it**. Online su Netlify.
+
+> ⚠️ **IL CHECK SI PAGA (1,99), NON è GRATIS.** Lo comanda un interruttore,
+> la variabile `NEXT_PUBLIC_CHECK_PREZZO_ATTIVO` su Netlify: a "1" il muro
+> è acceso (1,99), altrimenti il check è libero. **Oggi Valerio lo tiene
+> ACCESO.** I documenti più vecchi e i giri di `STATO.md` dicono spesso
+> "check gratis": era vero quando l'interruttore era spento, non adesso.
+> Per lo stato VERO leggi la variabile su Netlify col connettore, non
+> fidarti della prosa. ⚠️ E oggi non c'è ancora un incassatore vero (Polar
+> ha detto no): il 1,99 si VEDE ma dietro c'è la cassa di prova, non un
+> pagamento reale. Chi lascia una recensione riceve un codice `RIV-XXXXX`
+> che sblocca UNA analisi gratis (`lib/recensioni`).
 
 ## 2. Come parti in locale
 

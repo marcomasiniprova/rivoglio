@@ -58,7 +58,8 @@ function valida(d: DatiNuovaRecensione): string | null {
 
 /**
  * Crea la recensione (nascosta) e, se l'evento non era già recensito,
- * emette il buono. Torna l'id del buono: la rotta lo mette nel cookie.
+ * emette il buono. Torna il CODICE (RIV-XXXXX): la rotta lo manda al
+ * browser, che lo mostra alla persona da incollare al muro. Niente cookie.
  */
 export async function creaRecensione(d: DatiNuovaRecensione): Promise<EsitoNuovaRecensione> {
   const errore = valida(d);
