@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { chiamataAutorizzata } from "@/lib/motore/esegui";
+import { chiamataAutorizzata } from "@/lib/motore/autorizza";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { colonnaMancante } from "@/lib/supabase/colonne";
 import { verificaVolo } from "@/lib/voli/verifica";

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { chiamataAutorizzata } from "@/lib/motore/esegui";
+import { chiamataAutorizzata } from "@/lib/motore/autorizza";
 import { SERVIZIO_ATTIVO } from "@/lib/supabase/servizio";
 import {
   eventiRegistrati,

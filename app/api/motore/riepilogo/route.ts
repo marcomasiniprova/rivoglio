@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { chiamataAutorizzata } from "@/lib/motore/esegui";
+import { chiamataAutorizzata } from "@/lib/motore/autorizza";
 import { leggiCruscotto } from "@/lib/eventi/lettura";
 import { TELEGRAM_ATTIVO, tin } from "@/lib/eventi/telegram";
 
