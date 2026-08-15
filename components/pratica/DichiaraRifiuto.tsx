@@ -40,8 +40,16 @@ export default function DichiaraRifiuto({
   giaDichiarato,
   etichettaScelta,
   nuovoGiro = false,
+  nudo = false,
 }: {
   praticaId: string;
+  /**
+   * `nudo`: reso DENTRO il box unico «Come è andata con la compagnia?»
+   * (EsitoCompagnia), quindi senza la sua cornice e senza il suo titolo,
+   * che li mette il box che lo contiene. Parte già aperto sul flusso, così
+   * non ripete il bottone «Mi hanno risposto no» che l'utente ha già premuto.
+   */
+  nudo?: boolean;
   /** Il motivo già registrato, se il cliente ha già risposto una volta. */
   giaDichiarato?: string | null;
   /**
@@ -58,7 +66,11 @@ export default function DichiaraRifiuto({
    */
   etichettaScelta?: string | null;
 }) {
-  const [aperto, setAperto] = useState(false);
+  /* Nudo (dentro il box unico) parte già aperto sul flusso: il bottone
+     «Mi hanno risposto no» l'ha già premuto il box che lo contiene. Ma se
+     un no è già registrato, NON si apre: si mostra il riepilogo (stato
+     "fatto"), non si riparte da capo. */
+  const [aperto, setAperto] = useState(nudo && !(!nuovoGiro && Boolean(giaDichiarato)));
   /* Si parte SEMPRE dalla lettura: incollare la risposta è meno lavoro
      che leggersi otto voci e scegliere, e produce una replica migliore.
      La lista resta un clic sotto, e diventa la strada principale se il
@@ -147,7 +159,7 @@ export default function DichiaraRifiuto({
          dove siamo, perché metterne un altro che conferma?».
          Adesso questo riquadro dice l'unica cosa che l'altro non può
          dire: SU QUALE no è stata scritta, e come cambiarlo. */
-      <section className="rounded-2xl border border-bordo bg-white px-6 py-4">
+      <section className={nudo ? "" : "rounded-2xl border border-bordo bg-white px-6 py-4"}>
         <p className="flex items-start gap-2 text-[0.95rem] leading-relaxed text-fumo">
           <Check className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
           <span>
@@ -176,16 +188,21 @@ export default function DichiaraRifiuto({
   }
 
   return (
-    <section className="rounded-2xl border border-bordo bg-white px-6 py-5">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-[-0.03em]">
-        <AlertTriangle className="size-4 shrink-0 text-sole" aria-hidden="true" />
-        La compagnia ti ha risposto no?
-      </h2>
-      <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
-        Succede alla maggior parte dei reclami validi, e quasi sempre è un no che non regge.
-        Incolla qui quello che ti hanno scritto, o fotografalo: lo leggo io e ti preparo la
-        risposta sui loro stessi fatti, senza aspettare.
-      </p>
+    <section className={nudo ? "" : "rounded-2xl border border-bordo bg-white px-6 py-5"}>
+      {/* Nudo: titolo e intro li mette il box unico che ci contiene. */}
+      {!nudo && (
+        <>
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-[-0.03em]">
+            <AlertTriangle className="size-4 shrink-0 text-sole" aria-hidden="true" />
+            La compagnia ti ha risposto no?
+          </h2>
+          <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
+            Succede alla maggior parte dei reclami validi, e quasi sempre è un no che non regge.
+            Incolla qui quello che ti hanno scritto, o fotografalo: lo leggo io e ti preparo la
+            risposta sui loro stessi fatti, senza aspettare.
+          </p>
+        </>
+      )}
 
       {!aperto ? (
         <button

@@ -1,39 +1,43 @@
 import { test, expect } from "@playwright/test";
-import { creaBuonoCookie, leggiBuonoCookie } from "../lib/recensioni/buono";
+import { generaCodice, normalizzaCodice, formaCodiceValida } from "../lib/recensioni/buono";
 
 /**
- * IL BUONO ANALISI GRATIS: la ricevuta firmata che apre il cancello del
- * check una volta. Come il pass del pagamento, il cookie è solo la
- * consegna: il permesso vero lo tiene il database. Ma la FIRMA deve
- * reggere, se no chiunque si fabbrica buoni gratis.
+ * IL CODICE DELL'ANALISI GRATIS: usa e getta, guadagnato con una recensione.
  *
- * (In sviluppo il segreto ha un valore di ripiego, quindi la firma si
- * calcola e queste prove girano; in produzione senza segreto non si firma
- * affatto, che è il comportamento voluto.)
+ * Non è più un cookie (era fragile e riusabile: un incerto non lo spendeva,
+ * quindi restava vivo all'infinito, Valerio 15/08). Adesso è un CODICE che
+ * il registro nel database segna bruciato al primo uso. Qui si prova solo la
+ * FORMA e la pulizia dell'input; la validità (esiste, non ancora usato) la
+ * decide il database, provata a parte contro il Supabase vero.
  */
-
-test.describe("La firma del buono", () => {
-  test("un buono emesso da noi si rilegge e torna il suo id", () => {
-    const cookie = creaBuonoCookie("abc-123");
-    expect(cookie).not.toBeNull();
-    expect(leggiBuonoCookie(cookie)).toBe("abc-123");
+test.describe("Il codice dell'analisi gratis", () => {
+  test("un codice generato ha la forma RIV-XXXXX ed è accettato", () => {
+    const c = generaCodice();
+    expect(c).toMatch(/^RIV-[A-Z0-9]{5}$/);
+    expect(formaCodiceValida(c)).toBe(true);
   });
 
-  test("un buono con la firma manomessa viene rifiutato", () => {
-    const cookie = creaBuonoCookie("abc-123")!;
-    const rotto = cookie.slice(0, -3) + "000";
-    expect(leggiBuonoCookie(rotto)).toBeNull();
+  test("niente caratteri ambigui (0/O/1/I/L): un codice si detta a voce", () => {
+    for (let i = 0; i < 300; i++) {
+      const coda = generaCodice().slice(4); // dopo "RIV-"
+      expect(coda).not.toMatch(/[O0I1L]/);
+    }
   });
 
-  test("un id cambiato con la vecchia firma non passa", () => {
-    const cookie = creaBuonoCookie("abc-123")!;
-    const firma = cookie.slice(cookie.lastIndexOf("."));
-    expect(leggiBuonoCookie("altro-id" + firma)).toBeNull();
+  test("due codici di fila non sono uguali", () => {
+    expect(generaCodice()).not.toBe(generaCodice());
   });
 
-  test("una stringa a caso non è un buono", () => {
-    expect(leggiBuonoCookie("qualcosa")).toBeNull();
-    expect(leggiBuonoCookie("")).toBeNull();
-    expect(leggiBuonoCookie(null)).toBeNull();
+  test("quello che l'utente incolla si ripulisce: maiuscolo, via gli spazi", () => {
+    expect(normalizzaCodice("  riv-7k2p9 ")).toBe("RIV-7K2P9");
+    expect(normalizzaCodice("RIV-7K2P9")).toBe("RIV-7K2P9");
+  });
+
+  test("una stringa a caso non ha la forma di un codice", () => {
+    expect(formaCodiceValida("qualcosa")).toBe(false);
+    expect(formaCodiceValida("")).toBe(false);
+    expect(formaCodiceValida("RIV-ABCDEFG")).toBe(false); // troppo lungo
+    expect(formaCodiceValida("RIV-abc12")).toBe(false); // minuscole: non normalizzato
+    expect(formaCodiceValida("XXX-ABCDE")).toBe(false); // prefisso sbagliato
   });
 });

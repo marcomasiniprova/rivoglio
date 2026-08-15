@@ -7,7 +7,6 @@ import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
 import { COPY } from "@/lib/copy";
 import MuroCheck, { type DatiMuro } from "@/components/rivolio/MuroCheck";
 import { riprendiCheck, sospendiCheck, tornatoDallaCassa } from "@/lib/check/ripresa";
-import { CHIAVE_BUONO_LOCALE } from "@/lib/check/chiave-buono";
 
 /**
  * LA SCHEDA DEL CHECK: lo standard, identico ovunque.
@@ -299,8 +298,10 @@ export default function SchedaCheck() {
     return d.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
   };
 
-  /** IL CHECK, uguale per tutti i modi: teatro + richiesta vera. */
-  async function avvia(voloDaControllare: string, giornoIso: string) {
+  /** IL CHECK, uguale per tutti i modi: teatro + richiesta vera. Il
+      `codice` arriva solo dal muro, quando la persona ne incolla uno per
+      l'analisi gratis: viaggia col check e il server lo valida sul registro. */
+  async function avvia(voloDaControllare: string, giornoIso: string, codice?: string) {
     if (inCorso.current) return;
     inCorso.current = true;
     setErrore(null);
@@ -320,15 +321,6 @@ export default function SchedaCheck() {
       await attesa(PAUSA_FINALE_MS);
     })();
 
-    /* IL BUONO DI RISERVA. Se il browser ha scartato il cookie firmato del
-       buono (Brave, cookie ripuliti), il suo id parte da qui col check e il
-       muro non riappare su un'analisi già guadagnata. Il server lo valida
-       sul registro: se è già speso non serve a niente. */
-    const buono =
-      typeof window !== "undefined"
-        ? (localStorage.getItem(CHIAVE_BUONO_LOCALE) ?? undefined)
-        : undefined;
-
     try {
       const r = await richiestaResiliente("/api/verifica", {
         method: "POST",
@@ -336,20 +328,10 @@ export default function SchedaCheck() {
         body: JSON.stringify({
           volo: voloDaControllare.trim(),
           data: giornoIso,
-          ...(buono ? { buono } : {}),
+          ...(codice ? { codice } : {}),
         }),
       });
       const dati = await r.json().catch(() => null);
-
-      /* Buono speso: il browser lo dimentica, così non crede di averne
-         ancora uno e non lo rimanda a vuoto la prossima volta. */
-      if (dati?.buonoConsumato && typeof window !== "undefined") {
-        try {
-          localStorage.removeItem(CHIAVE_BUONO_LOCALE);
-        } catch {
-          /* niente */
-        }
-      }
 
       if (dati?.ok && dati.dato) {
         setLetto({
@@ -595,6 +577,12 @@ export default function SchedaCheck() {
              meglio una pagina che spiega che un bottone che non fa
              niente. */
           router.push(muro.cassa ?? "/#prezzi");
+        }}
+        onRiscatta={(codice) => {
+          /* Il codice dell'analisi gratis (da recensione): rifà il check
+             sullo stesso volo, stavolta col codice. Se vale, il cancello
+             si apre e parte l'analisi; se no, il muro resta con l'avviso. */
+          void avvia(inAnalisi.volo, inAnalisi.data, codice);
         }}
       />
     );

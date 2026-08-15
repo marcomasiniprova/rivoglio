@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { ArrowLeft, ArrowRight, FileText, ShieldCheck } from "lucide-react";
 import Logo from "@/components/Logo";
 import CaricaDocumento from "@/components/pratica/CaricaDocumento";
-import DichiaraRifiuto from "@/components/pratica/DichiaraRifiuto";
 import HoInviato from "@/components/pratica/HoInviato";
 import SpeseCura from "@/components/pratica/SpeseCura";
 import { Button } from "@/components/ui/button";
@@ -526,22 +525,16 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           è partito, e chiude la pratica: pagata (vittoria, entra in
           classifica) o no (parte la garanzia). Prima non c'era, e la
           pratica non finiva mai. */}
+      {/* IL BOX UNICO «Come è andata con la compagnia?» (Valerio, 15/08:
+          «fondi tutto in un box solo, mi hanno pagato o mi hanno risposto
+          no»). Prima erano due riquadri separati: qui dentro c'è sia il
+          «mi hanno pagato» (chiude la pratica) sia la strada del «mi hanno
+          risposto no» (carica il loro no, preparo la replica). La garanzia
+          NON scatta più sulla parola: solo con un no scritto registrato. */}
       {["inviata", "sollecito", "enac"].includes(pratica.stato) && (
-        <DichiaraEsito praticaId={pratica.id} />
-      )}
-
-      {/* ---------------------------- il no della compagnia, dichiarato.
-          🔴 STA QUI, SUBITO SOTTO «dove siamo», e prima stava terzultimo.
-          Valerio, 13/08: «nella sezione 4 che senso ha dire 1. dove
-          siamo, 2. carica i documenti, 3. il fascicolo, 4. la replica è
-          pronta? metti la 3 come la prima!».
-          Aveva ragione: l'ordine di una pagina deve essere l'ordine in
-          cui le cose servono. La cosa che fa muovere i soldi è dire che
-          hanno risposto no; la carta d'imbarco e il fascicolo sono
-          contorno, e il contorno sta sotto. */}
-      {R.rifiuto && (
-        <DichiaraRifiuto
+        <DichiaraEsito
           praticaId={pratica.id}
+          rifiutoRegistrato={Boolean(pratica.rifiuto_motivo)}
           giaDichiarato={pratica.rifiuto_motivo ?? null}
           etichettaScelta={schedaRifiuto(pratica.rifiuto_motivo)?.etichetta ?? null}
           nuovoGiro={percorso.giri.no > 0 && percorso.giri.no === percorso.giri.replicheMandate}
@@ -549,10 +542,19 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
       )}
 
       {/* --------------------------------- il diritto di cura (art. 9).
-          Si aggancia gratis al reclamo che il cliente ha già, quando la
-          lettera è disponibile. NON sul declassamento: lì hai volato, non
-          sei stato bloccato, e l'assistenza dell'art. 9 non c'entra. */}
+          🔴 SI FA PRIMA DEL RECLAMO, NON DOPO (Valerio, 15/08: «sta sempre
+          di mezzo, anche quando dico che mi hanno pagato e la pratica è
+          chiusa... quello si fa prima del reclamo, come i documenti»).
+          Aveva ragione: gli scontrini si allegano alla lettera, quindi la
+          domanda ha senso mentre la lettera si prepara (pagata/pronta), e
+          non ha più senso una volta che il reclamo è partito o la pratica
+          è chiusa. Da lì sparisce.
+          NON sul declassamento: lì hai volato, non sei stato bloccato, e
+          l'assistenza dell'art. 9 non c'entra. */}
       {R.letteraVisibile &&
+        !["inviata", "sollecito", "enac", "esito_pagata", "esito_rifiutata", "rimborsata"].includes(
+          pratica.stato,
+        ) &&
         (verificaRiga as { caso_dichiarato?: string | null } | null)?.caso_dichiarato !==
           "declassamento" && <SpeseCura praticaId={pratica.id} iniziale={pratica.cura_richiesta ?? false} />}
 

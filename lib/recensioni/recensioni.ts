@@ -13,6 +13,7 @@
  * nessuna policy, quindi il browser non la tocca mai da solo.
  */
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
+import { generaCodice } from "./buono";
 
 export type EventoRecensito = "check" | "verdetto" | "pratica";
 
@@ -39,9 +40,9 @@ export type DatiNuovaRecensione = {
 };
 
 export type EsitoNuovaRecensione =
-  | { ok: true; buonoId: string | null; giaFatta: false }
-  /** L'evento era già recensito: nessun buono nuovo (uno per evento). */
-  | { ok: true; buonoId: null; giaFatta: true }
+  | { ok: true; codice: string | null; giaFatta: false }
+  /** L'evento era già recensito: nessun codice nuovo (uno per evento). */
+  | { ok: true; codice: null; giaFatta: true }
   | { ok: false; errore: string };
 
 /** 1-5 stelle, un motivo vero, un evento a cui agganciarla. */
@@ -84,27 +85,63 @@ export async function creaRecensione(d: DatiNuovaRecensione): Promise<EsitoNuova
   if (error) {
     /* 23505 = quell'evento è già stato recensito. Non è un guasto: è la
        regola. Nessun buono nuovo, e lo diciamo alla rotta. */
-    if (error.code === "23505") return { ok: true, buonoId: null, giaFatta: true };
+    if (error.code === "23505") return { ok: true, codice: null, giaFatta: true };
     console.error("[recensioni] non salvata:", error.message);
     return { ok: false, errore: "Non sono riuscito a salvare la recensione. Riprova." };
   }
 
-  // Il buono: una sola analisi gratis, legata a questa recensione.
-  const { data: buono, error: erroreBuono } = await db
-    .from("buoni_analisi")
-    .insert({ recensione_id: rec.id, utente_id: d.utenteId ?? null, email: d.email ?? null })
-    .select("id")
-    .single();
+  /* Il buono: una sola analisi gratis, legata a questa recensione, con un
+     CODICE usa e getta che la persona incolla al muro. Il codice è quasi
+     sempre unico al primo colpo; se per sfortuna collide (indice unico), si
+     riprova con uno nuovo, non oltre tre volte. */
+  for (let tentativo = 0; tentativo < 3; tentativo++) {
+    const codice = generaCodice();
+    const { data: buono, error: erroreBuono } = await db
+      .from("buoni_analisi")
+      .insert({
+        recensione_id: rec.id,
+        utente_id: d.utenteId ?? null,
+        email: d.email ?? null,
+        codice,
+      })
+      .select("id")
+      .single();
 
-  if (erroreBuono) {
-    // La recensione c'è (conta per la vetrina); il buono no. Onesti: niente
-    // buono finto. Un raro doppione di submission è coperto dall'unico su
-    // recensione_id.
+    if (!erroreBuono) return { ok: true, codice, giaFatta: false };
+
+    /* 23505 sull'indice del codice = collisione: si riprova con un codice
+       nuovo. 23505 su recensione_id = il buono per questa recensione c'è
+       già (doppia submission): non se ne emette un altro. */
+    if (erroreBuono.code === "23505" && /codice/.test(erroreBuono.message)) continue;
+    if (erroreBuono.code === "23505") return { ok: true, codice: null, giaFatta: false };
+
     console.error("[recensioni] buono non emesso:", erroreBuono.message);
-    return { ok: true, buonoId: null, giaFatta: false };
+    return { ok: true, codice: null, giaFatta: false };
   }
 
-  return { ok: true, buonoId: buono.id, giaFatta: false };
+  // Tre collisioni di fila: praticamente impossibile. La recensione resta.
+  console.error("[recensioni] codice non generato: troppe collisioni");
+  return { ok: true, codice: null, giaFatta: false };
+}
+
+/**
+ * IL RISCATTO, dal cancello del check. Dato un codice, torna l'id del buono
+ * SOLO se esiste ed è ancora libero (mai usato). È il registro a decidere,
+ * come per il pass: un codice speso non apre più niente.
+ */
+export async function buonoIdDaCodice(codice: string): Promise<string | null> {
+  if (!SERVIZIO_ATTIVO || !codice) return null;
+  try {
+    const { data } = await supabaseServizio()
+      .from("buoni_analisi")
+      .select("id")
+      .eq("codice", codice)
+      .is("usato_il", null)
+      .maybeSingle<{ id: string }>();
+    return data?.id ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** C'è già una recensione per questo evento? Serve alla UI per non riproporla. */
@@ -196,28 +233,10 @@ export async function recensioniApprovate(limite = 24): Promise<RecensioneVetrin
 /* ───────────────────── il buono, dal cancello ────────────────────── */
 
 /**
- * Il buono è valido? Vero SOLO se esiste nel registro e non è ancora
- * usato. È il registro a decidere, non il cookie: un cookie si copia.
- */
-export async function buonoUsabile(id: string): Promise<boolean> {
-  if (!SERVIZIO_ATTIVO) return false;
-  try {
-    const { data } = await supabaseServizio()
-      .from("buoni_analisi")
-      .select("id, usato_il")
-      .eq("id", id)
-      .is("usato_il", null)
-      .maybeSingle();
-    return Boolean(data);
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Spende il buono: lo segna usato, una volta sola. Torna vero se è stato
  * QUESTA chiamata a spenderlo (grazie al filtro `usato_il is null`, due
- * chiamate in corsa non lo spendono due volte).
+ * chiamate in corsa non lo spendono due volte). L'id lo trova
+ * `buonoIdDaCodice` partendo dal codice che la persona incolla.
  */
 export async function consumaBuono(id: string, verificaId: string | null): Promise<boolean> {
   if (!SERVIZIO_ATTIVO) return false;

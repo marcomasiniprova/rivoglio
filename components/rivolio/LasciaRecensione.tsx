@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { seSiPaga } from "@/lib/check/ingresso";
-import { CHIAVE_BUONO_LOCALE } from "@/lib/check/chiave-buono";
 import type { EventoRecensito } from "@/lib/recensioni/recensioni";
 
 /**
@@ -74,6 +73,7 @@ export default function LasciaRecensione({
   const [nome, setNome] = useState("");
   const [stato, setStato] = useState<"fermo" | "invio" | "fatto" | "gia" | "errore">("fermo");
   const [sbloccato, setSbloccato] = useState(false);
+  const [codice, setCodice] = useState<string | null>(null);
   const [errore, setErrore] = useState("");
 
   const pronto = stelle >= 1 && motivo.trim().length >= 3;
@@ -94,22 +94,17 @@ export default function LasciaRecensione({
         errore?: string;
         giaFatta?: boolean;
         sbloccata?: boolean;
-        buonoId?: string | null;
+        codice?: string | null;
       } | null;
       if (!r.ok || !d?.ok) {
         setErrore(d?.errore ?? "Non sono riuscito a salvare. Riprova.");
         setStato("errore");
         return;
       }
-      /* Il buono DI RISERVA nel browser: se il cookie non arriverà al
-         check, l'id parte da qui e l'analisi gratis vale lo stesso. */
-      if (!d.giaFatta && d.buonoId && typeof window !== "undefined") {
-        try {
-          localStorage.setItem(CHIAVE_BUONO_LOCALE, d.buonoId);
-        } catch {
-          // localStorage negato (navigazione privata stretta): resta il cookie.
-        }
-      }
+      /* Il CODICE dell'analisi gratis: lo mostriamo alla persona, che lo
+         incolla al muro del check. Niente da salvare nel browser: a decidere
+         se vale è il registro. */
+      setCodice(d.codice ?? null);
       setSbloccato(Boolean(d.sbloccata));
       setStato(d.giaFatta ? "gia" : "fatto");
     } catch {
@@ -151,6 +146,22 @@ export default function LasciaRecensione({
               ? "Grazie, la tua recensione è salvata. L'analisi gratis non è partita: riprova più tardi."
               : GRAZIE}
         </p>
+
+        {/* IL CODICE, grande e da copiare. È l'unica cosa che sblocca
+            l'analisi gratis: si incolla nel muro del check. */}
+        {stato === "fatto" && sbloccato && codice && (
+          <div className="mt-4 rounded-xl border border-verde/40 bg-white px-4 py-3.5 text-center">
+            <p className="text-[12.5px] font-medium uppercase tracking-[0.14em] text-fumo">
+              Il tuo codice
+            </p>
+            <p className="numeri mt-1 font-display text-[28px] font-semibold tracking-[0.12em] text-verde-scuro">
+              {codice}
+            </p>
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-fumo">
+              Incollalo nel check, alla voce «Hai un codice dell&apos;analisi gratis?».
+            </p>
+          </div>
+        )}
       </motion.div>
     );
   }

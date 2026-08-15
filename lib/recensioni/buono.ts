@@ -1,68 +1,36 @@
 /**
- * IL BUONO ANALISI GRATIS: la ricevuta che apre il cancello del check una
- * volta, guadagnata lasciando una recensione.
+ * IL CODICE DELL'ANALISI GRATIS: usa e getta, guadagnato con una recensione.
  *
- * È fatto come il pass del pagamento (lib/check/pass.ts), e per la stessa
- * ragione: zero frizione. Il buono viaggia in un cookie FIRMATO che porta
- * solo il suo identificativo; la firma dimostra che l'abbiamo emesso noi.
+ * ⚠️ NON è più un cookie, e il motivo è un buco vero (Valerio, 15/08:
+ * «faccio analisi gratis quanto voglio»). Il cookie era fragile (a volte
+ * non arrivava, e il muro compariva su un buono valido) E riusabile (un
+ * verdetto "incerto" non lo spendeva, quindi restava vivo all'infinito).
  *
- * ⚠️ IL COOKIE NON È IL PERMESSO, È LA CONSEGNA. Un cookie si copia, quindi
- * da solo non basta: il conto vero lo tiene il database (`buoni_analisi`,
- * colonna `usato_il`). Il cookie serve a ritrovare QUALE buono, senza far
- * cercare niente all'utente e senza un account che magari non ha. La
- * validità (non ancora usato) la decide sempre il registro.
- *
- * Il segreto è quello del servizio, come per il pass e per i gettoni
- * delle email: se manca, in produzione NON si firma niente, perché un
- * buono che chiunque può fabbricarsi non è un buono, è una porta aperta.
+ * Adesso è un CODICE che la persona vede e incolla al muro. A decidere se
+ * vale è SEMPRE il registro nel database (`buoni_analisi`, colonna
+ * `usato_il`): il codice si brucia al primo uso e riusarlo è impossibile.
+ * Niente cookie, niente localStorage, niente da copiare.
  */
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { randomBytes } from "node:crypto";
 
-const SEGRETO =
-  process.env.SEGRETO_ISCRITTI ??
-  process.env.SUPABASE_SECRET_KEY ??
-  process.env.SUPABASE_SERVICE_ROLE_KEY ??
-  "";
-const IN_PRODUZIONE = process.env.NODE_ENV === "production";
-const SEGRETO_SVILUPPO = "rivolio-sviluppo-non-usare-in-produzione";
+/* Alfabeto senza caratteri ambigui (niente 0/O/1/I/L): un codice si legge e
+   si detta a voce senza sbagliare. */
+const ALFABETO = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 
-/** Il cookie che porta il buono. */
-export const COOKIE_BUONO = "rivolio_buono";
-
-/** Quanto vale il cookie, in giorni: un buono non scade in fretta. */
-export const GIORNI_BUONO = 90;
-
-function chiave(): string | null {
-  if (SEGRETO) return SEGRETO;
-  if (IN_PRODUZIONE) return null;
-  return SEGRETO_SVILUPPO;
+/** Un codice tipo "RIV-7K2P9": prefisso più cinque caratteri (~28 milioni). */
+export function generaCodice(): string {
+  const b = randomBytes(5);
+  let s = "";
+  for (let i = 0; i < 5; i++) s += ALFABETO[b[i] % ALFABETO.length];
+  return `RIV-${s}`;
 }
 
-const firma = (corpo: string, k: string) =>
-  createHmac("sha256", k).update(corpo).digest("base64url");
-
-/** La ricevuta del buono: "id.firma". null se non si può firmare. */
-export function creaBuonoCookie(id: string): string | null {
-  const k = chiave();
-  if (!k) {
-    console.error("[buono] nessun segreto in produzione: buono non emesso");
-    return null;
-  }
-  return `${id}.${firma(id, k)}`;
+/** Ripulisce quello che l'utente incolla: maiuscolo, via gli spazi. */
+export function normalizzaCodice(grezzo: string): string {
+  return grezzo.trim().toUpperCase().replace(/\s+/g, "");
 }
 
-/** Rilegge il cookie e torna l'id del buono, o null se manca/è falso. */
-export function leggiBuonoCookie(valore: string | null | undefined): string | null {
-  const k = chiave();
-  if (!k || !valore) return null;
-  const punto = valore.lastIndexOf(".");
-  if (punto <= 0) return null;
-  const id = valore.slice(0, punto);
-  const data = valore.slice(punto + 1);
-  /* Confronto a tempo costante: come per il pass, su un confronto normale
-     la firma si indovina un carattere alla volta misurando i tempi. */
-  const atteso = Buffer.from(firma(id, k));
-  const ricevuto = Buffer.from(data);
-  if (atteso.length !== ricevuto.length || !timingSafeEqual(atteso, ricevuto)) return null;
-  return id;
+/** Vero se ha la forma di un nostro codice: non tocca il database. */
+export function formaCodiceValida(codice: string): boolean {
+  return /^RIV-[A-Z0-9]{5}$/.test(codice);
 }

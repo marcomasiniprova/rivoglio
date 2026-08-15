@@ -5,7 +5,6 @@ import {
   recensioniApprovate,
   type EventoRecensito,
 } from "@/lib/recensioni/recensioni";
-import { COOKIE_BUONO, GIORNI_BUONO, creaBuonoCookie } from "@/lib/recensioni/buono";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 
@@ -27,14 +26,6 @@ export const dynamic = "force-dynamic";
  */
 
 const MASSIMO_AL_MINUTO = 10;
-
-const BISCOTTO = {
-  httpOnly: true,
-  sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
-  path: "/",
-  maxAge: GIORNI_BUONO * 24 * 60 * 60,
-};
 
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS });
@@ -110,26 +101,11 @@ export async function POST(req: Request) {
     );
   }
 
-  const risposta = NextResponse.json(
-    {
-      ok: true,
-      giaFatta: false,
-      sbloccata: Boolean(esito.buonoId),
-      /* L'id del buono torna anche al browser, che lo tiene di riserva e lo
-         rimanda col check se il cookie non arriva (vedi /api/verifica). È
-         un UUID che il registro segna usato una volta sola: la riserva non
-         regala niente, mette solo il buono al riparo da un browser che
-         scarta i cookie. */
-      buonoId: esito.buonoId,
-    },
+  /* Il CODICE torna al browser, che lo mostra alla persona: lo incolla al
+     muro per l'analisi gratis. Niente cookie, niente da salvare: a decidere
+     se vale è il registro, che lo segna usato una volta sola. */
+  return NextResponse.json(
+    { ok: true, giaFatta: false, sbloccata: Boolean(esito.codice), codice: esito.codice },
     { headers: CORS },
   );
-
-  // Il cookie del buono: la consegna primaria. Il permesso vero lo tiene il database.
-  if (esito.buonoId) {
-    const cookie = creaBuonoCookie(esito.buonoId);
-    if (cookie) risposta.cookies.set(COOKIE_BUONO, cookie, BISCOTTO);
-  }
-
-  return risposta;
 }

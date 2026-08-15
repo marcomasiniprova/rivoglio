@@ -2,8 +2,6 @@ import { Check } from "lucide-react";
 import { Anima, AnimaLista, Figlio } from "@/components/Anima";
 import ConfrontoBanconote from "./ConfrontoBanconote";
 import { COPY } from "@/lib/copy";
-import { cassaDiProvaAperta } from "@/lib/check/cancello";
-import { CHECK_A_PAGAMENTO } from "@/lib/check/ingresso";
 import { listinoCorrente } from "@/lib/prezzi-server";
 
 /**
@@ -58,8 +56,6 @@ export default async function PrezziRivolio() {
      questa persona sta vedendo, non da COPY. Se il cookie manca è il
      listino di sempre, quindi la pagina non cambia. */
   const { listino } = await listinoCorrente();
-  /* Dove porta il bottone di sblocco, o null se non c'è dove andare. */
-  const cassaDiretta = CHECK_A_PAGAMENTO && cassaDiProvaAperta() ? "/cassa-prova" : null;
   const prezzoDi = (nome: string) =>
     nome === COPY.prezzi.piani.famiglia.nome ? listino.famigliaTesto : listino.singolaTesto;
   return (
@@ -129,37 +125,20 @@ export default async function PrezziRivolio() {
                   ))}
                 </ul>
 
-                {/* ⚠️ DA QUI SI PUÒ ANCHE PAGARE (richiesta di Valerio,
-                    12/08: «se uno va nel pricing e clicca paga viene
-                    scrollato all'analisi, fai che possa pagare da
-                    entrambi»). Aveva ragione: quando il check si paga,
-                    questa card È un prodotto in vendita, e un bottone
-                    che invece di vendere ti sposta la pagina più in su
-                    fa perdere la persona che aveva già deciso.
-                    Il secondo bottone compare solo se ci sono TUTTE E
-                    DUE le cose: il muro acceso e una cassa vera dove
-                    andare. Se manca una delle due resta il solo invito
-                    al check, che è il percorso normale. */}
-                <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+                {/* UN SOLO BOTTONE (Valerio, 15/08: «due bottoni uguali,
+                    che senso ha?»). Prima ce n'erano due, tutti e due a
+                    prezzo di lancio: uno portava al check, l'altro alla
+                    cassa. Erano gemelli e confondevano. Resta quello che
+                    porta al check, dove si mette il volo e si paga: è
+                    l'unico che porta davvero all'analisi. */}
+                <div className="mt-6">
                   <a
                     href="#controllo"
-                    className={`riflesso inline-flex h-13 w-full items-center justify-center gap-2 rounded-bottone px-8 text-[16px] font-semibold transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.99] sm:w-auto ${
-                      cassaDiretta
-                        ? "border border-verde/35 bg-white text-verde-scuro hover:border-verde"
-                        : "bg-verde text-white shadow-[0_16px_34px_-14px_rgba(10,157,92,.7)] hover:bg-verde-scuro"
-                    }`}
+                    className="riflesso inline-flex h-13 w-full items-center justify-center gap-2 rounded-bottone bg-verde px-8 text-[16px] font-semibold text-white shadow-[0_16px_34px_-14px_rgba(10,157,92,.7)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro active:scale-[0.99] sm:w-auto"
                   >
                     {CHECK.bottone}
                     <span aria-hidden="true">→</span>
                   </a>
-                  {cassaDiretta && (
-                    <a
-                      href={cassaDiretta}
-                      className="riflesso inline-flex h-13 w-full items-center justify-center gap-2 rounded-bottone bg-verde px-8 text-[16px] font-semibold text-white shadow-[0_16px_34px_-14px_rgba(10,157,92,.7)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro active:scale-[0.99] sm:w-auto"
-                    >
-                      Sblocca ora · {CHECK.prezzo}
-                    </a>
-                  )}
                 </div>
                 <p className="mt-3 text-[13px] text-fumo-2">{CHECK.rassicurazione}</p>
               </div>

@@ -4,25 +4,47 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import DichiaraRifiuto from "./DichiaraRifiuto";
 
 /**
- * COM'È FINITA CON LA COMPAGNIA (Valerio, 15/08).
+ * COME È ANDATA CON LA COMPAGNIA — un box solo (Valerio, 15/08).
  *
- * Il traguardo che mancava: dopo aver mandato il reclamo, l'utente non
- * aveva nessun modo per dire «mi hanno pagato» e chiudere la pratica. Solo
- * lui sa se i soldi sono arrivati sul suo conto (la compagnia paga lui,
- * non noi), quindi è lui a dichiararlo.
+ * 🔴 Prima erano DUE riquadri per la stessa cosa: «ti ha pagato?» e «ti ha
+ * risposto no?». Confondevano. Adesso sono uno: una domanda, due bottoni.
+ *  - «Mi hanno pagato» → chiude la pratica come vinta (entra in classifica,
+ *    se ha scelto un nome pubblico). Il bonifico arriva sul suo conto, non
+ *    da noi, quindi è lui a dirlo.
+ *  - «Mi hanno risposto no» → apre, QUI DENTRO, la strada del rifiuto
+ *    (carica il loro no, gli preparo la replica): è la stessa che prima
+ *    stava in un box a parte.
  *
- * «Mi hanno pagato» chiude la pratica come vinta (ed entra in classifica,
- * se ha scelto un nome pubblico). «Non hanno pagato» apre la garanzia: gli
- * rimborsiamo i 14,90. La seconda chiede una conferma in più, perché
- * chiude comunque la pratica.
+ * 🔴 LA GARANZIA NON SCATTA PIÙ SULLA PAROLA (Valerio, 15/08: «uno può
+ * essere pagato e chiedere il rimborso lo stesso, come lo verifichiamo?»).
+ * Non possiamo vedere il conto di nessuno. Quindi il rimborso dei 14,90
+ * parte solo DOPO che c'è un no SCRITTO della compagnia registrato, che
+ * leggiamo noi: chi è stato pagato non ha un no da mostrare. Il server lo
+ * ricontrolla (`/api/pratiche/[id]/esito`).
+ *
+ * I due bottoni restano SEMPRE visibili: chi ha ricevuto un no e poi, dopo
+ * la replica, si è visto pagare, deve poterlo dire.
  */
-export default function DichiaraEsito({ praticaId }: { praticaId: string }) {
+export default function DichiaraEsito({
+  praticaId,
+  rifiutoRegistrato = false,
+  giaDichiarato = null,
+  etichettaScelta = null,
+  nuovoGiro = false,
+}: {
+  praticaId: string;
+  /** Vero se un no scritto della compagnia è già registrato sulla pratica. */
+  rifiutoRegistrato?: boolean;
+  giaDichiarato?: string | null;
+  etichettaScelta?: string | null;
+  nuovoGiro?: boolean;
+}) {
   const router = useRouter();
-  // La FASE decide quale schermata mostrare; `inCorso` se una richiesta è
-  // in volo. Tenerle separate evita che l'invio faccia sparire la conferma.
-  const [fase, setFase] = useState<"scelta" | "conferma_no">("scelta");
+  // Con un no già registrato la strada del rifiuto è aperta di suo.
+  const [mostraNo, setMostraNo] = useState(rifiutoRegistrato);
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
 
@@ -50,64 +72,71 @@ export default function DichiaraEsito({ praticaId }: { praticaId: string }) {
     <section className="rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-5">
       <h2 className="flex items-center gap-2 font-display text-lg tracking-[-0.03em] text-verde-notte">
         <CheckCircle2 className="size-5 shrink-0" aria-hidden="true" />
-        La compagnia ti ha pagato?
+        Come è andata con la compagnia?
       </h2>
       <p className="mt-2 text-[0.95rem] leading-relaxed text-verde-notte/80">
-        Il bonifico arriva sul tuo conto, non da noi: quando lo vedi, dimmelo qui e chiudiamo la
-        pratica. Se invece non paga o rifiuta, entra la garanzia e ti rimborsiamo i 14,90.
+        Quando sai com&apos;è finita, dimmelo qui e chiudiamo la pratica. Il bonifico arriva sul
+        tuo conto, non da noi.
       </p>
 
-      {fase === "scelta" ? (
-        <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
-          <Button
-            type="button"
-            size="lg"
-            className="flex-1"
-            disabled={inCorso}
-            onClick={() => void dichiara("pagata")}
-          >
-            {inCorso ? "Un attimo…" : "Sì, mi hanno pagato"}
-          </Button>
-          <Button
-            type="button"
-            variant="contorno"
-            size="lg"
-            className="flex-1"
-            disabled={inCorso}
-            onClick={() => {
-              setErrore(null);
-              setFase("conferma_no");
-            }}
-          >
-            No, non hanno pagato
-          </Button>
-        </div>
-      ) : (
-        <div className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5">
-          <p className="text-[0.95rem] leading-relaxed text-inchiostro">
-            Chiudo la pratica e faccio partire la garanzia: ti rimborsiamo i 14,90 che hai pagato.
-            Confermi?
-          </p>
-          <div className="mt-3 flex flex-col gap-2.5 sm:flex-row">
-            <Button
-              type="button"
-              variant="scuro"
-              className="flex-1"
-              disabled={inCorso}
-              onClick={() => void dichiara("non_pagata")}
-            >
-              {inCorso ? "Un attimo…" : "Sì, chiudi e rimborsa"}
-            </Button>
-            <Button
-              type="button"
-              variant="contorno"
-              className="flex-1"
-              disabled={inCorso}
-              onClick={() => setFase("scelta")}
-            >
-              Aspetta, torno indietro
-            </Button>
-          </div>
+      <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
+        <Button
+          type="button"
+          size="lg"
+          className="flex-1"
+          disabled={inCorso}
+          onClick={() => void dichiara("pagata")}
+        >
+          {inCorso ? "Un attimo…" : "Mi hanno pagato"}
+        </Button>
+        <Button
+          type="button"
+          variant="contorno"
+          size="lg"
+          className="flex-1"
+          aria-pressed={mostraNo}
+          onClick={() => {
+            setErrore(null);
+            setMostraNo(true);
+          }}
+        >
+          Mi hanno risposto no
+        </Button>
+      </div>
+
+      {mostraNo && (
+        <div className="mt-5 border-t border-verde/20 pt-5">
+          {/* La strada del rifiuto, resa QUI DENTRO (nuda): carica il loro
+              no e prepara la replica. È la stessa di prima, senza un box a
+              parte. */}
+          <DichiaraRifiuto
+            praticaId={praticaId}
+            nudo
+            giaDichiarato={giaDichiarato}
+            etichettaScelta={etichettaScelta}
+            nuovoGiro={nuovoGiro}
+          />
+
+          {/* LA CHIUSURA CON GARANZIA compare SOLO con un no già registrato:
+              è il paletto anti-frode. Senza un no scritto sulla pratica non
+              c'è (e il server lo rifiuta comunque). */}
+          {rifiutoRegistrato && (
+            <div className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5">
+              <p className="text-[0.95rem] leading-relaxed text-inchiostro">
+                Se dopo la replica e i solleciti non hai visto un euro, chiudo la pratica e faccio
+                partire la garanzia: ti rimborsiamo i 14,90 che hai pagato.
+              </p>
+              <Button
+                type="button"
+                variant="scuro"
+                className="mt-3 w-full"
+                disabled={inCorso}
+                onClick={() => void dichiara("non_pagata")}
+              >
+                {inCorso ? "Un attimo…" : "Chiudi con la garanzia (rimborso 14,90€)"}
+              </Button>
+            </div>
+          )}
         </div>
       )}
 

@@ -22,6 +22,16 @@ import { tin } from "@/lib/eventi/telegram";
  *                   rimborsiamo i 14,90), e un avviso ci arriva sul
  *                   telefono per processarla.
  *
+ * 🔴 ANTI-FRODE (Valerio, 15/08): non possiamo vedere il conto di nessuno,
+ * quindi «non mi hanno pagato» detto e basta non è verificabile: uno
+ * potrebbe essere stato pagato dalla compagnia (250-600€) e chiedere ANCHE
+ * il rimborso dei 14,90 dicendo di no. Per questo la garanzia NON scatta
+ * più sulla parola: scatta solo se c'è un NO SCRITTO della compagnia
+ * registrato sulla pratica (`rifiuto_motivo`), che leggiamo noi. Chi è
+ * stato pagato non ha un rifiuto da mostrare, quindi non ha niente da
+ * farsi rimborsare. Il controllo sta QUI sul server, non solo nella UI:
+ * un POST diretto senza rifiuto registrato viene rifiutato.
+ *
  * La scrittura la fa il server con la chiave di servizio (le transizioni
  * non passano MAI dal client), ma solo dopo aver controllato che la
  * pratica sia davvero sua.
@@ -92,10 +102,23 @@ export async function POST(req: Request, contesto: { params: Promise<{ id: strin
       return NextResponse.json({ ok: true, stato: "esito_pagata" }, { headers: CORS });
     }
 
+    /* 🔴 IL PALETTO ANTI-FRODE: la garanzia scatta solo con un NO scritto
+       della compagnia già registrato. Senza, si rimanda a registrarlo: è
+       lì che il rimborso trova il suo appiglio verificabile. */
+    if (!(pratica as { rifiuto_motivo?: string | null }).rifiuto_motivo) {
+      return NextResponse.json(
+        {
+          errore:
+            "Per la garanzia serve prima il no scritto della compagnia: registralo qui sopra («Mi hanno risposto no»), lo leggiamo noi.",
+        },
+        { status: 409, headers: CORS },
+      );
+    }
+
     const r = await transizionePratica(
       id,
       "esito_rifiutata",
-      "L'utente ha dichiarato che la compagnia non ha pagato: la garanzia entra in gioco.",
+      "L'utente ha dichiarato che la compagnia non ha pagato: la garanzia entra in gioco (con un no scritto registrato).",
     );
     if (!r.ok) {
       return NextResponse.json({ errore: "Non sono riuscito a salvare. Riprova." }, { status: 503, headers: CORS });

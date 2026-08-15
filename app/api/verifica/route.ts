@@ -6,15 +6,14 @@ import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { CHECK_A_PAGAMENTO, CORTESIA_SU_INCERTO } from "@/lib/check/ingresso";
 import {
   analisiGiaPagata,
-  cookieDi,
   creditoFinito,
   passDi,
   rispostaMuro,
   segnaConsumo,
 } from "@/lib/check/cancello";
 import { COOKIE_PASS, consumaPass } from "@/lib/check/pass";
-import { COOKIE_BUONO, leggiBuonoCookie } from "@/lib/recensioni/buono";
-import { buonoUsabile, consumaBuono } from "@/lib/recensioni/recensioni";
+import { formaCodiceValida, normalizzaCodice } from "@/lib/recensioni/buono";
+import { buonoIdDaCodice, consumaBuono } from "@/lib/recensioni/recensioni";
 import { COOKIE_ULTIMA_VERIFICA, ULTIMA_VERIFICA_VALE_S } from "@/lib/check/verifica-cookie";
 import { traccia } from "@/lib/eventi/registra";
 
@@ -82,33 +81,22 @@ export async function POST(req: Request) {
   const {
     volo,
     data,
-    buono: buonoDalCorpo,
-  } = (corpo ?? {}) as { volo?: unknown; data?: unknown; buono?: unknown };
+    codice: codiceDalCorpo,
+  } = (corpo ?? {}) as { volo?: unknown; data?: unknown; codice?: unknown };
 
   const pass = passDi(req);
-  /* IL BUONO ANALISI GRATIS (da recensione) apre il cancello quando non
-     c'è un pass pagato: è il premio di chi ha lasciato una recensione. A
-     spenderlo serve un verdetto vero (come il pass), e la validità la
-     decide il registro nel database, non il cookie.
-     ⚠️ DUE STRADE PER LO STESSO BUONO, e non è un buco. Primaria: il cookie
-     firmato. Riserva: l'id nel corpo della richiesta, che il browser porta
-     da solo quando ha guadagnato il buono. Serve perché un browser può
-     scartare il cookie (Brave, cookie ripuliti, salto fra schede) e allora
-     un'analisi già guadagnata sparirebbe: è esattamente quello che è
-     successo a Valerio il 15/08 (buono creato e LIBERO nel database, ma il
-     muro compariva lo stesso perché il cookie non arrivava). La riserva non
-     regala niente: il buono è un UUID che il registro segna usato una volta
-     sola, quindi vale come il cookie, né più né meno. */
-  const buonoDalBody =
-    typeof buonoDalCorpo === "string" &&
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(buonoDalCorpo.trim())
-      ? buonoDalCorpo.trim()
-      : null;
+  /* IL CODICE DELL'ANALISI GRATIS (da recensione) apre il cancello quando
+     non c'è un pass pagato. La persona lo incolla al muro e arriva qui nel
+     corpo della richiesta: il registro dice se esiste ed è ancora libero, e
+     lo brucia appena l'analisi produce un verdetto (vedi sotto).
+     ⚠️ NIENTE PIÙ COOKIE. Il cookie era fragile (a volte non arrivava e il
+     muro compariva su un buono valido) E riusabile (un incerto non lo
+     spendeva, quindi restava vivo all'infinito: «gratis quanto voglio»,
+     Valerio 15/08). Il codice si brucia al primo verdetto, punto. */
+  const codice = typeof codiceDalCorpo === "string" ? normalizzaCodice(codiceDalCorpo) : "";
   const buonoId =
-    CHECK_A_PAGAMENTO && !pass
-      ? (leggiBuonoCookie(cookieDi(req, COOKIE_BUONO)) ?? buonoDalBody)
-      : null;
-  const buonoOk = buonoId ? await buonoUsabile(buonoId) : false;
+    CHECK_A_PAGAMENTO && !pass && formaCodiceValida(codice) ? await buonoIdDaCodice(codice) : null;
+  const buonoOk = Boolean(buonoId);
   /* ⚠️ Chi sbatte sul muro conta ANCHE come "ha lanciato un'analisi": se
      no il cruscotto mostrerebbe più muri che analisi, cioè un imbuto che
      si allarga scendendo, e un numero impossibile fa dubitare di tutti
@@ -186,12 +174,12 @@ export async function POST(req: Request) {
      impedisce di riusare la stessa ricevuta copiandola a mano. */
   if (siConsuma && pass) await segnaConsumo(esito.verificaId, pass.ordine);
 
-  /* Il buono si spende come il pass: su un verdetto vero (mai sull'incerto,
-     che non è una risposta comprata) e una volta sola. È il registro a
-     segnarlo usato, quindi un cookie copiato non lo fa rivivere. */
-  let buonoConsumato = false;
-  if (buonoOk && buonoId && !(CORTESIA_SU_INCERTO && verdetto.esito === "incerto")) {
-    buonoConsumato = await consumaBuono(buonoId, esito.verificaId);
+  /* Il codice si brucia appena l'analisi ha prodotto un verdetto, ANCHE un
+     incerto: è quello che chiude il buco del «gratis quanto voglio» (con un
+     incerto il buono restava vivo). Un volo non trovato non arriva fin qui
+     (torna 400 prima), quindi un errore di battitura non consuma il codice. */
+  if (buonoOk && buonoId) {
+    await consumaBuono(buonoId, esito.verificaId);
   }
 
   const risposta = NextResponse.json(
@@ -217,9 +205,6 @@ export async function POST(req: Request) {
         km: fatto.kmOrtodromica,
       },
       demo: esito.demo,
-      /* Il buono è stato speso ora: il browser che lo teneva di riserva lo
-         cancella, così non crede di avere ancora un'analisi gratis. */
-      ...(buonoConsumato ? { buonoConsumato: true } : {}),
       // La prescrizione è una STIMA dichiarata (SPEC §4), e solo dove ha senso.
       ...(verdetto.esito === "idoneo"
         ? {
