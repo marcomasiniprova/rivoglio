@@ -105,24 +105,60 @@ per reggerle è già a posto o pronto; queste sono configurazioni.
   oppure partita IVA + Stripe diretto). Finché non c'è un incassatore, il
   check resta gratis e il traffico si costruisce lo stesso.
 - **Dominio email:** verifica `send.rivolio.it` su Resend e metti
-  `RESEND_MITTENTE = "Valerio di Rivolio <valerio@send.rivolio.it>"`. Finché
-  non è verificato, le email partono solo verso valerio@artecai.it.
+  `RESEND_MITTENTE = "Valerio dal team di Rivolio <team@send.rivolio.it>"`.
+  Finché non è verificato, le email partono solo verso valerio@artecai.it.
+
+### 7. Sistema email: le quattro cose da controllare su Netlify/Supabase
+Dal collaudo del 15/08. Il codice è a posto (ho aggiunto il ritentativo sugli
+intoppi transitori). Queste quattro sono configurazioni tue, e sono l'unica
+cosa fra un'email che parte e una che si perde:
+1. **`RESEND_API_KEY` e `RESEND_MITTENTE` su Netlify.** Senza la chiave non
+   parte NIENTE (in silenzio). Senza il mittente sul dominio verificato, le
+   email vanno solo a te. Sono la coppia più importante.
+2. **`RESEND_RISPOSTA_A`** = l'indirizzo VERO che leggi tu (es. la tua Gmail).
+   Le email dicono «rispondi qui»: senza questa riga, chi risponde scrive a
+   una casella che non riceve e il messaggio torna indietro. È il tuo unico
+   canale di assistenza: non lasciarlo scoperto.
+3. **Il gancio email di Supabase.** Authentication → Hooks → «Send Email
+   hook» → Enable, URI `https://rivolio.it/api/posta-auth`, e copia il
+   segreto in **`RESEND_HOOK_SECRET`** su Netlify. Senza, le email di
+   accesso (conferma, link magico, recupero password) le manda Supabase, che
+   sul piano gratuito ne fa **2 all'ora** e in inglese: al lancio blocca il
+   terzo che si registra. Con questo, tutte le email escono da Resend.
+4. **Resend Pro prima del lancio** (già scritto sopra al punto 4): il gratis
+   fa 100 email al giorno.
 
 ---
 
 ## DA FARE IO (prossimi passi)
 
-- **Scioperi, motore più furbo:** sciopero della compagnia stessa = resta
-  idoneo (la legge dice che paga lei, sentenza europea C-28/20); sciopero di
-  ENAV o degli addetti a terra (handling) = incerto. Recupera vendite senza
-  rischi. Uso lo schema del file del Ministero come guida.
-- **La coda quando siamo in piena (scelta tua col popup):** sopra il freno
-  d'emergenza, invece di dire "non lo so", si prende l'email della persona e
-  la si avvisa appena il volo si riesce a controllare. È il pezzo che rende
-  un video virale a prova di tutto anche col fornitore al limite. Serve una
-  tabella nuova + un lavoro notturno: lo costruisco a parte.
+- Per ora niente di aperto da parte mia: sciopero furbo, coda e recensioni
+  sono fatti e provati. Il prossimo pezzo lo decidi tu.
 
-## Fatto in questo giro (14-15/08)
+## Fatto il 15/08 (giro #74)
+- 🔴 **La pagina fantasma di ZZ777, chiusa** (dopo il volo cancellato la
+  scena dell'analisi ripartiva per un attimo: ora una sola volta per pagina).
+- 🟢 **Sciopero furbo** (C-28/20): sciopero della compagnia stessa = idoneo,
+  controllori/handling/generale = incerto. Prudente, provato.
+- 🟢 **La coda degli incerti**: il cron ricontrolla ogni giorno i check
+  incerti con email e avvisa se diventano idonei (la promessa "ti avvisiamo
+  noi" che prima era vuota).
+- 🟢 **Sistema recensioni completo**: box su verdetto e pratica → analisi
+  gratis (una per evento, blindata), moderazione in `/admin/recensioni`,
+  nastro testimonial animato in landing che si aggiorna quando approvi.
+- ✅ **Le tre migrazioni applicate sul database vero** (scala, coda,
+  recensioni) col connettore, verificate.
+- ✅ **Collaudo email**: sistema solido, aggiunto il ritentativo sugli
+  intoppi transitori (prima un singolo intoppo perdeva le email a colpo
+  solo). Le quattro cose tue sono al punto 7 qui sopra.
+- ✅ **Archivio aeroporti confrontato**: 9.016 scali, tutti i grandi hub del
+  mondo presenti, con coordinate/fuso/paese. È già OurAirports (come
+  `airportsdata`), rinfrescato ogni lunedì, e la distanza è già great-circle
+  (haversine), il metodo che il Regolamento richiede. **Niente da cambiare:
+  gli strumenti open-source che hai trovato li facciamo già** (i pacchetti
+  Python non si usano, siamo in TypeScript, ma la sostanza è la stessa).
+
+## Fatto il 14-15/08 (giro #73)
 - **Conto costi/profitto** nella pagina `/admin/economia` (tre scenari).
 - **Audit di scalabilità** a cinque lanterne + primi fix: rete di sicurezza
   sugli errori (mai più un 500/404 nudo), indici del database (migrazione),
