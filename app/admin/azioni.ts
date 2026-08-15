@@ -68,6 +68,27 @@ export async function guardato(id: string): Promise<EsitoAdmin> {
 }
 
 /**
+ * MODERA UNA RECENSIONE: approvala (compare in landing) o nascondila.
+ *
+ * Come tutte le azioni qui, ricontrolla da capo che chi chiama sia admin:
+ * è un endpoint pubblico, e "il bottone lo vede solo l'admin" non è una
+ * serratura. La landing legge le approvate da sola (con una cache di
+ * pochi minuti), quindi non serve ricostruire niente: basta cambiare lo
+ * stato.
+ */
+export async function moderaRecensione(
+  id: string,
+  azione: "approva" | "nascondi",
+): Promise<EsitoAdmin> {
+  if (!(await soloAdmin())) return { errore: "Non sei autorizzato." };
+  const { decidiRecensione } = await import("@/lib/recensioni/recensioni");
+  const ok = await decidiRecensione(id, azione);
+  if (!ok) return { errore: "Non salvato: ricarica la pagina." };
+  revalidatePath("/admin/recensioni");
+  return { ok: azione === "approva" ? "Approvata: comparirà in landing." : "Nascosta." };
+}
+
+/**
  * Corregge un verdetto: il motore ha detto una cosa, l'umano un'altra.
  * La verifica passa a `corretta` con l'esito giusto.
  *

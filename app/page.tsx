@@ -11,6 +11,7 @@ import PrezziRivolio from "@/components/rivolio/PrezziRivolio";
 import NumeriMercato from "@/components/rivolio/NumeriMercato";
 import FaqRivolio from "@/components/rivolio/FaqRivolio";
 import Osservatorio from "@/components/rivolio/Osservatorio";
+import Testimonial from "@/components/rivolio/Testimonial";
 import { Anima } from "@/components/Anima";
 import { COPY } from "@/lib/copy";
 
@@ -95,6 +96,7 @@ export default function Home() {
         <NumeriMercato />
         <ChiFaCosa />
         <Retroattivo />
+        <Testimonial />
         <PrezziRivolio />
         <FaqRivolio />
         <Osservatorio />

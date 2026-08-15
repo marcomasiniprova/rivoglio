@@ -308,6 +308,8 @@ test.describe("Nessuna porta di servizio sul muro", () => {
       "lavoro notturno di Netlify, chiuso da MOTORE_SEGRETO: non lo chiama un utente",
     "app/api/motore/segui/route.ts":
       "lavoro notturno di Netlify, chiuso da MOTORE_SEGRETO: non lo chiama un utente",
+    "app/api/motore/coda/route.ts":
+      "lavoro notturno di Netlify, chiuso da MOTORE_SEGRETO: ricontrolla gli incerti con email, non lo chiama un utente",
     "app/api/osservatorio/route.ts":
       "indice degli scali, una sola rilevazione al giorno per otto aeroporti: il costo e' fisso e non cresce col traffico",
     "app/api/pratiche/[id]/documento/route.ts":

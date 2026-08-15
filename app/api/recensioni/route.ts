@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
-import { creaRecensione, type EventoRecensito } from "@/lib/recensioni/recensioni";
+import {
+  creaRecensione,
+  recensioniApprovate,
+  type EventoRecensito,
+} from "@/lib/recensioni/recensioni";
 import { COOKIE_BUONO, GIORNI_BUONO, creaBuonoCookie } from "@/lib/recensioni/buono";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
+
+export const dynamic = "force-dynamic";
 
 /**
  * POST /api/recensioni  {stelle, motivo, nome?, eventoTipo, eventoRif}
@@ -32,6 +38,24 @@ const BISCOTTO = {
 
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS });
+}
+
+/* La vetrina della landing: solo le recensioni APPROVATE. Sta in memoria
+   qualche minuto (la leggono in tanti e cambia piano), così approvarne una
+   la fa comparire in landing entro pochi minuti senza ricostruire il sito. */
+let cache: { voci: unknown[]; quando: number } | null = null;
+const CACHE_MS = 5 * 60 * 1000;
+
+export async function GET() {
+  try {
+    if (!cache || Date.now() - cache.quando > CACHE_MS) {
+      cache = { voci: await recensioniApprovate(24), quando: Date.now() };
+    }
+    return NextResponse.json({ ok: true, voci: cache.voci }, { headers: CORS });
+  } catch {
+    // Un guasto non deve rompere la landing: nessuna recensione e via.
+    return NextResponse.json({ ok: true, voci: [] }, { headers: CORS });
+  }
 }
 
 export async function POST(req: Request) {

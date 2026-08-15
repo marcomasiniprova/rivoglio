@@ -22,6 +22,7 @@ import DichiaraCaso from "./DichiaraCaso";
 import ChiHaOperato from "./ChiHaOperato";
 import CardCondivisione from "./CardCondivisione";
 import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
+import LasciaRecensione from "@/components/rivolio/LasciaRecensione";
 
 /**
  * La pagina del risultato, lato client. TRE stati, mai due (SPEC §4):
@@ -586,6 +587,15 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
           <CardCondivisione volo={dati.volo} ritardo={ritardo} importo={importo} demo={dati.demo} />
         </Anima>
       )}
+
+      {/* La recensione: solo su una verifica VERA (non sui dimostrativi:
+          un esempio non è un'esperienza da recensire, e non deve emettere
+          un buono). Il premio lo gestisce il componente. */}
+      {dati.idVerifica && !dati.demo && (
+        <Anima ritardo={0.34}>
+          <LasciaRecensione eventoTipo="verdetto" eventoRif={dati.idVerifica} />
+        </Anima>
+      )}
     </div>
   );
 }
@@ -959,6 +969,12 @@ function NonIdoneo({ dati }: { dati: DatiVerifica }) {
           </p>
         </div>
       </Anima>
+
+      {dati.idVerifica && !dati.demo && (
+        <Anima ritardo={0.2}>
+          <LasciaRecensione eventoTipo="verdetto" eventoRif={dati.idVerifica} />
+        </Anima>
+      )}
     </div>
   );
 }

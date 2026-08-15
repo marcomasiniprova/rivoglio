@@ -534,13 +534,41 @@ a[class*="rounded-pillola"]:active {
   }
 }
 
+/* IL NASTRO DEI TESTIMONIAL: le recensioni che scorrono di lato, in loop.
+   Il binario porta le carte DUE volte di fila; l'animazione lo trascina di
+   metà (cioè della prima copia), poi riparte da zero: la giunzione non si
+   vede e lo scorrimento sembra infinito. Si ferma quando ci passi sopra,
+   così una recensione la puoi leggere con calma. */
+.nastro {
+  display: flex;
+  width: max-content;
+  animation: scorri-nastro var(--durata, 46s) linear infinite;
+}
+.nastro-fermo:hover .nastro {
+  animation-play-state: paused;
+}
+@keyframes scorri-nastro {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 /* Chi ha chiesto meno animazioni nel sistema operativo non ne vede nessuna.
    Le colonne restano ferme a metà corsa: la composizione regge lo stesso. */
 @media (prefers-reduced-motion: reduce) {
   .fluttua,
   .colonna,
-  .alone {
+  .alone,
+  .nastro {
     animation: none !important;
+  }
+  /* Senza scorrimento automatico il nastro diventa una fila che si
+     trascina a dito: mai una vetrina bloccata a metà. */
+  .nastro {
+    overflow-x: auto;
   }
   .colonna {
     opacity: 0.6;

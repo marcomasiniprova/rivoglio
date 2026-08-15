@@ -17,6 +17,7 @@ export type ChiaveSezione =
   | "panoramica"
   | "economia"
   | "verdetti"
+  | "recensioni"
   | "pratiche"
   | "traffico"
   | "registro"
@@ -76,6 +77,15 @@ export const SEZIONI: Sezione[] = [
     /* ⚠️ Diceva «finché non la dai, nessuno paga»: non è più vero dal
        12/08, quando il cancello è stato tolto dalla cassa. */
     sotto: "Gli ultimi idonei, dal più recente: un controllo a campione che il motore dica la verità.",
+  },
+  {
+    /* Accanto ai Verdetti: è l'altra coda che vuole il tuo occhio. Approvi
+       una recensione e compare in landing da sola (richiesta di Valerio,
+       15/08: «qualsiasi recensione io devo vederla e approvarla»). */
+    chiave: "recensioni",
+    href: "/admin/recensioni",
+    nome: "Recensioni",
+    sotto: "Cosa scrivono le persone. Approva e compare in landing; nascondi e sparisce.",
   },
   {
     chiave: "pratiche",
