@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import { seSiPaga } from "@/lib/check/ingresso";
 
 /**
  * QUANDO UN INDIRIZZO NON ESISTE.
@@ -23,8 +24,10 @@ export default function NonTrovata() {
           Questa pagina non c&apos;è.
         </p>
         <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">
-          O è stata spostata, o il link è vecchio. Ma il tuo volo puoi controllarlo subito, è
-          gratis.
+          {seSiPaga(
+            "O è stata spostata, o il link è vecchio. Ma il tuo volo puoi controllarlo subito.",
+            "O è stata spostata, o il link è vecchio. Ma il tuo volo puoi controllarlo subito, è gratis.",
+          )}
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Link

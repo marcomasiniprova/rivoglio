@@ -1,6 +1,5 @@
-import { execSync } from "node:child_process";
 import { createHmac } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { test, expect } from "@playwright/test";
 import {
@@ -22,6 +21,31 @@ import {
 } from "../lib/check/pass";
 import { LISTINI } from "../lib/prezzi";
 import { COPY } from "../lib/copy";
+
+/* Elenca i file sotto certe cartelle, in Node puro. Prima si usavano `rg` e
+   `find` via execSync, ma su Windows execSync passa da cmd.exe: gli apici
+   singoli non contano, il "|" dentro 'gratis|gratuit' diventa una pipe di
+   shell e `find -name` non esiste. La prova moriva prima di controllare i
+   testi (locale, 15/08). Camminare le cartelle in Node non dipende dal
+   sistema operativo. */
+function elencaFile(radici: string[], tieni: (rel: string) => boolean): string[] {
+  const trovati: string[] = [];
+  const salta = /[/\\](node_modules|\.next|public)([/\\]|$)/;
+  const cammina = (assoluto: string) => {
+    if (salta.test(assoluto)) return;
+    if (statSync(assoluto).isDirectory()) {
+      for (const nome of readdirSync(assoluto)) cammina(join(assoluto, nome));
+      return;
+    }
+    const rel = assoluto.slice(process.cwd().length + 1).replace(/\\/g, "/");
+    if (tieni(rel)) trovati.push(rel);
+  };
+  for (const r of radici) {
+    const base = join(process.cwd(), r);
+    if (existsSync(base)) cammina(base);
+  }
+  return trovati.sort();
+}
 
 /**
  * IL CHECK A PAGAMENTO (decisione di Valerio, 11/08).
@@ -315,10 +339,7 @@ test.describe("Nessuna porta di servizio sul muro", () => {
   };
 
   test("ogni rotta che ci costa soldi passa dal cancello", () => {
-    const rotte = execSync("find app/api -name route.ts", { encoding: "utf8" })
-      .split("\n")
-      .filter(Boolean)
-      .sort();
+    const rotte = elencaFile(["app/api"], (rel) => rel.endsWith("/route.ts"));
 
     expect(rotte.length, "nessuna rotta trovata: la prova non sta guardando niente").toBeGreaterThan(
       10,
@@ -385,18 +406,18 @@ test.describe("Nessuna promessa di check gratuito fuori dall'interruttore", () =
   /* Le cose che sono gratuite DAVVERO e devono restare scritte: sono
      quelle che ci fanno guadagnare fiducia, non quelle che ci costano.
      Il reclamo alla compagnia, la segnalazione all'ente, la
-     conciliazione ART, i centri europei consumatori, le nostre guide. */
+     conciliazione ART, i centri europei consumatori, le nostre guide, e
+     l'assistenza gratuita per chi ha mobilità ridotta (Reg. 1107, dove il
+     testo nomina anche il "check-in" e i "controlli" di sicurezza): niente
+     di tutto questo è il check del volo. */
   const DAVVERO_GRATIS =
-    /\b(enac|ente|autorit|conciliaz|conciliaweb|ecc-net|europeo consumatori|reclamo|guida|da solo|ita airways|spid|destinazion)/i;
+    /\b(enac|ente|autorit|conciliaz|conciliaweb|ecc-net|europeo consumatori|reclamo|guida|da solo|ita airways|spid|destinazion|accompagnament|assistenz|carrozzin|mobilit)/i;
 
   test("nessun testo promette il check gratis fuori da seSiPaga", () => {
-    const file = execSync(
-      "rg -l --glob '!node_modules/**' --glob '!*.md' --glob '!public/**' " +
-        "-i 'gratis|gratuit' app components lib mobile/src || true",
-      { encoding: "utf8" },
-    )
-      .split("\n")
-      .filter(Boolean);
+    const file = elencaFile(["app", "components", "lib", "mobile/src"], (rel) => {
+      if (!/\.(t|j)sx?$/.test(rel)) return false;
+      return /gratis|gratuit/i.test(readFileSync(join(process.cwd(), rel), "utf8"));
+    });
 
     expect(file.length, "la prova non sta leggendo niente").toBeGreaterThan(5);
 
@@ -423,12 +444,22 @@ test.describe("Nessuna promessa di check gratuito fuori dall'interruttore", () =
         // i commenti di riga non li legge nessun utente
         if (/^(\*|\/\/|\/\*|\{\/\*)/.test(spoglio)) return;
         if (!/gratis|gratuit/i.test(riga)) return;
+        /* 🔴 LA FRASE PUÒ SPEZZARSI SU PIÙ RIGHE, e prima sfuggiva. Il JSX
+           va a capo: la pagina 404 aveva "puoi controllarlo subito, è" su una
+           riga e "gratis" su quella dopo, quindi la parola del check e il
+           "gratis" finivano separate e il controllo a riga singola non le
+           vedeva vicine (bug trovato il 15/08 in locale). Adesso si guarda una
+           finestra di tre righe unite, con gli spazi normalizzati. */
+        const finestra = righe
+          .slice(Math.max(0, i - 1), i + 2)
+          .join(" ")
+          .replace(/\s+/g, " ");
         // la promessa: "gratis" a meno di 60 caratteri da una parola del check
         const promessa =
-          /(check|analisi|controll\w*|verific\w*|scopri)[^\n]{0,60}(gratis|gratuit)/i.test(riga) ||
-          /(gratis|gratuit)\w*[^\n]{0,60}(check|analisi|controll\w*|verific\w*)/i.test(riga);
+          /(check|analisi|controll\w*|verific\w*|scopri).{0,60}(gratis|gratuit)/i.test(finestra) ||
+          /(gratis|gratuit)\w*.{0,60}(check|analisi|controll\w*|verific\w*)/i.test(finestra);
         if (!promessa) return;
-        if (DAVVERO_GRATIS.test(riga)) return;
+        if (DAVVERO_GRATIS.test(finestra)) return;
         // dentro un seSiPaga? si guarda il contorno, non la sola riga
         const contorno = righe.slice(Math.max(0, i - 5), i + 2).join("\n");
         if (contorno.includes("seSiPaga")) return;
