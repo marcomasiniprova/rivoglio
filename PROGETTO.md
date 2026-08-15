@@ -87,3 +87,33 @@ e Next lo ignora). Output in `/public/assets/`, WebP, max 1MB.
 - Le sezioni `whileInView` vanno scrollate piano e attese 2s prima dello scatto.
 - Le catture a pagina intera su questo sito non fanno testo: vanno fatte
   scorrendo.
+
+## Regole operative (le cose importanti che non stanno nel CLAUDE.md corto)
+
+- **Mai `npm run build` mentre gira `npm run dev`**: scrivono nella stessa
+  `.next`, e il server di sviluppo legge pezzi della build. L'errore che ne
+  esce non somiglia alla causa. Chiudi il dev, cancella `.next`, riparti.
+- **`.env.local` è UTF-16 e Next lo ignora**: le chiavi vive stanno in
+  `.env.development.local`. Il modello dei nomi è `.env.example`.
+- **Prove Playwright, `exact: true`** quando un'etichetta è sottostringa di
+  un'altra: `getByRole("button", { name: "So il numero", exact: true })`,
+  altrimenti prende «Non so il numero».
+- **L'idratazione può mangiare il primo click**: nei giri visivi aspetta un
+  attimo e ripeti il click prima di dare per rotto un bottone.
+- **Il giro visivo si fa con uno script Node** che importa
+  `node_modules/playwright` (Chromium preinstallato), non col server MCP.
+  E le larghezze si guardano DOVE cambiano i breakpoint, non solo tre.
+- **Le compagnie extra UE stanno in `lib/regole/vettori.ts`**, non in
+  `compagnie.ts` (quello dichiara canali reclamo verificati a mano). Non se
+  ne aggiunge una «a occhio»: un falso positivo è la cosa numero uno da non
+  fare.
+- **La cache dei voli è una fotografia, non una verità**: quando aggiungi
+  un campo che serve al verdetto, aggiungilo anche in `rigaUsabile`
+  (`lib/voli/verifica.ts`), o le righe vecchie danno per sempre il verdetto
+  sbagliato.
+- **Il buono analisi gratis è un CODICE** (`RIV-XXXXX`, `lib/recensioni/
+  buono.ts`), non un cookie: usa e getta, bruciato dal registro al primo
+  verdetto. Il vecchio cookie era fragile e riusabile: non tornarci.
+- **Le tabelle viaggi** (offerte, ricerche, invii, strutture) sono eredità
+  nel database: non usarle, non cancellarle. Il codice viaggi va tolto in
+  un giro suo.

@@ -2767,23 +2767,12 @@ social rifatta (era rimasta al prodotto viaggi).
   `.next`, si riparte: torna 200 al primo colpo.
   ⚠️ Va sospettato ogni volta che un errore compare **dopo** un build
   fatto a metà sessione e non c'entra niente col codice toccato.
-- **Nella sandbox il watcher di Metro NON vede gli edit**: dopo una
-  modifica al codice mobile il dev server Expo va riavviato con
-  `--clear`, o l'anteprima continua a servire il codice VECCHIO (pagato
-  con una controprova identica alla prova).
-- Il MCP Playwright cerca Chrome di sistema che nella sandbox non c'è:
-  il giro visivo si fa con uno script Node che importa
-  `node_modules/playwright` (Chromium preinstallato via
-  PLAYWRIGHT_BROWSERS_PATH).
 - `.env.local` è in UTF-16 e Next lo ignora: chiavi vive in
   `.env.development.local`.
 - Il fornitore demo si accende DA SOLO senza AERODATABOX_API_KEY: i voli
   demo iniziano per ZZ e ogni risposta è marcata demo.
 - SHADOW_MODE=1 in produzione finché 100 verdetti di fila non passano
   puliti: si spegne dal pannello, non dal codice.
-- Le 2 prove dell'Osservatorio falliscono SOLO nella sandbox: l'egress
-  blocca *.supabase.co ("Host not in allowlist"). Non è un bug del
-  codice e non va "sistemato": sul PC di Valerio e su Netlify passano.
 - **La cache dei voli non è una verità, è una fotografia.** Ogni volta
   che il motore impara a usare un campo nuovo, le righe salvate prima non
   ce l'hanno, e senza un controllo continuerebbero a produrre lo stesso
