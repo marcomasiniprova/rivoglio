@@ -77,6 +77,23 @@ test.describe("I promemoria partono da soli", () => {
     // E la memoria che impedisce il doppio invio.
     expect(rotta).toContain("eventiRegistrati");
   });
+
+  test("il benvenuto pagato non si perde: il cron lo recupera se non è mai partito", () => {
+    /* 🔴 IL BUCO: il benvenuto (T+0, col link magico per entrare) lo manda
+       solo il webhook di Polar. Se in quel momento Resend è giù, la pratica
+       resta pagata SENZA il link, e la persona non trova quello che ha
+       comprato. Il cron deve rimandarlo: pratica pagata + nessun evento
+       `email_t0` → si rimanda `praticaPronta`. */
+    const rotta = leggi("app/api/motore/segui/route.ts");
+    expect(rotta).toContain("recuperaBenvenuto");
+    expect(rotta).toContain("praticaPronta");
+    expect(rotta).toContain("email_t0");
+    // Ha la precedenza: si prova PRIMA del passo di follow-up, con un continue.
+    const i = rotta.indexOf("recuperaBenvenuto(pr, fatti)");
+    const j = rotta.indexOf("passoDovuto(pr, fatti)");
+    expect(i).toBeGreaterThan(0);
+    expect(j).toBeGreaterThan(i);
+  });
 });
 
 test.describe("Il freno regge anche con tanta gente", () => {

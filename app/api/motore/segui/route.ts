@@ -8,8 +8,15 @@ import {
   transizionePratica,
   type PraticaConVolo,
 } from "@/lib/pratiche/pratiche";
-import { comeVa, promemoriaInvio, reclamoEnac, sollecitoPronto } from "@/lib/email/pratiche";
+import {
+  comeVa,
+  praticaPronta,
+  promemoriaInvio,
+  reclamoEnac,
+  sollecitoPronto,
+} from "@/lib/email/pratiche";
 import { casa } from "@/lib/email/posta";
+import { linkDiIngresso } from "@/lib/pratiche/ingresso";
 import {
   GIORNI_PRIMA_DELL_ENTE,
   GIORNI_PRIMA_DELL_ESITO,
@@ -20,10 +27,18 @@ import {
  * Il cron dei follow-up (SPEC §6): una volta al giorno scorre le pratiche
  * aperte e manda l'email giusta per il punto in cui sono.
  *
+ *   T+0  recupero del benvenuto, se non è mai partito (audit 14/08)
  *   T+2  dal pagamento, se mai segnata come inviata → promemoria
  *   T+42 dall'invio → sollecito pronto (+ stato `sollecito`)
  *   T+56 dall'invio → segnalazione all'ente nazionale (+ stato `enac`)
  *   T+90 dall'invio → com'è andata + garanzia
+ *
+ * ⚠️ IL BENVENUTO (T+0) HA LA PRECEDENZA. Lo manda il webhook di Polar
+ * appena si paga; ma se in quel momento Resend è giù o il webhook viene
+ * ucciso a metà dai 10 secondi di Netlify, la pratica resta pagata SENZA
+ * il link magico per entrare. Senza quel link la persona non trova la
+ * pratica che ha comprato: è il buco peggiore. Qui il cron lo rimedia
+ * prima di ogni follow-up (`recuperaBenvenuto`).
  *
  * ⚠️ PERCHÉ 42 E NON 15, come era prima. Le compagnie rispondono in
  * 8-14 settimane: un sollecito mandato al giorno 15 arriva quando
@@ -154,6 +169,39 @@ async function mandaPasso(pr: PraticaConVolo, passo: Passo): Promise<boolean> {
   return true;
 }
 
+/**
+ * 🔴 RECUPERO DEL BENVENUTO (T+0), audit 14/08.
+ *
+ * Il webhook di Polar manda il benvenuto (`praticaPronta`) e scrive
+ * l'evento `email_t0` SOLO se è partito. Se in quel momento Resend è giù
+ * o il webhook viene ucciso a metà, la pratica resta pagata senza il
+ * link magico per entrare. Qui il cron lo rimanda: ogni pratica pagata a
+ * cui manca `email_t0` si rimedia il benvenuto.
+ *
+ * L'evento si scrive solo se l'email parte, quindi il giro dopo riprova
+ * da solo finché non riesce. Un raro doppione (email partita ma evento
+ * non scritto per un attimo) è molto meglio di un cliente pagante senza
+ * il suo link: sbaglia dalla parte giusta.
+ */
+async function recuperaBenvenuto(pr: PraticaConVolo, fatti: Set<string>): Promise<boolean> {
+  if (fatti.has(`${pr.id}:email_t0`)) return false;
+
+  const link = await linkDiIngresso(pr.email, `/pratica/${pr.id}`);
+  const spedita = await praticaPronta(pr.email, {
+    volo: pr.voli?.volo_iata ?? "",
+    dataVolo: pr.voli?.data_locale ?? null,
+    importo: pr.importo_fascia,
+    tipo: pr.tipo,
+    prezzo: pr.prezzo_pagato,
+    garanziaFinoAl: pr.garanzia_fino_al,
+    link,
+  });
+  if (!spedita.ok) return false;
+
+  await registraEvento(pr.id, "email_t0", "Email di benvenuto pratica (T+0) recuperata dal cron.");
+  return true;
+}
+
 async function giroSegui({ budgetMs = 8000 } = {}) {
   if (!SERVIZIO_ATTIVO) return { ok: false as const, motivo: "SUPABASE_SECRET_KEY assente." };
 
@@ -162,24 +210,32 @@ async function giroSegui({ budgetMs = 8000 } = {}) {
   const fatti = await eventiRegistrati(pratiche.map((p) => p.id));
 
   const inviate: { pratica: string; passo: Passo }[] = [];
+  const recuperati: string[] = [];
   let esaminate = 0;
 
   for (const pr of pratiche) {
     if (Date.now() - inizio > budgetMs) break;
     esaminate++;
 
-    const passo = passoDovuto(pr, fatti);
-    if (!passo) continue;
-
     try {
+      // Prima di tutto: se il benvenuto non è mai partito, si rimanda.
+      // È una sola email per pratica per giro, e questa vince sui follow-up:
+      // senza il link d'ingresso l'utente non entra nemmeno.
+      if (await recuperaBenvenuto(pr, fatti)) {
+        recuperati.push(pr.id);
+        continue;
+      }
+
+      const passo = passoDovuto(pr, fatti);
+      if (!passo) continue;
       if (await mandaPasso(pr, passo)) inviate.push({ pratica: pr.id, passo });
     } catch (e) {
       // Una pratica rotta non ferma le altre: log e avanti.
-      console.error(`[segui] passo ${passo} fallito per ${pr.id}:`, e);
+      console.error(`[segui] pratica ${pr.id} saltata:`, e);
     }
   }
 
-  return { ok: true as const, aperte: pratiche.length, esaminate, inviate };
+  return { ok: true as const, aperte: pratiche.length, esaminate, recuperati, inviate };
 }
 
 export async function POST(req: NextRequest) {

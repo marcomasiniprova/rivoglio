@@ -251,9 +251,9 @@ export async function POST(req: NextRequest) {
      Vedi lib/pratiche/ingresso.ts. */
   const link = await linkDiIngresso(email, `/pratica/${pratica.id}`);
 
-  // ---- email T+0. Se non parte non si blocca niente: il cron non la
-  // rimanda (il T+0 non è nella sequenza), ma l'utente ha comunque la
-  // pagina della pratica e il pagamento è registrato.
+  // ---- email T+0. Se non parte non si blocca niente: il cron dei
+  // follow-up la RECUPERA (ogni pratica pagata senza evento `email_t0` si
+  // rimanda il benvenuto, audit 14/08), e intanto il pagamento è registrato.
   const spedita = await praticaPronta(email, {
     volo: verifica.volo_iata,
     dataVolo: verifica.data_locale,
