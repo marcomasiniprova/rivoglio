@@ -19,7 +19,7 @@
 import { ambitoCE261, vettoreConLicenzaUE, zonaDiScalo } from "./territorio";
 
 import { seSiPaga } from "@/lib/check/ingresso";
-export const VERSIONE_REGOLE = "2026.08.8";
+export const VERSIONE_REGOLE = "2026.08.9";
 
 /** Soglia del ritardo all'ARRIVO (non alla partenza), in minuti. */
 export const SOGLIA_MINUTI = 180;
@@ -112,6 +112,16 @@ export type FattoVolo = {
    * da ATC esterno (lo è) richiede la verifica umana: shadow mode.
    */
   scioperoNoto?: boolean;
+  /**
+   * Lo sciopero che tocca questo volo è SOLO del personale della compagnia
+   * che ha operato (motore più furbo, 15/08). Per la causa C-28/20 non è
+   * circostanza straordinaria: la compensazione spetta, quindi il verdetto
+   * non resta incerto ma segue le fasce come un ritardo qualsiasi.
+   * Lo imposta `classificaSciopero`, e SOLO quando la colpa è chiaramente
+   * e soltanto della compagnia (nessun ATC/handling/generale lo stesso
+   * giorno): un falso positivo qui è vietato come ovunque.
+   */
+  scioperoCompagnia?: boolean;
   fonte: string;
 };
 
@@ -285,12 +295,15 @@ export function valuta(f: FattoVolo): Verdetto {
   }
 
   /* Sopra soglia con sciopero noto quel giorno: l'esito dipende da CHI
-     scioperava (personale di compagnia = si paga; ATC esterno = no).
-     Distinzione da umano, non da regola: incerto, non si vende. Sotto
-     soglia non si arriva qui: il no resta un no, sciopero o non sciopero. */
-  if (f.scioperoNoto === true) {
+     scioperava. Uno sciopero del PERSONALE DELLA COMPAGNIA stessa non è
+     circostanza straordinaria (Corte UE, C-28/20): la compensazione
+     spetta, quindi NON ci si ferma qui e si va alle fasce come un ritardo
+     qualsiasi. Uno sciopero ATC/handling/generale viene da fuori: lì la
+     compagnia potrebbe esserne esente, e resta incerto (verifica umana).
+     Sotto soglia non si arriva qui: il no resta un no. */
+  if (f.scioperoNoto === true && f.scioperoCompagnia !== true) {
     return incerto(
-      "Il ritardo supera le 3 ore, ma nel giorno di questo volo risulta uno sciopero del trasporto aereo: l'esito dipende da chi scioperava e lo verifichiamo a mano. Non ti facciamo pagare niente finché non è chiaro.",
+      "Il ritardo supera le 3 ore, ma nel giorno di questo volo risulta uno sciopero del trasporto aereo (controllori di volo, handling o generale): l'esito dipende da chi scioperava e lo verifichiamo a mano. Non ti facciamo pagare niente finché non è chiaro.",
     );
   }
 
@@ -326,11 +339,19 @@ export function valuta(f: FattoVolo): Verdetto {
   const km = f.kmOrtodromica;
   const importo = fasciaArt7(km, dentroLoSpazioEuropeo(f), ritardo < SOGLIA_RIDUZIONE_MINUTI);
 
+  /* Sull'idoneo da sciopero della compagnia stessa lo diciamo: è la
+     ragione per cui l'esito non è incerto, e nella lettera regge da sola
+     (C-28/20). Sugli altri idonei resta la frase standard. */
+  const notaSciopero =
+    f.scioperoCompagnia === true
+      ? " Quel giorno risulta uno sciopero del personale della compagnia stessa, che per la Corte di giustizia UE (causa C-28/20) non è una circostanza straordinaria: la compensazione spetta."
+      : " Restano da verificare le circostanze straordinarie, che può invocare solo la compagnia.";
+
   return {
     esito: "idoneo",
     importo,
     ritardoMinuti: ritardo,
-    motivo: `Arrivo con ${formattaMinuti(ritardo)} di ritardo su una tratta di ${Math.round(km)} km: fascia da ${importo}€. Restano da verificare le circostanze straordinarie, che può invocare solo la compagnia.`,
+    motivo: `Arrivo con ${formattaMinuti(ritardo)} di ritardo su una tratta di ${Math.round(km)} km: fascia da ${importo}€.${notaSciopero}`,
     versioneRegole: VERSIONE_REGOLE,
   };
 }

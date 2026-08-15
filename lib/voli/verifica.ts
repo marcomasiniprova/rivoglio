@@ -26,7 +26,7 @@ import { aviationstack } from "./fornitori/aviationstack";
 import { aviationedge } from "./fornitori/aviationedge";
 import { demo, voloDimostrativo } from "./fornitori/demo";
 import { incrociaFonti } from "./incrocio";
-import { scioperoInData } from "@/lib/scioperi/scioperi";
+import { classificaSciopero } from "@/lib/scioperi/scioperi";
 import { dopo } from "@/lib/eventi/registra";
 import { tinGuasto } from "@/lib/eventi/telegram";
 import { normalizzaData, normalizzaVolo } from "./normalizza";
@@ -358,8 +358,13 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
     /* Alla tabella serve il codice IATA, non il nome del vettore: lo
        prendiamo dal numero di volo (per i casi vendibili, IsOperator,
        coincide col vettore operativo). */
-    const sciopero = await scioperoInData(fatto.dataLocale, fatto.voloIata.slice(0, 2));
-    if (sciopero) fatto = { ...fatto, scioperoNoto: true };
+    const sciopero = await classificaSciopero(fatto.dataLocale, fatto.voloIata.slice(0, 2));
+    if (sciopero === "compagnia") {
+      // Sciopero della compagnia stessa: idoneo (C-28/20), non incerto.
+      fatto = { ...fatto, scioperoNoto: true, scioperoCompagnia: true };
+    } else if (sciopero === "esterno") {
+      fatto = { ...fatto, scioperoNoto: true };
+    }
   }
 
   // ── Strato 3: le regole. Solo codice, mai AI. ────────────────────────

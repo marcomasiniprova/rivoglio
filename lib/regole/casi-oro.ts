@@ -142,6 +142,23 @@ export const CASI_ORO: Caso[] = [
     atteso: { esito: "non_idoneo" },
   },
   {
+    /* Motore più furbo (15/08): lo sciopero è del personale della
+       compagnia stessa (C-28/20). Non è circostanza straordinaria, quindi
+       la compensazione spetta come per un ritardo qualsiasi. */
+    nome: "sciopero della compagnia stessa, sopra soglia: idoneo (C-28/20)",
+    fatto: conRitardo(300, { scioperoNoto: true, scioperoCompagnia: true, kmOrtodromica: 700 }),
+    atteso: { esito: "idoneo", importo: 250 },
+  },
+  {
+    /* Prudenza: `scioperoCompagnia` non è vero (lo stesso giorno c'era
+       anche un ATC), quindi `classificaSciopero` non lo alza e resta il
+       solo `scioperoNoto`. Il verdetto torna incerto: la causa non è
+       certa e un falso positivo è vietato. */
+    nome: "sciopero compagnia MA anche ATC lo stesso giorno: incerto",
+    fatto: conRitardo(300, { scioperoNoto: true }),
+    atteso: { esito: "incerto" },
+  },
+  {
     nome: "REALE: FR4001 del 6/08/2026 (BGY-ACE), 155 minuti: per 25 minuti niente fascia",
     fatto: {
       voloIata: "FR4001",

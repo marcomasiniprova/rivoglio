@@ -27,30 +27,81 @@ export type Sciopero = {
 };
 
 /**
- * C'è uno sciopero del trasporto aereo nel giorno dato?
- * `compagnia` (IATA) restringe: uno sciopero di SOLO un'altra compagnia
- * non sporca il verdetto; uno generale o ATC vale per tutti.
+ * IL MOTORE PIÙ FURBO SUGLI SCIOPERI (Valerio, 15/08).
+ *
+ * Fino a ieri OGNI sciopero nel giorno del volo rendeva il verdetto
+ * incerto (non si vende). Ma la Corte di giustizia UE, causa C-28/20
+ * (Airhelp c. SAS), dice che uno sciopero del PERSONALE DELLA COMPAGNIA
+ * STESSA non è una circostanza straordinaria: è parte del normale rischio
+ * d'impresa, quindi la compensazione spetta. Uno sciopero dei controllori
+ * di volo (ENAV/ATC) o degli addetti a terra (handling) invece viene da
+ * fuori: lì resta incerto, perché la compagnia potrebbe davvero esserne
+ * esente e serve l'occhio umano.
+ *
+ * Torna:
+ *  - "compagnia": lo sciopero che tocca questo volo è SOLO del personale
+ *    della compagnia che ha operato (e nessun altro sciopero esterno lo
+ *    stesso giorno) → il motore può dire idoneo.
+ *  - "esterno": c'è (anche) uno sciopero ATC/handling/generale che
+ *    riguarda il volo → incerto, verifica umana.
+ *  - null: nessuno sciopero che riguarda questo volo.
+ *
+ * ⚠️ PRUDENZA, perché un falso positivo è vietato: se lo stesso giorno
+ * c'è ANCHE uno sciopero esterno che riguarda il volo, la causa del
+ * ritardo non è certa e si torna a "esterno" (incerto). "compagnia" esce
+ * solo quando la colpa è chiaramente e soltanto della compagnia.
  */
-export async function scioperoInData(
+export type ClasseSciopero = "compagnia" | "esterno" | null;
+
+/** Una riga di sciopero ridotta a quello che serve per classificare. */
+export type RigaSciopero = { compagnie: string[] | null; tipo: Sciopero["tipo"] };
+
+/**
+ * LA DECISIONE, PURA E PROVABILE (senza database).
+ *
+ * È il pezzo che, se sbagliato, apre un falso positivo (uno sciopero ATC
+ * scambiato per uno della compagnia = idoneo dove non spetta). Sta qui da
+ * solo apposta, così una prova lo può battere con righe finte senza
+ * toccare Supabase.
+ */
+export function classeDaRighe(righe: RigaSciopero[], compagniaIata?: string | null): ClasseSciopero {
+  const iata = (compagniaIata ?? "").toUpperCase();
+  let compagnia = false;
+  let esterno = false;
+  for (const r of righe) {
+    const compagnie = (r.compagnie ?? []).map((c) => c.toUpperCase());
+    const generale = compagnie.length === 0;
+    const riguardaIlVolo = generale || (iata !== "" && compagnie.includes(iata));
+    if (!riguardaIlVolo) continue; // sciopero di un'altra compagnia: non tocca
+
+    /* "compagnia" SOLO se: è del personale di compagnia, ed è agganciato
+       proprio a questo vettore (mai su un generale senza compagnie). In
+       ogni altro caso è "esterno" o comunque non certo → prudenza. */
+    if (r.tipo === "personale_compagnia" && !generale && iata !== "" && compagnie.includes(iata)) {
+      compagnia = true;
+    } else {
+      esterno = true;
+    }
+  }
+  if (esterno) return "esterno"; // un esterno lo stesso giorno vince: incerto
+  if (compagnia) return "compagnia";
+  return null;
+}
+
+export async function classificaSciopero(
   dataLocale: string,
   compagniaIata?: string | null,
-): Promise<boolean> {
-  if (!SERVIZIO_ATTIVO) return false;
+): Promise<ClasseSciopero> {
+  if (!SERVIZIO_ATTIVO) return null;
   try {
     const { data, error } = await supabaseServizio()
       .from("scioperi")
       .select("compagnie, tipo")
       .eq("data", dataLocale);
-    if (error || !data) return false;
-    const iata = (compagniaIata ?? "").toUpperCase();
-    return data.some((riga) => {
-      const compagnie = (riga.compagnie ?? []) as string[];
-      // sciopero generale, ATC o di settore: tocca tutti i voli del giorno
-      if (compagnie.length === 0) return true;
-      return iata !== "" && compagnie.map((c) => c.toUpperCase()).includes(iata);
-    });
+    if (error || !data) return null;
+    return classeDaRighe(data as RigaSciopero[], compagniaIata);
   } catch {
-    return false;
+    return null;
   }
 }
 
