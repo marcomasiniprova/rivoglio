@@ -74,13 +74,31 @@ social rifatta (era rimasta al prodotto viaggi).
     coda verdetti, RLS su eventi/iscritti, indice UNICO su pratiche.verifica_id);
     idempotenza del pagamento a prova di corsa (creaPratica gestisce il 23505,
     il webhook non manda email doppie); single-flight sulle chiamate al
-    fornitore; silenziatore allarmi per fornitore non per volo. **Da fare TU**
-    (promemoria.md): applica la migrazione, alza il piano AeroDataBox, accendi
-    il freno Upstash, Resend a pagamento. **Da fare io:** timeout query DB,
-    freno d'emergenza sul fornitore, pulizia dati vecchi, allarme chiave
-    mancante, recupero email T+0.
-  - Prove: **1622 verdi, zero rosse.** Nasce `promemoria.md` (richiesto da
-    Valerio): l'elenco condiviso delle cose da fare, sue e mie.
+    fornitore; silenziatore allarmi per fornitore non per volo.
+  - ✅ **I CINQUE FIX DELICATI, TUTTI FATTI:** (3) timeout di 4 secondi su
+    OGNI query al database, riuso di un solo client per macchina; (4) freno
+    d'emergenza sul fornitore (dopo 4 `troppe richieste` di fila si stacca
+    per 3 secondi, così non si accumulano funzioni appese fino al 503);
+    (5) pulizia dei dati vecchi (registro oltre 12 mesi cancellato, email
+    delle verifiche oltre 24 mesi tolta, la riga resta anonima; una sveglia
+    la domenica); l'allarme Telegram se manca la chiave AeroDataBox (prima
+    il sito girava in demo in silenzio); e (6) **il recupero del benvenuto**:
+    il cron dei follow-up rimanda l'email T+0 col link d'ingresso a ogni
+    pratica pagata a cui non è mai arrivata (Resend giù, webhook ucciso a
+    metà). Ha la precedenza sui solleciti: prima l'utente deve poter entrare.
+  - **Da fare TU** (promemoria.md): applica la migrazione `2026-08-14-scala.sql`,
+    alza il piano AeroDataBox, accendi il freno Upstash, Resend a pagamento.
+  - **AERODATABOX, le due risposte a Valerio:** (a) il limite di 3 richieste
+    al secondo è del RapidAPI Basic, non è il vero soffitto; il tetto vero è
+    mensile (Basic ~2.400 chiamate/mese), da alzare col primo traffico. (b)
+    dai dati dell'API usiamo tutto quello che conta per il verdetto (orari
+    veri, `quality` Live, codeshare, distanza, paese); i campi che NON usiamo
+    (modello aereo, terminal, gate) non rafforzano il reclamo, e `predictedTime`
+    è saltato apposta (una previsione non è un fatto). Il motivo del ritardo
+    (che sbloccherebbe lo sciopero furbo) l'API non lo dà: nessuna lo dà.
+  - Prove: **1622 verdi, zero rosse**, più le nuove sulla scala. Nasce
+    `promemoria.md` (richiesto da Valerio): l'elenco condiviso delle cose da
+    fare, sue e mie.
 - **GIRO #72 (14/08): LA COINCIDENZA A DUE TRATTE, E LA PAGINA APERTA SUI
   DIRITTI DI CHI VOLA CON MOBILITÀ RIDOTTA (REG. 1107).** Il via finale di
   Valerio: «gli ultimi due casi, fatti benissimo, come un ingegnere senior.

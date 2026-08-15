@@ -4,7 +4,7 @@ Il mio blocco note condiviso. Qui segno le cose da fare, mie e tue, e a ogni
 giro ti ricordo quelle tue ancora aperte. Le spiegazioni sono in parole
 semplici, come piace a te.
 
-Aggiornato: 2026-08-14.
+Aggiornato: 2026-08-15.
 
 ---
 
@@ -102,21 +102,33 @@ per reggerle è già a posto o pronto; queste sono configurazioni.
   idoneo (la legge dice che paga lei, sentenza europea C-28/20); sciopero di
   ENAV o degli addetti a terra (handling) = incerto. Recupera vendite senza
   rischi. Uso lo schema del file del Ministero come guida.
-- **Solidità, secondo giro (i fix più delicati dell'audit):** timeout sulle
-  query al database (perché una query lenta diventi "non lo so" invece di un
-  errore dopo 10 secondi); il freno d'emergenza sul fornitore (dopo tanti
-  "troppe richieste" di fila, rispondere subito invece di riprovare per 8
-  secondi); il lavoro notturno che cancella i dati vecchi (12/24 mesi, come
-  dice la privacy); l'allarme se manca la chiave AeroDataBox; l'email di
-  benvenuto che si recupera se il pagamento va in timeout. Li faccio uno alla
-  volta, ognuno provato, perché toccano il flusso dei soldi.
+- **La coda quando siamo in piena (scelta tua col popup):** sopra il freno
+  d'emergenza, invece di dire "non lo so", si prende l'email della persona e
+  la si avvisa appena il volo si riesce a controllare. È il pezzo che rende
+  un video virale a prova di tutto anche col fornitore al limite. Serve una
+  tabella nuova + un lavoro notturno: lo costruisco a parte.
 
-## Fatto in questo giro (14/08)
+## Fatto in questo giro (14-15/08)
 - **Conto costi/profitto** nella pagina `/admin/economia` (tre scenari).
 - **Audit di scalabilità** a cinque lanterne + primi fix: rete di sicurezza
   sugli errori (mai più un 500/404 nudo), indici del database (migrazione),
   idempotenza del pagamento a prova di corsa, una sola chiamata al fornitore
   per lo stesso volo, allarmi che non intasano il telefono.
+- ✅ **I cinque fix delicati dell'audit, tutti fatti** (uno alla volta, ognuno
+  provato): timeout di 4 secondi sulle query al database; freno d'emergenza
+  sul fornitore (dopo 4 "troppe richieste" di fila si stacca per 3 secondi,
+  niente più funzioni appese fino al 503); pulizia dei dati vecchi la domenica
+  notte (registro oltre 12 mesi via, email delle verifiche oltre 24 mesi tolta,
+  la riga resta anonima); allarme se manca la chiave AeroDataBox; e il recupero
+  del benvenuto (il cron rimanda l'email col link d'ingresso a chi ha pagato e
+  non l'ha ricevuta, con la precedenza sui solleciti).
+- **AeroDataBox, le tue due domande:** il limite di 3 richieste/secondo è del
+  piano Basic su RapidAPI, ma il vero tetto è mensile (Basic ~2.400
+  chiamate/mese, troppo poche per un lancio); i piani più alti alzano il
+  mensile, il "al secondo" cambia poco. E dai dati dell'API usiamo tutto quello
+  che serve al verdetto: i campi che scartiamo (modello aereo, terminal, gate)
+  non rafforzano il reclamo. **Controlla i numeri esatti sul cruscotto
+  RapidAPI:** da qui il loro sito è bloccato.
 
 ---
 
