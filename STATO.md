@@ -35,6 +35,52 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #73 (14-15/08): IL MOTORE COLLAUDATO, LA SECONDA FONTE, IL METEO SUL
+  VPS, I CONTI, E L'AUDIT DI SCALA.** Sessione lunga, in pezzi.
+  - **COLLAUDO DEL MOTORE, offline, a tappeto:** golden set 57/57 (falsi
+    positivi 0, precisione idoneo 100%) + 81/81 sugli altri rami (negato,
+    coincidenza, declassamento, cancellato, codeshare, incrocio, fasce). Ha
+    trovato `main` rossa per una svista (la coppia demo ZZ501/ZZ502 non era
+    nell'elenco dei voli demo della prova): chiusa.
+  - **SECONDA FONTE AviationEdge collegata** (spenta finché non c'è la chiave):
+    adattatore nuovo, l'incrocio ora confronta il RITARDO non l'orario
+    assoluto (a prova di fuso: una fonte in ora locale non butta più gli
+    idonei in incerto), il banco di prova conta i recuperi. `secondaFonte()`
+    preferisce AVIATIONEDGE_API_KEY, poi AVIATIONSTACK. Scelta di Valerio col
+    popup: collega e misura col mese scontato prima di spendere 299 fissi.
+  - **METEO dal VPS di Valerio:** `OPENMETEO_URL` (self-hosted, costo zero,
+    ha già il KVM 4). Spento senza la variabile. Serve solo a vincere le
+    liti (smonta la scusa del maltempo nella replica), mai il verdetto.
+  - **DOMINIO:** rivolio.it è già l'indirizzo ufficiale ovunque (verificato
+    sul sito vero: canonical = rivolio.it). Il codice era già pulito
+    (NEXT_PUBLIC_SITO); corretta solo la riserva dell'app. Resta a Valerio
+    mettere rivolio.it come dominio PRINCIPALE su Netlify (301 del vecchio).
+  - **CONTI: `/admin/economia`** (voce nuova in barra), tre scenari 1/2/3%,
+    dove finiscono i 14,90, quanto pesa la garanzia, i costi con la fonte.
+    Il punto: l'infrastruttura è spiccioli, i costi veri sono la commissione
+    e la garanzia; la profittabilità dipende dal traffico.
+  - **SCIOPERI: il file del Ministero ha lo schema perfetto (settore,
+    categoria, esclusioni) ma si ferma al FEBBRAIO 2020.** Inutile per i voli
+    di oggi. Scelta di Valerio: tengo l'autopilota + rendo il motore più
+    furbo (sciopero della compagnia stessa = idoneo per C-28/20, ENAV/handling
+    = incerto). Da costruire ancora.
+  - 🔴 **AUDIT DI SCALA (5 lanterne in workflow) + primi fix.** Verdetto
+    onesto: il codice del check è ben protetto (mai un 500 sul percorso caldo,
+    degrado onesto a "incerto"), MA il vero soffitto è **AeroDataBox a 3
+    richieste/secondo**: un video virale di voli DIVERSI non regge senza un
+    piano più alto + la deduplica. Fix fatti: rete di sicurezza pubblica
+    (app/error.tsx, global-error.tsx, not-found.tsx: mai più un 500/404 nudo
+    in inglese); migrazione `2026-08-14-scala.sql` (indici su eventi.creato_il,
+    coda verdetti, RLS su eventi/iscritti, indice UNICO su pratiche.verifica_id);
+    idempotenza del pagamento a prova di corsa (creaPratica gestisce il 23505,
+    il webhook non manda email doppie); single-flight sulle chiamate al
+    fornitore; silenziatore allarmi per fornitore non per volo. **Da fare TU**
+    (promemoria.md): applica la migrazione, alza il piano AeroDataBox, accendi
+    il freno Upstash, Resend a pagamento. **Da fare io:** timeout query DB,
+    freno d'emergenza sul fornitore, pulizia dati vecchi, allarme chiave
+    mancante, recupero email T+0.
+  - Prove: **1622 verdi, zero rosse.** Nasce `promemoria.md` (richiesto da
+    Valerio): l'elenco condiviso delle cose da fare, sue e mie.
 - **GIRO #72 (14/08): LA COINCIDENZA A DUE TRATTE, E LA PAGINA APERTA SUI
   DIRITTI DI CHI VOLA CON MOBILITÀ RIDOTTA (REG. 1107).** Il via finale di
   Valerio: «gli ultimi due casi, fatti benissimo, come un ingegnere senior.
