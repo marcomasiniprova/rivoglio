@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Award, FileText, Plane, Search, User } from "lucide-react";
 import CheckRapido from "@/components/app/CheckRapido";
@@ -68,6 +68,22 @@ export default function AppRivolio({
   const [pannello, setPannello] = useState<Pannello>(
     email && pratiche.length > 0 ? "pratiche" : "controlla",
   );
+
+  /* 🔴 SE SI TORNA DALLA CASSA (?ripresa=1), si va su «Controlla»: lì il
+     check fa ripartire da solo l'analisi appena pagata. Prima chi aveva già
+     pratiche restava su «Pratiche» e l'analisi non ripartiva: sembrava di
+     essere stati buttati a caso nell'elenco (Valerio, 15/08). Il marcatore
+     ?ripresa NON si tocca qui: lo consuma SchedaCheck dentro «Controlla». */
+  useEffect(() => {
+    const u = new URL(window.location.href);
+    if (u.searchParams.get("ripresa") !== "1") return;
+    /* ⚠️ Lo stato non si tocca dentro il corpo dell'effetto: React lo vieta
+       (secondo disegno a catena). Un rinvio di un giro basta, come fa la
+       ripresa dentro SchedaCheck. */
+    const t = setTimeout(() => setPannello("controlla"), 0);
+    return () => clearTimeout(t);
+  }, []);
+
   const [salvataggio, salva, inCorso] = useActionState<EsitoApp, FormData>(salvaProfiloWeb, {});
 
   const C = COPY.pratica.elenco;

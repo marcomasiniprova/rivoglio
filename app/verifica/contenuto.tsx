@@ -173,7 +173,11 @@ export async function contenutoVerifica(
   checkoutGrezzo: string | string[] | undefined,
 ): Promise<ReactNode> {
   const avvisoCheckout = avvisoCheckoutDa(checkoutGrezzo);
-  const collegato = SUPABASE_CONFIGURATO ? Boolean(await utenteCollegato()) : false;
+  const utente = SUPABASE_CONFIGURATO ? await utenteCollegato() : null;
+  const collegato = Boolean(utente);
+  /* L'email dell'account di chi guarda (dalla sessione, sempre la sua):
+     serve a non richiederla a chi è già loggato. */
+  const emailAccount = utente?.email ?? null;
 
   // ── Esempio dimostrativo: si ricalcola, non si legge ────────────────
   const demoMatch = id.match(DEMO_OK);
@@ -292,6 +296,7 @@ export async function contenutoVerifica(
     inAttesa: riga.conferma === "in_attesa",
     corretto: riga.conferma === "corretta",
     emailGiaData: Boolean(riga.email),
+    emailAccount,
     arrivoPrevistoUtc: riga.voli?.arrivo_previsto_utc ?? null,
     arrivoEffettivoUtc: riga.voli?.arrivo_effettivo_utc ?? null,
     km: riga.voli?.km_ortodromica ?? null,

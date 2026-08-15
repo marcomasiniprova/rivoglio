@@ -87,6 +87,13 @@ export type DatiVerifica = {
    * che è esattamente quello che faceva prima.
    */
   emailGiaData?: boolean;
+  /**
+   * L'email dell'account di CHI STA GUARDANDO, se è loggato. Viene dalla
+   * SESSIONE, non dalla verifica: è sempre la sua, mai quella di un altro,
+   * quindi un link condiviso non la espone. Serve a non richiedere l'email
+   * (né il modulo di cattura) a chi è già loggato: ce l'ha già l'account.
+   */
+  emailAccount?: string | null;
   arrivoPrevistoUtc: string | null;
   arrivoEffettivoUtc: string | null;
   km: number | null;
@@ -627,9 +634,16 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
   const [inCorso, setInCorso] = useState(false);
   const [errore, setErrore] = useState<string | null>(null);
   const [email, setEmail] = useState("");
-  /* L'email si chiede QUI e solo se non c'è già. Su un esempio puro
-     (senza riga nel database) non c'è niente a cui agganciarla. */
-  const serveEmail = Boolean(dati.idVerifica) && !dati.emailGiaData;
+  /* L'email va SALVATA sulla verifica (da lì nasce l'account e si aggancia
+     la pratica) se non c'è già. Su un esempio puro non c'è riga a cui
+     agganciarla. */
+  const serveSalvareEmail = Boolean(dati.idVerifica) && !dati.emailGiaData;
+  /* 🔴 IL CAMPO EMAIL SI MOSTRA SOLO A CHI NON È LOGGATO (Valerio, 15/08:
+     «da loggato mi esce ancora il campo email»). Chi ha un account ce l'ha
+     già: usiamo quella del suo account e non gliela richiediamo. Così la
+     pratica si aggancia lo stesso, senza un campo inutile davanti. */
+  const emailDaUsare = dati.emailAccount ?? email;
+  const mostraCampoEmail = serveSalvareEmail && !dati.emailAccount;
 
   const compraFamiglia = dati.demo || dati.checkout.famiglia || dati.cassaProva;
 
@@ -639,11 +653,12 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
       setRichiamo(true);
       return;
     }
-    if (serveEmail) {
+    if (mostraCampoEmail) {
       /* Lo stesso controllo del server, meno il giro sul DNS (che nel
          browser non si può fare). Serve a dire subito cosa non va invece
          di far aspettare un viaggio andata e ritorno; il cancello vero
-         resta dentro /api/verifica/email. */
+         resta dentro /api/verifica/email. Solo l'email DIGITATA si valida:
+         quella dell'account è già buona. */
       const forma = controllaFormato(email, { insisto: true });
       if (!forma.ok) {
         setErrore(forma.motivo === "formato" ? COPY.catturaEmail.errore : forma.messaggio);
@@ -674,11 +689,11 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
       /* L'email prima del consenso: se la si scrive dopo, un guasto a
          metà lascia una verifica firmata e senza destinatario, cioè una
          pratica che non si può consegnare a nessuno. */
-      if (serveEmail) {
+      if (serveSalvareEmail) {
         const r = await fetch("/api/verifica/email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: dati.idVerifica, email: email.trim() }),
+          body: JSON.stringify({ id: dati.idVerifica, email: emailDaUsare.trim() }),
         });
         /* ⚠️ Un 404 qui vuol dire "un'email c'era già" (la rotta scrive
            una volta sola, di proposito), e non è un guasto: si tira
@@ -728,8 +743,9 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
 
       {/* L'email, una volta sola e proprio qui: prima del pagamento
           serve, dopo il verdetto era solo un ostacolo fra la persona e
-          il suo risultato. Se c'è già, questo pezzo non compare. */}
-      {serveEmail && (
+          il suo risultato. Se c'è già (o sei loggato) questo pezzo non
+          compare. */}
+      {mostraCampoEmail && (
         <div className="rounded-xl border border-bordo bg-white px-4 py-3.5">
           <label htmlFor={idEmail} className="block text-sm font-medium">
             {COPY.catturaEmail.campo.etichetta}
@@ -883,8 +899,9 @@ function Incerto({ dati }: { dati: DatiVerifica }) {
       )}
 
       {/* Niente vendita sul giallo, MAI. Solo l'avviso se il dato si
-          sblocca: a caso chiuso non serve più. */}
-      {!chiuso && (
+          sblocca: a caso chiuso non serve più. E niente modulo email a chi
+          è loggato: ce l'ha già l'account (Valerio, 15/08). */}
+      {!chiuso && !dati.emailAccount && (
       <Anima ritardo={0.16}>
         <CatturaEmail
           idVerifica={dati.idVerifica}

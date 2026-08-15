@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { Check, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DichiaraRifiuto from "./DichiaraRifiuto";
 
@@ -83,27 +83,39 @@ export default function DichiaraEsito({
         tuo conto, non da noi.
       </p>
 
+      {/* ⚠️ BOTTONI PIÙ CORPOSI + ICONE (Valerio, 15/08: «sono brutti e
+          troppo magri, metti la spunta per pagato e la X per il no»).
+          h-13 e font-semibold li ingrassano; la spunta sul verde, la X
+          sul bordato. */}
       <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
         <Button
           type="button"
           size="lg"
-          className="flex-1"
+          className="h-13 flex-1 gap-2 text-[15px] font-semibold"
           disabled={inCorso}
           onClick={() => void dichiara("pagata")}
         >
-          {inCorso ? "Un attimo…" : "Mi hanno pagato"}
+          {inCorso ? (
+            "Un attimo…"
+          ) : (
+            <>
+              <Check className="size-5 shrink-0" aria-hidden="true" />
+              Mi hanno pagato
+            </>
+          )}
         </Button>
         <Button
           type="button"
           variant="contorno"
           size="lg"
-          className="flex-1"
+          className="h-13 flex-1 gap-2 text-[15px] font-semibold"
           aria-pressed={mostraNo}
           onClick={() => {
             setErrore(null);
             setMostraNo(true);
           }}
         >
+          <X className="size-5 shrink-0" aria-hidden="true" />
           Mi hanno risposto no
         </Button>
       </div>

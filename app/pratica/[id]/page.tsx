@@ -419,6 +419,22 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           </div>
         )}
 
+        {/* IL DIRITTO DI CURA (art. 9) STA QUI, ATTACCATO AI DOCUMENTI
+            (Valerio, 15/08: «documenti e pasti/hotel sono due passi vicini
+            che uno fa PRIMA del reclamo, poi sotto i bottoni»). Prima stava
+            in fondo, dopo tutto. Sparisce a reclamo partito. NON sul
+            declassamento: lì hai volato, l'assistenza dell'art. 9 non c'entra. */}
+        {R.letteraVisibile &&
+          !["inviata", "sollecito", "enac", "esito_pagata", "esito_rifiutata", "rimborsata"].includes(
+            pratica.stato,
+          ) &&
+          (verificaRiga as { caso_dichiarato?: string | null } | null)?.caso_dichiarato !==
+            "declassamento" && (
+            <div className="mt-5 border-t border-bordo pt-5">
+              <SpeseCura praticaId={pratica.id} iniziale={pratica.cura_richiesta ?? false} />
+            </div>
+          )}
+
         {R.letteraVisibile && (
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {R.letteraApribile ? (
@@ -548,23 +564,6 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           nuovoGiro={percorso.giri.no > 0 && percorso.giri.no === percorso.giri.replicheMandate}
         />
       )}
-
-      {/* --------------------------------- il diritto di cura (art. 9).
-          🔴 SI FA PRIMA DEL RECLAMO, NON DOPO (Valerio, 15/08: «sta sempre
-          di mezzo, anche quando dico che mi hanno pagato e la pratica è
-          chiusa... quello si fa prima del reclamo, come i documenti»).
-          Aveva ragione: gli scontrini si allegano alla lettera, quindi la
-          domanda ha senso mentre la lettera si prepara (pagata/pronta), e
-          non ha più senso una volta che il reclamo è partito o la pratica
-          è chiusa. Da lì sparisce.
-          NON sul declassamento: lì hai volato, non sei stato bloccato, e
-          l'assistenza dell'art. 9 non c'entra. */}
-      {R.letteraVisibile &&
-        !["inviata", "sollecito", "enac", "esito_pagata", "esito_rifiutata", "rimborsata"].includes(
-          pratica.stato,
-        ) &&
-        (verificaRiga as { caso_dichiarato?: string | null } | null)?.caso_dichiarato !==
-          "declassamento" && <SpeseCura praticaId={pratica.id} iniziale={pratica.cura_richiesta ?? false} />}
 
       {/* --------------------------------------- il fascicolo, in fondo.
           Scelta di Valerio (13/08): resta raggiungibile ma non ingombra.
