@@ -295,7 +295,7 @@ export default function AppRivolio({
                     onClick={() => setPannello("pratiche")}
                     className="text-sm font-medium text-verde transition-colors hover:text-verde-scuro"
                   >
-                    Aprile →
+                    Vedi tutte →
                   </button>
                 )}
               </div>

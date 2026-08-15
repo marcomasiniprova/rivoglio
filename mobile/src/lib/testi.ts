@@ -715,7 +715,7 @@ export const TESTI = {
     },
     modifica: "Modifica il profilo",
     esci: "Esci dall'account",
-    email: "valerio@artecai.it",
+    email: "team@rivolio.it",
     ospite: {
       titolo: "Non sei entrato",
       testo:

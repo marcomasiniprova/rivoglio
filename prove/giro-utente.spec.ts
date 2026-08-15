@@ -57,8 +57,10 @@ test.describe("Cosa copriamo: il sito non mente su quello che il motore fa", () 
     expect(t).toContain("bagagli");
     expect(t).toContain("treni");
     expect(t).toContain("convenzione di montreal");
-    // e la guida gratuita resta raggiungibile
-    expect(t).toContain("/guida-bagagli");
+    /* E la guida gratuita resta raggiungibile: il link vero è quello
+       cliccabile nel footer (la FAQ è testo semplice, quindi un
+       "/guida-bagagli" scritto lì dentro non si può cliccare). */
+    expect(JSON.stringify(COPY).toLowerCase()).toContain("/guida-bagagli");
   });
 
   test("negato imbarco e coincidenza persa NON sono dichiarati mancanti", () => {

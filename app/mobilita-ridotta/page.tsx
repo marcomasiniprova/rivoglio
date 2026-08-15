@@ -102,7 +102,7 @@ export default function PaginaMobilitaRidotta() {
             sono le tue gambe. Se te li perdono o te li danneggiano durante il volo o la gestione in
             aeroporto, ti spetta il <strong>risarcimento</strong> (art. 12). Il risarcimento segue
             le regole della Convenzione di Montreal, che oggi fissa un tetto per passeggero (attorno
-            ai <strong>1.500 diritti speciali di prelievo</strong>, circa 1.800€ come stima, il cambio
+            ai <strong>1.519 diritti speciali di prelievo</strong>, circa 1.900€ come stima, il cambio
             varia ogni giorno). Per un ausilio che vale di più, alla consegna puoi fare una
             dichiarazione speciale di valore. In ogni caso: apri subito il <strong>PIR</strong>
             all&apos;ufficio bagagli prima di uscire, fotografa il danno e conserva le ricevute.

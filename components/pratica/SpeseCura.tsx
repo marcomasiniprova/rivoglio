@@ -57,7 +57,7 @@ export default function SpeseCura({
       </h2>
       <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
         Dalle due ore di ritardo la compagnia doveva offrirti da mangiare, e un hotel se hai dormito
-        fuori. Se hai pagato tu, hai diritto al rimborso (articolo 9): lo aggiungo al tuo reclamo,
+        fuori. Se hai pagato tu, ti spetta il rimborso (articolo 9): lo aggiungo al tuo reclamo,
         senza costarti niente in più. Gli scontrini li alleghi tu quando mandi la lettera.
       </p>
 

@@ -260,7 +260,7 @@ export const COPY = {
       {
         nome: "Invii tu, incassi tu",
         testo:
-          "Lo mandi dalla tua email in 2 minuti. La compensazione arriva a te, per intero. E se restano in silenzio, dopo sei settimane trovi il sollecito già pronto.",
+          "Mandi il reclamo dalla tua email in 2 minuti. La compensazione arriva a te, per intero. E se resta in silenzio, dopo sei settimane trovi il sollecito già pronto.",
       },
     ],
     /** I 3 passi mostrati durante il check: avanzamento REALE, mai finto. */
@@ -334,7 +334,7 @@ export const COPY = {
       effettivo: "02:47",
       fascia: "250€",
       fasciaTesto: "Questa tratta rientra nella fascia da 250€.",
-      verifica: "Verifichiamo se ci sono cause escludenti. Ecco cosa serve per chiederli.",
+      verifica: "Verifichiamo se ci sono circostanze eccezionali. Ecco cosa serve per fare la richiesta.",
     },
   },
 
@@ -420,11 +420,11 @@ export const COPY = {
         descrizione: "Il reclamo pronto da inviare, seguito fino all'esito.",
         punti: [
           "Lettera formale con i dati verificati del volo",
-          "Indirizzo e canale corretti della compagnia operativa",
+          "Indirizzo e canale corretti della compagnia che ha operato il volo",
           "Sollecito già pronto dopo sei settimane",
           "Se dicono no, la replica che smonta il loro motivo",
           "Segnalazione all'ente e conciliazione gratuita, già scritte",
-          "Tracker della pratica, sul web e nell'app",
+          "Segui la pratica passo per passo, sul web e nell'app",
         ],
         bottone: "Prepara la pratica",
       },
@@ -558,7 +558,7 @@ export const COPY = {
       },
       {
         valore: "52%",
-        testo: "delle richieste respinte dalle compagnie in modo illegittimo",
+        testo: "dei no delle compagnie è senza un motivo valido",
         fonte: "AirHelp",
       },
       {
@@ -585,7 +585,7 @@ export const COPY = {
       {
         domanda: "E allora cosa pago, esattamente?",
         risposta:
-          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, letto dal tracciamento del volo e archiviato come prova. I colpi dopo il primo: il sollecito, la replica se dicono no, la segnalazione all'ente e la conciliazione gratuita, che è il canale dove i soldi si muovono davvero. La garanzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, ti rimborsiamo per intero.",
+          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, letto dal tracciamento del volo e archiviato come prova. Quello che viene dopo il primo reclamo: il sollecito, la replica se dicono no, la segnalazione all'ente e la conciliazione gratuita, che è il canale dove i soldi si muovono davvero. La garanzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, ti rimborsiamo per intero.",
       },
       {
         domanda: "Quanto ricevo, se va a buon fine?",
@@ -595,7 +595,7 @@ export const COPY = {
       {
         domanda: "E se la compagnia dice che era maltempo o sciopero?",
         risposta:
-          "Alcune circostanze eccezionali escludono davvero la compensazione, ed è giusto dirlo. Per questo il verdetto ti indica la fascia e le cause escludenti da verificare, mai una promessa. Se il tuo caso è incerto, non ti facciamo pagare. E se la compagnia rifiuta con una motivazione debole, la contro-risposta te la prepariamo subito; se invece tacciono, alla sesta settimana trovi il sollecito, e due settimane dopo la segnalazione all'ente nazionale, già scritti.",
+          "Alcune circostanze eccezionali escludono davvero la compensazione, ed è giusto dirlo. Per questo il verdetto ti indica la fascia e le cause escludenti da verificare, mai una promessa. Se il tuo caso è incerto, non ti facciamo pagare. E se la compagnia rifiuta con una motivazione debole, la contro-risposta te la prepariamo subito; se invece tace, alla sesta settimana trovi il sollecito, e due settimane dopo la segnalazione all'ente nazionale, già scritti.",
       },
       {
         domanda: "Siete un'agenzia di reclami? Devo cedervi il credito?",
@@ -610,7 +610,7 @@ export const COPY = {
       {
         domanda: "Quali voli posso controllare?",
         risposta:
-          "Verifichiamo i voli coperti dal Regolamento CE 261/2004: in partenza da un aeroporto UE, o in arrivo nell'UE con una compagnia europea. Copriamo il ritardo di 3 ore o più all'arrivo, il volo cancellato, il dirottamento, il negato imbarco, la coincidenza persa e il declassamento in una classe più bassa di quella pagata. Se sei rimasto a terra a lungo e hai pagato pasti o hotel di tasca tua, alla pratica si aggiunge gratis il diritto di cura (art. 9). Sul ritardo il verdetto è automatico; negli altri casi il check ti fa una o due domande a risposta chiusa, perché quei fatti negli archivi non ci sono. Se resti nel dubbio non paghi. E se voli con una disabilità o a mobilità ridotta, c'è una guida gratuita con la lettera pronta su /mobilita-ridotta.",
+          "Verifichiamo i voli coperti dal Regolamento CE 261/2004: in partenza da un aeroporto UE, o in arrivo nell'UE con una compagnia europea. Copriamo il ritardo di 3 ore o più all'arrivo, il volo cancellato, l'atterraggio in un altro aeroporto, il negato imbarco, la coincidenza persa e il declassamento in una classe più bassa di quella pagata. Se sei rimasto a terra a lungo e hai pagato pasti o hotel di tasca tua, alla pratica si aggiunge gratis il diritto di cura (art. 9). Sul ritardo il verdetto è automatico; negli altri casi il check ti fa una o due domande a risposta chiusa, perché quei fatti negli archivi non ci sono. Se resti nel dubbio non paghi. E se voli con una disabilità o a mobilità ridotta, c'è una guida gratuita con la lettera pronta: la trovi tra le guide, nel menù in fondo alla pagina.",
       },
       {
         /* ⚠️ QUESTA DOMANDA VIENE DALLA SEZIONE "COSA COPRE", tolta dalla
@@ -622,12 +622,12 @@ export const COPY = {
            cliente. */
         domanda: "E per i bagagli o per i treni?",
         risposta:
-          "Non li facciamo, e preferiamo dirlo prima che tu ci perda tempo. Il bagaglio perso o in ritardo ricade sulla Convenzione di Montreal, non sul CE 261, e nessun archivio certifica un bagaglio: un verdetto automatico non è possibile. La guida per farlo da solo però c'è, ed è gratuita: la trovi su /guida-bagagli. I treni hanno un regolamento diverso (CE 1371/2007) e non esiste un archivio pubblico sui ritardi di Trenitalia e Italo.",
+          "Non li facciamo, e preferiamo dirlo prima che tu ci perda tempo. Il bagaglio perso o in ritardo ricade sulla Convenzione di Montreal, non sul CE 261, e nessun archivio certifica un bagaglio: un verdetto automatico non è possibile. La guida per farlo da solo però c'è, ed è gratuita: la trovi tra le guide, nel menù in fondo alla pagina. I treni hanno un regolamento diverso (CE 1371/2007) e non esiste un archivio pubblico sui ritardi di Trenitalia e Italo.",
       },
       {
         domanda: "Che fine fanno i miei dati?",
         risposta:
-          "Il check non chiede chi sei: bastano numero di volo e data. L'email te la chiediamo solo dopo, se vuoi salvare la pratica, e la usiamo solo per quella. L'Osservatorio è una iscrizione a parte e si annulla con un clic.",
+          "Il check non chiede chi sei: bastano numero di volo e data. L'email te la chiediamo solo dopo, se vuoi salvare la pratica, e la usiamo solo per quella. L'Osservatorio è un'iscrizione a parte e si annulla con un clic.",
       },
     ],
   },
@@ -636,7 +636,7 @@ export const COPY = {
     occhiello: "La newsletter",
     titolo: "L'Osservatorio dei Disservizi",
     testo:
-      "Ogni settimana, i 10 voli più in ritardo sui cieli italiani, presi dai dati che verifichiamo per i check. Una email a settimana, si annulla con un clic.",
+      "Ogni settimana, i 10 voli più in ritardo sui cieli italiani, presi dai dati che verifichiamo per i check. Un'email a settimana, si annulla con un clic.",
     campoEmail: {
       etichetta: "La tua email",
       segnaposto: "nome@esempio.it",
@@ -714,7 +714,7 @@ export const COPY = {
       /* 🔴 Le due domande non si capivano (Valerio, 13/08): «il tuo aereo
          può risultare in orario» è vero ma astratto, e «ho perso una
          coincidenza» non dice di che coincidenza. Riscritte concrete. */
-      invito: "A volte il volo risulta a posto ma a te è andata diversamente. È un tuo caso?",
+      invito: "A volte il volo risulta a posto ma a te è andata diversamente. È il tuo caso?",
       invitoSotto:
         "Sei rimasto a terra, hai perso la coincidenza per colpa di questo volo, o ti hanno messo in una classe più bassa di quella che avevi pagato: la legge te li riconosce tutti. Dimmi quale, e ti dico se ti spetta qualcosa.",
       negato: {
@@ -889,6 +889,7 @@ export const COPY = {
          manda quella lettera si fa rispondere male. */
       titoloNegato: "Ti hanno lasciato a terra contro la tua volontà.",
       titoloCoincidenza: "Hai perso la coincidenza e sei arrivato con almeno tre ore di ritardo.",
+      titoloDeclassamento: "Ti hanno messo in una classe più bassa di quella che avevi pagato.",
       fattoNegato:
         "Volo {volo} del {data}. Qui il ritardo non conta: la compensazione per negato imbarco è dovuta subito (art. 4, comma 3).",
       fattoCoincidenza:
@@ -898,7 +899,7 @@ export const COPY = {
       /** Quando gli orari archiviati non ci sono più: il ritardo verificato resta. */
       fattoBreveTemplate: "Volo {volo} del {data}: ritardo verificato di {ritardo}.",
       fasciaTemplate: "Questa tratta rientra nella fascia da {importo}.",
-      verifica: "Verifichiamo se ci sono cause escludenti. Ecco cosa serve per chiederli.",
+      verifica: "Verifichiamo se ci sono circostanze eccezionali. Ecco cosa serve per fare la richiesta.",
       /** La fascia è per ogni passeggero: una famiglia moltiplica. */
       perPasseggero: "a passeggero",
       notaOrari: "Orari in ora italiana.",
@@ -961,7 +962,7 @@ export const COPY = {
          gli diciamo che non siamo riusciti a fare l'analisi»). Non è così:
          è una scelta di qualità, e quasi sempre è solo un volo troppo
          recente. Il titolo lo dice con fiducia, e il «per ora» è la verità. */
-      titolo: "Per ora su questo volo non abbiamo una prova a prova di compagnia.",
+      titolo: "Per ora su questo volo non abbiamo una prova abbastanza solida.",
       motivi: {
         fontiDiscordanti:
           "Le due fonti che incrociamo non danno lo stesso orario per questo volo: aspettiamo che siano d'accordo prima di darti un verdetto.",
@@ -969,7 +970,7 @@ export const COPY = {
           "Non è ancora arrivato l'orario ufficiale di atterraggio. Se il volo è di oggi o di ieri, di solito arriva entro un giorno.",
       },
       testo:
-        "Ti paghiamo solo quando il dato regge davanti alla compagnia aerea, e per questo volo non è ancora così. Non ti facciamo pagare per un forse: lascia la mail qui sotto e ti avvisiamo appena diventa certo.",
+        "Andiamo avanti solo quando il dato regge davanti alla compagnia aerea, e per questo volo non è ancora così. Non ti facciamo pagare per un forse: lascia la mail qui sotto e ti avvisiamo appena diventa certo.",
       alternativa:
         "Puoi comunque fare reclamo da solo, gratis: il modulo è nella sezione assistenza del sito della compagnia.",
       avviso: {

@@ -41,8 +41,9 @@ export default function PaginaGiudiceDiPace() {
     >
       <p>
         Hai mandato il reclamo, hai mandato il sollecito, hai segnalato all&apos;ente nazionale.
-        Se dopo tutto questo non hai ancora visto un euro, resta una strada sola: il giudice.
-        Questa pagina ti dice com&apos;è fatta, senza girarci intorno.
+        Se dopo tutto questo non hai ancora visto un euro, restano due strade, in ordine: prima la
+        conciliazione gratuita, poi, se non basta, il giudice. Questa pagina ti dice com&apos;è
+        fatta, senza girarci intorno.
       </p>
 
       <h2>Prima del giudice c&apos;è un passaggio gratuito, e non è facoltativo</h2>

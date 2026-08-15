@@ -92,7 +92,7 @@ export default async function PaginaScioperi() {
       ? {
           stato: "attenzione" as const,
           titolo: `Oggi non risultano scioperi aerei. Il prossimo è ${giornoEData(primo.data)}`,
-          testo: `Mancano ${giorniDa(primo.data, oggi)} giorni. Se hai un volo quel giorno, sotto trovi chi sciopera e cosa puoi fare adesso.`,
+          testo: `${giorniDa(primo.data, oggi) === 1 ? "Manca 1 giorno" : `Mancano ${giorniDa(primo.data, oggi)} giorni`}. Se hai un volo quel giorno, sotto trovi chi sciopera e cosa puoi fare adesso.`,
         }
       : {
           stato: "calmo" as const,

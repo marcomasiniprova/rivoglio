@@ -379,7 +379,7 @@ export function comeVa(
 ): Promise<Esito> {
   return spedisci({
     a,
-    oggetto: "Com'è andata? Conta anche il silenzio.",
+    oggetto: "Com'è andata? Dimmelo anche se non hanno risposto.",
     html: vestito({
       titolo: "A che punto sei",
       corpo:

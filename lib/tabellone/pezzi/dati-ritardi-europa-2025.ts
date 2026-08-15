@@ -158,7 +158,7 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "p",
       testo:
-        "Sul fronte italiano il numero ufficiale lo dà l'ENAC: negli aeroporti italiani nel 2025 sono passati **229.740.554 passeggeri**, il **5% in più** del 2024. Anche qui la crescita è la cornice: più passeggeri, stesse piste, stessi controlli, stessi finger.",
+        "Sul fronte italiano il numero ufficiale lo dà l'ENAC: negli aeroporti italiani nel 2025 sono passati **229.740.554 passeggeri**, il **5% in più** del 2024. Anche qui la crescita è la cornice: più passeggeri, stesse piste, stessi controlli, gli stessi gate.",
     },
     {
       tipo: "p",

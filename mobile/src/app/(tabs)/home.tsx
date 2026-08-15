@@ -215,7 +215,7 @@ export default function Home() {
             >
               <View style={stili.rigaTesti}>
                 <Text style={stili.rigaVolo}>
-                  {p.volo_iata ?? "—"}
+                  {p.volo_iata ?? "–"}
                   {p.data_locale ? ` · ${dataBreve(p.data_locale)}` : ""}
                 </Text>
                 <Text style={stili.rigaStato}>{nomeStato(p.stato)}</Text>

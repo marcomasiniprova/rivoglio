@@ -18,7 +18,7 @@ export const ARTICOLO: Articolo = {
   descrizione:
     "Il primo passo da fare adesso, la differenza fra sciopero della compagnia e sciopero di aeroporto o controllori, e perché una scusa generica non regge.",
   estratto:
-    "Chiedi subito la riprotezione e fatti mettere per iscritto il motivo. Chi incrocia le braccia cambia il verdetto più di quanto pensi.",
+    "Chiedi subito un altro volo e fatti mettere per iscritto il motivo. Chi incrocia le braccia cambia il verdetto più di quanto pensi.",
   data: "2026-08-09",
   tipo: "emergenza",
   tag: ["scioperi", "emergenza", "cancellazione"],
@@ -46,8 +46,8 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "passi",
       voci: [
-        "**Mettiti in fila al banco della compagnia**, non a quello dell'handling. Mentre aspetti, apri l'app della compagnia: a volte la riprotezione si fa da lì, e sei fuori dalla coda.",
-        "**Chiedi il riavvio su un altro volo** e chiedi anche le alternative su altri aeroporti vicini. Se accetti la prima cosa che ti offrono senza chiedere, di solito è quella che conviene a loro.",
+        "**Mettiti in fila al banco della compagnia**, non al banco dei servizi di terra. Mentre aspetti, apri l'app della compagnia: a volte il nuovo volo si fa da lì, e sei fuori dalla coda.",
+        "**Chiedi di essere rimesso su un altro volo** e chiedi anche le alternative su altri aeroporti vicini. Se accetti la prima cosa che ti offrono senza chiedere, di solito è quella che conviene a loro.",
         "**Fatti dare per iscritto la causa**: un'email, un SMS, la schermata dell'app, un foglio timbrato. Vale anche una foto del tabellone con la dicitura.",
         "**Fotografa tutto**: tabellone, carta d'imbarco, coda al banco, ora sul telefono. Costa dieci secondi e ti risparmia una discussione.",
         "**Conserva gli scontrini** di quello che paghi di tasca tua: acqua, panino, taxi, albergo. Le spese si chiedono a parte, e si chiedono anche quando la somma fissa non spetta.",
@@ -71,7 +71,7 @@ export const ARTICOLO: Articolo = {
       righe: [
         [
           "**Il personale della compagnia** (piloti, assistenti di volo, suo personale di terra)",
-          "È la posizione più forte per il passeggero: lo sciopero del personale del vettore, in linea di principio, non è una circostanza eccezionale.",
+          "È la posizione più forte per il passeggero: lo sciopero del personale della compagnia, in linea di principio, non è una circostanza eccezionale.",
         ],
         [
           "**I controllori di volo o il personale dell'aeroporto** (handling, sicurezza, rifornimento)",
@@ -185,7 +185,7 @@ export const ARTICOLO: Articolo = {
         {
           domanda: "Con lo sciopero non spetta mai niente, giusto?",
           risposta:
-            "No, è una semplificazione che conviene alle compagnie. Lo sciopero del personale del vettore in linea di principio non è una circostanza eccezionale, e in ogni caso la compagnia deve dimostrare il legame concreto con il tuo volo. Una dicitura generica sul tabellone non è una dimostrazione.",
+            "No, è una semplificazione che conviene alle compagnie. Lo sciopero del personale della compagnia in linea di principio non è una circostanza eccezionale, e in ogni caso la compagnia deve dimostrare il legame concreto con il tuo volo. Una dicitura generica sul tabellone non è una dimostrazione.",
         },
         {
           domanda: "Mi hanno riprotetto su un volo il giorno dopo: cambia qualcosa?",
@@ -200,7 +200,7 @@ export const ARTICOLO: Articolo = {
         {
           domanda: "Posso rifiutare il volo alternativo e tornare a casa?",
           risposta:
-            "Se il volo è cancellato puoi scegliere il rimborso del biglietto al posto della riprotezione, ed è dovuto entro 7 giorni. Valuta bene: rinunciare al viaggio e farsi rimborsare sono due scelte diverse e la seconda non cancella l'eventuale somma fissa.",
+            "Se il volo è cancellato puoi scegliere il rimborso del biglietto al posto di un altro volo, ed è dovuto entro 7 giorni. Valuta bene: rinunciare al viaggio e farsi rimborsare sono due scelte diverse e la seconda non cancella l'eventuale somma fissa.",
         },
         {
           domanda: "Nessuno al banco mi ha dato niente da mangiare o da bere.",

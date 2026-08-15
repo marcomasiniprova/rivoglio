@@ -66,7 +66,7 @@ export const ARTICOLO: Articolo = {
       tipo: "nota",
       titolo: "Chi deve provare cosa",
       testo:
-        "Tu devi provare due cose sole: che avevi il biglietto e che il disservizio c'è stato. È il vettore a dover provare la circostanza eccezionale e il nesso con il tuo volo. La Cassazione lo ha ribadito con l'ordinanza n. 17644 del 2025. Una risposta che dice solo \"condizioni operative straordinarie\", senza documenti, non ha ancora provato niente.",
+        "Tu devi provare due cose sole: che avevi il biglietto e che il disservizio c'è stato. È la compagnia a dover provare la circostanza eccezionale e il nesso con il tuo volo. La Cassazione lo ha ribadito con l'ordinanza n. 17644 del 2025. Una risposta che dice solo \"condizioni operative straordinarie\", senza documenti, non ha ancora provato niente.",
     },
 
     { tipo: "h2", testo: "L'ENAC apre un procedimento, non ti manda i soldi" },
@@ -91,7 +91,7 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "p",
       testo:
-        "La compagnia deve rispondere al reclamo entro sei settimane. Prima di quel termine l'organismo nazionale non entra in gioco, quindi il reclamo scritto al vettore non è un passaggio saltabile: è il presupposto di tutto il resto.",
+        "La compagnia deve rispondere al reclamo entro sei settimane. Prima di quel termine l'organismo nazionale non entra in gioco, quindi il reclamo scritto alla compagnia non è un passaggio saltabile: è il presupposto di tutto il resto.",
     },
     {
       tipo: "p",

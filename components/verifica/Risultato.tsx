@@ -404,7 +404,9 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
   const titolo = dichiarato
     ? dichiarato === "negato"
       ? t.titoloNegato
-      : t.titoloCoincidenza
+      : dichiarato === "declassamento"
+        ? t.titoloDeclassamento
+        : t.titoloCoincidenza
     : ritardo
       ? riempi(t.titoloTemplate, { ritardo })
       : null;

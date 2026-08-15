@@ -635,7 +635,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-verde-notte/85">
             {scheda && scheda.motivo !== "silenzio"
               ? scheda.spiegazione
-              : `Le compagnie rispondono in otto-quattordici settimane, quindi il silenzio a questo punto è normale. Ma da oggi ${GIORNI_PRIMA_DEL_SOLLECITO} giorni sono passati, e mettere agli atti che non hanno risposto serve al passo dopo: la segnalazione all'ente nazionale.`}
+              : `Le compagnie rispondono in 8-14 settimane, quindi il silenzio a questo punto è normale. Ma sono ormai passati ${GIORNI_PRIMA_DEL_SOLLECITO} giorni dall'invio, e mettere agli atti che non hanno risposto serve al passo dopo: la segnalazione all'ente nazionale.`}
           </p>
           {scheda && scheda.peso === "dipende" && (
             <p className="mt-3 max-w-xl rounded-xl bg-white/70 px-4 py-3 text-sm leading-relaxed text-verde-notte">
@@ -754,7 +754,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           </p>
           <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-inchiostro/80">
             È il passo che le compagnie non ignorano: l&apos;ente accerta la violazione e può
-            sanzionarle. Dirti come funziona davvero: <span className="font-medium">non ti paga
+            sanzionarle. E come funziona davvero: <span className="font-medium">non ti paga
             lui</span>, la compensazione resta una cosa fra te e la compagnia. Serve a farla
             muovere, e di solito funziona.
           </p>

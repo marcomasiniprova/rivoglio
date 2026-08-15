@@ -126,7 +126,7 @@ export const ARTICOLO: Articolo = {
       voci: [
         "**Il ritardo all'arrivo è sotto le 3 ore.** Anche due ore e cinquantanove minuti sono un no. È una soglia secca.",
         "**La compagnia dimostra una circostanza eccezionale.** Deve dimostrarla lei, e deve dimostrare il legame con il tuo volo. Dire che quel giorno c'era maltempo non basta.",
-        "**Il volo non è coperto**: parte da un paese fuori dall'Unione ed è stato operato da un vettore senza licenza europea. Con Ryanair è un caso raro, ma esiste quando il biglietto è di un'altra compagnia.",
+        "**Il volo non è coperto**: parte da un paese fuori dall'Unione ed è stato operato da una compagnia senza licenza europea. Con Ryanair è un caso raro, ma esiste quando il biglietto è di un'altra compagnia.",
       ],
     },
     {

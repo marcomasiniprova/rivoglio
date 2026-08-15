@@ -66,7 +66,7 @@ export const SITUAZIONI: Record<SituazioneMobilita, SchedaSituazione> = {
     scheda: "Non mi hanno dato l'assistenza",
     titolo: "Assistenza non fornita o inadeguata",
     spiega:
-      "Avevi diritto a essere accompagnato dal banco fino al posto (e viceversa), ma l'aiuto non c'è stato, è arrivato tardi o è stato fatto male.",
+      "Ti spettava essere accompagnato dal banco fino al posto (e viceversa), ma l'aiuto non c'è stato, è arrivato tardi o è stato fatto male.",
     aChi: "Al gestore dell'aeroporto (per l'assistenza a terra) e alla compagnia aerea (per l'imbarco, lo sbarco e l'assistenza a bordo).",
   },
   imbarco: {

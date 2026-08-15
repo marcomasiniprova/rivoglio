@@ -171,7 +171,7 @@ export const ARTICOLO: Articolo = {
     {
       tipo: "p",
       testo:
-        "Il termine di legge è più largo di quello dichiarato dalla compagnia: l'ENAC indica **sei settimane** come tempo entro cui il vettore deve rispondere al reclamo. Solo dopo si passa allo scalino successivo, e prima è inutile bussare altrove.",
+        "Il termine di legge è più largo di quello dichiarato dalla compagnia: l'ENAC indica **sei settimane** come tempo entro cui la compagnia deve rispondere al reclamo. Solo dopo si passa allo scalino successivo, e prima è inutile bussare altrove.",
     },
     {
       tipo: "p",
