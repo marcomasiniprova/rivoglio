@@ -73,6 +73,29 @@ export { casa } from "@/lib/sito";
 
 export type Esito = { ok: true; id?: string } | { ok: false; motivo: string };
 
+/* IL RITENTATIVO (collaudo email del 15/08).
+ *
+ * Resend ogni tanto risponde "troppe richieste" (429) o ha un intoppo suo
+ * (5xx), e la rete può cadere per un istante. Senza ritentativo, un
+ * singolo intoppo perde l'email: e le email a colpo solo (conferma
+ * iscrizione, verdetto idoneo, benvenuto account) NON le recupera nessun
+ * cron, quindi sarebbero perse per sempre. Un secondo tentativo dopo mezzo
+ * secondo copre quasi tutti questi casi.
+ *
+ * ⚠️ SI RIPROVA SOLO SU QUELLO CHE PUÒ ANDARE MEGLIO AL SECONDO COLPO: 429,
+ * 5xx e la rete giù (l'email NON è partita). Un 4xx (indirizzo sbagliato,
+ * dominio inesistente) è definitivo: riprovarlo è solo tempo perso. Un raro
+ * doppione da un ritentativo di rete è molto meglio di un'email persa, ed è
+ * lo stesso compromesso già accettato altrove (il recupero del T+0). */
+const TENTATIVI = 2;
+const ATTESA_MS = 600;
+const dormi = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Esportata solo per la prova: un 429 o un 5xx si riprovano, un 4xx no. */
+export function daRiprovare(statusCode: number | undefined): boolean {
+  return statusCode === 429 || (typeof statusCode === "number" && statusCode >= 500);
+}
+
 /**
  * Spedisce. Non lancia MAI eccezioni: un'email che non parte non deve far
  * fallire una registrazione. Chi chiama decide se gli interessa l'esito.
@@ -93,26 +116,39 @@ export async function spedisci({
     return { ok: false, motivo: "Resend non è configurato." };
   }
 
-  try {
-    const resend = new Resend(CHIAVE);
-    const { data, error } = await resend.emails.send({
-      from: MITTENTE,
-      to: a,
-      ...(RISPOSTA_A ? { replyTo: RISPOSTA_A } : {}),
-      subject: oggetto,
-      html,
-      // La versione solo testo non è un di più: senza, i filtri antispam
-      // penalizzano il messaggio e finisci in posta indesiderata.
-      text: testo,
-    });
+  const resend = new Resend(CHIAVE);
+  let ultimoMotivo = "Invio fallito.";
 
-    if (error) {
-      console.error("[posta] Resend ha rifiutato:", error.message);
-      return { ok: false, motivo: error.message };
+  for (let tentativo = 0; tentativo < TENTATIVI; tentativo++) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: MITTENTE,
+        to: a,
+        ...(RISPOSTA_A ? { replyTo: RISPOSTA_A } : {}),
+        subject: oggetto,
+        html,
+        // La versione solo testo non è un di più: senza, i filtri antispam
+        // penalizzano il messaggio e finisci in posta indesiderata.
+        text: testo,
+      });
+
+      if (!error) return { ok: true, id: data?.id };
+
+      ultimoMotivo = error.message;
+      const stato = (error as { statusCode?: number }).statusCode;
+      // Errore definitivo (indirizzo sbagliato, ecc.): inutile riprovare.
+      if (!daRiprovare(stato)) {
+        console.error("[posta] Resend ha rifiutato:", error.message);
+        return { ok: false, motivo: error.message };
+      }
+      console.warn(`[posta] Resend ${stato} (tentativo ${tentativo + 1}/${TENTATIVI}): riprovo`);
+    } catch (e) {
+      // Rete giù / timeout: il caso classico che al secondo colpo funziona.
+      console.warn(`[posta] invio fallito (tentativo ${tentativo + 1}/${TENTATIVI}):`, e);
     }
-    return { ok: true, id: data?.id };
-  } catch (e) {
-    console.error("[posta] invio fallito:", e);
-    return { ok: false, motivo: "Invio fallito." };
+    if (tentativo + 1 < TENTATIVI) await dormi(ATTESA_MS);
   }
+
+  console.error("[posta] invio fallito dopo i tentativi:", ultimoMotivo);
+  return { ok: false, motivo: ultimoMotivo };
 }
