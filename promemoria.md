@@ -60,16 +60,30 @@ lo costruisco su quello schema in mezza giornata.
 ### 6. Solidità per l'alto traffico (dall'audit del 14/08)
 Prima di mandare un video a migliaia di persone, quattro cose tue. Il codice
 per reggerle è già a posto o pronto; queste sono configurazioni.
-1. **Applica la migrazione** `supabase/2026-08-14-scala.sql` sul Supabase vero
-   (SQL editor). Aggiunge gli indici che tengono in piedi il pannello sotto
-   carico e il vincolo che impedisce pratiche doppie. Non tocca dati, si può
-   rilanciare.
-2. 🔴 **AeroDataBox è il vero collo di bottiglia: 3 richieste al secondo.**
-   Con la cache un volo = una chiamata, ma in un video virale la gente
-   controlla voli DIVERSI, quindi la cache aiuta poco: sopra ~3 voli nuovi al
-   secondo i check escono "non lo so". Non è un errore (nessuno paga per un
-   verdetto sbagliato), ma il video "non regge". Prima di un lancio grosso:
-   **chiedi ad AeroDataBox il piano più alto e se ammette picchi (burst).**
+1. ~~**Applica la migrazione** `supabase/2026-08-14-scala.sql`~~ ✅ **FATTA
+   io il 15/08 col connettore Supabase**, insieme a quella della coda
+   (`2026-08-15-coda.sql`) e delle recensioni (`2026-08-15-recensioni.sql`).
+   Verificato sul database vero: tabelle, colonne e indici tutti presenti.
+2. 🔴 **AeroDataBox: i numeri VERI, riletti col motore di Firecrawl il
+   15/08** (prima ti avevo detto una cosa sbagliata: il limite al secondo
+   NON è uguale su tutti i piani, cresce col piano). I quattro piani su
+   RapidAPI:
+   - **Basic (gratis):** 2.400 richieste/mese, 600 "unità"/mese, **1 al
+     secondo**, storico ±365 giorni.
+   - **Pro ($5,35/mese):** 24.000 richieste, 6.000 unità, **1 al secondo**.
+   - **Ultra ($32/mese, consigliato da loro):** 240.000 richieste, 60.000
+     unità, **2 al secondo**, storico ±210 giorni.
+   - **Mega ($160/mese):** 2,4 milioni di richieste, 600.000 unità, **3 al
+     secondo**, storico ±365 giorni.
+   ⚠️ **Due tetti, non uno:** le "richieste" e le "unità". Ogni nostra
+   chiamata al volo costa più di un'unità (gli endpoint ricchi ne costano
+   6), quindi a esaurirsi per primo è il tetto delle UNITÀ, non delle
+   richieste. Sul Basic 600 unità sono poche centinaia di controlli veri al
+   mese: buono per provare, non per un lancio.
+   ⚠️ **Il collo di bottiglia di un video resta il "al secondo":** anche
+   col Mega sono 3 voli DIVERSI al secondo (la cache aiuta solo sui voli
+   ripetuti). Per un lancio grosso: **Ultra o Mega**, e la coda-email (già
+   costruita il 15/08) raccoglie chi arriva mentre siamo in piena.
 3. **Accendi il freno condiviso:** su Netlify metti `UPSTASH_REDIS_REST_URL`
    e `UPSTASH_REDIS_REST_TOKEN` (account gratuito Upstash). Il codice del
    freno c'è già, è spento perché mancano quelle due righe. Senza, le rotte

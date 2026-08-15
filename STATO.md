@@ -35,6 +35,60 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #74 (15/08): LA PAGINA FANTASMA, LO SCIOPERO FURBO, LA CODA, E IL
+  SISTEMA DELLE RECENSIONI.** Sessione lunga, in pezzi, ognuno verde e
+  spinto prima del prossimo. Le migrazioni le ho applicate io col connettore.
+  - 🔴 **LA PAGINA FANTASMA DI ZZ777, CHIUSA.** Valerio: dopo aver
+    dichiarato un volo cancellato, «appare una pagina fantasma che fa
+    l'analisi per microsecondi prima del verdetto». Era un caso che il fix
+    del 12/08 non copriva: dichiarando il cancellato la pagina si ricarica
+    per rileggere il verdetto vero, ma la scena dell'analisi (già andata
+    all'hero) veniva saltata SENZA segnare la pagina come «vista», e al
+    ricaricamento ripartiva. Ora ogni ramo che salta la scena la segna
+    prima: una sola volta per pagina, mai più al ricaricamento.
+  - 🟢 **LO SCIOPERO FURBO** (C-28/20). Fino a ieri OGNI sciopero nel giorno
+    del volo = incerto. Ora: sciopero del personale della compagnia che ha
+    operato = **idoneo** (non è circostanza straordinaria, lo dice la Corte
+    UE); controllori (ATC), handling o generale = incerto. Prudente: «idoneo»
+    esce SOLO quando la colpa è chiaramente e soltanto della compagnia; se
+    lo stesso giorno c'è anche un esterno, resta incerto. La decisione è in
+    una funzione pura (`classeDaRighe`), blindata da 9 prove + 2 casi d'oro.
+    Regole 2026.08.9.
+  - 🟢 **LA CODA DEGLI INCERTI.** Il verdetto incerto di un volo fresco già
+    prometteva «se ci lasci l'email ti avvisiamo noi», ma NESSUNO
+    ricontrollava: promessa vuota. Ora `/api/motore/coda` (sveglia alle 8:30)
+    ripassa gli incerti con email: se il dato è arrivato ed è idoneo, avvisa
+    col link e la riga passa a idoneo; se diventa non idoneo o resta incerto
+    oltre 7 giorni, si chiude in silenzio (solo buone notizie via email).
+  - 🟢 **IL SISTEMA DELLE RECENSIONI, COMPLETO** (scelte di Valerio col popup:
+    buono sull'account, una gratis per evento vero, box su check/verdetto/
+    pratica, sblocco immediato). Dopo un evento vero la persona lascia stelle
+    + motivo e sblocca SUBITO un'analisi gratis, una sola: lo stesso evento
+    non si recensisce due volte (indice unico = niente analisi a raffica). Il
+    **buono** è fatto come il pass del pagamento (cookie firmato, il registro
+    decide se è usato, non il cookie); il cancello del check lo accetta quando
+    non c'è un pass e lo spende su un verdetto vero. La recensione **nasce
+    nascosta**: in `/admin/recensioni` la vedi e la **approvi**, e compare in
+    landing da sola (la vetrina legge le approvate a pagina aperta, nessuna
+    ricostruzione). La **sezione testimonial** è un nastro che scorre di lato,
+    coi nostri colori, prima dei prezzi; a zero recensioni non esiste (mai una
+    finta). La ricompensa segue il muro (`seSiPaga`): col muro spento
+    ringrazia e basta, acceso sblocca davvero. 21 prove nuove.
+  - ✅ **LE TRE MIGRAZIONI APPLICATE SUL DATABASE VERO col connettore
+    Supabase** (scala, coda, recensioni): verificato, tabelle/colonne/indici
+    tutti presenti. Da qui in avanti coda e recensioni funzionano in
+    produzione appena il deploy passa.
+  - 🔴 **AERODATABOX, I NUMERI VERI (Firecrawl, 15/08), e correggo me
+    stesso:** il limite «al secondo» NON è uguale su tutti i piani, cresce
+    col piano. Basic (gratis) e Pro = **1 al secondo**; Ultra ($32) = 2;
+    Mega ($160) = 3. Due tetti mensili (richieste E «unità»): a esaurirsi per
+    primo sono le UNITÀ, perché ogni chiamata ricca ne costa ~6. Il Basic
+    (600 unità/mese) regge poche centinaia di controlli: per provare, non per
+    un lancio. Dettaglio in `promemoria.md`.
+  - Prove: le nuove sono 40+ (scena fantasma, sciopero furbo, coda,
+    recensioni, buono); tipi e lint verdi a ogni pezzo. La suite piena non
+    l'ho girata tutta (dev in corso in sandbox: il build vero gira su
+    Netlify).
 - **GIRO #73 (14-15/08): IL MOTORE COLLAUDATO, LA SECONDA FONTE, IL METEO SUL
   VPS, I CONTI, E L'AUDIT DI SCALA.** Sessione lunga, in pezzi.
   - **COLLAUDO DEL MOTORE, offline, a tappeto:** golden set 57/57 (falsi
