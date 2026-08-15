@@ -57,7 +57,29 @@ quelli di oggi tengo l'autopilota che già gira. Se sul sito del Ministero
 trovi la versione aggiornata al 2025-2026, scaricala e mandamela: il lettore
 lo costruisco su quello schema in mezza giornata.
 
-### 6. Ancora aperte dai giri prima (le più importanti)
+### 6. Solidità per l'alto traffico (dall'audit del 14/08)
+Prima di mandare un video a migliaia di persone, quattro cose tue. Il codice
+per reggerle è già a posto o pronto; queste sono configurazioni.
+1. **Applica la migrazione** `supabase/2026-08-14-scala.sql` sul Supabase vero
+   (SQL editor). Aggiunge gli indici che tengono in piedi il pannello sotto
+   carico e il vincolo che impedisce pratiche doppie. Non tocca dati, si può
+   rilanciare.
+2. 🔴 **AeroDataBox è il vero collo di bottiglia: 3 richieste al secondo.**
+   Con la cache un volo = una chiamata, ma in un video virale la gente
+   controlla voli DIVERSI, quindi la cache aiuta poco: sopra ~3 voli nuovi al
+   secondo i check escono "non lo so". Non è un errore (nessuno paga per un
+   verdetto sbagliato), ma il video "non regge". Prima di un lancio grosso:
+   **chiedi ad AeroDataBox il piano più alto e se ammette picchi (burst).**
+3. **Accendi il freno condiviso:** su Netlify metti `UPSTASH_REDIS_REST_URL`
+   e `UPSTASH_REDIS_REST_TOKEN` (account gratuito Upstash). Il codice del
+   freno c'è già, è spento perché mancano quelle due righe. Senza, le rotte
+   che ci costano (dati volo, OCR) non hanno un tetto vero sotto tanti
+   utenti da tante macchine.
+4. **Resend a pagamento prima del lancio:** il piano gratis manda 100 email
+   al giorno. Il giorno del video le superi e i benvenuti dei clienti
+   paganti si perdono in silenzio. I 20 $/mese che avevi in mente bastano.
+
+
 - **Telegram:** su Netlify mancano due righe, `TELEGRAM_BOT_TOKEN` e
   `TELEGRAM_ADMIN_CHAT` (chat id 8534801784), poi *Trigger deploy*. I valori
   stanno in `.env.development.local`.
@@ -80,10 +102,21 @@ lo costruisco su quello schema in mezza giornata.
   idoneo (la legge dice che paga lei, sentenza europea C-28/20); sciopero di
   ENAV o degli addetti a terra (handling) = incerto. Recupera vendite senza
   rischi. Uso lo schema del file del Ministero come guida.
-- **Conto costi/profitto end to end** nella pagina admin nuova
-  (`/admin/economia`), coi tre scenari.
-- **Solidità per l'alto traffico:** audit in corso, poi sistemo i colli di
-  bottiglia veri.
+- **Solidità, secondo giro (i fix più delicati dell'audit):** timeout sulle
+  query al database (perché una query lenta diventi "non lo so" invece di un
+  errore dopo 10 secondi); il freno d'emergenza sul fornitore (dopo tanti
+  "troppe richieste" di fila, rispondere subito invece di riprovare per 8
+  secondi); il lavoro notturno che cancella i dati vecchi (12/24 mesi, come
+  dice la privacy); l'allarme se manca la chiave AeroDataBox; l'email di
+  benvenuto che si recupera se il pagamento va in timeout. Li faccio uno alla
+  volta, ognuno provato, perché toccano il flusso dei soldi.
+
+## Fatto in questo giro (14/08)
+- **Conto costi/profitto** nella pagina `/admin/economia` (tre scenari).
+- **Audit di scalabilità** a cinque lanterne + primi fix: rete di sicurezza
+  sugli errori (mai più un 500/404 nudo), indici del database (migrazione),
+  idempotenza del pagamento a prova di corsa, una sola chiamata al fornitore
+  per lo stesso volo, allarmi che non intasano il telefono.
 
 ---
 
