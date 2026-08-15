@@ -38,6 +38,7 @@ import {
 } from "@/lib/tempo";
 import { COPY } from "@/lib/copy";
 import LasciaRecensione from "@/components/rivolio/LasciaRecensione";
+import DichiaraEsito from "@/components/pratica/DichiaraEsito";
 
 /**
  * Il tracker della pratica: la linea del tempo dagli eventi, lo stato
@@ -519,6 +520,15 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           </span>
         </p>
       </section>
+
+      {/* IL TRAGUARDO: solo l'utente sa se i soldi sono arrivati sul suo
+          conto (la compagnia paga lui, non noi). Compare appena il reclamo
+          è partito, e chiude la pratica: pagata (vittoria, entra in
+          classifica) o no (parte la garanzia). Prima non c'era, e la
+          pratica non finiva mai. */}
+      {["inviata", "sollecito", "enac"].includes(pratica.stato) && (
+        <DichiaraEsito praticaId={pratica.id} />
+      )}
 
       {/* ---------------------------- il no della compagnia, dichiarato.
           🔴 STA QUI, SUBITO SOTTO «dove siamo», e prima stava terzultimo.
