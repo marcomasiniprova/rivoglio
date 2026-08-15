@@ -6,12 +6,15 @@ import { CORS, ipDi, oltreIlLimiteCondiviso } from "@/lib/api/limite";
 import { CHECK_A_PAGAMENTO, CORTESIA_SU_INCERTO } from "@/lib/check/ingresso";
 import {
   analisiGiaPagata,
+  cookieDi,
   creditoFinito,
   passDi,
   rispostaMuro,
   segnaConsumo,
 } from "@/lib/check/cancello";
 import { COOKIE_PASS, consumaPass } from "@/lib/check/pass";
+import { COOKIE_BUONO, leggiBuonoCookie } from "@/lib/recensioni/buono";
+import { buonoUsabile, consumaBuono } from "@/lib/recensioni/recensioni";
 import { COOKIE_ULTIMA_VERIFICA, ULTIMA_VERIFICA_VALE_S } from "@/lib/check/verifica-cookie";
 import { traccia } from "@/lib/eventi/registra";
 
@@ -66,11 +69,18 @@ export async function POST(req: Request) {
      per sviluppatori, e ogni check scavalcato è una chiamata pagata da
      noi. */
   const pass = passDi(req);
+  /* IL BUONO ANALISI GRATIS (da recensione) apre il cancello quando non
+     c'è un pass pagato: è il premio di chi ha lasciato una recensione. Si
+     legge solo col muro acceso e senza pass, e a spenderlo serve un
+     verdetto vero (come il pass). La validità la decide il registro nel
+     database, non il cookie: un cookie si copia. */
+  const buonoId = CHECK_A_PAGAMENTO && !pass ? leggiBuonoCookie(cookieDi(req, COOKIE_BUONO)) : null;
+  const buonoOk = buonoId ? await buonoUsabile(buonoId) : false;
   /* ⚠️ Chi sbatte sul muro conta ANCHE come "ha lanciato un'analisi": se
      no il cruscotto mostrerebbe più muri che analisi, cioè un imbuto che
      si allarga scendendo, e un numero impossibile fa dubitare di tutti
      gli altri. */
-  if (CHECK_A_PAGAMENTO && !pass) {
+  if (CHECK_A_PAGAMENTO && !pass && !buonoOk) {
     traccia(req, { tipo: "check" }, { tipo: "muro" });
     return rispostaMuro(req);
   }
@@ -152,6 +162,13 @@ export async function POST(req: Request) {
   /* Il consumo si scrive nel REGISTRO, non solo nel cookie: è quello che
      impedisce di riusare la stessa ricevuta copiandola a mano. */
   if (siConsuma && pass) await segnaConsumo(esito.verificaId, pass.ordine);
+
+  /* Il buono si spende come il pass: su un verdetto vero (mai sull'incerto,
+     che non è una risposta comprata) e una volta sola. È il registro a
+     segnarlo usato, quindi un cookie copiato non lo fa rivivere. */
+  if (buonoOk && buonoId && !(CORTESIA_SU_INCERTO && verdetto.esito === "incerto")) {
+    await consumaBuono(buonoId, esito.verificaId);
+  }
 
   const risposta = NextResponse.json(
     {
