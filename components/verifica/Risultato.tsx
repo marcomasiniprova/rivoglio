@@ -1002,7 +1002,19 @@ export default function Risultato({ dati }: { dati: DatiVerifica }) {
        si fa mai quando si torna da un rimbalzo della cassa. */
     const gia = `rivolio-visto-${dati.idPagina}`;
     const giaVista = sessionStorage.getItem(gia) === "1";
-    if (dalCheck || fermo || giaVista || dati.avvisoCheckout) return;
+    if (dalCheck || fermo || giaVista || dati.avvisoCheckout) {
+      /* 🔴 LA PAGINA FANTASMA DI ZZ777 (Valerio, 15/08). Qui la scena non
+         si mostra (è già andata all'hero, o il movimento è ridotto, o si
+         torna da un rimbalzo). Prima si usciva SENZA segnare la pagina come
+         "vista": così, quando si dichiara un volo cancellato e la pagina si
+         RICARICA per rileggere il verdetto vero, al secondo giro `dalCheck`
+         è falso, `giaVista` è falso, e la scena RIPARTIVA per un attimo
+         prima del verdetto. Segnando "vista" anche quando si salta, il
+         ricaricamento non fa più ripartire niente: la scena è una sola per
+         pagina, sempre. */
+      sessionStorage.setItem(gia, "1");
+      return;
+    }
     // la decisione vive SOLO nel browser (sessionStorage): partire spenti
     // e accendersi dopo l'idratazione è il comportamento voluto, non un tic
     // eslint-disable-next-line react-hooks/set-state-in-effect
