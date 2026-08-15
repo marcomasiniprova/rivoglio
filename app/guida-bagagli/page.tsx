@@ -89,8 +89,8 @@ export default function PaginaGuidaBagagli() {
         Gli acquisti di prima necessità (biancheria, articoli da bagno, un capo per il
         lavoro) rientrano nel danno da ritardo: <strong>conserva ogni scontrino</strong> e
         mettili nel reclamo. Molte compagnie pubblicano regole proprie su cosa considerano
-        &quot;essenziale&quot;: prima di spendere cifre importanti, controlla il sito del tuo
-        vettore.
+        &quot;essenziale&quot;: prima di spendere cifre importanti, controlla il sito della tua
+        compagnia.
       </p>
 
       <h2>E se il volo era anche in ritardo?</h2>

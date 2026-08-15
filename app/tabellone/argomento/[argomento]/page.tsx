@@ -26,7 +26,7 @@ const SPIEGA: Record<ChiaveTag, string> = {
   compagnie:
     "Come si scrive a ogni compagnia, dove finisce il reclamo e cosa rispondono di solito.",
   scioperi:
-    "Scioperi del personale, dei controllori e degli handler: quali fermano la compensazione e quali no.",
+    "Scioperi del personale, dei controllori e degli addetti di terra: quali fermano la compensazione e quali no.",
   rimborsi:
     "Rimborso del biglietto, compensazione, assistenza: tre cose diverse che quasi tutti confondono.",
   aeroporti: "Come si vola dagli scali italiani, scalo per scalo, coi dati che raccogliamo.",
