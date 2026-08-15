@@ -24,9 +24,11 @@ import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { aerodatabox } from "./fornitori/aerodatabox";
 import { aviationstack } from "./fornitori/aviationstack";
 import { aviationedge } from "./fornitori/aviationedge";
-import { demo } from "./fornitori/demo";
+import { demo, voloDimostrativo } from "./fornitori/demo";
 import { incrociaFonti } from "./incrocio";
 import { scioperoInData } from "@/lib/scioperi/scioperi";
+import { dopo } from "@/lib/eventi/registra";
+import { tinGuasto } from "@/lib/eventi/telegram";
 import { normalizzaData, normalizzaVolo } from "./normalizza";
 import type { FattoConPayload, FornitoreVoli } from "./tipi";
 
@@ -244,6 +246,20 @@ export async function verificaVolo(voloGrezzo: string, dataGrezza: string): Prom
   // ── Strato 2b: il fornitore ──────────────────────────────────────────
   if (!fatto) {
     const primario = fornitoreAttivo(volo.valore);
+    /* 🔴 ALLARME CHIAVE MANCANTE (audit 14/08): se un volo VERO viene servito
+       dalla demo, la chiave AeroDataBox manca o è scritta male su Netlify, e da
+       quel momento OGNI check esce "incerto" senza che nessuno lo sappia (è
+       stato il caso di FR4001). Un TIN sul telefono, silenziato a un quarto
+       d'ora come gli altri: mille check muti restano un messaggio solo. La demo
+       sui voli ZZ è voluta e non fa scattare niente. */
+    if (primario.nome === "demo" && !voloDimostrativo(volo.valore)) {
+      dopo(() =>
+        tinGuasto(
+          "aerodatabox-chiave",
+          'AeroDataBox non è configurato: un volo vero è stato servito dalla demo.\nLa chiave AERODATABOX_API_KEY manca o è sbagliata su Netlify, e i check escono tutti "non lo so". Da guardare adesso.',
+        ),
+      );
+    }
     fatto = await cercaCoalescata(primario, volo.valore, data.valore);
 
     if (!fatto) {
