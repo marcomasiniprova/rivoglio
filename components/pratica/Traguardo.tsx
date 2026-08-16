@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Trophy } from "lucide-react";
 
 /**
@@ -39,11 +39,8 @@ export default function Traguardo({
   famiglia: boolean;
 }) {
   const [pezzi, setPezzi] = useState<Pezzo[]>([]);
-  const fatto = useRef(false);
 
   useEffect(() => {
-    if (fatto.current) return;
-    fatto.current = true;
     // Chi ha chiesto meno movimento non riceve coriandoli.
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     // I coriandoli si generano nel browser (Math.random è lato client, ok).
