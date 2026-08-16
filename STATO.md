@@ -44,6 +44,62 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #76 (16/08): IL SECONDO COLLAUDO DI VALERIO. I CODICI CHE SI
+  BRUCIAVANO SULL'INCERTO, LA LETTERA CHE VENIVA PRIMA DEI SUOI PASSI, E IL
+  FLUSSO EMAIL PROVATO SUL DATABASE VERO.** Valerio ha ripercorso il
+  prodotto e alzato un pacco di cose in un messaggio. Quattro domande col
+  popup, poi i pezzi uno alla volta, ognuno verde prima del prossimo.
+  - 🔴 **I CODICI «NON FUNZIONAVANO» PERCHÉ SI BRUCIAVANO SULL'INCERTO.**
+    Diagnosi vera, non a naso: ho provato sul sito VERO un codice valido e
+    il cancello **l'ha accettato** (200, non 402). Il difetto stava dopo:
+    un codice riscattato veniva consumato ANCHE quando il verdetto usciva
+    «incerto» (che capita spessissimo). Il credito PAGATO in quel caso non
+    si consuma (CORTESIA_SU_INCERTO): ora il codice fa uguale. Chi riscatta
+    e si sente dire «non lo so» tiene il codice, e non legge più «già usato»
+    al secondo tentativo. Guardia statica sulla rotta
+    (`recensioni-buono.spec.ts`) perché non torni.
+    ⚠️ **Provando ho consumato io il codice di prova `RIV-8AAP9`** (unico
+    modo di sapere la verità): gli altri tre restano buoni.
+  - **LA PRATICA: PRIMA I DUE PASSI, POI LA LETTERA** (Valerio: «la lettera
+    deve essere fatta DOPO questi due passi, sennò diventano inutili»).
+    Nuovo `components/pratica/PreparaReclamo.tsx`: i due passi facoltativi
+    (carta d'imbarco, spese art. 9) vengono per primi, poi un bottone «Il
+    mio reclamo è pronto» PORTA alla lettera. ⚠️ **Non è il muro grigio del
+    12/08** che lui stesso fece togliere il 13/08: qui niente è bloccato, il
+    bottone porta avanti, e vale solo sul PRIMO reclamo (su replica ed ente
+    la lettera resta diretta). **Verificato che le spese (art.9) entrano
+    davvero nella lettera**: SpeseCura → `/cura` → `cura_richiesta` →
+    `generaReclamo` aggiunge il paragrafo (già coperto da `foglio.spec.ts`).
+  - **I BOTTONI «MI HANNO PAGATO / RISPOSTO NO» PIÙ ALTI** (h-13 → h-14),
+    con la spunta e la X.
+  - ✅ **IL FLUSSO EMAIL PROVATO SUL DATABASE VERO, POI PULITO** (scelta di
+    Valerio col popup). Cinque pratiche datate a mano ai giorni chiave,
+    fatte girare dal conto del cron dei follow-up, poi **cancellate**
+    (database tornato a 13 pratiche, zero residui). Sul dato reale: giorno
+    41 → NIENTE (non anticipa), 42 → sollecito, 56 → segnalazione all'ente,
+    90 → com'è andata + garanzia, e una pagata da 3 giorni mai inviata →
+    promemoria d'invio (T+2). Confermato anche che l'evento scritto blocca
+    il doppione. Prova permanente in `passi.spec.ts`: le soglie 42/56 della
+    PAGINA e del CRON vengono dalla stessa costante, così la data che
+    l'utente legge e il giorno dell'email non slittano separate.
+  - 🟡 **I CODICI CREATOR SONO FERMI, E ASPETTANO IL VENDITORE (scelta di
+    Valerio col popup).** Lo sconto vero sulla pratica passa per forza dalla
+    cassa del venditore (il prezzo vive nel prodotto Polar, noi non lo
+    calcoliamo); Polar ha detto no e non c'è nessun prodotto attivo, quindi
+    uno sconto non si può far pagare a nessuno. Si costruiscono col venditore
+    deciso, così lo sconto è vero dal primo giorno e non c'è impianto
+    dormiente da rifare. È la stessa decisione aperta della voce 2 di «Serve
+    Valerio».
+  - ⚠️ **LO STATO GIT DELLA SANDBOX SI È CONFUSO DUE VOLTE** (lo stesso
+    difetto del giro di consegna): i ref locali sono saltati a una storia
+    estranea (`27e2469`, un clone vecchio). Ogni volta la cura è la stessa:
+    `git ls-remote origin main` dice la verità, `git fetch` + `git reset
+    --hard origin/main` rimette a posto. Il lavoro è sempre stato salvo su
+    GitHub. Chi lavora da qui: controllare `HEAD == origin/main` PRIMA di
+    ogni commit.
+  - Prove: **verify verde** a ogni pezzo (build, tipi, lint, 1651 prove).
+    Le nuove: la guardia sull'incerto (`recensioni-buono.spec.ts`) e le
+    quattro sul calendario del silenzio (`passi.spec.ts`).
 - **GIRO #75 (15/08): IL BUONO A CODICE, LA GARANZIA COL NO SCRITTO, E IL
   BANCONE PULITO PER IL PASSAGGIO IN LOCALE.** Valerio prepara una sessione
   di Claude che gira **in locale sul suo PC**: clonerà la repo e ripartirà
