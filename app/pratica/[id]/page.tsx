@@ -40,6 +40,7 @@ import {
 import { COPY } from "@/lib/copy";
 import LasciaRecensione from "@/components/rivolio/LasciaRecensione";
 import DichiaraEsito from "@/components/pratica/DichiaraEsito";
+import Traguardo from "@/components/pratica/Traguardo";
 
 /**
  * Il tracker della pratica: la linea del tempo dagli eventi, lo stato
@@ -239,6 +240,11 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
     riga: stato?.nome ?? "La tua pratica",
   };
   const attesa = attesaDopoInvio(pratica.inviata_il, pratica.stato);
+  /* LA PRATICA VINTA (la compagnia ha pagato): è il traguardo, e la
+     schermata cambia mestiere (Valerio, 16/08). Via la garanzia, «come
+     mai», il fascicolo: non servono più. Al loro posto la festa. */
+  const vinta = pratica.stato === "esito_pagata";
+  const chiusa = ["esito_pagata", "esito_rifiutata", "rimborsata"].includes(pratica.stato);
   /* IL FASCICOLO (scelta di Valerio col popup, 13/08). Lo stesso che
      legge l'AI prima di scrivere una replica: se lo mostriamo a lei e non
      a lui, la trasparenza che vendiamo si ferma alla porta di casa. */
@@ -370,14 +376,29 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
 
       <BarraPassi passi={percorso.passi} />
 
-      {/* ------------------------------------------------ dove siamo */}
+      {/* ------------------------------------------------ il traguardo (vinta) */}
+      {vinta && (
+        <Traguardo
+          importoTesto={pratica.importo_fascia ? `${pratica.importo_fascia}€` : null}
+          famiglia={pratica.tipo === "famiglia"}
+        />
+      )}
+
+      {/* ------------------------------------------------ dove siamo
+          🔴 Sparisce a pratica VINTA: lì comanda la festa, e «In attesa» +
+          garanzia + «come mai» sono rumore su una cosa finita bene
+          (Valerio, 16/08). */}
+      {!vinta && (
       <section className="rounded-2xl border border-bordo bg-white px-6 py-6">
         <p
           className={`text-[0.7rem] font-medium uppercase tracking-[0.16em] ${
             passoDelMomento.tocca ? "text-verde" : "text-fumo-2"
           }`}
         >
-          {passoDelMomento.tocca ? "Tocca a te" : "In attesa"}
+          {/* 🔴 «In attesa» su una pratica CHIUSA era assurdo (Valerio,
+              16/08: «che cazzo attesa quando la pratica è finita»). Ora una
+              pratica chiusa dice «Chiusa». */}
+          {passoDelMomento.tocca ? "Tocca a te" : chiusa ? "Chiusa" : "In attesa"}
         </p>
         <h2 className="mt-2 font-display text-2xl leading-tight tracking-[-0.03em]">
           {passoDelMomento.riga}
@@ -540,16 +561,22 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
             notava, ma arrivava dopo la cronologia, cioè dopo che uno
             aveva già finito di preoccuparsi. Qui sta nel punto in cui
             guardi a che punto sei, che è quando la domanda "e se non
-            pagano?" te la fai davvero. */}
-        <p className="mt-5 flex items-start gap-2 border-t border-bordo pt-4 text-sm leading-relaxed text-fumo">
-          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
-          <span>
-            {pratica.garanzia_fino_al
-              ? riempi(C.garanzia.template, { data: dataItArticolo(pratica.garanzia_fino_al) })
-              : C.garanzia.senzaData}
-          </span>
-        </p>
+            pagano?" te la fai davvero.
+            🔴 SPARISCE A PRATICA CHIUSA (Valerio, 16/08): se ti hanno
+            pagato, o se ti abbiamo già rimborsato, «ti rimborsiamo se non
+            pagano» è una promessa che non ha più senso. */}
+        {!chiusa && (
+          <p className="mt-5 flex items-start gap-2 border-t border-bordo pt-4 text-sm leading-relaxed text-fumo">
+            <ShieldCheck className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
+            <span>
+              {pratica.garanzia_fino_al
+                ? riempi(C.garanzia.template, { data: dataItArticolo(pratica.garanzia_fino_al) })
+                : C.garanzia.senzaData}
+            </span>
+          </p>
+        )}
       </section>
+      )}
 
       {/* IL TRAGUARDO: solo l'utente sa se i soldi sono arrivati sul suo
           conto (la compagnia paga lui, non noi). Compare appena il reclamo
@@ -569,6 +596,9 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           /* La garanzia parte solo se il no è un DOCUMENTO vero caricato,
              non testo scritto a mano (anti-frode, Valerio 15/08). */
           rifiutoProvato={eventi.some((e) => e.tipo === EVENTO_RIFIUTO_DOCUMENTO)}
+          /* Il rimborso è l'ultima spiaggia: si sblocca solo dopo che
+             l'utente ha mandato almeno una replica (Valerio, 16/08). */
+          haCombattuto={percorso.giri.replicheMandate > 0}
           giaDichiarato={pratica.rifiuto_motivo ?? null}
           etichettaScelta={schedaRifiuto(pratica.rifiuto_motivo)?.etichetta ?? null}
           nuovoGiro={percorso.giri.no > 0 && percorso.giri.no === percorso.giri.replicheMandate}
@@ -586,7 +616,10 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           due «Il fascicolo del tuo caso» uno dentro l'altro, uno che
           diceva «chiudi» e uno «×». Tolto il guscio: il componente si
           apre e si chiude da solo. */}
-      <Fascicolo dossier={dossier} />
+      {/* 🔴 SPARISCE A PRATICA VINTA (Valerio, 16/08: «è tutto chiuso, non
+          servono altri box»). Il fascicolo serve mentre si combatte, non
+          dopo aver vinto. */}
+      {!vinta && <Fascicolo dossier={dossier} />}
 
       {/* ------------------------------------------------ come si invia */}
       {R.istruzioni && (

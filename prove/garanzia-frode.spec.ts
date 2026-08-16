@@ -64,14 +64,31 @@ test.describe("La garanzia esige un documento vero, non testo scritto a mano", (
     expect(riga).toContain("base64");
   });
 
-  test("il bottone della garanzia compare solo col rifiuto PROVATO da documento", () => {
+  test("il bottone della garanzia compare solo con documento PROVATO e dopo aver combattuto", () => {
     const c = senzaCommenti(leggi("components/pratica/DichiaraEsito.tsx"));
-    /* Il ramo che mostra il bottone del rimborso guarda `rifiutoProvato`,
-       non il solo `rifiutoRegistrato`. */
+    /* Il ramo che mostra il bottone del rimborso guarda `rifiutoProvato` E
+       `haCombattuto`: documento vero, e replica già mandata. */
     expect(c).toContain("rifiutoProvato");
+    expect(c).toContain("haCombattuto");
     const iBottone = c.indexOf('dichiara("non_pagata")');
-    const iProvato = c.indexOf("rifiutoProvato ?");
-    expect(iProvato, "il bottone non è più dietro rifiutoProvato").toBeGreaterThan(-1);
-    expect(iProvato, "il gate del documento sta prima del bottone").toBeLessThan(iBottone);
+    const iGate = c.indexOf("rifiutoProvato && haCombattuto");
+    expect(iGate, "il bottone non è più dietro rifiutoProvato && haCombattuto").toBeGreaterThan(-1);
+    expect(iGate, "il gate sta prima del bottone").toBeLessThan(iBottone);
+  });
+
+  test("🔴 il rimborso è l'ultima spiaggia: serve prima una replica mandata", () => {
+    /* Valerio, 16/08: «se è il primo no rimborsiamo già? deve arrivare dopo
+       aver combattuto». Il server pretende l'evento della replica inviata
+       PRIMA di concedere il rimborso: se qualcuno toglie il gate, la suite
+       si ferma. */
+    const r = senzaCommenti(leggi("app/api/pratiche/[id]/esito/route.ts"));
+    expect(r).toContain("ultima spiaggia");
+    const iCheck = r.lastIndexOf("EVENTO_REPLICA_INVIATA");
+    /* `lastIndexOf`: la stringa "esito_rifiutata" compare anche nell'array
+       GIA_CHIUSA in cima al file (prima del gate). A noi serve l'ULTIMA
+       occorrenza, cioè la transizione vera che concede il rimborso. */
+    const iTransizione = r.lastIndexOf('"esito_rifiutata"');
+    expect(iCheck, "il gate della replica non c'è").toBeGreaterThan(-1);
+    expect(iCheck, "la replica si controlla PRIMA del rimborso").toBeLessThan(iTransizione);
   });
 });

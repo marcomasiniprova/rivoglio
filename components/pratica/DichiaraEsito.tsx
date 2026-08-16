@@ -32,6 +32,7 @@ export default function DichiaraEsito({
   praticaId,
   rifiutoRegistrato = false,
   rifiutoProvato = false,
+  haCombattuto = false,
   giaDichiarato = null,
   etichettaScelta = null,
   nuovoGiro = false,
@@ -42,6 +43,9 @@ export default function DichiaraEsito({
   /** Vero se il no è arrivato come DOCUMENTO vero (foto/email), non testo
    *  scritto a mano: è quello che fa scattare la garanzia (anti-frode). */
   rifiutoProvato?: boolean;
+  /** Vero se l'utente ha già mandato almeno una replica: il rimborso è
+   *  l'ultima spiaggia, si sblocca solo dopo aver combattuto (Valerio 16/08). */
+  haCombattuto?: boolean;
   giaDichiarato?: string | null;
   etichettaScelta?: string | null;
   nuovoGiro?: boolean;
@@ -139,16 +143,18 @@ export default function DichiaraEsito({
             nuovoGiro={nuovoGiro}
           />
 
-          {/* LA CHIUSURA CON GARANZIA compare SOLO se il no è un DOCUMENTO
-              vero caricato (foto/email): è il paletto anti-frode. Un no
-              scritto a mano prepara la replica ma NON fa scattare il
-              rimborso (Valerio, 15/08: «metto testo semplice e mi dà il
-              rimborso»). Il server lo ricontrolla comunque. */}
-          {rifiutoProvato ? (
+          {/* LA CHIUSURA CON GARANZIA È L'ULTIMA SPIAGGIA, e compare a due
+              condizioni (Valerio, 15 e 16/08):
+              1. il no è un DOCUMENTO vero caricato (foto/email), non testo
+                 scritto a mano: è il paletto anti-frode;
+              2. hai già MANDATO la replica al loro no: il rimborso arriva
+                 DOPO aver combattuto, non al primo no (spesso il no cade
+                 proprio alla replica). Il server ricontrolla entrambe. */}
+          {rifiutoProvato && haCombattuto ? (
             <div className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5">
               <p className="text-[0.95rem] leading-relaxed text-inchiostro">
-                Se dopo la replica e i solleciti non hai visto un euro, chiudo la pratica e faccio
-                partire la garanzia: ti rimborsiamo i 14,90 che hai pagato.
+                Hai mandato la replica e non hanno pagato lo stesso? Allora chiudo la pratica e
+                faccio partire la garanzia: ti rimborsiamo i 14,90 che hai pagato.
               </p>
               {/* ⚠️ h-auto + whitespace-normal: prima il testo era su una
                   riga sola e si tagliava ai bordi sul telefono (Valerio,
@@ -163,6 +169,14 @@ export default function DichiaraEsito({
                 {inCorso ? "Un attimo…" : "Chiudi e chiedi il rimborso (14,90€)"}
               </Button>
             </div>
+          ) : rifiutoProvato ? (
+            /* Ha caricato il no ma non ha ancora combattuto: la strada è la
+               replica, non il rimborso. */
+            <p className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5 text-[0.9rem] leading-relaxed text-fumo">
+              Il rimborso è l&apos;ultima spiaggia. Prima manda la replica qui sopra: spessissimo il
+              loro no cade proprio lì. Se dopo la replica non pagano lo stesso, la garanzia dei
+              14,90€ scatta da sola.
+            </p>
           ) : rifiutoRegistrato ? (
             <p className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5 text-[0.9rem] leading-relaxed text-fumo">
               Per far partire la garanzia dei 14,90€ serve la risposta VERA della compagnia:

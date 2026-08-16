@@ -451,6 +451,30 @@ details[open] .faq-risposta {
   }
 }
 
+/* I coriandoli del traguardo: cadono dall'alto ruotando e sfumano. La
+   componente non li genera nemmeno se si è chiesto meno movimento, questa
+   è la seconda rete. */
+.traguardo-coriandolo {
+  animation-name: traguardo-cadi;
+  animation-timing-function: cubic-bezier(0.35, 0.2, 0.6, 1);
+  animation-fill-mode: forwards;
+}
+@keyframes traguardo-cadi {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(440px) rotate(560deg);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .traguardo-coriandolo {
+    display: none;
+  }
+}
+
 /* Le card delle pratiche entrano in fila, 50ms l'una dall'altra. */
 .pratica-entra {
   animation: pratica-entra 0.3s var(--curva-fuori) backwards;

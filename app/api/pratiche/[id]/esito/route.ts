@@ -4,6 +4,7 @@ import { utenteDaRichiesta } from "@/lib/api/utente";
 import { SERVIZIO_ATTIVO } from "@/lib/supabase/servizio";
 import { caricaPratica, eventiPratica, transizionePratica } from "@/lib/pratiche/pratiche";
 import { EVENTO_RIFIUTO_DOCUMENTO } from "@/lib/pratiche/dossier";
+import { EVENTO_REPLICA_INVIATA } from "@/lib/pratiche/passi";
 import { tin } from "@/lib/eventi/telegram";
 
 /**
@@ -127,6 +128,23 @@ export async function POST(req: Request, contesto: { params: Promise<{ id: strin
         {
           errore:
             "Per la garanzia serve la risposta VERA della compagnia: carica la foto o l'email del loro no («Carica lo screenshot»). Il testo scritto a mano prepara la replica, ma non basta per il rimborso.",
+        },
+        { status: 409, headers: CORS },
+      );
+    }
+
+    /* 🔴 IL RIMBORSO È L'ULTIMA SPIAGGIA, NON LA PRIMA (Valerio, 16/08: «se
+       è il primo no rimborsiamo già? deve arrivare DOPO aver combattuto»).
+       Prima di restituire i 14,90 la persona deve aver MANDATO la replica
+       al loro no: spessissimo il no cade proprio lì (stavano solo misurando
+       il ritardo alla partenza invece che all'arrivo). Solo se dopo la
+       replica non pagano lo stesso la garanzia entra in gioco. Il controllo
+       sta anche qui sul server, non solo nella UI. */
+    if (!eventi.some((e) => e.tipo === EVENTO_REPLICA_INVIATA)) {
+      return NextResponse.json(
+        {
+          errore:
+            "Il rimborso è l'ultima spiaggia: prima manda la replica al loro no (spesso basta quella). Se dopo la replica non pagano lo stesso, allora la garanzia scatta.",
         },
         { status: 409, headers: CORS },
       );
