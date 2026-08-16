@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { EVENTO_REPLICA_INVIATA, giriDiNo, percorsoPratica } from "../lib/pratiche/passi";
 import { EVENTO_CARICATO, EVENTO_SALTATO } from "../lib/pratiche/documenti";
 import type { EventoPratica, StatoPratica } from "../lib/pratiche/pratiche";
+import { GIORNI_PRIMA_DEL_SOLLECITO, GIORNI_PRIMA_DELL_ENTE } from "../lib/pratiche/rifiuto";
 
 /**
  * I PALETTI DELLA PRATICA.
@@ -290,5 +291,52 @@ test.describe("I giri di «no» sono illimitati", () => {
       const staAspettando = p.attivo === "attesa";
       expect(qualcosaDaFare || staAspettando, `${stato} è un vicolo cieco`).toBe(true);
     }
+  });
+});
+
+/**
+ * IL CALENDARIO DEL SILENZIO: gli stessi giorni per la pagina e per il cron.
+ *
+ * Il flusso email dopo l'invio del reclamo (Valerio, 15/08: «mi spieghi
+ * qual è il flusso? funziona davvero?»). L'ho provato sul database vero, con
+ * pratiche datate a mano ai giorni chiave, e poi cancellate: al giorno 42
+ * scatta il sollecito, al 56 la segnalazione all'ente, al 90 la garanzia; al
+ * 41 NON scatta niente (non parte in anticipo). Qui quel comportamento
+ * diventa una prova permanente, così i conti non slittano in silenzio.
+ *
+ * I giorni sono UNA costante sola (lib/pratiche/rifiuto.ts): la pagina della
+ * pratica e il cron dei follow-up (app/api/motore/segui) la leggono da lì.
+ * Se uno dei due scrivesse "42" a mano, la pagina e l'email potrebbero
+ * scattare in due giorni diversi, e l'utente leggerebbe una data e ne
+ * riceverebbe un'altra.
+ */
+test.describe("Il calendario del silenzio: pagina e cron sugli stessi giorni", () => {
+  const ENTE = GIORNI_PRIMA_DEL_SOLLECITO + GIORNI_PRIMA_DELL_ENTE;
+
+  test("un giorno prima del sollecito la palla è ancora loro, e non si scrive niente", () => {
+    const p = percorsoPratica("inviata", [], null, GIORNI_PRIMA_DEL_SOLLECITO - 1);
+    expect(p.attivo).toBe("attesa");
+    expect(p.chiaveTesto).toBe("inviata");
+  });
+
+  test("al giorno del sollecito la pagina lo dichiara pronto", () => {
+    const p = percorsoPratica("inviata", [], null, GIORNI_PRIMA_DEL_SOLLECITO);
+    expect(p.chiaveTesto).toBe("sollecito");
+  });
+
+  test("al giorno dell'ente la pagina passa alla segnalazione", () => {
+    const p = percorsoPratica("inviata", [], null, ENTE);
+    expect(p.chiaveTesto).toBe("enac");
+  });
+
+  test("il cron dei follow-up usa le STESSE costanti, non giorni scritti a mano", () => {
+    const cron = readFileSync(join(process.cwd(), "app/api/motore/segui/route.ts"), "utf8");
+    expect(cron).toContain("GIORNI_PRIMA_DEL_SOLLECITO");
+    expect(cron).toContain("GIORNI_PRIMA_DELL_ENTE");
+    expect(cron).toContain("GIORNI_PRIMA_DELL_ESITO");
+    // Nessuna soglia di giorni copiata a mano: la fonte è una sola.
+    expect(cron).not.toMatch(/>=\s*42\b/);
+    expect(cron).not.toMatch(/>=\s*56\b/);
+    expect(cron).not.toMatch(/>=\s*90\b/);
   });
 });
