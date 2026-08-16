@@ -43,6 +43,10 @@ export type Conciliazione = {
   sigla?: string;
   /** Dove si va, l'unico indirizzo che deve aprire l'utente. */
   url: string;
+  /** L'etichetta del bottone: il nome che l'utente riconosce (la
+   *  piattaforma vera), non la sigla dell'ente. «Apri ART» non lo capiva
+   *  nessuno (Valerio, 16/08). */
+  bottone: string;
   /** Il titolo del riquadro: parla del risultato, non dell'ente. */
   titolo: string;
   /** Due righe che dicono perché questo passo è diverso dagli altri. */
@@ -68,6 +72,7 @@ export function conciliazioneArt(): Conciliazione {
     nome: "Autorità di regolazione dei trasporti",
     sigla: "ART",
     url: "https://www.autorita-trasporti.it/conciliaweb/",
+    bottone: "Vai su ConciliaWeb",
     titolo: "La conciliazione: gratis, online, e questa i soldi li muove",
     premessa:
       "La segnalazione all'ente serve a far accertare la violazione, ma il pagamento non lo dispone lui. La conciliazione è l'altra strada, ed è quella dove si tratta di soldi: la apri tu su una piattaforma pubblica, non costa niente e la compagnia si siede, perché è un passaggio previsto prima di una causa.",
@@ -101,6 +106,7 @@ export function conciliazioneEstero(paese: string): Conciliazione {
     nome: "Centro Europeo Consumatori Italia",
     sigla: "ECC-Net",
     url: "https://ecc-netitalia.it/",
+    bottone: "Vai al Centro Europeo Consumatori",
     titolo: "La strada gratuita quando la compagnia è all'estero",
     premessa: `Il tuo volo è partito da ${paese}, quindi la conciliazione italiana potrebbe non coprirlo. Quello che copre di sicuro una controversia con una compagnia di un altro paese dell'Unione è la rete dei centri europei consumatori: assistenza gratuita, e si occupano proprio di questo.`,
     passi: [

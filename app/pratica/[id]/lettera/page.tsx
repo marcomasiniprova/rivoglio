@@ -630,7 +630,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
       {attuale.chiave === "replica" && sollecito && (
         <section className="no-stampa rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-6">
           <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde">
-            Il secondo colpo
+            Il passo dopo il reclamo
           </p>
           <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-verde-notte/85">
             {scheda && scheda.motivo !== "silenzio"
@@ -706,13 +706,16 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           settimane prima che servissero. Adesso compaiono quando l'ente è
           davvero il passo del momento. */}
       {attuale.chiave === "ente" && (
-      <details className="no-stampa group rounded-2xl border border-bordo bg-white px-6 py-4">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-1 font-display text-lg tracking-[-0.03em] marker:hidden">
-          {organismo.titolo}
-          <span aria-hidden="true" className="text-fumo-2 transition-transform group-open:rotate-45">
-            +
-          </span>
-        </summary>
+      <section className="no-stampa rounded-2xl border border-bordo bg-white px-6 py-6">
+        {/* 🔴 NON PIÙ UN ACCORDION CHIUSO. Valerio, 16/08: «ENAC dove sta?
+            mettiamolo fuori». Era dentro un <details> chiuso: le istruzioni
+            per l'ente c'erano ma nascoste dietro un «+». Adesso è una
+            sezione aperta, con un titolo umano. Compare comunque solo
+            quando l'ente è il passo del momento, come chiese lui il 13/08. */}
+        <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde">
+          Se la compagnia non si muove
+        </p>
+        <h2 className="mt-2 font-display text-lg tracking-[-0.03em]">{organismo.titolo}</h2>
         <p className="mt-3 text-[0.95rem] leading-relaxed text-fumo">{organismo.premessa}</p>
         <ol className="mt-3 flex list-none flex-col gap-2 text-[0.95rem] leading-relaxed text-fumo">
           {organismo.passi.map((passo, i) => (
@@ -743,14 +746,14 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           </a>
         </div>
         <p className="mt-4 text-sm leading-relaxed text-fumo-2">{organismo.avvertenza}</p>
-      </details>
+      </section>
       )}
 
       {/* ------ quando l'ente è il documento di adesso, si dice cos'è */}
       {attuale.chiave === "ente" && (
         <section className="no-stampa rounded-2xl border border-sole/40 bg-sole/10 px-6 py-6">
           <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-inchiostro/60">
-            Il terzo colpo
+            Cosa fa l&apos;ente, davvero
           </p>
           <p className="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-inchiostro/80">
             È il passo che le compagnie non ignorano: l&apos;ente accerta la violazione e può
@@ -814,11 +817,11 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         </details>
       )}
 
-      {/* ------------------------------------------- il quarto colpo */}
+      {/* --------------------------- la conciliazione (la strada che paga) */}
       {conciliazione && (
         <section className="no-stampa rounded-2xl border border-verde/25 bg-verde/[0.06] px-6 py-7 sm:px-8">
           <p className="text-[0.7rem] font-medium uppercase tracking-[0.16em] text-verde-scuro">
-            Il quarto colpo
+            La strada che fa pagare
           </p>
           <h2 className="mt-2 font-display text-xl tracking-[-0.03em]">{conciliazione.titolo}</h2>
           <p className="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-inchiostro/80">
@@ -859,7 +862,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Button asChild>
               <a href={conciliazione.url} target="_blank" rel="noopener noreferrer">
-                Apri {conciliazione.sigla ?? conciliazione.nome}
+                {conciliazione.bottone}
                 <ExternalLink className="size-4" aria-hidden="true" />
               </a>
             </Button>
