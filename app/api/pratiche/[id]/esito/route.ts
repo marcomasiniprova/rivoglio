@@ -5,6 +5,7 @@ import { SERVIZIO_ATTIVO } from "@/lib/supabase/servizio";
 import { caricaPratica, eventiPratica, transizionePratica } from "@/lib/pratiche/pratiche";
 import { EVENTO_RIFIUTO_DOCUMENTO } from "@/lib/pratiche/dossier";
 import { EVENTO_REPLICA_INVIATA } from "@/lib/pratiche/passi";
+import { euro, rimborsoGaranzia } from "@/lib/prezzi";
 import { tin } from "@/lib/eventi/telegram";
 
 /**
@@ -158,9 +159,10 @@ export async function POST(req: Request, contesto: { params: Promise<{ id: strin
     if (!r.ok) {
       return NextResponse.json({ errore: "Non sono riuscito a salvare. Riprova." }, { status: 503, headers: CORS });
     }
-    // Garanzia da processare a mano: qualcuno deve rimborsare i 14,90.
+    // Garanzia da processare a mano: qualcuno deve rimborsare quello che ha
+    // pagato (14,90 singola, 29,90 famiglia), non un numero fisso.
     void tin(
-      `⚠️ GARANZIA da valutare: l'utente dichiara che la compagnia NON ha pagato. Da controllare e rimborsare la pratica (14,90€). Pratica ${id}.`,
+      `⚠️ GARANZIA da valutare: l'utente dichiara che la compagnia NON ha pagato. Da controllare e rimborsare la pratica (${euro(rimborsoGaranzia(pratica.tipo))}). Pratica ${id}.`,
     );
     return NextResponse.json({ ok: true, stato: "esito_rifiutata" }, { headers: CORS });
   } catch (e) {

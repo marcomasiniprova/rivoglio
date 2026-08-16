@@ -64,7 +64,7 @@ export default function PaginaCondizioni() {
           un passeggero, il sollecito, le istruzioni ENAC e il tracker della pratica.
         </li>
         <li>
-          <strong>Pratica famiglia, 24,90 euro</strong>: lo stesso, per lo stesso volo, fino
+          <strong>Pratica famiglia, 29,90 euro</strong>: lo stesso, per lo stesso volo, fino
           a 5 passeggeri.
         </li>
       </ul>

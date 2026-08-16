@@ -30,15 +30,16 @@ import {
   adesso,
   dataConGiorno,
   dataIt,
-  dataItArticolo,
   dataOraIt,
   fraQuanto,
   giorniDaQuando,
   giorniFra,
   giornoPiu,
 } from "@/lib/tempo";
+import { euro, rimborsoGaranzia } from "@/lib/prezzi";
 import { COPY } from "@/lib/copy";
 import LasciaRecensione from "@/components/rivolio/LasciaRecensione";
+import { eventoGiaRecensito } from "@/lib/recensioni/recensioni";
 import DichiaraEsito from "@/components/pratica/DichiaraEsito";
 import Traguardo from "@/components/pratica/Traguardo";
 import ProvaPagamento from "@/components/pratica/ProvaPagamento";
@@ -192,6 +193,11 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
     : { data: null };
 
   const eventi = await eventiPratica(pratica.id);
+  /* Il box recensione non deve ricomparire a chi ha già recensito questa
+     pratica: prima mostrava sempre il form vuoto e lo diceva «l'avevi già
+     recensita» solo DOPO che lo riscrivevi e premevi invia (Valerio, 16/08).
+     Ora lo chiediamo al server e, se c'è già, non lo riproponiamo. */
+  const giaRecensito = await eventoGiaRecensito("pratica", pratica.id);
 
   const C = COPY.pratica;
   const etichetteEventi: Record<string, string> = C.lineaTempo.eventi;
@@ -246,6 +252,10 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
      mai», il fascicolo: non servono più. Al loro posto la festa. */
   const vinta = pratica.stato === "esito_pagata";
   const chiusa = ["esito_pagata", "esito_rifiutata", "rimborsata"].includes(pratica.stato);
+  /* Quanto rimborsa la garanzia se la compagnia non paga: è quello che ha
+     versato DAVVERO per questa pratica (14,90 singola, 29,90 famiglia), non
+     più il "14,90" fisso che alla famiglia prometteva meno del pagato. */
+  const rimborsoTesto = euro(rimborsoGaranzia(pratica.tipo));
   /* IL FASCICOLO (scelta di Valerio col popup, 13/08). Lo stesso che
      legge l'AI prima di scrivere una replica: se lo mostriamo a lei e non
      a lui, la trasparenza che vendiamo si ferma alla porta di casa. */
@@ -573,11 +583,7 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
         {!chiusa && (
           <p className="mt-5 flex items-start gap-2 border-t border-bordo pt-4 text-sm leading-relaxed text-fumo">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
-            <span>
-              {pratica.garanzia_fino_al
-                ? riempi(C.garanzia.template, { data: dataItArticolo(pratica.garanzia_fino_al) })
-                : C.garanzia.senzaData}
-            </span>
+            <span>{riempi(C.garanzia.template, { importo: rimborsoTesto })}</span>
           </p>
         )}
       </section>
@@ -597,6 +603,7 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
       {["inviata", "sollecito", "enac"].includes(pratica.stato) && (
         <DichiaraEsito
           praticaId={pratica.id}
+          importoRimborso={rimborsoTesto}
           rifiutoRegistrato={Boolean(pratica.rifiuto_motivo)}
           /* La garanzia parte solo se il no è un DOCUMENTO vero caricato,
              non testo scritto a mano (anti-frode, Valerio 15/08). */
@@ -660,12 +667,19 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
 
       {/* La recensione della pratica: chi è arrivato qui ha pagato, quindi
           ha un'esperienza vera da raccontare. Una per pratica (indice unico),
-          e sblocca un'analisi gratis. */}
-      <LasciaRecensione
-        eventoTipo="pratica"
-        eventoRif={pratica.id}
-        titolo="Com'è andata con Rivolio? Lascia una recensione"
-      />
+          e sblocca un'analisi gratis.
+          🔴 NON RICOMPARE A CHI HA GIÀ RECENSITO (Valerio, 16/08): prima il
+          form vuoto tornava su ogni stato della pratica, e sulla vinta stava
+          accanto a «carica la foto dell'accredito», due richieste in fila.
+          Ora se la pratica è già recensita il box sparisce, e sulla vinta
+          resta la sola foto dell'accredito. */}
+      {!giaRecensito && (
+        <LasciaRecensione
+          eventoTipo="pratica"
+          eventoRif={pratica.id}
+          titolo="Com'è andata con Rivolio? Lascia una recensione"
+        />
+      )}
 
       <Link
         href="/app"

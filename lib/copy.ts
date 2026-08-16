@@ -1345,13 +1345,19 @@ export const COPY = {
        all'indirizzo che trovi nella lettera». Ma la pagina della lettera
        fa già tutto col bottone: apre la tua email GIÀ SCRITTA, e per le
        compagnie senza email (Ryanair, easyJet, Wizz) copia il testo e
-       apre il loro modulo ufficiale. E l'unico campo da mettere è l'IBAN.
+       apre il loro modulo ufficiale.
+       ⚠️ I CAMPI DA METTERE SONO DUE, NON UNO (Valerio, 16/08). Prima qui
+       (e nel passo 2) si diceva «l'unico campo è l'IBAN», ma la lettera
+       porta anche «[Nome e cognome]» come segnaposto (firma e intestatario
+       del conto): l'account ha solo l'email, non il nome, quindi il nome
+       resta da compilare. La pagina della lettera lo diceva già giusto
+       («IBAN e il tuo nome»); qui no, e si contraddicevano. Ora combaciano.
        Adesso i passi dicono quello che succede davvero. */
     istruzioniInvio: {
       titolo: "Come si invia, in 2 minuti",
       passi: [
         "Premi \"Apri la lettera\": è già scritta, col destinatario giusto",
-        "Metti il tuo IBAN dove la lettera lo chiede: è l'unico campo tuo",
+        "Metti il tuo IBAN e il tuo nome dove la lettera li chiede: sono i campi da compilare",
         "Premi il bottone verde: si apre la tua email col reclamo dentro (con alcune compagnie si copia il testo e si apre il loro modulo ufficiale)",
         "Allega la carta d'imbarco, premi Invia, poi torna qui e premi \"Ho inviato il reclamo\"",
       ],
@@ -1372,14 +1378,18 @@ export const COPY = {
 
     garanzia: {
       titolo: "La garanzia",
-      /** {data} = garanzia_fino_al della pratica, articolo compreso
-       *  (`dataItArticolo`): in italiano davanti all'8 e all'11
-       *  l'articolo si elide, e scriverlo a mano qui dentro produceva
-       *  «entro il 11 novembre». */
+      /* ⚠️ NIENTE DATA, NIENTE «SENZA MODULI» (Valerio, 16/08). Prima qui
+         c'era «Se entro il 14 novembre la compagnia non ti ha pagato, ti
+         rimborsiamo, senza moduli da compilare»: una promessa di rimborso
+         AUTOMATICO a scadenza, che il sistema non mantiene. Il rimborso
+         scatta solo dopo un no scritto della compagnia caricato come
+         documento E la replica mandata (gate in /api/pratiche/[id]/esito).
+         Dirlo a data fissa e «senza moduli» era un falso positivo sui
+         soldi. Ora la riga dice la verità, e combacia col box «come è
+         andata». {importo} è quello che ha pagato davvero, per tipo di
+         pratica (14,90 o 29,90), mai un numero scritto a mano. */
       template:
-        "Se entro {data} la compagnia non ti ha pagato, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
-      senzaData:
-        "Se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di legge, ti rimborsiamo la pratica per intero. Il rimborso parte da noi, senza moduli da compilare.",
+        "Se la compagnia rifiuta senza un motivo valido, o non risponde nei termini, dopo che hai mandato la replica al loro no ti rimborsiamo per intero i {importo} che hai pagato.",
     },
 
     scadenza: {

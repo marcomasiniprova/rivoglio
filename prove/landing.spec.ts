@@ -79,7 +79,7 @@ test.describe("Landing page", () => {
        `toContainText` riprova finché non trova, entro il suo tempo. */
     // i due prezzi chiusi in SPEC §5
     await expect(prezzi).toContainText("14,90€");
-    await expect(prezzi).toContainText("24,90€");
+    await expect(prezzi).toContainText("29,90€");
 
     // il conto del confronto coi portali a percentuale: la somma regge
     await expect(prezzi).toContainText("210€");

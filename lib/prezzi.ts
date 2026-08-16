@@ -65,7 +65,7 @@ export function euro(n: number): string {
 }
 
 export const LISTINI: Record<Variante, Listino> = {
-  a: listino(14.9, 24.9),
+  a: listino(14.9, 29.9),
   b: listino(24.9, 39.9),
 };
 
@@ -106,4 +106,22 @@ export function confronto(listino: Listino) {
     trattenutoNostro: listino.singola,
     restanoNostro: Math.round((compensazione - listino.singola) * 100) / 100,
   };
+}
+
+/**
+ * Quanto ha pagato IN TUTTO chi ha aperto questa pratica, ed è la cifra che
+ * la garanzia rimborsa se la compagnia non paga.
+ *
+ * Il totale del percorso è sempre il prezzo pieno del listino (i 1,99 del
+ * check si scalano dalla pratica, non si aggiungono): quindi il rimborso è
+ * `listino.singola` (14,90) o `listino.famiglia` (29,90), non un numero
+ * scritto a mano che il giorno di un cambio prezzo diverge in silenzio.
+ * Prima "14,90" era fisso in quattro punti: la famiglia si vedeva promettere
+ * meno del versato.
+ */
+export function rimborsoGaranzia(
+  tipo: "singola" | "famiglia",
+  listino: Listino = LISTINO_BASE,
+): number {
+  return tipo === "famiglia" ? listino.famiglia : listino.singola;
 }

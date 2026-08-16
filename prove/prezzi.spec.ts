@@ -13,7 +13,7 @@ import { COOKIE_PREZZO, LISTINI, confronto, euro, listinoDi, varianteValida } fr
 test.describe("I due listini", () => {
   test("le cifre sono quelle decise, scritte in italiano", () => {
     expect(LISTINI.a.singolaTesto).toBe("14,90€");
-    expect(LISTINI.a.famigliaTesto).toBe("24,90€");
+    expect(LISTINI.a.famigliaTesto).toBe("29,90€");
     expect(LISTINI.b.singolaTesto).toBe("24,90€");
     expect(LISTINI.b.famigliaTesto).toBe("39,90€");
     // mai il punto decimale all'inglese

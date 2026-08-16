@@ -16,7 +16,7 @@ import type { Variante } from "@/lib/prezzi";
 /* ------------------------------------------------------- checkout link */
 
 /**
- * I due checkout link (pratica 14,90€ · famiglia 24,90€) si creano a mano
+ * I due checkout link (pratica 14,90€ · famiglia 29,90€) si creano a mano
  * nel pannello Polar e si mettono qui come URL COMPLETI. Sono l'unico SKU
  * doppio del prodotto: niente altri (SPEC §5).
  */

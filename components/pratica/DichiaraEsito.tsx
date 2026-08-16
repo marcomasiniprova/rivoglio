@@ -30,6 +30,7 @@ import DichiaraRifiuto from "./DichiaraRifiuto";
  */
 export default function DichiaraEsito({
   praticaId,
+  importoRimborso,
   rifiutoRegistrato = false,
   rifiutoProvato = false,
   haCombattuto = false,
@@ -38,6 +39,11 @@ export default function DichiaraEsito({
   nuovoGiro = false,
 }: {
   praticaId: string;
+  /** Quanto rimborsa la garanzia: quello che ha pagato DAVVERO per questa
+   *  pratica (14,90 singola, 29,90 famiglia), calcolato dal chiamante sul
+   *  tipo. Prima era "14,90" fisso qui dentro, e alla famiglia (che ne paga
+   *  29,90) prometteva meno del versato. */
+  importoRimborso: string;
   /** Vero se un no scritto della compagnia è già registrato sulla pratica. */
   rifiutoRegistrato?: boolean;
   /** Vero se il no è arrivato come DOCUMENTO vero (foto/email), non testo
@@ -163,7 +169,7 @@ export default function DichiaraEsito({
             <div className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5">
               <p className="text-[0.95rem] leading-relaxed text-inchiostro">
                 Hai mandato la replica e non hanno pagato lo stesso? Allora chiudo la pratica e
-                faccio partire la garanzia: ti rimborsiamo i 14,90 che hai pagato.
+                faccio partire la garanzia: ti rimborsiamo i {importoRimborso} che hai pagato.
               </p>
               {/* ⚠️ h-auto + whitespace-normal: prima il testo era su una
                   riga sola e si tagliava ai bordi sul telefono (Valerio,
@@ -175,7 +181,7 @@ export default function DichiaraEsito({
                 disabled={inCorso}
                 onClick={() => void dichiara("non_pagata")}
               >
-                {inCorso ? "Un attimo…" : "Chiudi e chiedi il rimborso (14,90€)"}
+                {inCorso ? "Un attimo…" : `Chiudi e chiedi il rimborso (${importoRimborso})`}
               </Button>
             </div>
           ) : rifiutoProvato ? (
@@ -183,14 +189,14 @@ export default function DichiaraEsito({
                replica, non il rimborso. */
             <p className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5 text-[0.9rem] leading-relaxed text-fumo">
               Il rimborso è l&apos;ultima spiaggia. Prima manda la replica qui sopra: spessissimo il
-              loro no cade proprio lì. Se dopo la replica non pagano lo stesso, la garanzia dei
-              14,90€ scatta da sola.
+              loro no cade proprio lì. Se dopo la replica non pagano lo stesso, la garanzia dei{" "}
+              {importoRimborso} scatta da sola.
             </p>
           ) : rifiutoRegistrato ? (
             <p className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5 text-[0.9rem] leading-relaxed text-fumo">
-              Per far partire la garanzia dei 14,90€ serve la risposta VERA della compagnia:
-              caricala qui sopra come foto o email («Carica lo screenshot»). Il testo scritto a
-              mano prepara la replica, ma non basta per il rimborso.
+              Per far partire la garanzia dei {importoRimborso} serve la risposta VERA della
+              compagnia: caricala qui sopra come foto o email («Carica lo screenshot»). Il testo
+              scritto a mano prepara la replica, ma non basta per il rimborso.
             </p>
           ) : null}
         </div>

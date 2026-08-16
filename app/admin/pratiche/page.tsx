@@ -70,7 +70,7 @@ export default async function PaginaPratiche() {
        pratica «Pratiche in tutto» sarebbe rimasto a 60 per sempre, e
        l'incasso mostrato sarebbe stato quello delle ultime 60. Peggio:
        essendo ordinate dalla piu' recente, il totale poteva anche
-       CALARE, se usciva dalla finestra una pratica famiglia da 24,90 e
+       CALARE, se usciva dalla finestra una pratica famiglia da 29,90 e
        ne entrava una singola da 14,90. Trovato dall'ispezione del 12/08;
        oggi le pratiche sono zero, quindi era un difetto che aspettava.
        Adesso il conteggio e la somma li fa il DATABASE su tutte le

@@ -20,7 +20,7 @@
 
 /** Il prezzo della pratica (il check da 1,99 è un anticipo che si scala). */
 export const PREZZO_PRATICA = 14.9;
-export const PREZZO_FAMIGLIA = 24.9;
+export const PREZZO_FAMIGLIA = 29.9;
 
 /* ──────────────────────── COSTI VARIABILI ───────────────────── */
 
