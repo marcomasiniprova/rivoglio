@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test, expect } from "@playwright/test";
 import { generaCodice, normalizzaCodice, formaCodiceValida } from "../lib/recensioni/buono";
 
@@ -39,5 +41,26 @@ test.describe("Il codice dell'analisi gratis", () => {
     expect(formaCodiceValida("RIV-ABCDEFG")).toBe(false); // troppo lungo
     expect(formaCodiceValida("RIV-abc12")).toBe(false); // minuscole: non normalizzato
     expect(formaCodiceValida("XXX-ABCDE")).toBe(false); // prefisso sbagliato
+  });
+
+  /**
+   * 🔴 IL CODICE NON SI BRUCIA SU UN INCERTO (Valerio, 15/08: «tutti i
+   * codici non funzionano»). Chi riscatta il codice e si sente rispondere
+   * «non lo so» non ha ottenuto niente: bruciarlo lo lascia senza codice E
+   * senza risposta, e la volta dopo legge «già usato». Il credito PAGATO in
+   * quel caso non si consuma (CORTESIA_SU_INCERTO): il codice deve fare
+   * uguale. Qui si legge la rotta e si pretende che il consumo del buono
+   * sia protetto dalla stessa condizione: se qualcuno la toglie, la suite
+   * si ferma prima che il difetto torni in produzione.
+   */
+  test("il consumo del buono è protetto dall'incerto, come il credito pagato", () => {
+    const rotta = readFileSync(join(process.cwd(), "app/api/verifica/route.ts"), "utf8");
+    // La chiamata che brucia il buono deve stare dentro una condizione che
+    // esclude l'incerto: mai un `consumaBuono` senza quel filtro accanto.
+    const puntoConsumo = rotta.indexOf("consumaBuono(buonoId");
+    expect(puntoConsumo).toBeGreaterThan(-1);
+    // Nelle righe intorno al consumo deve comparire la guardia sull'incerto.
+    const intorno = rotta.slice(Math.max(0, puntoConsumo - 600), puntoConsumo + 100);
+    expect(intorno).toMatch(/CORTESIA_SU_INCERTO\s*&&\s*verdetto\.esito\s*===\s*"incerto"/);
   });
 });

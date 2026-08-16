@@ -7,6 +7,7 @@ import Logo from "@/components/Logo";
 import CaricaDocumento from "@/components/pratica/CaricaDocumento";
 import HoInviato from "@/components/pratica/HoInviato";
 import SpeseCura from "@/components/pratica/SpeseCura";
+import PreparaReclamo from "@/components/pratica/PreparaReclamo";
 import { Button } from "@/components/ui/button";
 import { utenteCollegato } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
@@ -404,107 +405,116 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           </div>
         )}
 
-        {/* 🔴 I DOCUMENTI STANNO PRIMA DELLA LETTERA, o non stanno.
-            Valerio, 13/08: «dice che il reclamo è pronto e subito sotto
-            c'è il box carica i tuoi documenti: che senso ha se è tutto
-            pronto da inviare? O prima o niente».
-            Aveva ragione: allegare la carta d'imbarco serve a rendere il
-            reclamo più solido, quindi o si fa PRIMA di mandarlo o non
-            serve a niente. Adesso sta qui, dentro il passo, sopra il
-            bottone che apre la lettera; e appena il reclamo è partito
-            sparisce per sempre. */}
-        {R.documentoExtra && percorso.attivo === "lettera" && (
-          <div className="mt-5 border-t border-bordo pt-5">
-            <CaricaDocumento praticaId={pratica.id} />
-          </div>
-        )}
+        {/* PREPARA IL RECLAMO: i due passi facoltativi (carta d'imbarco,
+            spese art. 9) PRIMA, la lettera DOPO (Valerio, 15/08: «la
+            lettera deve essere fatta dopo questi due passi, e visibile non
+            prima, sennò diventano inutili e hanno meno importanza»).
+            Il gate vale SOLO nella fase "lettera", cioè il primo reclamo
+            non ancora inviato. Su replica ed ente la lettera si apre
+            dritta: è la regola tolta al muro il 13/08 (non si trattiene la
+            replica di chi si è appena preso un no). */}
+        {(() => {
+          const prepNode = (
+            <>
+              {R.documentoExtra && <CaricaDocumento praticaId={pratica.id} />}
+              {![
+                "inviata",
+                "sollecito",
+                "enac",
+                "esito_pagata",
+                "esito_rifiutata",
+                "rimborsata",
+              ].includes(pratica.stato) &&
+                (verificaRiga as { caso_dichiarato?: string | null } | null)?.caso_dichiarato !==
+                  "declassamento" && (
+                  <SpeseCura praticaId={pratica.id} iniziale={pratica.cura_richiesta ?? false} />
+                )}
+            </>
+          );
 
-        {/* IL DIRITTO DI CURA (art. 9) STA QUI, ATTACCATO AI DOCUMENTI
-            (Valerio, 15/08: «documenti e pasti/hotel sono due passi vicini
-            che uno fa PRIMA del reclamo, poi sotto i bottoni»). Prima stava
-            in fondo, dopo tutto. Sparisce a reclamo partito. NON sul
-            declassamento: lì hai volato, l'assistenza dell'art. 9 non c'entra. */}
-        {R.letteraVisibile &&
-          !["inviata", "sollecito", "enac", "esito_pagata", "esito_rifiutata", "rimborsata"].includes(
-            pratica.stato,
-          ) &&
-          (verificaRiga as { caso_dichiarato?: string | null } | null)?.caso_dichiarato !==
-            "declassamento" && (
-            <div className="mt-5 border-t border-bordo pt-5">
-              <SpeseCura praticaId={pratica.id} iniziale={pratica.cura_richiesta ?? false} />
-            </div>
-          )}
+          const letteraNode = (
+            <>
+              {R.letteraVisibile && (
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  {R.letteraApribile ? (
+                    <Button asChild variant="pieno">
+                      <Link href={`/pratica/${pratica.id}/lettera`}>
+                        <FileText className="size-4" aria-hidden="true" />
+                        {/* Dopo un no dichiarato il foglio che si apre non è
+                            più il reclamo: è la replica. Chiamarlo ancora
+                            "la lettera" fa credere di riaprire quella di
+                            prima. */}
+                        {percorso.attivo === "replica"
+                          ? C.azioni.apriReplica
+                          : percorso.attivo === "ente"
+                            ? C.azioni.apriSegnalazione
+                            : C.azioni.apriLettera}
+                      </Link>
+                    </Button>
+                  ) : (
+                    /* Spento, non nascosto: chi ha appena pagato deve
+                       vedere che la lettera c'è, e capire cosa manca per
+                       aprirla. Un bottone che sparisce fa pensare di aver
+                       comprato una cosa che non esiste. */
+                    <Button disabled variant="contorno" className="pointer-events-none opacity-55">
+                      <FileText className="size-4" aria-hidden="true" />
+                      {C.azioni.apriLettera}
+                    </Button>
+                  )}
+                  {/* 🔴 CHIUDE IL GIRO, e prima non esisteva: la pagina
+                      restava ferma sulla replica anche dopo averla mandata,
+                      quindi un secondo no non aveva dove andare (Valerio,
+                      13/08: «ti blocchi al passo 4»). */}
+                  {R.confermaReplica && (
+                    <HoInviato
+                      praticaId={pratica.id}
+                      gesto="replica"
+                      etichetta={C.azioni.confermaReplica}
+                      inCorso={C.azioni.confermaReplicaInCorso}
+                      fatta={C.azioni.confermaReplicaFatta}
+                      errore={C.azioni.confermaReplicaErrore}
+                    />
+                  )}
+                  {R.confermaInvio && (
+                    <HoInviato
+                      praticaId={pratica.id}
+                      etichetta={C.azioni.confermaInvio}
+                      inCorso={C.azioni.confermaInvioInCorso}
+                      fatta={C.azioni.confermaInvioFatta}
+                      errore={C.azioni.confermaInvioErrore}
+                    />
+                  )}
+                </div>
+              )}
+              {R.letteraVisibile && !R.letteraApribile && (
+                /* `text-fumo` e non `text-fumo-2`: questa riga spiega
+                   perché il bottone accanto è spento, quindi in quel
+                   momento è la cosa più importante della sezione. Nel
+                   grigio più chiaro, negli scatti, spariva proprio dove
+                   serviva. */
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo">
+                  {C.azioni.letteraChiusa}
+                </p>
+              )}
+              {R.confermaInvio && (
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
+                  {C.azioni.confermaInvioNota}
+                </p>
+              )}
+              {R.confermaReplica && (
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
+                  {C.azioni.confermaReplicaNota}
+                </p>
+              )}
+            </>
+          );
 
-        {R.letteraVisibile && (
-          <div className="mt-5 flex flex-wrap items-center gap-3">
-            {R.letteraApribile ? (
-              <Button asChild variant="pieno">
-                <Link href={`/pratica/${pratica.id}/lettera`}>
-                  <FileText className="size-4" aria-hidden="true" />
-                  {/* Dopo un no dichiarato il foglio che si apre non è più
-                      il reclamo: è la replica. Chiamarlo ancora "la
-                      lettera" fa credere di riaprire quella di prima. */}
-                  {percorso.attivo === "replica"
-                    ? C.azioni.apriReplica
-                    : percorso.attivo === "ente"
-                      ? C.azioni.apriSegnalazione
-                      : C.azioni.apriLettera}
-                </Link>
-              </Button>
-            ) : (
-              /* Spento, non nascosto: chi ha appena pagato deve vedere
-                 che la lettera c'è, e capire cosa manca per aprirla.
-                 Un bottone che sparisce fa pensare di aver comprato
-                 una cosa che non esiste. */
-              <Button disabled variant="contorno" className="pointer-events-none opacity-55">
-                <FileText className="size-4" aria-hidden="true" />
-                {C.azioni.apriLettera}
-              </Button>
-            )}
-            {/* 🔴 CHIUDE IL GIRO, e prima non esisteva: la pagina restava
-                ferma sulla replica anche dopo averla mandata, quindi un
-                secondo no non aveva dove andare (Valerio, 13/08: «ti
-                blocchi al passo 4»). */}
-            {R.confermaReplica && (
-              <HoInviato
-                praticaId={pratica.id}
-                gesto="replica"
-                etichetta={C.azioni.confermaReplica}
-                inCorso={C.azioni.confermaReplicaInCorso}
-                fatta={C.azioni.confermaReplicaFatta}
-                errore={C.azioni.confermaReplicaErrore}
-              />
-            )}
-            {R.confermaInvio && (
-              <HoInviato
-                praticaId={pratica.id}
-                etichetta={C.azioni.confermaInvio}
-                inCorso={C.azioni.confermaInvioInCorso}
-                fatta={C.azioni.confermaInvioFatta}
-                errore={C.azioni.confermaInvioErrore}
-              />
-            )}
-          </div>
-        )}
-        {R.letteraVisibile && !R.letteraApribile && (
-          /* `text-fumo` e non `text-fumo-2`: questa riga spiega perché il
-             bottone accanto è spento, quindi in quel momento è la cosa
-             più importante della sezione. Nel grigio più chiaro, negli
-             scatti, spariva proprio dove serviva. */
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo">
-            {C.azioni.letteraChiusa}
-          </p>
-        )}
-        {R.confermaInvio && (
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
-            {C.azioni.confermaInvioNota}
-          </p>
-        )}
-        {R.confermaReplica && (
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-fumo-2">
-            {C.azioni.confermaReplicaNota}
-          </p>
-        )}
+          return percorso.attivo === "lettera" ? (
+            <PreparaReclamo prep={prepNode} lettera={letteraNode} />
+          ) : (
+            letteraNode
+          );
+        })()}
 
         {/* Il perché, per chi lo cerca. Fuori dalla strada di chi deve
             solo fare la cosa del momento. */}

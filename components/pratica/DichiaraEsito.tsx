@@ -85,13 +85,14 @@ export default function DichiaraEsito({
 
       {/* ⚠️ BOTTONI PIÙ CORPOSI + ICONE (Valerio, 15/08: «sono brutti e
           troppo magri, metti la spunta per pagato e la X per il no»).
-          h-13 e font-semibold li ingrassano; la spunta sul verde, la X
-          sul bordato. */}
+          h-14 e font-semibold li ingrassano (Valerio, 15/08: «ancora
+          sottilissimi, dagli più altezza»); la spunta sul verde, la X sul
+          bordato. */}
       <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
         <Button
           type="button"
           size="lg"
-          className="h-13 flex-1 gap-2 text-[15px] font-semibold"
+          className="h-14 flex-1 gap-2 text-[15px] font-semibold"
           disabled={inCorso}
           onClick={() => void dichiara("pagata")}
         >
@@ -108,7 +109,7 @@ export default function DichiaraEsito({
           type="button"
           variant="contorno"
           size="lg"
-          className="h-13 flex-1 gap-2 text-[15px] font-semibold"
+          className="h-14 flex-1 gap-2 text-[15px] font-semibold"
           aria-pressed={mostraNo}
           onClick={() => {
             setErrore(null);

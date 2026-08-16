@@ -174,11 +174,20 @@ export async function POST(req: Request) {
      impedisce di riusare la stessa ricevuta copiandola a mano. */
   if (siConsuma && pass) await segnaConsumo(esito.verificaId, pass.ordine);
 
-  /* Il codice si brucia appena l'analisi ha prodotto un verdetto, ANCHE un
-     incerto: è quello che chiude il buco del «gratis quanto voglio» (con un
-     incerto il buono restava vivo). Un volo non trovato non arriva fin qui
-     (torna 400 prima), quindi un errore di battitura non consuma il codice. */
-  if (buonoOk && buonoId) {
+  /* Il codice si brucia appena l'analisi dà un verdetto VERO (idoneo o non
+     idoneo). Un volo non trovato non arriva fin qui (torna 400 prima),
+     quindi un errore di battitura non lo consuma.
+     🔴 MA NON SU UN INCERTO (Valerio, 15/08: «tutti i codici non
+     funzionano»). Chi riscatta il codice e si sente rispondere «non lo so»
+     non ha ottenuto niente: bruciargli il codice è come trattenere il
+     credito a chi ha pagato e ha avuto un incerto, e infatti lì NON si
+     consuma (CORTESIA_SU_INCERTO, vedi `siConsuma` sopra). Le due strade
+     ora si comportano uguale. Il buco del «gratis quanto voglio» resta
+     chiuso: un incerto non è una risposta vendibile, quindi non è un giro
+     gratis rubato. */
+  const codiceSiConsuma =
+    buonoOk && buonoId && !(CORTESIA_SU_INCERTO && verdetto.esito === "incerto");
+  if (codiceSiConsuma && buonoId) {
     await consumaBuono(buonoId, esito.verificaId);
   }
 
