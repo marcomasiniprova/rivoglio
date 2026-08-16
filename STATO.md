@@ -44,6 +44,45 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #77 (16/08): I BOTTONI ERANO SCHIACCIATI DA `flex-1`, LA GUIDA
+  D'INVIO ERA VECCHIA, E IL FURTO D'ACCOUNT.** Terzo collaudo di Valerio
+  dal telefono. Quattro domande col popup, poi i pezzi uno alla volta.
+  - 🔴 **I BOTTONI ESITO: TROVATO IL VERO MOTIVO, MISURANDOLI.** Da due giri
+    dicevo «alzati» e restavano magri. Li ho misurati nel browser: **24px,
+    non 64**. La causa NON era la classe altezza (h-13/h-14/h-16): era
+    `flex-1` dentro un contenitore `flex-col`. In una colonna, `flex-1`
+    governa la dimensione VERTICALE e vince sull'`height`, quindi senza
+    un'altezza fissa sul contenitore i bottoni collassavano sul testo. Su
+    desktop (`flex-row`) andavano; sul TELEFONO no, ed è lì che guarda
+    Valerio. Fix: `flex-1` solo da `sm` in su, su telefono `w-full` +
+    `h-16`. **Rimisurato: 64px veri.** La lezione: i bottoni si MISURANO,
+    non si guardano.
+  - **LA GUIDA «COME SI INVIA» AGGIORNATA AL FLUSSO VERO** (Valerio: «è
+    outdated, dà istruzioni vecchie»). Diceva «copia il testo, mandalo
+    all'indirizzo nella lettera»; ma la pagina della lettera fa tutto col
+    bottone (apre la tua email già scritta, o copia + modulo per Ryanair/
+    easyJet/Wizz). Ora i passi dicono: apri la lettera, metti l'IBAN, premi
+    il bottone, allega la carta d'imbarco, torna e conferma.
+  - 🔴 **IL FURTO D'ACCOUNT (grave, aveva ragione Valerio).** Il gettone
+    d'ingresso veniva costruito e il BROWSER di chi paga ci veniva rimandato
+    dentro: mettendo l'email di un altro al verdetto si entrava nel suo
+    account, e la cassa di prova è aperta a tutti. Adesso il gettone va
+    nella POSTA di quell'indirizzo (`linkPerEntrare`) e il browser va su
+    «controlla la posta» (`/entra?pratica=1`). Entra solo chi apre quella
+    casella; chi è già collegato con quell'email entra dritto come prima.
+    Prova nuova (`sicurezza-ingresso.spec.ts`) e prova vecchia riscritta
+    (`dentro-app.spec.ts` difendeva il buco).
+  - 🟡 **IL VIDEO NON È FILMABILE DA QUESTO AMBIENTE, e stavolta con la
+    prova.** Il browser-registratore non raggiunge il sito vero
+    (`ERR_CONNECTION_RESET`, provato con e senza proxy, con e senza ignora-
+    TLS: il proxy serve curl, non il browser). E il sito in locale non
+    raggiunge Supabase (`*.supabase.co` fuori allowlist), quindi login e
+    pratiche non girano nemmeno in locale. È lo stesso muro dei giri #68-69,
+    adesso dimostrato. Il video del prodotto loggato va fatto da una
+    macchina col browser in rete (la sessione locale sul PC di Valerio), o
+    lo cammina lui col telefono. Le opzioni sono in «Serve Valerio».
+  - Prove: **verify verde** (build, tipi, lint, 1656 prove). Screenshot dei
+    bottoni a 390px mandato in chat come prova.
 - **GIRO #76 (16/08): IL SECONDO COLLAUDO DI VALERIO. I CODICI CHE SI
   BRUCIAVANO SULL'INCERTO, LA LETTERA CHE VENIVA PRIMA DEI SUOI PASSI, E IL
   FLUSSO EMAIL PROVATO SUL DATABASE VERO.** Valerio ha ripercorso il
