@@ -1,4 +1,5 @@
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
+import { èNostroHost } from "./registra";
 import type { TipoEvento } from "./registra";
 
 /**
@@ -88,6 +89,13 @@ function racconta(r: RigaGrezza): string {
   const volo = r.volo ? ` ${r.volo}` : "";
   switch (r.tipo) {
     case "visita":
+      /* 🔴 Le righe vecchie possono avere come provenienza un'anteprima di
+         Netlify (`6a81...--rivolio.netlify.app`): finivano nel registro
+         prima che il filtro fosse blindato (Valerio, 16/08). Qui le si
+         chiama col loro nome: «un'anteprima interna», non traffico vero. Le
+         nuove non ci arrivano proprio (vedi soloIlDominio). */
+      if (r.provenienza && èNostroHost(r.provenienza))
+        return "Qualcuno è arrivato da un'anteprima interna del sito";
       return `Qualcuno è arrivato sul sito${r.provenienza ? ` da ${r.provenienza}` : ""}`;
     case "check":
       return `Analisi lanciata${volo}`;

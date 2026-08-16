@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, Check } from "lucide-react";
 import LeggiRisposta from "./LeggiRisposta";
 
@@ -89,6 +90,7 @@ export default function DichiaraRifiuto({
      credere che non sia successo niente. */
   const [fatto, setFatto] = useState(!nuovoGiro && Boolean(giaDichiarato));
   const [errore, setErrore] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     if (!aperto || motivi.length) return;
@@ -129,10 +131,16 @@ export default function DichiaraRifiuto({
         setErrore(typeof d?.errore === "string" ? d.errore : "Qualcosa non ha funzionato.");
         return;
       }
+      /* 🔴 PRIMA QUI C'ERA `window.location.reload()`, e Valerio l'ha
+         vissuto come «le cose si resettano e ritorni indietro» (16/08): un
+         reload vero sbianca lo schermo, salta in cima e scarta tutto lo
+         stato. Adesso si chiude il modulo e si rinfresca SOLO la parte del
+         server (`router.refresh`): niente lampo bianco, niente salto. La
+         replica la scrive il server e la si apre col bottone in cima. */
       setFatto(true);
-      /* La pagina si rifà: la lettera del secondo colpo la scrive il
-         server, e da qui non si può indovinare cosa dirà. */
-      window.location.reload();
+      setAperto(false);
+      setLista(false);
+      router.refresh();
     } catch {
       setErrore("Qualcosa non ha funzionato. Riprova tra poco.");
     } finally {
@@ -160,12 +168,21 @@ export default function DichiaraRifiuto({
          Adesso questo riquadro dice l'unica cosa che l'altro non può
          dire: SU QUALE no è stata scritta, e come cambiarlo. */
       <section className={nudo ? "" : "rounded-2xl border border-bordo bg-white px-6 py-4"}>
+        {/* 🔴 IL FALSO CLAIM (Valerio, 16/08: «io ho dato una email
+            completamente diversa, questa frase non rispecchia il no della
+            compagnia che ho dato, è fissa o inventata»).
+            Aveva ragione: qui c'era «Il no che hai registrato: "..."», e
+            fra le virgolette non c'erano le SUE parole ma l'etichetta della
+            CATEGORIA in cui abbiamo inquadrato la risposta. Presentata così
+            sembrava una citazione della compagnia, e se l'abbiamo inquadrata
+            male sembra inventata. Adesso si dice quello che è: la NOSTRA
+            lettura, correggibile col bottone qui sotto. */}
         <p className="flex items-start gap-2 text-[0.95rem] leading-relaxed text-fumo">
           <Check className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
           <span>
             {etichettaScelta
-              ? `Il no che hai registrato: «${etichettaScelta}». La replica è scritta su quello, punto per punto.`
-              : "La replica è scritta sul motivo che hai registrato, punto per punto."}
+              ? `Ho inquadrato la loro risposta come: «${etichettaScelta}», e la replica risponde a quel punto. Se ho preso il verso sbagliato, cambialo qui sotto.`
+              : "La replica risponde al motivo che hai registrato. Se non è quello giusto, cambialo qui sotto."}
           </span>
         </p>
         {/* 🔴 QUI C'ERA UN SECONDO BOTTONE «Leggi la replica», e portava

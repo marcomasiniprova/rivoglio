@@ -3,6 +3,18 @@ import { redirect } from "next/navigation";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 
 /**
+ * L'EMAIL DEL PADRONE DI CASA (Valerio, 16/08, scelta col popup: «falla
+ * SOLO per la mia email, non fare casini»).
+ *
+ * Entrando con questa email si è sempre admin e si atterra sempre nel
+ * pannello, senza passare dalla web app. È volutamente l'EMAIL e non il
+ * ruolo nel database: così vale anche il giorno che il ruolo, per un
+ * qualsiasi motivo, non fosse impostato, e non c'è modo di restare chiusi
+ * fuori dal proprio pannello. Un indirizzo, non un segreto: può stare qui.
+ */
+export const EMAIL_ADMIN = "valerio@artecai.it";
+
+/**
  * IL GUARDIANO DEL RETROBOTTEGA.
  *
  * ⚠️ PERCHÉ STA IN UN FILE SUO E NON DENTRO OGNI PAGINA. Il controllo
@@ -32,6 +44,11 @@ import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
 export const soloAdmin = cache(async () => {
   const utente = await utenteCollegato();
   if (!utente) redirect("/entra");
+
+  /* L'email del padrone di casa entra sempre, ruolo o non ruolo (scelta di
+     Valerio, 16/08). È anche quello che impedisce il rimbalzo infinito:
+     `/app` manda questa email a `/admin`, e qui `/admin` la fa entrare. */
+  if (utente.email?.toLowerCase() === EMAIL_ADMIN) return utente;
 
   const supabase = await supabaseServer();
   const { data: profilo } = await supabase

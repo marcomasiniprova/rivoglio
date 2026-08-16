@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
 import AppRivolio, { type CardPratica } from "@/components/app/AppRivolio";
 import { supabaseServer, utenteCollegato } from "@/lib/supabase/server";
+import { EMAIL_ADMIN } from "@/lib/admin/guardia";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { colonnaMancante } from "@/lib/supabase/colonne";
@@ -81,6 +83,13 @@ function classiStato(palla: DiChiELaPalla, stato: StatoPratica): string {
 
 export default async function PaginaApp() {
   const utente = SUPABASE_CONFIGURATO ? await utenteCollegato() : null;
+
+  /* 🔴 IL PADRONE DI CASA NON DEVE FINIRE NELLA WEB APP (Valerio, 16/08:
+     «io ho permessi speciali, quando accedo con la mia email mi deve SEMPRE
+     portare nel pannello, non nell'app da utente normale»). Entrando con la
+     sua email si va dritti al pannello: la guardia di `/admin` la lascia
+     entrare per la stessa email, quindi niente rimbalzo. */
+  if (utente?.email?.toLowerCase() === EMAIL_ADMIN) redirect("/admin");
 
   if (!utente) {
     return (

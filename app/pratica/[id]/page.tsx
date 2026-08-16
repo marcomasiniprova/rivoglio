@@ -536,7 +536,7 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           );
 
           return percorso.attivo === "lettera" ? (
-            <PreparaReclamo prep={prepNode} lettera={letteraNode} />
+            <PreparaReclamo praticaId={pratica.id} prep={prepNode} lettera={letteraNode} />
           ) : (
             letteraNode
           );

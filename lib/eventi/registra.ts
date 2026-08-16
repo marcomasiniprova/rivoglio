@@ -64,32 +64,51 @@ export type Evento = {
  * dato in più su di lei che a noi non serve, perché per capire cosa
  * funziona basta sapere che è arrivata da TikTok.
  */
+/**
+ * I NOSTRI HOST, scritti a mano più quelli dell'ambiente.
+ *
+ * 🔴 Valerio, 16/08: «perché tutti i miei log dicono "arrivato da
+ * 6a81...--rivolio.netlify.app"? indirizzi strani, mica dovrebbe essere
+ * rivolio.it?». Erano le ANTEPRIME di Netlify: ogni deploy ne pubblica una
+ * pubblica, e i bot le visitano. Erano già filtrate, MA solo se
+ * `NEXT_PUBLIC_SITO` o `URL` erano impostate. La checklist del dominio dice
+ * di togliere `NEXT_PUBLIC_SITO`, e a runtime `URL` di Netlify non è
+ * garantita: senza nessuna delle due, il filtro non partiva e le anteprime
+ * tornavano nei log come "traffico". Cioè il sito che naviga sé stesso, il
+ * numero più inutile del cruscotto.
+ *
+ * Adesso i nostri host stanno anche SCRITTI A MANO: così il filtro vale
+ * sempre, variabili o non variabili. `rivolio.it` è già qui per il giorno
+ * del dominio.
+ */
+const NOSTRE_RADICI_FISSE = ["rivolio.it", "rivolio.netlify.app"];
+
+/** Vero se questo host è nostro: il dominio, un suo sottodominio, o
+ *  un'anteprima di deploy (`<hash>--radice`). */
+export function èNostroHost(host: string): boolean {
+  const h = host.replace(/^www\./, "");
+  const radici = [
+    ...NOSTRE_RADICI_FISSE,
+    ...[process.env.NEXT_PUBLIC_SITO, process.env.URL]
+      .filter((v): v is string => Boolean(v))
+      .map((s) => s.replace(/^https?:\/\/(www\.)?/, "").replace(/\/.*$/, "")),
+  ];
+  return radici.some((r) => {
+    /* Le anteprime hanno il nome del sito dopo un "--"; i rami un
+       sottodominio. Tutti e due finiscono con la radice. */
+    const radice = r.replace(/^[^.]*--/, "");
+    return h === r || h === radice || h.endsWith(`--${radice}`) || h.endsWith(`.${radice}`);
+  });
+}
+
 export function soloIlDominio(referer: string | null | undefined): string | null {
   if (!referer) return null;
   try {
     const h = new URL(referer).hostname.replace(/^www\./, "");
-
-    /* Chi arriva da una nostra pagina non è una "provenienza": è
-       navigazione interna, e contarla gonfierebbe i numeri.
-       ⚠️ E NON BASTA CONFRONTARE IL DOMINIO ESATTO. Netlify pubblica una
-       copia del sito a ogni deploy, su indirizzi tipo
-       `6a7b89e1...--rivolio.netlify.app`: sono nostri a tutti gli
-       effetti, ma non sono uguali al dominio principale. Il primo
-       riepilogo vero elencava tre di quegli indirizzi come "da dove
-       arrivano le persone" (visto l'11/08). Erano il sito che navigava
-       sé stesso, cioè il numero più inutile che si possa mettere in un
-       cruscotto: si legge come traffico e non lo è. */
-    const nostro = (process.env.NEXT_PUBLIC_SITO ?? process.env.URL ?? "")
-      .replace(/^https?:\/\/(www\.)?/, "")
-      .replace(/\/.*$/, "");
-    if (nostro) {
-      /* Le anteprime di deploy hanno il nome del sito dopo un "--"; i
-         rami hanno un sottodominio. Tutti e due finiscono col nostro. */
-      const radice = nostro.replace(/^[^.]*--/, "");
-      if (h === nostro || h === radice || h.endsWith(`--${radice}`) || h.endsWith(`.${radice}`)) {
-        return null;
-      }
-    }
+    /* Chi arriva da una nostra pagina (dominio vero o anteprima) non è una
+       "provenienza": è navigazione interna, e contarla gonfierebbe i
+       numeri. */
+    if (èNostroHost(h)) return null;
     return h.slice(0, 80);
   } catch {
     return null;

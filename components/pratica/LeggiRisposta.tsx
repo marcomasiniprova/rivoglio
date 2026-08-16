@@ -159,9 +159,15 @@ export default function LeggiRisposta({
           {esito.sicurezza === "bassa" &&
             " La loro risposta però non era chiarissima: prima di mandarla, dai un'occhiata che il senso sia quello."}
         </p>
+        {/* 🔴 PRIMA `window.location.reload()`, e con esso il lampo bianco e
+            il salto in cima che Valerio chiama «si resetta» (16/08). Il
+            server l'abbiamo già rinfrescato appena la risposta è stata letta
+            (router.refresh qui sopra): questo bottone non deve ricaricare
+            niente, deve PORTARE alla replica. Quindi apre direttamente il
+            foglio, che dopo un no è già la replica. */}
         <button
           type="button"
-          onClick={() => window.location.reload()}
+          onClick={() => router.push(`/pratica/${praticaId}/lettera`)}
           className="riflesso mt-4 inline-flex h-11 items-center rounded-bottone bg-verde px-5 text-[0.95rem] font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-verde-scuro"
         >
           Vedi la replica

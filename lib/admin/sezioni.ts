@@ -136,12 +136,26 @@ export const SEZIONI: Sezione[] = [
  * ⚠️ Si prende la corrispondenza PIÙ LUNGA. Con un banale "inizia per",
  * `/admin` (che è il prefisso di tutti) vincerebbe sempre e la voce
  * attiva resterebbe Panoramica su ogni pagina.
+ *
+ * 🔴 MA PRIMA ERA ROTTO AL CONTRARIO (Valerio, 16/08: «quando clicco
+ * Panoramica si apre insieme la sezione della Mappa»). La colpa: si partiva
+ * da `SEZIONI[0]` (la Mappa, href `/admin/mappa`, lunga 12) e si sostituiva
+ * solo con una corrispondenza almeno ALTRETTANTO lunga. Sulla Panoramica
+ * (`/admin`, lunga 6) la voce giusta non batteva mai i 12 della Mappa di
+ * partenza, così restava selezionata la Mappa: la pagina era la Panoramica,
+ * ma il menu e il titolo dicevano «La mappa». Sembravano aperte insieme.
+ *
+ * Adesso si guardano SOLO le sezioni che davvero corrispondono e si tiene
+ * la più lunga fra quelle. Su `/admin` corrisponde solo la Panoramica; su
+ * `/admin/mappa` corrispondono Panoramica e Mappa, e vince la Mappa.
  */
 export function sezioneDi(percorso: string): Sezione {
-  let scelta = SEZIONI[0];
+  let scelta: Sezione | null = null;
   for (const s of SEZIONI) {
     const dentro = percorso === s.href || percorso.startsWith(s.href + "/");
-    if (dentro && s.href.length >= scelta.href.length) scelta = s;
+    if (dentro && (scelta === null || s.href.length > scelta.href.length)) scelta = s;
   }
-  return scelta;
+  /* Fuori da ogni sezione (non dovrebbe capitare): si ripiega sulla
+     Panoramica, la casa del pannello, non sulla prima voce dell'elenco. */
+  return scelta ?? SEZIONI.find((s) => s.href === "/admin") ?? SEZIONI[0];
 }

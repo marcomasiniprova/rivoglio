@@ -115,19 +115,28 @@ export default function DichiaraEsito({
             </>
           )}
         </Button>
-        <Button
-          type="button"
-          variant="contorno"
-          className="h-16 w-full gap-2 text-base font-semibold sm:w-auto sm:flex-1"
-          aria-pressed={mostraNo}
-          onClick={() => {
-            setErrore(null);
-            setMostraNo(true);
-          }}
-        >
-          <X className="size-5 shrink-0" aria-hidden="true" />
-          Mi hanno risposto no
-        </Button>
+        {/* 🔴 «IL BOTTONE MI HANNO RISPOSTO NO A VOLTE NON FUNZIONA, CONTINUO
+            A PREMERE MA NON VA» (Valerio, 16/08). Non era rotto: una volta
+            aperta la strada del no (qui sotto), premerlo di nuovo non faceva
+            niente, perché la strada era già aperta. Un bottone che resta lì
+            e non risponde SEMBRA rotto. Adesso, appena la strada è aperta, il
+            bottone sparisce: quello che serve (carica il no, scegli il
+            motivo) è già lì sotto, e «Mi hanno pagato» resta per chi, dopo la
+            replica, si è visto pagare. */}
+        {!mostraNo && (
+          <Button
+            type="button"
+            variant="contorno"
+            className="h-16 w-full gap-2 text-base font-semibold sm:w-auto sm:flex-1"
+            onClick={() => {
+              setErrore(null);
+              setMostraNo(true);
+            }}
+          >
+            <X className="size-5 shrink-0" aria-hidden="true" />
+            Mi hanno risposto no
+          </Button>
+        )}
       </div>
 
       {mostraNo && (
