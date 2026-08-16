@@ -7,7 +7,11 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-15 (giro #75: il buono dell'analisi gratis da cookie
+**Aggiornato:** 2026-08-16 (giro #78: la festa sulla pratica vinta, il
+rimborso solo dopo aver combattuto, la lettera senza gergo (ENAC fuori,
+«Vai su ConciliaWeb»), e la foto della prova di pagamento · giro #77: i
+bottoni schiacciati da `flex-1`, la guida d'invio vecchia, il furto
+d'account · giro #75: il buono dell'analisi gratis da cookie
 a codice usa e getta, la garanzia col no scritto, il box esito fuso, e il
 bancone pulito per il passaggio in locale · giro #72: la coincidenza persa che il motore
 verifica sui DUE voli, e la pagina aperta sui diritti di chi vola con
@@ -44,6 +48,58 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #78 (16/08): LA FESTA, LA PULIZIA DELLA PRATICA VINTA, IL RIMBORSO
+  DOPO AVER COMBATTUTO, LA LETTERA SENZA GERGO, E LA FOTO DELLA PROVA.**
+  Quarto collaudo di Valerio dal telefono, con gli screenshot. Quattro
+  scelte col popup, poi i pezzi uno alla volta, ognuno verde e mandato in
+  chat come prova prima del prossimo.
+  - 🎉 **LA PRATICA VINTA È UNA FESTA** (scelta di Valerio: «festa + pulizia
+    completa»). Quando dichiari «Mi hanno pagato», 70 coriandoli scendono,
+    «Obiettivo completato», «Ce l'hai fatta», l'importo recuperato. E su
+    quella schermata sparisce tutto il resto: via garanzia, fascicolo,
+    «come mai». 🔴 **I coriandoli però NON cadevano**: misurati nel browser,
+    zero nel DOM. Colpa di una guardia di ref inutile che in strict mode
+    mangiava il secondo montaggio. Tolta: adesso cadono davvero (screenshot
+    in chat). Rispettano chi ha chiesto meno movimento.
+  - 🔴 **«IN ATTESA» SU UNA PRATICA CHIUSA** (Valerio: «che cazzo attesa
+    quando è finita»). L'eyebrow di una pratica chiusa adesso dice
+    «Chiusa», non più «In attesa».
+  - **IL RIMBORSO DELLA GARANZIA È L'ULTIMA SPIAGGIA, NON LA PRIMA** (Valerio:
+    «se è il primo no rimborsiamo già? deve arrivare dopo aver combattuto»,
+    scelta col popup). Adesso il rimborso si sblocca solo DOPO aver mandato
+    la replica al no (spesso il no cade proprio lì). Il gate sta anche sul
+    server (`esito/route`), non solo nella UI. Prova nuova in
+    `garanzia-frode.spec`.
+  - **LA PAGINA LETTERA: ENAC FUORI, E VIA IL GERGO** (Valerio: «tutta
+    questa pagina è brutalmente fatta male. ENAC dove sta? mettiamolo fuori.
+    Apri ART?? in che senso?», scelta col popup «restyle: fuori e chiari»).
+    Le istruzioni per l'ente erano dentro un accordion chiuso: adesso sono
+    una sezione APERTA con titolo umano («Se la compagnia non si muove»). Il
+    bottone della conciliazione diceva «Apri ART» (nessuno la capiva): ora
+    dice «Vai su ConciliaWeb», il nome della piattaforma vera. Via anche «il
+    secondo/terzo/quarto colpo»: gergo interno, ora etichette umane. Restano
+    visibili solo quando servono, come chiese lui il 13/08 (screenshot in
+    chat).
+  - **LA FOTO DELLA PROVA DI PAGAMENTO** (Valerio: «facoltativa, salvata, nel
+    pannello admin, per i testimonial anonimi», scelta col popup «senza
+    spunta di consenso»). Sulla pratica vinta, sotto la festa, un invito
+    FACOLTATIVO a caricare la foto dell'accredito. ⚠️ **È l'unica immagine
+    che il prodotto TIENE** (tutte le altre si leggono e si scartano):
+    bucket Supabase Storage PRIVATO `prove-pagamento` (creato col
+    connettore), letto solo dal server, mostrato nell'admin con URL firmati
+    che scadono. All'utente diciamo di coprire IBAN e nome (per un
+    testimonial bastano importo e data). Niente spunta di consenso: caricare
+    è già la scelta. Nel pannello (`/admin/recensioni`) una sezione «Prove
+    di pagamento». Guardie in `prova-pagamento.spec` (bucket privato, solo
+    proprietario, solo pratica vinta). ⚠️ **Il giro upload→storage→admin NON
+    è collaudabile da questa sandbox** (l'egress non raggiunge Supabase): da
+    provare in locale o su Netlify.
+  - **NASCE `collaudo-ux/screenshot/`**: la cartella dove Valerio committa
+    gli screenshot di tutti i percorsi del prodotto, per un'analisi critica
+    foto per foto (promessa esplicita). In attesa delle foto.
+  - Prove: **verify verde** a ogni pezzo (build, tipi, lint, **1664 prove**,
+    0 rosse). Le nuove: la festa (misurata a 70 coriandoli nel DOM), il gate
+    della replica prima del rimborso, e le tre della foto prova.
 - **GIRO #77 (16/08): I BOTTONI ERANO SCHIACCIATI DA `flex-1`, LA GUIDA
   D'INVIO ERA VECCHIA, E IL FURTO D'ACCOUNT.** Terzo collaudo di Valerio
   dal telefono. Quattro domande col popup, poi i pezzi uno alla volta.
