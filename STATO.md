@@ -107,6 +107,40 @@ social rifatta (era rimasta al prodotto viaggi).
   - Prove: **verify verde a ogni lotto** (1670 prove, 0 rosse). Una prova
     (`campione`) ha beccato un mio commento troppo lungo che allontanava
     `.order` da `.eq`: il filtro demo è stato spostato dopo l'ordinamento.
+  - ✅ **COLLAUDO DEL SISTEMA COI CONNETTORI (16/08, tutto verde).** Valerio
+    aveva finito il trasloco del dominio; l'ho verificato coi connettori
+    Supabase + Resend + il workbench remoto (da questa sandbox l'egress non
+    raggiunge il sito vero, il workbench sì):
+    - **rivolio.it è VIVO**: 200, HTTPS, Netlify, `www` → apex, serve la
+      landing giusta. Il dominio è puntato (nameserver su Netlify, DNS
+      dentro Netlify).
+    - **EMAIL DI LOGIN: SMTP custom con Resend, NON il gancio.** L'auth
+      config dice `smtp_host=smtp.resend.com`, mittente
+      `valerio@send.rivolio.it`, e `hook_send_email_enabled=false`. Quindi
+      il gancio `/api/posta-auth` **non serve**: Valerio ha fatto la strada
+      più semplice (SMTP), che manda le email di login via Resend senza il
+      tetto di Supabase. La chiave Resend `supabase-smtp` esiste (creata
+      12/08) e non è ancora stata usata solo perché nessuno ha ancora fatto
+      un login vero.
+    - **Dominio Resend `send.rivolio.it`: verified.**
+    - **Supabase**: `site_url=https://rivolio.it`, `uri_allow_list=
+      https://rivolio.it/**`, **protezione password rubate ACCESA**
+      (`password_hibp_enabled=true`, era in "Serve Valerio"), servizi auth/
+      db/rest/storage tutti sani.
+    - **Dati veri**: valerio@artecai.it = ruolo `admin`, email confermata;
+      bucket `prove-pagamento` c'è con **1 foto** (il test di Valerio);
+      **23 check** nelle ultime 24h; 16 pratiche, 4 vinte.
+    - ⚠️ **Netlify non ha un connettore**: le sue variabili non le vedo,
+      ma sono provate dai fatti (i 23 check = Supabase + AeroDataBox ok, le
+      email partite = Resend ok). L'unica al buio è **Telegram**: le due
+      variabili vanno messe su Netlify (guida data in chat), il bot
+      @Rivolio_AI_bot e il chat id 8534801784 sono già noti.
+  - **Le 4 scelte del collaudo (Valerio, popup):** analisi foto → report
+    unico per gravità; prova → foto + collaudo dal vivo del sito vero;
+    mittente login → si lascia «Rivolio»; Telegram → da guidare.
+  - **PROSSIMO GIRO:** l'analisi delle foto in `collaudo-ux/screenshot/`
+    (report unico, per gravità) più il collaudo dal vivo dei percorsi
+    pubblici di rivolio.it (adesso il workbench remoto ci arriva).
 - **GIRO #78 (16/08): LA FESTA, LA PULIZIA DELLA PRATICA VINTA, IL RIMBORSO
   DOPO AVER COMBATTUTO, LA LETTERA SENZA GERGO, E LA FOTO DELLA PROVA.**
   Quarto collaudo di Valerio dal telefono, con gli screenshot. Quattro
