@@ -172,6 +172,43 @@ export function praticaPronta(
   });
 }
 
+/* ------------------------------------------- link d'ingresso (sicurezza) */
+/**
+ * IL LINK PER ENTRARE NELLA PROPRIA PRATICA, mandato nella POSTA.
+ *
+ * 🔴 SICUREZZA (Valerio, 16/08): «uno può pagare l'analisi, mettere l'email
+ * di un altro al verdetto, e a quel punto entra nell'account dell'altro».
+ * Aveva ragione, ed era un furto d'account vero: il link di accesso veniva
+ * costruito col gettone e il BROWSER ci veniva rimandato dentro, quindi
+ * chiunque poteva entrare come chiunque scrivendone l'email e pagando (la
+ * cassa di prova è aperta a tutti).
+ *
+ * La cura è lo standard dei siti seri: il link NON va più al browser di chi
+ * paga, va nella POSTA di quell'indirizzo. Entra solo chi apre quella
+ * casella. Vedi `ingressoDopoPagamento` in lib/pratiche/ingresso.ts.
+ */
+export function linkPerEntrare(a: string, d: { link: string }): Promise<Esito> {
+  return spedisci({
+    a,
+    oggetto: "Il link per entrare nella tua pratica",
+    html: vestito({
+      titolo: "Entra nella tua pratica",
+      corpo:
+        h("Ecco il link per entrare.") +
+        p(
+          "Per la tua sicurezza l'ingresso passa da qui: solo chi apre questa casella entra nella pratica. Nessun altro può entrarci al posto tuo.",
+        ) +
+        bottone("Entra nella pratica", d.link) +
+        p(
+          "Il bottone ti fa entrare senza password e vale una volta sola. Se scade, entra con questa email da " +
+            `<a href="${casa()}/entra" style="color:${C.verde};">${casa().replace(/^https?:\/\//, "")}/entra</a>.`,
+        ),
+      coda: CODA,
+    }),
+    testo: `Ecco il link per entrare nella tua pratica (vale una volta sola):\n${d.link}\n\nPer la tua sicurezza l'ingresso passa di qui: solo chi apre questa casella entra. Se scade, entra da ${casa()}/entra con questa email.`,
+  });
+}
+
 /* ------------------------------------------- conferma dell'invio */
 /**
  * «Ho inviato il reclamo»: la ricevuta di quel gesto.

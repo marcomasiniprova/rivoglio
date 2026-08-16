@@ -83,16 +83,22 @@ export default function DichiaraEsito({
         tuo conto, non da noi.
       </p>
 
-      {/* ⚠️ BOTTONI PIÙ CORPOSI + ICONE (Valerio, 15/08: «sono brutti e
-          troppo magri, metti la spunta per pagato e la X per il no»).
-          h-14 e font-semibold li ingrassano (Valerio, 15/08: «ancora
-          sottilissimi, dagli più altezza»); la spunta sul verde, la X sul
-          bordato. */}
+      {/* ⚠️ BOTTONI ALTI 64px + ICONE (Valerio, 15/08 e 16/08: «sono brutti e
+          troppo magri», e TRE volte «ancora sottilissimi»).
+          🔴 PERCHÉ NON SI ALZAVANO, e l'ho scoperto misurandoli davvero nel
+          browser (24px su telefono, non 64): il colpevole era `flex-1`
+          dentro un contenitore `flex-col`. In una colonna, `flex-1` governa
+          la dimensione VERTICALE e vince sull'altezza: senza un'altezza
+          fissa sul contenitore, i bottoni collassavano al testo. `h-13`,
+          `h-14`, `h-16` non contavano niente. Su desktop (`flex-row`)
+          andavano bene, ma Valerio guarda dal telefono.
+          Fix: `flex-1` SOLO da `sm` in su; su telefono `w-full` + `h-16`,
+          e l'altezza torna a comandare. Misurato: 64px veri sul telefono.
+          La spunta sul verde, la X sul bordato. */}
       <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
         <Button
           type="button"
-          size="lg"
-          className="h-14 flex-1 gap-2 text-[15px] font-semibold"
+          className="h-16 w-full gap-2 text-base font-semibold sm:w-auto sm:flex-1"
           disabled={inCorso}
           onClick={() => void dichiara("pagata")}
         >
@@ -108,8 +114,7 @@ export default function DichiaraEsito({
         <Button
           type="button"
           variant="contorno"
-          size="lg"
-          className="h-14 flex-1 gap-2 text-[15px] font-semibold"
+          className="h-16 w-full gap-2 text-base font-semibold sm:w-auto sm:flex-1"
           aria-pressed={mostraNo}
           onClick={() => {
             setErrore(null);

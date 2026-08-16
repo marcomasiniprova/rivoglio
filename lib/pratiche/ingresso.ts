@@ -1,5 +1,6 @@
 import { casa } from "@/lib/sito";
 import { supabaseServizio } from "@/lib/supabase/servizio";
+import { linkPerEntrare } from "@/lib/email/pratiche";
 
 /**
  * IL LINK CHE FA ENTRARE CHI HA APPENA PAGATO.
@@ -90,10 +91,28 @@ export async function ingressoDopoPagamento(
   percorso: string,
   emailCollegata: string | null | undefined,
 ): Promise<string> {
+  // Già dentro con quell'email: si va dritti. È sicuro, perché il browser È
+  // già quell'utente (ha una sessione valida per quell'indirizzo).
   if (emailCollegata && emailCollegata.toLowerCase() === emailPratica.toLowerCase()) {
     return percorso;
   }
-  return linkDiIngresso(emailPratica, percorso);
+  /* 🔴 IL BUCO DELL'ACCOUNT (Valerio, 16/08: «uno paga, mette l'email di un
+     altro al verdetto, ed entra nell'account dell'altro»). Aveva ragione, ed
+     era un furto d'account: prima qui si tornava `linkDiIngresso(...)`, cioè
+     un `/auth/conferma?token_hash=...` su cui il BROWSER veniva rimandato,
+     che consumava il gettone e faceva entrare come quell'email SENZA
+     possederla. Con la cassa di prova aperta a tutti bastava un check,
+     l'email di un altro e un pagamento (anche finto) per entrare nel suo
+     account e vedere tutte le sue pratiche.
+     Adesso il gettone NON tocca mai il browser di chi paga: si manda il link
+     nella POSTA di quell'indirizzo (`linkPerEntrare`) e il browser va su una
+     pagina che dice «controlla la posta». Entra solo chi apre quella
+     casella. È lo standard dei siti seri.
+     ⚠️ `linkDiIngresso` su errore torna l'indirizzo semplice SENZA gettone,
+     quindi anche il ripiego non fa mai trapelare un accesso. */
+  const link = await linkDiIngresso(emailPratica, percorso);
+  await linkPerEntrare(emailPratica, { link });
+  return `/entra?pratica=1&poi=${encodeURIComponent(percorso)}`;
 }
 
 /**

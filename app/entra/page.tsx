@@ -26,6 +26,10 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
   const poi = percorsoInterno(p.poi);
   const modo = p.modo === "registrati" ? "registrati" : "accedi";
   const errore = typeof p.errore === "string" ? p.errore : null;
+  /* Si arriva qui dopo aver aperto una pratica senza essere già collegati:
+     il link d'ingresso è stato mandato nella posta di quell'indirizzo, non
+     dato al browser (sicurezza, vedi lib/pratiche/ingresso.ts). */
+  const postaPratica = p.pratica === "1";
 
   return (
     <main className="grid min-h-dvh place-items-center bg-verde-notte px-4 py-6 sm:px-8 sm:py-10">
@@ -42,6 +46,16 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
               Torna al sito
             </Link>
           </div>
+
+          {postaPratica && (
+            <div className="mt-6 rounded-2xl border border-verde/30 bg-menta-tenue px-5 py-4">
+              <p className="text-[0.95rem] leading-relaxed text-verde-notte">
+                <strong>Ti abbiamo mandato il link per entrare nella tua pratica.</strong> Controlla
+                la posta dell&apos;indirizzo che hai usato: per la tua sicurezza si entra solo da lì,
+                così nessuno può aprire la tua pratica al posto tuo.
+              </p>
+            </div>
+          )}
 
           <div className="flex flex-1 items-center justify-center py-12">
             <ModuloEntra modoIniziale={modo} poi={poi} errore={errore} />

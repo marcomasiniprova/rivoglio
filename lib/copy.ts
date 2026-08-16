@@ -1339,13 +1339,21 @@ export const COPY = {
         "La lettera è pronta e si apre appena hai caricato la carta d'imbarco, qui sotto. Se non ce l'hai adesso, puoi andare avanti lo stesso.",
     },
 
+    /* ⚠️ AGGIORNATA AL FLUSSO VERO (Valerio, 16/08: «questa guida è
+       outdated, dà istruzioni vecchie che non servono»). Aveva ragione: la
+       vecchia diceva «copia il testo, incollalo in una email, mandala
+       all'indirizzo che trovi nella lettera». Ma la pagina della lettera
+       fa già tutto col bottone: apre la tua email GIÀ SCRITTA, e per le
+       compagnie senza email (Ryanair, easyJet, Wizz) copia il testo e
+       apre il loro modulo ufficiale. E l'unico campo da mettere è l'IBAN.
+       Adesso i passi dicono quello che succede davvero. */
     istruzioniInvio: {
       titolo: "Come si invia, in 2 minuti",
       passi: [
-        "Apri la lettera e copia il testo del reclamo",
-        "Incollalo in una email dalla tua casella e aggiungi gli allegati indicati",
-        "Invia all'indirizzo della compagnia che trovi nella lettera",
-        "Torna qui e premi \"Ho inviato il reclamo\": da lì partono i promemoria",
+        "Premi \"Apri la lettera\": è già scritta, col destinatario giusto",
+        "Metti il tuo IBAN dove la lettera lo chiede: è l'unico campo tuo",
+        "Premi il bottone verde: si apre la tua email col reclamo dentro (con alcune compagnie si copia il testo e si apre il loro modulo ufficiale)",
+        "Allega la carta d'imbarco, premi Invia, poi torna qui e premi \"Ho inviato il reclamo\"",
       ],
       perche:
         "Il reclamo parte dalla tua email, a tuo nome. Le compagnie rispondono al passeggero, non a un intermediario.",

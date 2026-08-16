@@ -39,23 +39,33 @@ test.describe("Dopo il pagamento", () => {
     expect(dove).toBe("/pratica/abc");
   });
 
-  test("senza sessione si passa dal link di accesso, come prima", async () => {
-    /* Senza chiavi Supabase il link non si genera e si ripiega
-       sull'indirizzo pieno: quello che conta è che NON sia il percorso
-       nudo, cioè che la strada del link resti quella. */
+  test("🔴 senza sessione il browser NON entra: il link va nella posta", async () => {
+    /* IL BUCO DELL'ACCOUNT (Valerio, 16/08). Prima questa prova pretendeva
+       il contrario: che senza sessione si tornasse il LINK DI ACCESSO
+       (`startsWith("http")`, col gettone). Ma quel link, dato al browser di
+       chi paga, lo faceva entrare come quell'email SENZA possederla: un
+       furto d'account. Adesso il gettone va nella POSTA di quell'indirizzo
+       e il browser va su «controlla la posta». */
     const dove = await ingressoDopoPagamento("chi@esempio.it", "/pratica/abc", null);
+    // Niente ingresso automatico nella pratica.
     expect(dove).not.toBe("/pratica/abc");
-    expect(dove.startsWith("http")).toBe(true);
+    // Si va sulla pagina «controlla la posta».
+    expect(dove).toContain("/entra?pratica=1");
+    // E MAI un indirizzo che consegna il gettone al browser.
+    expect(dove).not.toContain("token_hash");
+    expect(dove).not.toContain("/auth/conferma");
+    expect(dove.startsWith("http")).toBe(false);
   });
 
-  test("🔴 collegato con un ALTRO indirizzo: non si scambia l'account di nascosto", async () => {
+  test("🔴 collegato con un ALTRO indirizzo: non si entra nell'account altrui", async () => {
     const dove = await ingressoDopoPagamento(
       "moglie@gmail.com",
       "/pratica/abc",
       "marito@gmail.com",
     );
-    // Non è la sua sessione: deve passare dall'accesso vero.
+    // Non è la sua sessione: niente ingresso automatico, si passa dalla posta.
     expect(dove).not.toBe("/pratica/abc");
+    expect(dove).toContain("/entra?pratica=1");
   });
 });
 
