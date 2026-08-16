@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Area, Barre, Imbuto, Legenda, Scheda } from "@/components/admin/Grafici";
+import { Area, Imbuto, Legenda, Scheda } from "@/components/admin/Grafici";
+import GraficoGiorni from "@/components/admin/GraficoGiorni";
 import { Avviso, Kpi, euro, oNonLetto } from "@/components/admin/Pezzi";
 import { contaInAttesa } from "@/lib/admin/dati";
 import { soloAdmin } from "@/lib/admin/guardia";
@@ -180,17 +181,35 @@ export default async function PaginaPanoramica() {
             />
           }
         >
-          <Barre
-            giorni={serie}
-            serie={[
-              { nome: "Visite", classe: "fill-menta", valore: (g) => g.per.visita ?? 0 },
-              { nome: "Analisi", classe: "fill-verde", valore: (g) => g.per.check ?? 0 },
-              {
-                nome: "Pagamenti",
-                classe: "fill-verde-notte",
-                valore: (g) => g.per.pagato ?? 0,
-              },
-            ]}
+          {/* Le serie si risolvono QUI in liste di numeri: il grafico è
+              interattivo (gira nel browser) e una funzione non attraversa il
+              confine server→browser. Vedi GraficoGiorni. */}
+          <GraficoGiorni
+            giorni={serie ? serie.map((g) => ({ etichetta: g.etichetta, oggi: g.oggi })) : null}
+            serie={
+              serie
+                ? [
+                    {
+                      nome: "Visite",
+                      fill: "fill-menta",
+                      punto: "bg-menta",
+                      valori: serie.map((g) => g.per.visita ?? 0),
+                    },
+                    {
+                      nome: "Analisi",
+                      fill: "fill-verde",
+                      punto: "bg-verde",
+                      valori: serie.map((g) => g.per.check ?? 0),
+                    },
+                    {
+                      nome: "Pagamenti",
+                      fill: "fill-verde-notte",
+                      punto: "bg-verde-notte",
+                      valori: serie.map((g) => g.per.pagato ?? 0),
+                    },
+                  ]
+                : null
+            }
           />
         </Scheda>
 

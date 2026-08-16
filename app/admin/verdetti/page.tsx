@@ -53,8 +53,28 @@ type RigaVerifica = {
     arrivo_effettivo_utc: string | null;
     vettore_operativo: string | null;
     fonte: string;
+    fonti_discordanti: boolean | null;
   } | null;
 };
+
+/**
+ * QUALI CASI MERITANO UN'OCCHIATA IN PIÙ (Valerio, 16/08: «evidenzia quelli
+ * strani da controllare»).
+ *
+ * Due segnali concreti, non un'impressione:
+ * - il ritardo è appena sopra le 3 ore (180-210 min): lì un piccolo errore
+ *   sull'orario di arrivo può ribaltare il verdetto, ed è dove il motore è
+ *   più esposto;
+ * - le fonti non erano d'accordo (`fonti_discordanti`): il dato di partenza
+ *   era già incerto.
+ * Tutto il resto è un idoneo comodo, che quasi sempre regge.
+ */
+function motivoSospetto(v: RigaVerifica): string | null {
+  const r = v.ritardo_minuti;
+  if (r !== null && r >= 180 && r <= 210) return "ritardo al limite delle 3 ore";
+  if (v.voli?.fonti_discordanti) return "le fonti non erano d'accordo";
+  return null;
+}
 
 const oraUtc = (iso: string | null) =>
   iso
@@ -121,7 +141,7 @@ export default async function PaginaVerdetti() {
     db
       .from("verifiche")
       .select(
-        "id, volo_iata, data_locale, importo, ritardo_minuti, motivo, versione_regole, email, creata_il, voli(arrivo_previsto_utc, arrivo_effettivo_utc, vettore_operativo, fonte)",
+        "id, volo_iata, data_locale, importo, ritardo_minuti, motivo, versione_regole, email, creata_il, voli(arrivo_previsto_utc, arrivo_effettivo_utc, vettore_operativo, fonte, fonti_discordanti)",
       )
       .eq("esito", "idoneo")
       .eq("conferma", "in_attesa")
@@ -130,22 +150,35 @@ export default async function PaginaVerdetti() {
          sbagliato, perché il verdetto uscito un minuto fa è quello che
          sta vendendo adesso. */
       .order("creata_il", { ascending: false })
+      /* 🔴 SOLO CASI VERI (Valerio, 16/08, scelta col popup): i voli demo
+         (numero che inizia per ZZ) sono il collaudo, non il motore al
+         lavoro. Riempivano questa pagina di rumore e nascondevano i pochi
+         casi veri da controllare. (Il filtro sta DOPO l'ordinamento apposta:
+         così `.eq → .order` restano vicini, come vuole la prova campione.) */
+      .not("volo_iata", "ilike", "ZZ%")
       .limit(30),
-    db.from("verifiche").select("id", { count: "exact", head: true }).gte("creata_il", oggi),
+    db
+      .from("verifiche")
+      .select("id", { count: "exact", head: true })
+      .not("volo_iata", "ilike", "ZZ%")
+      .gte("creata_il", oggi),
     db
       .from("verifiche")
       .select("id", { count: "exact", head: true })
       .eq("esito", "idoneo")
+      .not("volo_iata", "ilike", "ZZ%")
       .gte("creata_il", oggi),
     db
       .from("verifiche")
       .select("id", { count: "exact", head: true })
       .eq("esito", "incerto")
+      .not("volo_iata", "ilike", "ZZ%")
       .gte("creata_il", oggi),
     db
       .from("verifiche")
       .select("id", { count: "exact", head: true })
       .eq("esito", "non_idoneo")
+      .not("volo_iata", "ilike", "ZZ%")
       .gte("creata_il", oggi),
   ]);
 
@@ -190,7 +223,7 @@ export default async function PaginaVerdetti() {
 
       <Scheda
         titolo="Gli ultimi verdetti idonei"
-        sotto="Dal più recente. Il motore vende gia' da solo: qui controlli a campione che stia dicendo la verita'. Confronta gli orari con la fonte; se regge premi Va bene, se ha sbagliato correggi e scrivi perche'. Solo la correzione ferma la vendita su quel caso."
+        sotto="Solo casi veri, dal più recente (i voli demo ZZ sono nascosti). Quelli col bordo giallo sono al limite: vale la pena guardarli per primi. Confronta gli orari con la fonte; se regge premi Va bene, se ha sbagliato correggi e scrivi perché. Solo la correzione ferma la vendita su quel caso."
         destra={
           codaNonLetta ? (
             /* ⚠️ Niente bollo verde su una lettura fallita: sarebbe una
@@ -220,8 +253,18 @@ export default async function PaginaVerdetti() {
           />
         ) : (
           <ul className="flex flex-col gap-2.5">
-            {coda.map((v) => (
-              <li key={v.id} className="rounded-[12px] border border-bordo bg-nebbia/50 px-4 py-3.5">
+            {coda.map((v) => {
+              /* I casi sospetti hanno il bordo giallo e un'etichetta che dice
+                 PERCHÉ: così l'occhio va lì per primo, invece di scorrere
+                 trenta righe uguali. */
+              const sospetto = motivoSospetto(v);
+              return (
+              <li
+                key={v.id}
+                className={`rounded-[12px] border px-4 py-3.5 ${
+                  sospetto ? "border-sole/60 bg-sole/[0.06]" : "border-bordo bg-nebbia/50"
+                }`}
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-medium">
@@ -230,6 +273,11 @@ export default async function PaginaVerdetti() {
                         <span className="text-fumo"> · {v.voli.vettore_operativo}</span>
                       ) : null}
                     </p>
+                    {sospetto && (
+                      <span className="mt-1.5 inline-flex items-center rounded-pillola bg-sole/25 px-2.5 py-0.5 text-[11.5px] font-medium text-inchiostro">
+                        Da guardare: {sospetto}
+                      </span>
+                    )}
                     <p className="mt-1 text-[13px] leading-relaxed text-fumo">
                       ritardo{" "}
                       <span className="numeri font-medium text-inchiostro">
@@ -326,7 +374,8 @@ export default async function PaginaVerdetti() {
                   </form>
                 </details>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
       </Scheda>
