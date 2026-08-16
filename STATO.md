@@ -7,7 +7,10 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-16 (giro #78: la festa sulla pratica vinta, il
+**Aggiornato:** 2026-08-16 (giro #79: i buchi della pratica (memoria,
+reset, bottoni, falso claim), il menu che apriva due sezioni, l'accesso
+admin per la sola email, i log delle anteprime, e il pannello (Verdetti
+solo casi veri + grafico interattivo) · giro #78: la festa sulla pratica vinta, il
 rimborso solo dopo aver combattuto, la lettera senza gergo (ENAC fuori,
 «Vai su ConciliaWeb»), e la foto della prova di pagamento · giro #77: i
 bottoni schiacciati da `flex-1`, la guida d'invio vecchia, il furto
@@ -48,6 +51,62 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #79 (16/08): I BUCHI DELLA PRATICA, IL MENU STORTO, L'ACCESSO
+  ADMIN, I LOG STRANI, E IL PANNELLO (VERDETTI + GRAFICO INTERATTIVO).**
+  Quarto collaudo di Valerio dal telefono. Prima ho dovuto RIALLINEARE: il
+  working tree locale era rimasto indietro (bug ricorrente della sandbox,
+  `git reset --hard origin/main` verso `c57ad26`, il mio giro #78 c'era
+  già). Poi i bug, in due lotti.
+  - 🔴 **LA PRATICA NON PERDE PIÙ LA MEMORIA.** «Apro la lettera, torno
+    indietro e mi ritrovo al passo precedente» (carta d'imbarco, spese): il
+    «sono pronto» viveva solo nel browser e si azzerava. Adesso si ricorda
+    (`sessionStorage` per pratica, `PreparaReclamo`).
+  - 🔴 **NON SI RESETTA PIÙ.** Scegliere il motivo del no faceva un
+    `window.location.reload()` (lampo bianco, salto in cima): Valerio lo
+    viveva come «si resetta e torni indietro». Adesso `router.refresh`,
+    morbido. Idem sul «Vedi la replica», che ora porta dritto alla replica.
+    Due reload duri tolti (DichiaraRifiuto, LeggiRisposta).
+  - 🔴 **«MI HANNO RISPOSTO NO» CHE NON RISPONDEVA:** una volta aperta la
+    strada del no, ripremerlo non faceva niente e sembrava rotto. Ora
+    sparisce appena la strada è aperta (DichiaraEsito).
+  - 🔴 **IL FALSO CLAIM:** «Il no che hai registrato: "circostanza
+    eccezionale..."» metteva fra virgolette l'ETICHETTA DELLA CATEGORIA,
+    non le parole della compagnia. Su una email diversa sembrava inventata.
+    Ora dice che è la NOSTRA lettura, correggibile.
+  - Guardie in `prove/pratica-stato.spec.ts`: niente reload duri, il pronto
+    si ricorda, il no non spaccia la categoria per parole loro.
+  - 🔴 **PANORAMICA APRIVA ANCHE LA MAPPA:** `sezioneDi` partiva da
+    `SEZIONI[0]` (la Mappa) e la sostituiva solo con una corrispondenza
+    ALMENO altrettanto lunga; su `/admin` (Panoramica) la voce giusta non
+    batteva mai i 12 caratteri della Mappa. Ora vince la corrispondenza più
+    lunga fra quelle che davvero corrispondono.
+  - **ACCESSO ADMIN (scelta col popup: solo l'email):** entrando con
+    `valerio@artecai.it` si va sempre nel pannello, mai nella web app. La
+    guardia di `/admin` la lascia entrare per la stessa email (niente
+    rimbalzo). `EMAIL_ADMIN` in `lib/admin/guardia.ts`.
+  - **I LOG STRANI (scelta col popup: nascondi le anteprime):** gli
+    indirizzi `6a81...--rivolio.netlify.app` erano le anteprime di Netlify.
+    Il filtro dipendeva da `NEXT_PUBLIC_SITO`/`URL` (che la checklist del
+    dominio dice di togliere, e a runtime Netlify non le garantisce):
+    adesso i nostri host sono anche scritti a mano (`rivolio.it` incluso).
+    Le righe vecchie si mostrano «anteprima interna».
+  - **VERDETTI (scelta col popup: trasformala):** nascosti i voli demo ZZ
+    (coda e contatori); i casi al limite (ritardo 180-210 min, o fonti
+    discordanti) hanno il bordo giallo e il perché.
+  - **GRAFICO GIORNO PER GIORNO INTERATTIVO:** striscia verticale che segue
+    il cursore/dito + cartellino coi numeri del giorno. Nuovo componente
+    client `GraficoGiorni`; le serie si risolvono in liste di numeri sul
+    server (una funzione non attraversa il confine server→browser).
+  - **Le 4 scelte del popup:** admin → solo l'email; Verdetti → trasforma;
+    Upstash → spento per ora; log → nascondi le anteprime.
+  - ⚠️ **RESTA DA FARE (prossimo giro):** l'analisi critica degli
+    screenshot che Valerio ha committato in `collaudo-ux/screenshot/` (sua
+    scelta: «al prossimo giro»). E la checklist del dominio: `rivolio.it`
+    **non è ancora puntato su Netlify** (lo dicono i log, ancora
+    `rivolio.netlify.app`); il codice è pronto.
+  - Prove: **verify verde a ogni lotto** (1670 prove, 0 rosse). Una prova
+    (`campione`) ha beccato un mio commento troppo lungo che allontanava
+    `.order` da `.eq`: il filtro demo è stato spostato dopo l'ordinamento.
 - **GIRO #78 (16/08): LA FESTA, LA PULIZIA DELLA PRATICA VINTA, IL RIMBORSO
   DOPO AVER COMBATTUTO, LA LETTERA SENZA GERGO, E LA FOTO DELLA PROVA.**
   Quarto collaudo di Valerio dal telefono, con gli screenshot. Quattro
