@@ -159,3 +159,119 @@ export function scenario(
 export function checkPerPaganti(pagantiVoluti: number, conversione: number): number {
   return conversione > 0 ? Math.round(pagantiVoluti / conversione) : 0;
 }
+
+/* ─────────── IL MODELLO COMPLETO: IVA, INCASSO, CREATOR, GARANZIA ────────────
+ *
+ * Il conto qui sopra (contoPratica) è la versione semplice: non toglie l'IVA,
+ * non ha i creator, e tratta la garanzia come un rimborso in CONTANTI. Questo
+ * pezzo, chiesto da Valerio il 16/08, aggiunge le tre leve che decidono
+ * davvero se il business regge quando arriva il traffico e si lavora con gli
+ * influencer:
+ *  1. l'IVA (chi la versa dipende da come incassi);
+ *  2. il modo di incassare (merchant-of-record o Stripe diretto);
+ *  3. la commissione ai creator, pagata SUBITO;
+ *  4. la forma della garanzia: rimborso in CREDITO (un buono) o in CONTANTI.
+ *
+ * La scoperta che rende tutto solido: col rimborso in CREDITO non esce mai
+ * cassa, quindi la commissione già pagata al creator è sempre coperta e il
+ * netto per pratica NON va mai in negativo, a qualsiasi tasso di rimborso.
+ */
+
+/** IVA ordinaria italiana, B2C. I prezzi mostrati la includono. */
+export const IVA = 0.22;
+
+/** I due modi di incassare, a confronto. */
+export const INCASSO = {
+  mor: {
+    nome: "Merchant-of-record (Paddle/Lemon)",
+    percento: 0.05,
+    fisso: 0.5,
+    nota: "Versano IVA, OSS e fatture al posto tuo. Commissione più alta, zero adempimenti.",
+  },
+  stripe: {
+    nome: "Stripe diretto (tua partita IVA)",
+    percento: 0.015,
+    fisso: 0.25,
+    nota: "Commissione bassa, ma IVA, OSS e fatture le gestisci tu (serve un commercialista).",
+  },
+} as const;
+export type ModoIncasso = keyof typeof INCASSO;
+
+/** La commissione ai creator, sulla PRATICA (non sul check: è un anticipo che si scala). */
+export const CREATOR_PCT = 0.25;
+
+export type LeveMargine = {
+  prezzo: number;
+  incasso: ModoIncasso;
+  /** 0..1 sulla pratica. */
+  creatorPct: number;
+  /** 0..1: quanti reclami falliscono e fanno scattare la garanzia. */
+  tassoRimborso: number;
+  /** true = rimborso in credito (un buono), false = rimborso in contanti. */
+  garanziaCredito: boolean;
+};
+
+export type MargineCompleto = {
+  exIva: number;
+  iva: number;
+  commissione: number;
+  creator: number;
+  serviziPratica: number;
+  /** Quello che resta su una vendita che RESTA (nessun rimborso). */
+  tieni: number;
+  /** Il netto su una vendita RIMBORSATA: ~positivo col credito, negativo coi contanti. */
+  nettoSuRimborso: number;
+  /** La media pesata al tasso di rimborso: il netto vero per pratica. */
+  medioPerPratica: number;
+  /** Il tasso di rimborso oltre cui vai in perdita. null = non ci vai mai. */
+  pareggioRimborso: number | null;
+};
+
+/** I costi vivi di una pratica oltre incasso e creator (OCR + email). Briciole. */
+function serviziDiUnaPratica(): number {
+  return COSTO_OCR + EMAIL_PER_PRATICA * COSTO_EMAIL;
+}
+
+/**
+ * Il conto completo di una pratica, con tutte le leve. È una funzione PURA
+ * (nessuna dipendenza dal server): la usa anche il simulatore nel browser.
+ */
+export function margineCompleto(leve: LeveMargine): MargineCompleto {
+  const { prezzo, incasso, creatorPct, tassoRimborso, garanziaCredito } = leve;
+  const inc = INCASSO[incasso];
+  const exIva = prezzo / (1 + IVA);
+  const iva = prezzo - exIva;
+  const commissione = prezzo * inc.percento + inc.fisso;
+  const creator = prezzo * creatorPct;
+  const serviziPratica = serviziDiUnaPratica();
+  // Quello che resta se la vendita non torna indietro.
+  const tieni = exIva - commissione - creator - serviziPratica;
+
+  // Su un rimborso:
+  //  - in CREDITO non esce cassa: tieni i soldi, dai un buono. Costa al
+  //    massimo il servizio di una pratica in più se il buono viene usato.
+  //  - in CONTANTI ridai il prezzo pieno; recuperi l'IVA (nota di credito),
+  //    ma la commissione e il creator sono già usciti: resti sotto di quelli.
+  const nettoSuRimborso = garanziaCredito
+    ? tieni - serviziPratica
+    : -(commissione + creator + serviziPratica);
+
+  const medioPerPratica = (1 - tassoRimborso) * tieni + tassoRimborso * nettoSuRimborso;
+
+  // Il tasso di rimborso che porta il netto medio a zero. Se anche una
+  // vendita rimborsata resta positiva (il credito), non ci arrivi mai.
+  const pareggioRimborso =
+    nettoSuRimborso >= 0 ? null : tieni / (tieni - nettoSuRimborso);
+
+  return {
+    exIva,
+    iva,
+    commissione,
+    creator,
+    serviziPratica,
+    tieni,
+    nettoSuRimborso,
+    medioPerPratica,
+    pareggioRimborso,
+  };
+}

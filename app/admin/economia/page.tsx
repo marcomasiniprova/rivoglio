@@ -5,14 +5,18 @@ import { leggiCruscotto } from "@/lib/eventi/lettura";
 import { SERVIZIO_ATTIVO } from "@/lib/supabase/servizio";
 import {
   FISSI_MENSILI,
+  INCASSO,
+  PREZZO_FAMIGLIA,
   PREZZO_PRATICA,
   TASSO_RIMBORSO_GARANZIA,
   checkPerPaganti,
   contoPratica,
   costoCheck,
   fissiMensiliTotale,
+  margineCompleto,
   scenario,
 } from "@/lib/admin/economia";
+import SimulatoreMargine from "@/components/admin/SimulatoreMargine";
 
 /**
  * ECONOMIA: quanto si fa e quanto costa, dal check alla compensazione
@@ -90,6 +94,54 @@ export default async function PaginaEconomia() {
           }
         />
       </div>
+
+      {/* ── IL SIMULATORE (leve: incasso, creator, rimborsi, credito) ── */}
+      <SimulatoreMargine />
+
+      {/* ── INCASSARE: MERCHANT-OF-RECORD O STRIPE ─────────────────── */}
+      <Scheda
+        titolo="Incassare: merchant-of-record o Stripe diretto"
+        sotto="Quello che ti resta per pratica (creator 25%, garanzia in credito), coi due modi."
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[480px] text-[14px]">
+            <thead>
+              <tr className="text-left text-[12.5px] uppercase tracking-wide text-fumo-2">
+                <th className="pb-2 font-medium">&nbsp;</th>
+                <th className="pb-2 text-right font-medium">Merchant-of-record</th>
+                <th className="pb-2 text-right font-medium">Stripe diretto</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-bordo/70">
+              <tr>
+                <td className="py-2 text-fumo">Ti resta, pratica singola</td>
+                <td className="numeri py-2 text-right font-medium text-inchiostro">
+                  {euro(margineCompleto({ prezzo: PREZZO_PRATICA, incasso: "mor", creatorPct: 0.25, tassoRimborso: 0.15, garanziaCredito: true }).tieni)}
+                </td>
+                <td className="numeri py-2 text-right font-medium text-inchiostro">
+                  {euro(margineCompleto({ prezzo: PREZZO_PRATICA, incasso: "stripe", creatorPct: 0.25, tassoRimborso: 0.15, garanziaCredito: true }).tieni)}
+                </td>
+              </tr>
+              <tr>
+                <td className="py-2 text-fumo">Ti resta, pratica famiglia</td>
+                <td className="numeri py-2 text-right font-medium text-inchiostro">
+                  {euro(margineCompleto({ prezzo: PREZZO_FAMIGLIA, incasso: "mor", creatorPct: 0.25, tassoRimborso: 0.15, garanziaCredito: true }).tieni)}
+                </td>
+                <td className="numeri py-2 text-right font-medium text-inchiostro">
+                  {euro(margineCompleto({ prezzo: PREZZO_FAMIGLIA, incasso: "stripe", creatorPct: 0.25, tassoRimborso: 0.15, garanziaCredito: true }).tieni)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 border-t border-bordo pt-3 text-[12.5px] leading-relaxed text-fumo">
+          Stripe ti lascia qualche centesimo in più (commissione più bassa), ma IVA, OSS e fatture
+          le gestisci tu. Il merchant-of-record ({INCASSO.mor.nome.split(" (")[0]}) costa un po&apos; di
+          più e in cambio ti toglie tutti gli adempimenti: per un fondatore da solo, di solito
+          vince lui. In ogni caso la compensazione (250-600€) non passa mai da te: la paga la
+          compagnia al passeggero.
+        </p>
+      </Scheda>
 
       {/* ── DOVE VA UNA PRATICA DA 14,90 ───────────────────────────── */}
       <Scheda
@@ -218,6 +270,12 @@ export default async function PaginaEconomia() {
             </tbody>
           </table>
         </div>
+        <p className="mt-3 border-t border-bordo pt-3 text-[12.5px] leading-relaxed text-fumo">
+          Questa tabella è lo scenario <strong>peggiore</strong>: rimborso in contanti, senza
+          creator. Col rimborso in <strong>credito</strong> (un buono, non i soldi) non esce cassa
+          e il costo di un rimborso è quasi zero: il netto per pratica resta quello pieno a
+          qualsiasi tasso. Gioca con le leve nel simulatore qui sopra per vederlo.
+        </p>
       </Scheda>
 
       {/* ── I PREZZI VERI, CON LE FONTI ────────────────────────────── */}
