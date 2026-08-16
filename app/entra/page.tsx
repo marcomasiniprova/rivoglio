@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Logo from "@/components/Logo";
 import ModuloEntra from "@/components/ModuloEntra";
+import AspettaAccesso from "@/components/AspettaAccesso";
 import { percorsoInterno } from "@/lib/api/percorso";
 
 export const metadata: Metadata = {
@@ -54,6 +55,7 @@ export default async function PaginaEntra({ searchParams }: PageProps<"/entra">)
                 la posta dell&apos;indirizzo che hai usato: per la tua sicurezza si entra solo da lì,
                 così nessuno può aprire la tua pratica al posto tuo.
               </p>
+              <AspettaAccesso poi={poi || "/app"} />
             </div>
           )}
 

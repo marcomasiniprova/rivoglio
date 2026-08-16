@@ -51,6 +51,57 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #80 (16/08): IL LOGIN IN UNA PAGINA SOLA, IL LAMPO BIANCO TOLTO
+  IN ALTRI TRE PUNTI, E IL GIRO DI CONTROLLO DEL CODICE.** Valerio dopo il
+  test dei 30 secondi: «l'email è arrivata, ho cliccato il link e mi ha
+  aperto una pagina nuova con la web app, la vecchia è rimasta lì. Vorrei
+  una pagina sola: parte "ti ho mandato il link" e poi si aggiorna DA SOLA
+  e mi fa entrare. Poi guardami il codice, cose che io non so, controlla
+  che sia stabile». Quattro scelte col popup: spiegazione in chat semplice;
+  giro completo; sistema le sicure e chiedi per le grosse; provo a fare il
+  login in una pagina sola.
+  - **IL LOGIN NON LASCIA PIÙ DUE PAGINE APERTE.** Il link nell'email lo
+    apre il programma di posta, quasi sempre in una scheda nuova: quella
+    entra e atterra su /app, la vecchia («ti ho mandato il link») restava
+    morta. Adesso la pagina d'attesa chiede al server ogni 3 secondi «sono
+    entrato?» (`app/api/sessione-attiva`, `no-store`) e appena il cookie
+    di sessione compare (vale per tutte le schede dello stesso sito) si
+    porta dentro da sola con una navigazione piena a `poi`. Componente
+    nuovo `components/AspettaAccesso.tsx`, agganciato sotto l'avviso di
+    `ModuloEntra` (link magico + registrazione) e nel riquadro «entra
+    nella tua pratica» di `app/entra/page.tsx`. Controlla subito
+    all'apertura e a ogni ritorno sulla scheda (`visibilitychange`/`focus`),
+    e smette dopo 6 minuti. ⚠️ Il link continua ad aprirsi in una scheda
+    nuova (lo decide il client di posta, non noi): il fastidio tolto è la
+    pagina di partenza che restava inutile. Combacia col proxy, che già
+    rimanda a /app un `/entra` di chi è collegato (riga 113).
+  - **IL LAMPO BIANCO («si resetta») TOLTO IN ALTRI TRE PUNTI.** Cercando
+    i `window.location.reload()` rimasti: `SpeseCura` (spese art. 9 sulla
+    pratica), `DomandeCancellato` (le due domande del volo cancellato) e
+    `ChiHaOperato` (codeshare, «di che compagnia era l'aereo»). Erano lo
+    stesso difetto già chiuso su rifiuto e coincidenza: ricaricavano la
+    pagina di forza, e sul verdetto rifacevano partire lo scanner, che
+    sembrava un crash. Ora `router.refresh()` come `DichiaraCaso`. La
+    prova `prova/pratica-stato.spec.ts` adesso vieta il reload duro (e
+    pretende `router.refresh`) su tutti e cinque i flussi «dichiara un
+    caso, il server riscrive il verdetto».
+  - **IL GIRO COMPLETO DI CONTROLLO (letto, non solo provato).** I
+    paracadute errore ci sono tutti (`app/error.tsx`, `global-error.tsx`,
+    `not-found.tsx`, `app/admin/error.tsx`). Ogni `JSON.parse` sul
+    percorso critico (webhook Polar, ricevuta del check, gettone iscritti)
+    è dentro un try/catch. Nessun `process.env.X!` che possa far crashare
+    per una variabile mancante. `dangerouslySetInnerHTML` solo per JSON-LD
+    e CSS da costanti controllate, mai da input utente. Nessuna chiave
+    segreta nei log o nel bundle. Il proxy non chiama più Supabase per chi
+    non ha mai fatto login. **Niente bug nuovo, niente buco di sicurezza
+    nuovo**: le instabilità vere che Valerio sentiva erano i ricaricamenti
+    duri, ora tolti. Le cose aperte restano sue decisioni già prese (Polar
+    fermo, cassa di prova aperta, Upstash spento).
+  - **TELEGRAM**: le due variabili (`TELEGRAM_BOT_TOKEN`,
+    `TELEGRAM_ADMIN_CHAT`) Valerio le ha messe su Netlify. Nessuna azione
+    lato codice.
+  - Prove: verify verde (build, tipi, lint, l'intera suite). La nuova
+    copertura è in `prove/pratica-stato.spec.ts`.
 - **GIRO #79 (16/08): I BUCHI DELLA PRATICA, IL MENU STORTO, L'ACCESSO
   ADMIN, I LOG STRANI, E IL PANNELLO (VERDETTI + GRAFICO INTERATTIVO).**
   Quarto collaudo di Valerio dal telefono. Prima ho dovuto RIALLINEARE: il

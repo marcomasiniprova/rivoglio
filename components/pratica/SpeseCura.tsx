@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Check, Utensils } from "lucide-react";
 
 /**
@@ -21,6 +22,7 @@ export default function SpeseCura({
   praticaId: string;
   iniziale: boolean;
 }) {
+  const router = useRouter();
   const [vuole, setVuole] = useState(iniziale);
   const [invio, setInvio] = useState(false);
   const [errore, setErrore] = useState("");
@@ -41,7 +43,10 @@ export default function SpeseCura({
         return;
       }
       setVuole(nuovo);
-      window.location.reload();
+      /* Il paragrafo dell'art. 9 lo scrive il server dentro la lettera:
+         aggiornamento morbido, così la pagina della pratica non sbianca e
+         non salta in cima (era `window.location.reload()`). */
+      router.refresh();
     } catch {
       setErrore("Non ha funzionato. Riprova tra poco.");
     } finally {

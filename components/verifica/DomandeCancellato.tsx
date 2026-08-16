@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { COPY } from "@/lib/copy";
 import type { Alternativa, Preavviso } from "@/lib/regole/cancellato";
@@ -97,6 +98,7 @@ export default function DomandeCancellato({
   /** Dice alla pagina che il caso è chiuso: il titolo non deve più dire "ci fermiamo". */
   avvisa?: (esito: "idoneo" | "incerto" | "non_idoneo") => void;
 }) {
+  const router = useRouter();
   const [preavviso, setPreavviso] = useState<Preavviso | null>(null);
   const [alternativa, setAlternativa] = useState<Alternativa | null>(null);
   const [invio, setInvio] = useState(false);
@@ -121,12 +123,13 @@ export default function DomandeCancellato({
         return;
       }
       /* Caso VERO (c'è una riga di verifica): il server ha già riscritto
-         l'esito, quindi si ricarica e la pagina si rifà da capo col
-         verdetto giusto, il reveal e il bottone per aprire la pratica.
-         Meglio ricaricare che ricostruire qui una seconda vendita.
+         l'esito. Aggiornamento morbido (era `window.location.reload()`, che
+         rifaceva partire la scenetta dello scanner e sembrava un crash): il
+         server rilegge il verdetto giusto, il reveal e il bottone per aprire
+         la pratica, senza sbiancare la pagina.
          Caso demo: nessuna riga da rileggere, il verdetto si mostra qui. */
       if (idVerifica && d.esito !== "incerto") {
-        window.location.reload();
+        router.refresh();
         return;
       }
       setEsito({ esito: d.esito, motivo: d.motivo, importo: d.importo });

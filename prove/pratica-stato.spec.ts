@@ -29,12 +29,17 @@ test.describe("Lo stato della pratica non salta", () => {
     for (const f of [
       "components/pratica/DichiaraRifiuto.tsx",
       "components/pratica/LeggiRisposta.tsx",
+      "components/pratica/SpeseCura.tsx",
+      // stessi flussi «dichiara un caso, il server riscrive il verdetto»:
+      // il reload duro rifaceva partire lo scanner e sembrava un crash.
+      "components/verifica/DichiaraCaso.tsx",
+      "components/verifica/DomandeCancellato.tsx",
+      "components/verifica/ChiHaOperato.tsx",
     ]) {
       const c = senzaCommenti(leggi(f));
       expect(c, `${f} ricarica la pagina di forza`).not.toContain("window.location.reload");
+      expect(c, `${f} non rinfresca col router`).toContain("router.refresh");
     }
-    const rifiuto = senzaCommenti(leggi("components/pratica/DichiaraRifiuto.tsx"));
-    expect(rifiuto).toContain("router.refresh");
   });
 
   test("il «pronto» del reclamo si ricorda al ritorno dalla lettera", () => {

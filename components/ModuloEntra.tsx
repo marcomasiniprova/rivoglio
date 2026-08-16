@@ -7,6 +7,7 @@ import { accedi, linkMagico, registrati, type Esito } from "@/app/entra/azioni";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import AspettaAccesso from "@/components/AspettaAccesso";
 
 import { seSiPaga } from "@/lib/check/ingresso";
 type Modo = "accedi" | "registrati" | "magico";
@@ -197,6 +198,11 @@ export default function ModuloEntra({
           </motion.p>
         )}
       </AnimatePresence>
+
+      {/* Mandato il link, la pagina resta ad aspettare e si fa entrare da
+          sola appena tu lo apri (anche se il link si apre in un'altra
+          scheda): niente più due pagine da tenere aperte. */}
+      {esito.avviso && <AspettaAccesso poi={poi} />}
 
       {/* ⚠️ QUESTA NON È PIÙ UNA VIA SECONDARIA, ed è il motivo per cui
           non è più una riga grigia in fondo. Dall'11/08 il bottone di

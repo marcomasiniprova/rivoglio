@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { COPY } from "@/lib/copy";
 
@@ -41,6 +42,7 @@ export default function ChiHaOperato({
   demo: boolean;
   avvisa?: (esito: "idoneo" | "incerto" | "non_idoneo") => void;
 }) {
+  const router = useRouter();
   const [testo, setTesto] = useState("");
   const [elenco, setElenco] = useState<Compagnia[]>([]);
   const [scelta, setScelta] = useState<Compagnia | null>(null);
@@ -94,11 +96,12 @@ export default function ChiHaOperato({
         setErrore(typeof d?.errore === "string" ? d.errore : COPY.comune.erroreGenerico);
         return;
       }
-      /* Caso vero: il server ha già riscritto l'esito sulla riga, quindi
-         si ricarica e la pagina si rifà col verdetto giusto e il bottone
-         per aprire la pratica. La vendita passa sempre da lì. */
+      /* Caso vero: il server ha già riscritto l'esito sulla riga.
+         Aggiornamento morbido (era `window.location.reload()`): il server
+         rilegge il verdetto giusto e il bottone per aprire la pratica, senza
+         rifar partire lo scanner e senza sbiancare la pagina. */
       if (idVerifica && d.esito !== "incerto") {
-        window.location.reload();
+        router.refresh();
         return;
       }
       setEsito({ esito: d.esito, motivo: d.motivo, importo: d.importo });
