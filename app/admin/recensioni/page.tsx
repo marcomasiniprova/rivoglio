@@ -6,6 +6,7 @@ import { dataIt } from "@/lib/admin/dati";
 import { soloAdmin } from "@/lib/admin/guardia";
 import { SERVIZIO_ATTIVO } from "@/lib/supabase/servizio";
 import { recensioniPerAdmin, type Recensione } from "@/lib/recensioni/recensioni";
+import { proveDiPagamento } from "@/lib/pratiche/prova-pagamento";
 
 /**
  * LE RECENSIONI: LA MODERAZIONE (Valerio, 15/08).
@@ -51,6 +52,10 @@ export default async function PaginaRecensioni() {
   const tutte = await recensioniPerAdmin(200);
   const inAttesa = tutte.filter((r) => r.stato === "in_attesa");
   const decise = tutte.filter((r) => r.stato !== "in_attesa");
+
+  // Le foto di pagamento caricate dagli utenti (facoltative), per i
+  // testimonial anonimi. Bucket privato: sono URL firmati che scadono.
+  const prove = await proveDiPagamento(60);
 
   const Riga = ({ r }: { r: Recensione }) => (
     <li className="rounded-[12px] border border-bordo bg-nebbia/50 px-4 py-3.5">
@@ -138,6 +143,50 @@ export default async function PaginaRecensioni() {
           </ul>
         </Scheda>
       )}
+
+      <Scheda
+        titolo="Prove di pagamento"
+        sotto="Le foto che gli utenti caricano dopo aver vinto (facoltative). Servono come testimonial anonimo: ritagliale per mostrare solo importo e data, mai IBAN o nome."
+        destra={
+          prove.length > 0 ? (
+            <Bollo tono="verde">{prove.length}</Bollo>
+          ) : (
+            <Bollo>nessuna</Bollo>
+          )
+        }
+      >
+        {prove.length === 0 ? (
+          <Vuoto
+            titolo="Ancora nessuna foto."
+            spiega="Quando qualcuno chiude una pratica come pagata, gli chiediamo (senza obbligo) la foto dell'accredito. Compaiono qui, e le usi tu a mano come testimonial anonimo."
+          />
+        ) : (
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {prove.map((p) => (
+              <li
+                key={p.percorso}
+                className="overflow-hidden rounded-[12px] border border-bordo bg-nebbia/50"
+              >
+                {p.url ? (
+                  <a href={p.url} target="_blank" rel="noopener noreferrer">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- URL firmato dinamico da Supabase Storage: next/image non lo ottimizza */}
+                    <img
+                      src={p.url}
+                      alt={`Prova di pagamento della pratica ${p.praticaId}`}
+                      className="aspect-[4/3] w-full bg-white object-contain"
+                    />
+                  </a>
+                ) : (
+                  <div className="grid aspect-[4/3] w-full place-items-center px-3 text-center text-[12px] text-fumo-2">
+                    Foto non leggibile (il bucket non è ancora attivo?)
+                  </div>
+                )}
+                <p className="px-3 py-2 text-[12px] text-fumo-2">{dataIt(p.quando)}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Scheda>
     </div>
   );
 }

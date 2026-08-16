@@ -41,6 +41,7 @@ import { COPY } from "@/lib/copy";
 import LasciaRecensione from "@/components/rivolio/LasciaRecensione";
 import DichiaraEsito from "@/components/pratica/DichiaraEsito";
 import Traguardo from "@/components/pratica/Traguardo";
+import ProvaPagamento from "@/components/pratica/ProvaPagamento";
 
 /**
  * Il tracker della pratica: la linea del tempo dagli eventi, lo stato
@@ -383,6 +384,10 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           famiglia={pratica.tipo === "famiglia"}
         />
       )}
+
+      {/* La foto della prova di pagamento: FACOLTATIVA, solo sulla pratica
+          vinta, per un testimonial anonimo (Valerio, 16/08). */}
+      {vinta && <ProvaPagamento praticaId={pratica.id} />}
 
       {/* ------------------------------------------------ dove siamo
           🔴 Sparisce a pratica VINTA: lì comanda la festa, e «In attesa» +
