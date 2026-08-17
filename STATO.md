@@ -7,7 +7,12 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-16 (giro #79: i buchi della pratica (memoria,
+**Aggiornato:** 2026-08-17 (giro #81: i 4 fix del collaudo UX, il prezzo
+famiglia a 29,90, il simulatore margini in /admin/economia, e LA GARANZIA
+CHE DIVENTA UN CREDITO (la prossima pratica è su di noi, non i soldi
+indietro): tabella crediti_pratica applicata sul DB vero, grant automatico,
+rotta /api/pratiche/credito, copy riscritta ovunque · giro #80: il login in
+una pagina sola · giro #79: i buchi della pratica (memoria,
 reset, bottoni, falso claim), il menu che apriva due sezioni, l'accesso
 admin per la sola email, i log delle anteprime, e il pannello (Verdetti
 solo casi veri + grafico interattivo) · giro #78: la festa sulla pratica vinta, il
@@ -51,6 +56,55 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #81 (17/08): I FIX DEL COLLAUDO UX, IL PREZZO FAMIGLIA A 29,90,
+  IL SIMULATORE MARGINI, E LA GARANZIA CHE DIVENTA UN CREDITO.** Sessione
+  lunga, in pezzi, ognuno verde prima del prossimo. Online su `main`.
+  - **I 4 DIFETTI DEGLI SCREENSHOT DI COLLAUDO** (Valerio li aveva messi
+    in `collaudo-ux/screenshot/`, poi tolti dal repo dopo l'analisi):
+    - 🔴 **LA GARANZIA SI CONTRADDICEVA:** la pagina pratica prometteva un
+      rimborso a data fissa «entro il 14 novembre, senza moduli», mentre
+      il sistema chiede no scritto + documento + replica. Riscritta
+      coerente.
+    - 🔴 **IL «14,90» ERA FISSO** nel box esito: alla famiglia (29,90)
+      prometteva meno del pagato. Reso dinamico (poi superato dal credito).
+    - 🔴 **«L'UNICO CAMPO È L'IBAN»** contro la lettera che chiede anche
+      il nome: il passo 2 ora dice «IBAN e il tuo nome».
+    - 🟡 **IL BOX RECENSIONE** ricompariva a chi aveva già recensito:
+      ora si nasconde (controllo `eventoGiaRecensito` lato server).
+  - **PREZZO FAMIGLIA 24,90 → 29,90** (scelta di Valerio), ovunque:
+    listino, economia, condizioni, mappa admin.
+  - **CONSULENZA SUL BUSINESS MODEL + `/admin/economia` col SIMULATORE:**
+    IVA, confronto merchant-of-record vs Stripe, leve creator e tasso di
+    rimborso, netto per pratica dal vivo. La scoperta: col rimborso in
+    CREDITO non si va mai in perdita, a qualsiasi tasso.
+  - 🟢 **LA GARANZIA NON RIMBORSA PIÙ IN CONTANTI: DÀ UN CREDITO.** Se la
+    compagnia rifiuta senza motivo (o tace) e hai mandato la replica, la
+    tua **prossima pratica è su di noi** (un credito sull'account, del tipo
+    della pratica fallita, non scade). Non esce cassa → margini sempre
+    positivi anche pagando i creator in anticipo, e il negativo-su-rimborso
+    sparisce.
+    - Migrazione `crediti_pratica` **applicata e verificata sul DB vero**
+      col connettore Supabase (`supabase/2026-08-17-credito-garanzia.sql`).
+    - `lib/pratiche/credito.ts` (concedi/disponibile/consuma, `creditoCopre`
+      pura), grant automatico nella rotta esito (avviso Telegram
+      informativo), rotta `/api/pratiche/credito` (POST) che apre la
+      pratica gratis solo con un credito vero, bottone dedicato al verdetto
+      per chi è loggato e ha un credito.
+    - **Copy tutta in un colpo** da «ti rimborsiamo per intero» a «la
+      prossima pratica è su di noi (un credito, non i soldi indietro)»:
+      landing, FAQ, condizioni, /rimborsi, box esito, pagina pratica,
+      email, cassa di prova, app mobile. ⚠️ Il **rimborso in denaro resta**
+      per un errore NOSTRO (pagina /rimborsi): è una cosa diversa dalla
+      garanzia, e la distinzione è dichiarata.
+    - Prove: **6 nuove** in `prove/credito-garanzia.spec.ts` (il credito
+      solo col gate completo, la pratica gratis solo con credito vero,
+      rotta POST, credito usa e getta). tipi e lint verdi; le suite affette
+      verdi. ⚠️ `npm run build` non gira in sandbox (blocco rete Google
+      Fonts): Netlify builda con rete.
+  - ⚠️ **DA FARE:** collaudo dal vivo del box esito/credito dietro il login
+    (serve il tuo account o la chiave collaudatore); e su Netlify tieni
+    `NEXT_PUBLIC_CHECK_PREZZO_ATTIVO` e `EXPO_PUBLIC_CHECK_PREZZO_ATTIVO`
+    allineate come sempre.
 - **GIRO #80 (16/08): IL LOGIN IN UNA PAGINA SOLA, IL LAMPO BIANCO TOLTO
   IN ALTRI TRE PUNTI, E IL GIRO DI CONTROLLO DEL CODICE.** Valerio dopo il
   test dei 30 secondi: «l'email è arrivata, ho cliccato il link e mi ha
