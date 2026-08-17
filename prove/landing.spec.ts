@@ -161,6 +161,20 @@ test.describe("Landing page", () => {
     expect(largo, "la pagina esce dallo schermo in larghezza").toBe(false);
   });
 
+  test("la home dichiara le domande ai motori AI (FAQPage per il GEO)", async ({ page }) => {
+    /* GEO/AIO (17/08): le domande della home escono anche come dati
+       strutturati FAQPage, così ChatGPT e Perplexity possono citarle. Non
+       è per il riquadro di Google (riservato ai siti pubblici), è per farsi
+       ripetere dalle AI. Se un domani sparisce, questa prova se ne accorge. */
+    await page.goto("/");
+    const blocchi = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = blocchi.map((t) => JSON.parse(t)).find((d) => d["@type"] === "FAQPage");
+    expect(faq, "manca il FAQPage sulla home").toBeTruthy();
+    expect(faq.mainEntity.length).toBe(COPY.faq.voci.length);
+    // le domande strutturate sono le stesse che si leggono a schermo
+    expect(faq.mainEntity[0].name).toBe(COPY.faq.voci[0].domanda);
+  });
+
   test("il logo regge a 24px (è lì che si vede quasi sempre)", async ({ page }) => {
     await page.goto("/");
     // il segno nuovo è un'immagine (la lente), non più un svg disegnato

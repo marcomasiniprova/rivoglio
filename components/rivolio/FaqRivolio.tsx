@@ -1,11 +1,19 @@
 import { Anima, AnimaLista, Figlio } from "@/components/Anima";
 import { COPY } from "@/lib/copy";
+import { datiDomande, scriptDati } from "@/lib/tabellone/seo";
 
 /**
  * Le domande, con la struttura di Faq.tsx (details/summary nativi: si
  * aprono anche senza JavaScript e i lettori di schermo li conoscono).
  * Le risposte vengono da COPY.faq e restano oneste anche quando non ci
  * convengono: la prima spiega come fare tutto da soli, gratis.
+ *
+ * ⚠️ IL FAQPage QUI È PER I MOTORI AI, non per il riquadro di Google (che
+ * dal 2023 lo mostra solo a siti governativi e sanitari, come dice il
+ * layout). ChatGPT e Perplexity leggono i dati strutturati e citano le
+ * risposte: strutturare le domande le rende ripetibili da un'AI parola per
+ * parola. È il pezzo GEO chiesto da Valerio (17/08), e lo stesso schema che
+ * il Tabellone e le pagine /reclamo già usano: qui si estende alla home.
  */
 const SEZIONE = COPY.faq;
 
@@ -17,6 +25,12 @@ const titoloCorsivo = SEZIONE.titolo.slice(stacco + 1);
 export default function FaqRivolio() {
   return (
     <section id="domande" className="scroll-mt-24 px-5 py-13 sm:px-8 sm:py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={scriptDati(
+          datiDomande(SEZIONE.voci.map((v) => ({ domanda: v.domanda, risposta: v.risposta }))),
+        )}
+      />
       <div className="mx-auto max-w-[760px]">
         <Anima>
           <h2 className="luce-testo text-center text-[clamp(2.1rem,4.6vw,3.05rem)] leading-[1.06]">
