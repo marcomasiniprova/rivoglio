@@ -7,7 +7,7 @@ import {
   GIORNI_PRIMA_DEL_SOLLECITO,
 } from "@/lib/pratiche/rifiuto";
 import { paeseDiScalo } from "@/lib/regole/territorio";
-import { bottone, COLORI as C, FONT, riga, vestito } from "./modello";
+import { bottone, COLORI as C, FONT, firma, riga, vestito } from "./modello";
 
 /* ────────────────────── i giorni, presi dal motore ──────────────────────
    🔴 QUESTE EMAIL DICEVANO GIORNI CHE NON SONO PIU' QUELLI VERI: 15, 30 e
@@ -157,18 +157,19 @@ export function praticaPronta(
         ) +
         famiglia +
         p(
-          `<strong style="color:${C.inchiostro}">Perché la mandi tu e non noi:</strong> un reclamo che parte dalla casella del passeggero non può essere respinto come richiesta di un intermediario, e quello che recuperi resta tuo al 100%. Noi prepariamo, tu firmi.`,
+          `<strong style="color:${C.inchiostro}">Perché la mandi tu e non io:</strong> un reclamo che parte dalla tua casella non può essere respinto come richiesta di un intermediario, e quello che recuperi resta tuo al 100%. Io preparo tutto, tu firmi e invii.`,
         ) +
         p(
           `<strong style="color:${C.inchiostro}">La garanzia:</strong> se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di legge, dopo la tua replica la prossima pratica è su di noi (un credito, non i soldi indietro). Ti scrivo io per sapere com'è andata.`,
-        ),
+        ) +
+        firma(),
       coda: CODA,
     }),
     testo: `Pagamento ricevuto. La pratica è aperta.\n\nVolo ${d.volo}${quando}.${
       d.importo ? ` Fascia: ${euro(d.importo)} a passeggero (artt. 5 e 7, Reg. CE 261/2004).` : ""
-    }\n\nI due passi che restano:\n1. Entra nella pratica e carica la carta d'imbarco.\n2. Copia la lettera pronta e inviala alla compagnia dalla tua email.\n\nApri la pratica (link valido una volta sola): ${d.link}\nSe scade: ${casa()}/entra\n\nPerché la mandi tu: un reclamo dal passeggero non si respinge come richiesta di un intermediario, e il recupero resta tuo al 100%.${
-      "\nGaranzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, dopo la tua replica la prossima pratica è su di noi (un credito)."
-    }`,
+    }\n\nI due passi che restano:\n1. Entra nella pratica e carica la carta d'imbarco.\n2. Copia la lettera pronta e inviala alla compagnia dalla tua email.\n\nApri la pratica (link valido una volta sola): ${d.link}\nSe scade: ${casa()}/entra\n\nPerché la mandi tu e non io: un reclamo dalla tua casella non si respinge come richiesta di un intermediario, e il recupero resta tuo al 100%. Io preparo tutto, tu firmi e invii.${
+      "\nGaranzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, dopo la tua replica la prossima pratica è su di noi (un credito, non i soldi indietro)."
+    }\n\nValerio\nRivolio`,
   });
 }
 
@@ -202,10 +203,11 @@ export function linkPerEntrare(a: string, d: { link: string }): Promise<Esito> {
         p(
           "Il bottone ti fa entrare senza password e vale una volta sola. Se scade, entra con questa email da " +
             `<a href="${casa()}/entra" style="color:${C.verde};">${casa().replace(/^https?:\/\//, "")}/entra</a>.`,
-        ),
+        ) +
+        firma(),
       coda: CODA,
     }),
-    testo: `Ecco il link per entrare nella tua pratica (vale una volta sola):\n${d.link}\n\nPer la tua sicurezza l'ingresso passa di qui: solo chi apre questa casella entra. Se scade, entra da ${casa()}/entra con questa email.`,
+    testo: `Ecco il link per entrare nella tua pratica (vale una volta sola):\n${d.link}\n\nPer la tua sicurezza l'ingresso passa di qui: solo chi apre questa casella entra. Se scade, entra da ${casa()}/entra con questa email.\n\nValerio\nRivolio`,
   });
 }
 
@@ -242,7 +244,7 @@ export function invioConfermato(
     html: vestito({
       titolo: "Reclamo inviato",
       corpo:
-        h("Il reclamo è partito. Da qui in poi ci pensiamo noi.") +
+        h("Il reclamo è partito. Da qui in poi ci penso io.") +
         p(
           `Hai segnato l'invio del reclamo per il volo <strong style="color:${C.inchiostro}">${d.volo}</strong> il ${dataIt(d.dataInvio)}. Da oggi la palla è alla compagnia.`,
         ) +
@@ -254,11 +256,12 @@ export function invioConfermato(
         ) +
         bottone("Apri la tua pratica", d.link) +
         p(
-          "Non devi controllare niente e non devi ricordarti nessuna data: i passi li facciamo partire noi.",
-        ),
+          "Non devi controllare niente e non devi ricordarti nessuna data: i passi li faccio partire io.",
+        ) +
+        firma(),
       coda: CODA,
     }),
-    testo: `Il reclamo è partito. Da qui in poi ci pensiamo noi.
+    testo: `Il reclamo è partito. Da qui in poi ci penso io.
 
 Hai segnato l'invio del reclamo per il volo ${d.volo} il ${dataIt(d.dataInvio)}.
 
@@ -267,7 +270,10 @@ Le compagnie rispondono in otto-quattordici settimane, quindi il silenzio delle 
 Se ${dataConGiorno(d.giornoSollecito)} non avranno risposto, ti scrivo io col sollecito già pronto.
 Se rispondono no prima, aprila e dimmi che motivo hanno dato: la replica parte subito.
 
-La tua pratica: ${d.link}`,
+La tua pratica: ${d.link}
+
+Valerio
+Rivolio`,
   });
 }
 
@@ -295,12 +301,13 @@ export function promemoriaInvio(
         bottone("Apri la pratica e copia la lettera", d.link) +
         p(
           `Quando l'hai mandata, premi "L'ho inviata" nella pratica. Da quel giorno partono i tempi del sollecito, e da lì in poi ti seguo io.`,
-        ),
+        ) +
+        firma(),
       coda: CODA,
     }),
     testo: `Manca solo l'invio.\n\nLa lettera è pronta da due giorni. Copiala dalla pratica, incollala in un'email e mandala alla compagnia.${
       d.importo ? `\nIn ballo: ${euro(d.importo)} a passeggero (Reg. CE 261/2004).` : ""
-    }\n\nApri la pratica: ${d.link}\n\nQuando l'hai mandata, premi "L'ho inviata" nella pratica: da quel giorno partono i tempi del sollecito.`,
+    }\n\nApri la pratica: ${d.link}\n\nQuando l'hai mandata, premi "L'ho inviata" nella pratica: da quel giorno partono i tempi del sollecito, e da lì in poi ti seguo io.\n\nValerio\nRivolio`,
   });
 }
 
@@ -350,10 +357,11 @@ export function sollecitoPronto(
         p("Copia questo testo e invialo alla compagnia, dalla stessa email del primo reclamo:") +
         daCopiare(testoSollecito) +
         bottone("Apri la tua pratica", d.link) +
-        p("Nella pratica trovi i dati del volo, se vuoi ricontrollarli prima di inviare."),
+        p("Nella pratica trovi i dati del volo, se vuoi ricontrollarli prima di inviare.") +
+        firma(),
       coda: CODA,
     }),
-    testo: `Nessuna risposta? Si insiste.\n\nHai inviato il reclamo il ${dataIt(d.dataInvio)} e la compagnia non ha risposto. Il sollecito è pronto: copia e invia questo testo dalla stessa email del primo reclamo.\n\n---\nOggetto: Sollecito richiesta di compensazione, volo ${d.volo} del ${quando}\n\nSpett.le ${compagnia},\n\nin data ${dataIt(d.dataInvio)} vi ho inviato una richiesta di compensazione pecuniaria ai sensi degli articoli 5 e 7 del Regolamento CE 261/2004, relativa al volo ${d.volo} del ${quando}.\n\nNon ho ricevuto alcun riscontro. Vi chiedo una risposta entro 14 giorni. In mancanza, presenterò reclamo a ${ente} e valuterò ogni ulteriore azione prevista dalla legge.\n\n[Nome e cognome]\n---\n\nLa tua pratica: ${d.link}`,
+    testo: `Nessuna risposta? Si insiste.\n\nHai inviato il reclamo il ${dataIt(d.dataInvio)} e la compagnia non ha risposto. Il sollecito è pronto: copia e invia questo testo dalla stessa email del primo reclamo.\n\n---\nOggetto: Sollecito richiesta di compensazione, volo ${d.volo} del ${quando}\n\nSpett.le ${compagnia},\n\nin data ${dataIt(d.dataInvio)} vi ho inviato una richiesta di compensazione pecuniaria ai sensi degli articoli 5 e 7 del Regolamento CE 261/2004, relativa al volo ${d.volo} del ${quando}.\n\nNon ho ricevuto alcun riscontro. Vi chiedo una risposta entro 14 giorni. In mancanza, presenterò reclamo a ${ente} e valuterò ogni ulteriore azione prevista dalla legge.\n\n[Nome e cognome]\n---\n\nLa tua pratica: ${d.link}\n\nValerio\nRivolio`,
   });
 }
 
@@ -400,11 +408,12 @@ export function reclamoEnac(
         ) +
         bottone("Apri la tua pratica", d.link) +
         p(
-          `${e.dove} Il testo della segnalazione è già scritto dentro la tua pratica. Se qualcosa non torna, rispondi a questa email.`,
-        ),
+          `${e.dove} Il testo della segnalazione è già scritto dentro la tua pratica. Se qualcosa non torna, rispondi a questa email: la leggo io.`,
+        ) +
+        firma(),
       coda: CODA,
     }),
-    testo: `Ora rispondono all'autorità.\n\n${SETTIMANE_ENTE} settimane dal tuo reclamo per il volo ${d.volo}${quando}, senza esito. Il passo successivo è la segnalazione a ${e.nome}: gratuita, online, e la compagnia risponde a chi può sanzionarla.\n\nCosa serve: numero e data del volo, il reclamo già inviato, l'eventuale risposta della compagnia. È tutto nella tua pratica, insieme al testo già scritto: ${d.link}`,
+    testo: `Ora rispondono all'autorità.\n\n${SETTIMANE_ENTE} settimane dal tuo reclamo per il volo ${d.volo}${quando}, senza esito. Il passo successivo è la segnalazione a ${e.nome}: gratuita, online, e la compagnia risponde a chi può sanzionarla.\n\nCosa serve: numero e data del volo, il reclamo già inviato, l'eventuale risposta della compagnia. È tutto nella tua pratica, insieme al testo già scritto: ${d.link}\n\nValerio\nRivolio`,
   });
 }
 
@@ -432,11 +441,12 @@ export function comeVa(
         bottone("Aggiorna la tua pratica", d.link) +
         p(
           `<strong style="color:${C.inchiostro}">La garanzia vale ancora:</strong> se la compagnia ha rifiutato senza un motivo valido, o non si è fatta viva nei termini, dopo la tua replica la prossima pratica è su di noi (un credito, non i soldi indietro). Basta che tu mi dica com'è andata.`,
-        ),
+        ) +
+        firma(),
       coda: CODA,
     }),
     testo: `A che punto sei?\n\nSono passate ${SETTIMANE_ESITO} settimane dall'invio del reclamo.\n- Se la compagnia ha pagato: segnalo nella pratica e chiudiamo.\n- Se ha rifiutato: segnalo, il rifiuto scritto serve per i passi successivi.\n- Se non si è fatta viva: dillo lo stesso, così la garanzia parte da sola.\n\nAggiorna la pratica: ${d.link}\n${
-      "\nGaranzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, rimborso integrale del prezzo pagato."
-    }`,
+      "\nGaranzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, dopo la tua replica la prossima pratica è su di noi (un credito, non i soldi indietro)."
+    }\n\nValerio\nRivolio`,
   });
 }
