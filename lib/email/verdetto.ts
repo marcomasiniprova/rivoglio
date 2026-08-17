@@ -1,5 +1,5 @@
 import { casa, spedisci, type Esito } from "./posta";
-import { bottone, COLORI as C, FONT, vestito } from "./modello";
+import { bottone, COLORI as C, FONT, firma, vestito } from "./modello";
 
 /**
  * L'EMAIL DEL VERDETTO: quella che l'utente aspetta e che non arrivava.
@@ -104,14 +104,15 @@ export function verdettoIdoneo(a: string, d: DatiVerdetto): Promise<Esito> {
         ) +
         bottone("Riapri il tuo risultato", link) +
         p(
-          "Questo link riapre la pagina esatta dove eri, anche da un altro telefono o computer. Tienilo: senza, il risultato lo ritrovi solo rifacendo il controllo.",
+          "Con questo link riapri la pagina esatta dove eri, anche da un altro telefono o computer. Tienilo da parte: senza, il risultato lo ritrovi solo rifacendo il controllo.",
         ) +
         p(
-          `<strong style="color:${C.inchiostro}">A cosa serve il tuo indirizzo:</strong> a mandarti questo link, e a tenerti aggiornato sulla pratica se decidi di aprirla. A nient'altro. Non finisci in nessuna lista.`,
+          `<strong style="color:${C.inchiostro}">A cosa serve il tuo indirizzo:</strong> a mandarti questo link, e a tenerti aggiornato sulla pratica se decidi di aprirla. A nient'altro, e in nessuna lista.`,
         ) +
         p(
-          `<strong style="color:${C.inchiostro}">Una cosa da sapere sui tempi:</strong> le compagnie rispondono in otto-quattordici settimane, e la legge dà due anni per far valere il diritto. Non c'è fretta di ore, ma più passa il tempo più è difficile recuperare i documenti del volo.`,
-        ),
+          `<strong style="color:${C.inchiostro}">Una cosa sui tempi, così stai tranquillo:</strong> le compagnie rispondono in otto-quattordici settimane, e la legge ti dà due anni per far valere questo diritto. Non c'è fretta di ore. Ma più passa il tempo, più diventa difficile recuperare i documenti del volo.`,
+        ) +
+        firma(),
       coda: CODA,
     }),
     testo: `${d.demo ? `ESEMPIO DIMOSTRATIVO: il volo ${d.volo} non esiste, serve a mostrare come funziona Rivolio.\n\n` : ""}Il tuo volo vale ${euro(d.importo)}.
@@ -123,8 +124,11 @@ Riapri il tuo risultato: ${link}
 
 Questo link riapre la pagina esatta dove eri, anche da un altro dispositivo.
 
-A cosa serve il tuo indirizzo: a mandarti questo link, e a tenerti aggiornato sulla pratica se decidi di aprirla. A nient'altro.
+A cosa serve il tuo indirizzo: a mandarti questo link, e a tenerti aggiornato sulla pratica se decidi di aprirla. A nient'altro, e in nessuna lista.
 
-Le compagnie rispondono in otto-quattordici settimane; la legge dà due anni per far valere il diritto.`,
+Una cosa sui tempi, così stai tranquillo: le compagnie rispondono in otto-quattordici settimane, e la legge ti dà due anni per far valere questo diritto. Non c'è fretta di ore.
+
+Valerio
+Rivolio`,
   });
 }
