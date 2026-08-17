@@ -66,6 +66,58 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #84 (17/08): LA SKILL DI COPYWRITING SU EMAIL E MICROCOPY, IN
+  PRIMA PERSONA (VALERIO).** Valerio: «vai con email per bene e microcopy».
+  Scelte col popup: tutte le email in ordine · microcopy un pezzo per
+  volta (dal check) · a pezzi su main col prima/dopo · voce personale in
+  prima persona. Consegnato in 6 commit su `main`.
+  - **TUTTE LE EMAIL RISCRITTE COME LE SCRIVE UNA PERSONA, NON UN
+    SISTEMA.** Login, conferma indirizzo, benvenuto account, i due
+    dell'Osservatorio (`lib/email/messaggi.ts`), l'email del verdetto
+    (`verdetto.ts`), e le sette della pratica (`pratiche.ts`: T+0, link
+    d'ingresso, invio confermato, promemoria T+2, sollecito, ente,
+    com'è andata). Il «noi» diventa «io» dove la voce è di Valerio:
+    «Da qui in poi ci penso io», «i passi li faccio partire io», «Io
+    preparo tutto, tu firmi e invii». Ogni email chiude con la **firma
+    Valerio / Rivolio** (`firma()` nuovo in `modello.ts`): su un'email
+    transazionale è il segnale di fiducia più forte che abbiamo. La
+    struttura `seSiPaga`, le costanti dei giorni e il bollo dimostrativo
+    intatti.
+  - 🔴 **UN ERRORE VERO CHIUSO STRADA FACENDO:** la versione testo
+    dell'email «com'è andata» (T+90) prometteva ancora «rimborso
+    integrale del prezzo pagato», ma dal giro #81 la garanzia è un
+    **credito**, non i soldi indietro. La versione con grafica lo diceva
+    giusto, quella testo no: chi legge senza immagini si portava a casa
+    una promessa che non manteniamo. Allineata.
+  - **MICROCOPY DEL CHECK, ripulito** (`lib/copy.ts`): l'errore generico
+    da «Qualcosa non ha funzionato» (la frase d'errore più vuota che ci
+    sia) a **«Non ci sono riuscito»**, in prima persona e senza dare la
+    colpa all'utente; la nota della scena analisi allineata alla voce in
+    prima persona dei sei passi («interrogo… se non li trovo, te lo
+    dico», non più «noi»). Il resto del check era **già a livello** (i
+    messaggi calmi, «compilo io volo e data», «la leggo e la butto»):
+    toccato solo dove miglioravo davvero.
+  - **STESSA FRASE VUOTA TOLTA DAI FLUSSI CLIENTE:** pratica (leggi
+    risposta, dichiara rifiuto) e accesso (`app/entra/azioni.ts`)
+    dicevano ancora «Qualcosa non ha funzionato» → «Non ci sono
+    riuscito», in linea col check.
+  - **L'ULTIMO TRATTINO LUNGO IN UNA STRINGA VISIBILE** stava nel
+    pannello impostazioni admin: tolto (virgole). Sweep finale sul web:
+    zero «lei» formale, zero «clicca qui», zero «Errore» nudo, zero
+    trattini lunghi nel testo che si legge.
+  - Prove: **tipi 0 errori, lint 0 errori** (8 avvisi vecchi), **190
+    verdi** sulle suite toccate (email, landing, ripresa, pratica-stato,
+    coerenza-risposta, entra, passi, garanzia, reggere, documenti), 2
+    saltate (le solite che in sandbox non arrivano a Supabase). Niente
+    «hai diritto a», niente trattino lungo (controllo meccanico, non a
+    sensazione).
+  - ⚠️ **RESTA FUORI, di proposito:** le stringhe dell'**app mobile**
+    (`mobile/src/lib/testi.ts` e altre) hanno lo stesso «Qualcosa non ha
+    funzionato» e la stessa voce da allineare, ma è un'altra superficie:
+    va fatta con la sua catena (`npm run` dentro `mobile/`), non
+    insieme al web, e l'app non è ancora sugli store. Le **etichette
+    admin** (cruscotto, `lib/eventi/lettura.ts`) sono per Valerio, non
+    per i clienti: si possono rifinire in un giro admin dedicato.
 - **GIRO #83 (17/08): IL MARKETING GEO/AIO — FARSI CITARE DAI MOTORI AI.**
   Valerio: «porta sempre le modifiche sul main, il progresso deve stare
   online» (nuova regola fissa), poi «implementa il GEO (Generative Engine
