@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { RADICE, tagUsati, tutti } from "@/lib/tabellone/indice";
 import { AEROPORTI_OSSERVATI } from "@/lib/osservatorio/ritardi";
 import { dateConSciopero } from "@/lib/scioperi/scioperi";
+import { COMPAGNIE_PAGINA } from "@/lib/rimborsi/pagine-compagnia";
 
 /**
  * La mappa del sito. Il prodotto È la home col check; da lì scendono le
@@ -75,6 +76,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily" as const,
       priority: 0.7,
     })),
+    // LE PAGINE DI RECLAMO PER COMPAGNIA (GEO): rispondono a "reclamo Ryanair",
+    // "rimborso volo easyJet". L'indice vale quanto il blog, le singole 0.7.
+    {
+      url: `${casa}/reclamo`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    },
+    ...COMPAGNIE_PAGINA.map((c) => ({
+      url: `${casa}/reclamo/${c.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+    {
+      url: `${casa}/alternative-airhelp`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    },
     // le guide: contenuto da ricerca, vale più delle pagine legali
     ...["/guida-bagagli", "/giudice-di-pace", "/mobilita-ridotta"].map((percorso) => ({
       url: `${casa}${percorso}`,
