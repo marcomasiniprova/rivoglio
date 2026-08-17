@@ -155,7 +155,7 @@ function stato(): Voce[] {
     {
       nome: "MOTORE_SEGRETO",
       serve:
-        "Chiude i lavori automatici a chi non è Netlify: gli scioperi di notte, gli avvisi del mattino e — dal 13/08 — i PROMEMORIA delle pratiche (il sollecito al giorno 42, l'ente al 56, «com'è andata?» al 90).",
+        "Chiude i lavori automatici a chi non è Netlify: gli scioperi di notte, gli avvisi del mattino e, dal 13/08, i PROMEMORIA delle pratiche (il sollecito al giorno 42, l'ente al 56, «com'è andata?» al 90).",
       seManca:
         "In produzione quelle rotte non si aprono. Gli scioperi non si aggiornano e, quel che è peggio, NESSUN promemoria parte: i clienti restano fermi e non se ne accorge nessuno.",
       peso: "importante",
