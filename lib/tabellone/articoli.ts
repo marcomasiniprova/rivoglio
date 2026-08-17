@@ -11,6 +11,7 @@ import { ARTICOLO as cancellato } from "./pezzi/volo-cancellato-primi-60-minuti"
 import { ARTICOLO as datiEuropa } from "./pezzi/dati-ritardi-europa-2025";
 import { ARTICOLO as datiItalia } from "./pezzi/scali-italiani-ritardi-2026";
 import { ARTICOLO as riforma } from "./pezzi/riforma-261-2027-cosa-cambia";
+import { ARTICOLO as coincidenza } from "./pezzi/coincidenza-persa-cosa-ti-spetta";
 
 /**
  * GLI ARTICOLI DEL TABELLONE.
@@ -27,6 +28,7 @@ import { ARTICOLO as riforma } from "./pezzi/riforma-261-2027-cosa-cambia";
  * primi, poi i pezzi che convertono, poi i dati.
  */
 export const ARTICOLI: Articolo[] = [
+  coincidenza,
   riforma,
   ritardoFasce,
   compagniaDiceNo,
