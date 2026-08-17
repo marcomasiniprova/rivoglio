@@ -340,6 +340,12 @@ export function CorpoMarketing() {
               &bull; Gruppi di città e aeroporto (chi vola da lì): es.{" "}
               <em>&laquo;italiani a Londra&raquo;</em>, gruppi dello scalo che ti interessa.
             </li>
+            <li>
+              &bull; I più grossi (offerte, ma pieni di gente): <em>Poracci In Viaggio</em> (oltre
+              200mila), <em>Viaggialo</em>, e i tanti gruppi &laquo;voli low cost&raquo;. Lì si
+              condividono offerte, ma quando qualcuno racconta un volo andato male è il momento di
+              dare una mano.
+            </li>
           </ul>
           <p className="mt-4 text-[13px] leading-relaxed text-fumo-2">
             <span className="font-medium text-inchiostro">Prima di postare:</span> leggi le regole
@@ -347,6 +353,38 @@ export function CorpoMarketing() {
             vera), e non incollare lo stesso testo in dieci gruppi lo stesso giorno: Facebook lo
             legge come spam e blocca l&apos;account. Meglio poche risposte, vere, dove qualcuno ha
             chiesto davvero aiuto.
+          </p>
+        </div>
+      </section>
+
+      {/* I FORUM ITALIANI. TripAdvisor "Trasporto aereo" è pieno di
+          domande italiane proprio su ritardi e rimborsi: terreno perfetto. */}
+      <section className="mt-10">
+        <div className="flex items-center gap-2.5">
+          <MessageSquare className="size-[18px] text-fumo" aria-hidden="true" />
+          <h2 className="font-display text-[1.35rem] tracking-[-0.02em]">
+            I forum italiani (dove già si parla di voli)
+          </h2>
+        </div>
+        <p className="mt-2 text-[14px] leading-relaxed text-fumo">
+          I forum sono una miniera doppia: c&apos;è gente vera che chiede aiuto, e le AI li leggono
+          e li citano (restano online per anni). Il migliore per noi:
+        </p>
+        <div className="mt-4 rounded-[14px] border border-bordo bg-white p-5">
+          <p className="text-[14px] font-medium text-inchiostro">
+            TripAdvisor &mdash; forum &laquo;Trasporto aereo&raquo;
+          </p>
+          <p className="mt-1.5 text-[13.5px] leading-relaxed text-fumo">
+            È pieno di discussioni italiane su ritardi, cancellazioni e rimborsi (Ryanair, Volotea,
+            coincidenze perse), e di gente che chiede &laquo;questi siti di rimborso sono
+            affidabili?&raquo;. Lì una risposta onesta e dichiarata &mdash; spiega come farlo da
+            soli, e di&apos; che Rivolio è il tuo progetto &mdash; è utilissima. Cerca su Google{" "}
+            <em>&laquo;tripadvisor trasporto aereo ritardo rimborso&raquo;</em> e rispondi ai thread
+            recenti. I testi pronti qui sopra vanno bene, accorciati.
+          </p>
+          <p className="mt-3 text-[13px] leading-relaxed text-fumo-2">
+            Altri buoni: i forum di viaggio generalisti e i gruppi Telegram di voli low cost.
+            Regola uguale a Reddit: prima aiuti davvero, poi (se ci sta) dici che è roba tua.
           </p>
         </div>
       </section>
