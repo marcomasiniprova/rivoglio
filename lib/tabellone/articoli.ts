@@ -12,6 +12,9 @@ import { ARTICOLO as datiEuropa } from "./pezzi/dati-ritardi-europa-2025";
 import { ARTICOLO as datiItalia } from "./pezzi/scali-italiani-ritardi-2026";
 import { ARTICOLO as riforma } from "./pezzi/riforma-261-2027-cosa-cambia";
 import { ARTICOLO as coincidenza } from "./pezzi/coincidenza-persa-cosa-ti-spetta";
+import { ARTICOLO as overbooking } from "./pezzi/overbooking-negato-imbarco-cosa-ti-spetta";
+import { ARTICOLO as ita } from "./pezzi/reclamo-ita-airways-come-fare";
+import { ARTICOLO as cancellatoScelta } from "./pezzi/volo-cancellato-rimborso-o-volo-alternativo";
 
 /**
  * GLI ARTICOLI DEL TABELLONE.
@@ -29,6 +32,9 @@ import { ARTICOLO as coincidenza } from "./pezzi/coincidenza-persa-cosa-ti-spett
  */
 export const ARTICOLI: Articolo[] = [
   coincidenza,
+  overbooking,
+  ita,
+  cancellatoScelta,
   riforma,
   ritardoFasce,
   compagniaDiceNo,

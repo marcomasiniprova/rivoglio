@@ -68,22 +68,24 @@ test.describe("Il Tabellone: la redazione", () => {
     expect(sparse, `immagini sparse in public/: ${sparse.join(", ")}`).toEqual([]);
   });
 
-  test("ci sono dodici articoli, con slug e titoli unici", () => {
-    /* Undici dal 10/08 (giro #48, riforma 2027); dodici dal 17/08 col
-       pezzo sulla coincidenza persa (giro GEO). */
-    expect(ARTICOLI.length).toBe(12);
+  test("ci sono quindici articoli, con slug e titoli unici", () => {
+    /* Undici dal 10/08 (giro #48, riforma 2027); dal 17/08 (giro GEO)
+       quattro nuovi: coincidenza persa, overbooking, ITA Airways e la
+       scelta rimborso/volo alternativo sul cancellato. */
+    expect(ARTICOLI.length).toBe(15);
     expect(SLUG.size).toBe(ARTICOLI.length);
     expect(new Set(ARTICOLI.map((a) => a.titolo)).size).toBe(ARTICOLI.length);
   });
 
-  test("il mix è quello deciso: 2 pilastri, 2 di emergenza, 2 sui dati, 6 verticali", () => {
+  test("il mix è quello deciso: 2 pilastri, 2 di emergenza, 2 sui dati, 9 verticali", () => {
     const conto = (t: string) => ARTICOLI.filter((a) => a.tipo === t).length;
     expect(conto("pilastro")).toBe(2);
     expect(conto("emergenza")).toBe(2);
     expect(conto("dati")).toBe(2);
-    /* I verticali sono i pezzi che intercettano una ricerca sola: tre per
-       compagnia e tre per situazione (prescrizione, riforma, coincidenza). */
-    expect(conto("compagnia") + conto("situazione")).toBe(6);
+    /* I verticali sono i pezzi che intercettano una ricerca sola: quattro
+       per compagnia (Ryanair, easyJet, Wizz, ITA) e cinque per situazione
+       (prescrizione, riforma, coincidenza, overbooking, cancellato-scelta). */
+    expect(conto("compagnia") + conto("situazione")).toBe(9);
   });
 
   for (const a of ARTICOLI) {
