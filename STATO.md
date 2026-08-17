@@ -7,7 +7,12 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-17 (giro #82: il collaudo dello stato "sono pronto?"
+**Aggiornato:** 2026-08-17 (giro #83: il marketing GEO/AIO, cioè farsi
+citare da ChatGPT e Perplexity: 79 pagine "reclamo per compagnia" + pagina
+di confronto (già online dal giro precedente), la misura del traffico dai
+motori AI, la sezione Marketing nel pannello coi testi pronti e il controllo
+mensile, e le domande della home dichiarate alle AI (FAQPage) ·
+giro #82: il collaudo dello stato "sono pronto?"
 — pronto per la distribuzione, manca solo la cassa — le pulizie DB, e il caso
 nuovo "ritardo 5h+ con rinuncia" (art. 6 → art. 8, rimborso del biglietto) ·
 giro #81: i 4 fix del collaudo UX, il prezzo
@@ -59,6 +64,53 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #83 (17/08): IL MARKETING GEO/AIO — FARSI CITARE DAI MOTORI AI.**
+  Valerio: «porta sempre le modifiche sul main, il progresso deve stare
+  online» (nuova regola fissa), poi «implementa il GEO (Generative Engine
+  Optimization) come un professionista, fai ricerche vere e poi 4 domande
+  col popup». Scelte sue: pagine per compagnia, pagina confronto + testi
+  Reddit/Quora, riscrittura GEO di blog+landing+casi, misura con UTM +
+  checklist mensile. Ricerca fatta online prima di costruire.
+  - **79 PAGINE "RECLAMO PER COMPAGNIA"** (`/reclamo/[slug]`) + l'indice
+    `/reclamo` + la pagina di confronto onesta `/alternative-airhelp`,
+    costruite dai dati veri di `compagnie.ts` (canale verificato uno per
+    uno). Ognuna risponde con le cifre in cima (250/400/600€), il canale
+    ufficiale, la lettera pronta, e per le 5 compagnie ostili agli
+    intermediari (Ryanair, easyJet, Wizz, ITA, Lufthansa) l'angolo «lo
+    mandi tu e tieni il 100%». Con dati strutturati (HowTo, FAQPage,
+    breadcrumb). **Già online dal push precedente.**
+  - **LA MISURA DEL TRAFFICO DAI MOTORI AI.** La visita porta anche
+    l'etichetta `utm_source`; `provenienzaVisita()` la fa vincere sul
+    referer (i motori AI spesso il referer lo tolgono); `sorgenteAI()`
+    normalizza chat.openai.com e chatgpt.com in "chatgpt". Nel pannello
+    **Traffico** c'è il riquadro «Ti manda l'AI?»: quante persone
+    arrivano da ChatGPT, Perplexity e simili. È l'unico modo di sapere se
+    il GEO funziona.
+  - **NASCE `/admin/marketing`** (sezione Marketing nella barra, fra
+    Traffico e Registro): il lavoro a mano che spinge le pagine, dentro
+    il sito e non in un file (regola di Valerio). Dentro: le **10 domande
+    del controllo mensile** da incollare in ChatGPT/Perplexity per vedere
+    se Rivolio compare, e i **testi pronti** da incollare su Reddit/Quora,
+    ognuno onesto e con la riga «è il mio progetto» (fingersi utente
+    qualsiasi fa più danni che bene). Ogni blocco ha il bottone «copia».
+  - **LA HOME DICHIARA LE DOMANDE ALLE AI** (FAQPage): le 9 domande della
+    home escono anche come dati strutturati, così le AI possono citarle
+    parola per parola. Non è per il riquadro di Google (riservato ai siti
+    pubblici dal 2023): è per farsi ripetere dalle AI. Il footer porta a
+    `/reclamo` e `/alternative-airhelp` da ogni pagina.
+  - **RICERCA GEO, i punti che hanno deciso le scelte:** `llms.txt` NON è
+    usato da Google/OpenAI/Perplexity per le citazioni (valore basso, non
+    ci abbiamo puntato); il referer cattura già le visite dai motori
+    (chatgpt.com, perplexity.ai); pagine PER COMPAGNIA invece che per
+    singolo volo (il codice del volo cambia ogni giorno, la compagnia no).
+  - Prove: **verify verde**. Le nuove: 6 sul riconoscimento dei motori AI
+    e la precedenza utm (`registro.spec.ts`), 6 sulle pagine reclamo
+    (`reclamo-compagnia.spec.ts`), 1 sul FAQPage della home
+    (`landing.spec.ts`). Collaudo visivo della pagina Marketing fatto a
+    375/768/1440 (pagina di prova temporanea, poi cancellata): zero errori
+    console, nessuno scorrimento orizzontale.
+  - ⚠️ **I motori AI ci metteranno settimane** a vedere le pagine nuove:
+    il numero «Ti manda l'AI?» all'inizio è a zero, ed è normale.
 - **GIRO #82 (17/08): "SONO PRONTO?" — IL COLLAUDO DELLO STATO, LE PULIZIE
   DB, E IL CASO NUOVO "RITARDO 5H+ CON RINUNCIA" (art. 6 → art. 8).** Valerio
   ha chiesto se Rivolio è pronto per la distribuzione (pagamenti a parte) e di
