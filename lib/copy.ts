@@ -234,7 +234,11 @@ export const COPY = {
     },
     puntiFiducia: [
       seSiPaga(`L'analisi costa ${PREZZO}: meno di un cappuccino al bar`, "Il check è gratis, sempre"),
-      "Nessuna percentuale sulla compensazione",
+      /* Riscritto (skill copywriting): da funzione ("nessuna percentuale")
+         a beneficio col contrasto implicito verso le agenzie che
+         trattengono il 25-35%. Quello che l'utente vuole sentirsi dire è
+         "sono tutti tuoi", non una regola nostra. */
+      "La compensazione è tutta tua: zero percentuali trattenute",
       "Se non ti pagano, la prossima pratica è su di noi",
     ],
   },
