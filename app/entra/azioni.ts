@@ -97,7 +97,7 @@ function inItaliano(messaggio: string): string {
   }
 
   console.error("[entra] messaggio Supabase non tradotto:", messaggio);
-  return "Qualcosa non ha funzionato. Riprova fra un attimo.";
+  return "Non ci sono riuscito. Riprova fra un attimo.";
 }
 
 /** Accesso con email e password. */

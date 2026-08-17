@@ -128,7 +128,7 @@ export default function DichiaraRifiuto({
       });
       const d = await r.json().catch(() => null);
       if (!r.ok || !d?.ok) {
-        setErrore(typeof d?.errore === "string" ? d.errore : "Qualcosa non ha funzionato.");
+        setErrore(typeof d?.errore === "string" ? d.errore : "Non ci sono riuscito. Riprova.");
         return;
       }
       /* 🔴 PRIMA QUI C'ERA `window.location.reload()`, e Valerio l'ha
@@ -142,7 +142,7 @@ export default function DichiaraRifiuto({
       setLista(false);
       router.refresh();
     } catch {
-      setErrore("Qualcosa non ha funzionato. Riprova tra poco.");
+      setErrore("Non ci sono riuscito. Riprova tra poco.");
     } finally {
       setInvio(false);
     }

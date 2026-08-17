@@ -103,11 +103,11 @@ export default function LeggiRisposta({
          Si segna a parte perché va mostrata in giallo, come un avviso da
          leggere, non in rosso fra gli errori tecnici. */
       setIncoerente(d?.incoerente === true);
-      setErrore(typeof d?.errore === "string" ? d.errore : "Qualcosa non ha funzionato. Riprova.");
+      setErrore(typeof d?.errore === "string" ? d.errore : "Non ci sono riuscito. Riprova.");
     } catch {
       setIncoerente(false);
       setStato("fermo");
-      setErrore("Qualcosa non ha funzionato. Riprova tra poco.");
+      setErrore("Non ci sono riuscito. Riprova tra poco.");
     }
   }
 
