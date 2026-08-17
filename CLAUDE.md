@@ -28,7 +28,9 @@ check del volo → verdetto → pratica di reclamo. Dominio: rivolio.it. Contest
 12. All'utente: dieci persone normali, del tu, frasi corte, MAI il trattino lungo, ogni numero apribile.
 
 ## Chiedi PRIMA
-13. Soldi, domini, software di sistema, pubblicare, cose irreversibili.
+13. Soldi, domini, software di sistema, cose irreversibili verso l'esterno.
+    NON il deploy: ogni pezzo finito va SEMPRE su `main` e quindi online, senza
+    chiedere (Valerio, 17/08: vuole il progresso sempre online).
 
 ## La mappa dei file
 - INIZIA-QUI.md — parti da qui: setup locale, mappa, stato, cosa collaudare.
