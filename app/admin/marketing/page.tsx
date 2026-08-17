@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Megaphone, Search, MessageSquare, TrendingUp } from "lucide-react";
+import { Megaphone, Search, MessageSquare, TrendingUp, Rocket, Users } from "lucide-react";
 import { soloAdmin } from "@/lib/admin/guardia";
 import BloccoDaCopiare from "@/components/admin/BloccoDaCopiare";
 
@@ -159,6 +159,77 @@ export function CorpoMarketing() {
         </div>
       </div>
 
+      {/* IL PASSO PRIORITARIO: BING. Senza questo il resto vale poco: le AI
+          non vedono le pagine finché Bing non le indicizza. */}
+      <section className="mt-6 rounded-[14px] border border-verde/40 bg-white p-5">
+        <div className="flex items-center gap-2.5">
+          <Rocket className="size-[19px] text-verde" aria-hidden="true" />
+          <h2 className="font-display text-[1.35rem] tracking-[-0.02em]">
+            Il passo che accende ChatGPT (5 minuti, una volta sola)
+          </h2>
+        </div>
+        <p className="mt-3 text-[14px] leading-relaxed text-fumo">
+          ChatGPT non naviga il web da solo: per le sue risposte usa l&apos;indice di{" "}
+          <strong>Bing</strong> (circa l&apos;87% delle citazioni). Una pagina che Bing non ha
+          visto, ChatGPT non la può citare. Quindi il pezzo che conta più di tutti è farsi vedere
+          da Bing.
+        </p>
+        <div className="mt-4 rounded-[12px] border border-verde/25 bg-menta-tenue p-4">
+          <p className="text-[14px] font-medium text-verde-scuro">
+            Metà è già automatica (l&apos;ho costruita io)
+          </p>
+          <p className="mt-1.5 text-[13.5px] leading-relaxed text-fumo">
+            Ogni notte il sito avvisa Bing da solo che c&apos;è roba nuova (si chiama IndexNow), e
+            gli manda tutti i 120 indirizzi del sito. Tu non devi fare niente per questo.
+          </p>
+        </div>
+        <p className="mt-4 text-[14px] font-medium text-inchiostro">
+          Il tuo passo, una volta sola:
+        </p>
+        <ol className="mt-2 space-y-2.5 text-[14px] leading-relaxed text-fumo">
+          <li>
+            <span className="font-medium text-inchiostro">1.</span> Vai su{" "}
+            <a
+              href="https://www.bing.com/webmasters"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-verde underline-offset-2 hover:underline"
+            >
+              bing.com/webmasters
+            </a>{" "}
+            ed entra (puoi usare l&apos;account Google, così importi tutto in un clic).
+          </li>
+          <li>
+            <span className="font-medium text-inchiostro">2.</span> Aggiungi il sito{" "}
+            <code className="text-inchiostro">rivolio.it</code>. Se ti chiede di verificarlo,
+            l&apos;import da Google fa tutto; altrimenti scegli la verifica col file, ce l&apos;hai
+            già pronto.
+          </li>
+          <li>
+            <span className="font-medium text-inchiostro">3.</span> Invia la sitemap:{" "}
+            <code className="text-inchiostro">https://rivolio.it/sitemap.xml</code>. Da qui in
+            avanti Bing (e ChatGPT) vedono tutte le pagine.
+          </li>
+        </ol>
+        <p className="mt-4 text-[13px] leading-relaxed text-fumo-2">
+          <span className="font-medium text-inchiostro">Bonus Google (facoltativo):</span> stessa
+          cosa su{" "}
+          <a
+            href="https://search.google.com/search-console"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-verde underline-offset-2 hover:underline"
+          >
+            Search Console
+          </a>{" "}
+          (aggiungi il sito e la stessa sitemap): serve per Google normale e per le sue risposte AI.
+        </p>
+        <p className="mt-3 text-[13px] leading-relaxed text-fumo-2">
+          ⚠️ Ci vogliono <strong>settimane</strong> perché le pagine nuove entrino nelle risposte
+          delle AI. È normale: prima le devono leggere e digerire.
+        </p>
+      </section>
+
       {/* IL CONTROLLO DI OGNI MESE. */}
       <section className="mt-8">
         <div className="flex items-center gap-2.5">
@@ -228,6 +299,55 @@ export function CorpoMarketing() {
               <BloccoDaCopiare testo={t.testo} etichetta="Copia il testo" />
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* I GRUPPI FACEBOOK ITALIANI. In Italia Facebook batte Reddit di
+          molto: è lì che c'è la gente vera col problema in mano. */}
+      <section className="mt-10">
+        <div className="flex items-center gap-2.5">
+          <Users className="size-[18px] text-fumo" aria-hidden="true" />
+          <h2 className="font-display text-[1.35rem] tracking-[-0.02em]">
+            I gruppi Facebook italiani
+          </h2>
+        </div>
+        <p className="mt-2 text-[14px] leading-relaxed text-fumo">
+          In Italia Facebook ha molta più gente di Reddit, ed è pieno di gruppi dove le persone
+          chiedono aiuto proprio quando il volo va storto. Non i profili delle agenzie (quelli sono
+          concorrenti), ma i gruppi <strong>aperti</strong> di viaggiatori. I testi da usare sono
+          gli stessi qui sopra: quando qualcuno chiede aiuto, rispondi con la mano tesa e dici che
+          è il tuo progetto.
+        </p>
+
+        <div className="mt-4 rounded-[14px] border border-bordo bg-white p-5">
+          <p className="text-[14px] font-medium text-inchiostro">Che gruppi cercare (su Facebook)</p>
+          <ul className="mt-2 space-y-1.5 text-[14px] leading-relaxed text-fumo">
+            <li>
+              &bull; Voli low cost e offerte: cerca{" "}
+              <em>&laquo;voli low cost&raquo;</em>, <em>&laquo;offerte voli&raquo;</em>,{" "}
+              <em>&laquo;Ryanair Italia&raquo;</em>, <em>&laquo;easyJet Italia&raquo;</em>.
+            </li>
+            <li>
+              &bull; Viaggiare risparmiando: <em>&laquo;viaggiare low cost&raquo;</em>,{" "}
+              <em>&laquo;consigli di viaggio&raquo;</em>.
+            </li>
+            <li>
+              &bull; Diritti e reclami: <em>&laquo;diritti del consumatore&raquo;</em>,{" "}
+              <em>&laquo;reclami compagnie aeree&raquo;</em>,{" "}
+              <em>&laquo;rimborso volo&raquo;</em>.
+            </li>
+            <li>
+              &bull; Gruppi di città e aeroporto (chi vola da lì): es.{" "}
+              <em>&laquo;italiani a Londra&raquo;</em>, gruppi dello scalo che ti interessa.
+            </li>
+          </ul>
+          <p className="mt-4 text-[13px] leading-relaxed text-fumo-2">
+            <span className="font-medium text-inchiostro">Prima di postare:</span> leggi le regole
+            del gruppo (molti vietano la promozione e la tollerano solo se rispondi a una domanda
+            vera), e non incollare lo stesso testo in dieci gruppi lo stesso giorno: Facebook lo
+            legge come spam e blocca l&apos;account. Meglio poche risposte, vere, dove qualcuno ha
+            chiesto davvero aiuto.
+          </p>
         </div>
       </section>
 
