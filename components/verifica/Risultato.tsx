@@ -108,6 +108,13 @@ export type DatiVerifica = {
    * attivo» e non aprivano niente (Valerio, 13/08).
    */
   cassaProva: boolean;
+  /**
+   * IL CREDITO DELLA GARANZIA (Valerio, 17/08). Se chi guarda è collegato e ha
+   * un credito libero, al posto del pagamento apre la pratica gratis. `singola`
+   * = ha un credito che copre una singola (qualsiasi credito); `famiglia` = ha
+   * un credito famiglia. Il server ricontrolla: qui è solo l'esperienza.
+   */
+  credito: { singola: boolean; famiglia: boolean };
   /** Rimbalzo dalla rotta di checkout: cosa dire e perché. */
   avvisoCheckout: "demo" | "non-attivo" | "errore" | "recesso" | null;
 };
@@ -573,7 +580,10 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
                 {testoAvviso}
               </p>
             )}
-            {compraSingola ? (
+            {dati.credito.singola ? (
+              /* Ha un credito della garanzia: apre gratis, niente pagamento. */
+              <AcquistoColCredito dati={dati} />
+            ) : compraSingola ? (
               <AcquistoPratica dati={dati} />
             ) : (
               !testoAvviso && (
@@ -817,6 +827,43 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
         </Button>
       )}
     </>
+  );
+}
+
+/* ------------------- il credito della garanzia: pratica gratis ------- */
+
+/**
+ * Al posto del pagamento, quando chi guarda ha un credito della garanzia
+ * (Valerio, 17/08). Niente recesso e niente cassa: la pratica è coperta dal
+ * credito. È un form POST, non un link: aprire una pratica e spendere un
+ * credito non deve poter partire da un prefetch. Il cancello vero sta nel
+ * server (/api/pratiche/gratis), che ricontrolla il credito.
+ */
+function AcquistoColCredito({ dati }: { dati: DatiVerifica }) {
+  const base = `/api/pratiche/gratis?verifica=${dati.idPagina}`;
+  return (
+    <div className="flex flex-col gap-2.5">
+      <form method="post" action={`${base}&tipo=singola`}>
+        <Button type="submit" size="lg" className="h-auto w-full py-4 text-base">
+          Apri la pratica, gratis col tuo credito
+        </Button>
+      </form>
+      {dati.credito.famiglia && (
+        <form method="post" action={`${base}&tipo=famiglia`}>
+          <Button
+            type="submit"
+            variant="contorno"
+            size="lg"
+            className="h-auto w-full whitespace-normal py-3.5 text-center text-[0.95rem]"
+          >
+            Eravate in più sullo stesso volo? Apri la pratica famiglia, gratis
+          </Button>
+        </form>
+      )}
+      <p className="text-center text-sm leading-relaxed text-fumo">
+        La garanzia ti aveva lasciato un credito: questa pratica è su di noi, non paghi niente.
+      </p>
+    </div>
   );
 }
 

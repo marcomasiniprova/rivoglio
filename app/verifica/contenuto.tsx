@@ -12,6 +12,7 @@ import { scadenzaStimata, valuta } from "@/lib/regole/eu261";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
 import { utenteCollegato } from "@/lib/supabase/server";
+import { creditoDisponibile } from "@/lib/pratiche/credito";
 import { demo as fornitoreDemo } from "@/lib/voli/fornitori/demo";
 import { normalizzaData, normalizzaVolo } from "@/lib/voli/normalizza";
 
@@ -156,6 +157,8 @@ async function datiDemo(
         : null,
     checkout: checkoutConfigurato(),
     cassaProva: cassaDiProvaAperta(),
+    // I voli dimostrativi non usano il credito: sono esempi, non pratiche vere.
+    credito: { singola: false, famiglia: false },
     avvisoCheckout,
   };
 }
@@ -273,6 +276,15 @@ export async function contenutoVerifica(
     );
   }
 
+  /* IL CREDITO DELLA GARANZIA (Valerio, 17/08): se chi guarda è collegato,
+     il verdetto è idoneo e ha un credito libero, al posto di "Prepara la
+     pratica a 14,90€" gli offriamo di aprirla gratis. Solo per gli idonei:
+     sul giallo non si vende, e col credito nemmeno. */
+  const credito =
+    utente && riga.esito === "idoneo"
+      ? await creditoDisponibile(utente.id)
+      : { singola: false, famiglia: false };
+
   const { listino: listinoPieno } = await listinoCorrente();
   const cassePronte = checkoutConfigurato();
   const venditoreVero = cassePronte.singola || cassePronte.famiglia;
@@ -306,6 +318,7 @@ export async function contenutoVerifica(
         : null,
     checkout: cassePronte,
     cassaProva: cassaDiProvaAperta(),
+    credito,
     avvisoCheckout,
   };
 

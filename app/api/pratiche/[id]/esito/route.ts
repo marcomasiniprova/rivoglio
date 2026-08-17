@@ -5,7 +5,7 @@ import { SERVIZIO_ATTIVO } from "@/lib/supabase/servizio";
 import { caricaPratica, eventiPratica, transizionePratica } from "@/lib/pratiche/pratiche";
 import { EVENTO_RIFIUTO_DOCUMENTO } from "@/lib/pratiche/dossier";
 import { EVENTO_REPLICA_INVIATA } from "@/lib/pratiche/passi";
-import { euro, rimborsoGaranzia } from "@/lib/prezzi";
+import { concediCredito } from "@/lib/pratiche/credito";
 import { tin } from "@/lib/eventi/telegram";
 
 /**
@@ -151,20 +151,29 @@ export async function POST(req: Request, contesto: { params: Promise<{ id: strin
       );
     }
 
+    /* 🟢 LA GARANZIA È UN CREDITO, NON CONTANTI (Valerio, 17/08): invece di
+       rimborsare i soldi, regala la PROSSIMA PRATICA dello stesso tipo. Non
+       esce cassa, e parte da sola. Idempotente sull'origine (niente doppio
+       credito se la rotta ritenta). Lo concedo PRIMA della transizione: se
+       la transizione fallisse e si riprovasse, il credito non si sdoppia. */
+    const credito = await concediCredito(pratica.utente_id, pratica.tipo, id);
+
     const r = await transizionePratica(
       id,
       "esito_rifiutata",
-      "L'utente ha dichiarato che la compagnia non ha pagato: la garanzia entra in gioco (con un no scritto registrato).",
+      "La compagnia non ha pagato: la garanzia ha dato un credito per la prossima pratica (no scritto registrato e replica mandata).",
     );
     if (!r.ok) {
       return NextResponse.json({ errore: "Non sono riuscito a salvare. Riprova." }, { status: 503, headers: CORS });
     }
-    // Garanzia da processare a mano: qualcuno deve rimborsare quello che ha
-    // pagato (14,90 singola, 29,90 famiglia), non un numero fisso.
+    // Avviso INFORMATIVO: il credito è automatico, non c'è cassa da muovere.
+    // Suona solo se qualcosa va storto (il credito non è partito).
     void tin(
-      `⚠️ GARANZIA da valutare: l'utente dichiara che la compagnia NON ha pagato. Da controllare e rimborsare la pratica (${euro(rimborsoGaranzia(pratica.tipo))}). Pratica ${id}.`,
+      credito.ok
+        ? `✅ GARANZIA (credito): la compagnia non ha pagato. Dato in automatico un credito ${pratica.tipo} per la prossima pratica. Niente cassa da muovere. Pratica ${id}.`
+        : `⚠️ GARANZIA: la compagnia non ha pagato ma il credito NON è partito (errore). Da dare a mano. Pratica ${id}.`,
     );
-    return NextResponse.json({ ok: true, stato: "esito_rifiutata" }, { headers: CORS });
+    return NextResponse.json({ ok: true, stato: "esito_rifiutata", credito: credito.ok }, { headers: CORS });
   } catch (e) {
     console.error("[pratiche] dichiarazione esito, errore inatteso:", e);
     return NextResponse.json({ errore: "Errore inatteso. Riprova." }, { status: 500, headers: CORS });
