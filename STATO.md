@@ -11,7 +11,9 @@
 citare da ChatGPT e Perplexity: 79 pagine "reclamo per compagnia" + pagina
 di confronto (già online dal giro precedente), la misura del traffico dai
 motori AI, la sezione Marketing nel pannello coi testi pronti e il controllo
-mensile, e le domande della home dichiarate alle AI (FAQPage) ·
+mensile, le domande della home dichiarate alle AI (FAQPage), IndexNow (il
+ping che fa vedere le pagine a Bing e quindi a ChatGPT) e il primo commento
+di solo aiuto su Reddit per scaldare l'account ·
 giro #82: il collaudo dello stato "sono pronto?"
 — pronto per la distribuzione, manca solo la cassa — le pulizie DB, e il caso
 nuovo "ritardo 5h+ con rinuncia" (art. 6 → art. 8, rimborso del biglietto) ·
@@ -98,6 +100,43 @@ social rifatta (era rimasta al prodotto viaggi).
     parola per parola. Non è per il riquadro di Google (riservato ai siti
     pubblici dal 2023): è per farsi ripetere dalle AI. Il footer porta a
     `/reclamo` e `/alternative-airhelp` da ogni pagina.
+  - 🟢 **INDEXNOW: IL PEZZO CHE FA FUNZIONARE TUTTO IL RESTO** (seconda
+    tornata, dopo le 4 nuove domande di Valerio: Bing+IndexNow come primo
+    canale). La ricerca ha scoperto il buco vero: **ChatGPT non naviga il
+    web, usa l'indice di Bing** (circa 87% delle citazioni), e finora il
+    sito non era MAI stato presentato a Bing. Le 79 pagine erano quasi
+    invisibili alle AI. Costruito IndexNow: `lib/seo/indexnow.ts`, la
+    chiave pubblica in `public/<chiave>.txt`, la rotta
+    `/api/motore/indexnow` (prende gli URL dalla sitemap, fonte unica), il
+    cron notturno `netlify/functions/indexnow.mjs` (3:20 UTC), la POST col
+    segreto e la GET `?segreto=` per lanciarlo a mano. **Provato in locale:
+    legge i 120 indirizzi del sito e raggiunge davvero l'API IndexNow; il
+    file della chiave è servito alla radice.** 3 prove nuove. ⚠️ IndexNow
+    lavora con la sola chiave, NON serve un account Bing: quello (Bing
+    Webmaster Tools) è un di più per la sitemap e i numeri, ed è il passo
+    da 5 minuti di Valerio.
+  - **LA PAGINA MARKETING SI È ALLARGATA:** in cima «Il passo che accende
+    ChatGPT» (metà automatica con IndexNow, metà il passo Bing di Valerio,
+    più il bonus Google Search Console), e in fondo «I gruppi Facebook
+    italiani» (in Italia Facebook batte Reddit: quali gruppi APERTI
+    cercare, i termini, e la regola anti-spam).
+  - **REDDIT, LA VERITÀ E IL PRIMO PASSO.** Il connettore Reddit di
+    Composio è vivo, ma l'account **Valerio_alieri ha 1 karma** (nuovo): da
+    lì un post con link a Rivolio verrebbe rimosso o manderebbe l'account
+    in shadowban. Scelta di Valerio col popup: **scaldare l'account, zero
+    promo.** Trovate domande vere di oggi (r/ViaggiITA, r/sicily) e
+    pubblicato **un primo commento di solo aiuto** sotto la domanda Wizz di
+    r/sicily (rimborso vs compensazione, 250€ a testa, la deve Wizz non
+    Booking, come chiedere gratis). Nessun Rivolio, nessun link. ⚠️ Il
+    warm-up è lento e a gocce nei giorni, NON automatizzabile (i pattern
+    automatici su Reddit fanno bannare): è un investimento a settimane,
+    non traffico immediato. La Svizzera del traffico vero, a breve, sono
+    Bing/Google (fatti) + Facebook + i contenuti.
+  - ⚠️ **IL PASSO DI VALERIO, UNO SOLO:** registra `rivolio.it` su Bing
+    Webmaster Tools (bing.com/webmasters, entra con Google) e invia la
+    sitemap `rivolio.it/sitemap.xml`. 5 minuti. La guida è nel pannello,
+    sezione Marketing. Bonus: stessa cosa su Google Search Console (che fra
+    l'altro è già collegato come connettore).
   - **RICERCA GEO, i punti che hanno deciso le scelte:** `llms.txt` NON è
     usato da Google/OpenAI/Perplexity per le citazioni (valore basso, non
     ci abbiamo puntato); il referer cattura già le visite dai motori
