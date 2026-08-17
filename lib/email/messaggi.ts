@@ -1,5 +1,5 @@
 import { casa, spedisci, type Esito } from "./posta";
-import { bottone, COLORI as C, FONT, rigaScalo, vestito } from "./modello";
+import { bottone, COLORI as C, FONT, firma, rigaScalo, vestito } from "./modello";
 import { linkConferma, linkDisdetta } from "@/lib/iscritti/gettone";
 
 import { seSiPaga } from "@/lib/check/ingresso";
@@ -42,14 +42,15 @@ export function componiConferma(link: string) {
       corpo:
         h("Manca un clic.") +
         p(
-          "Qualcuno ha chiesto di iscrivere questo indirizzo all'Osservatorio dei Disservizi: ogni settimana i voli più in ritardo sui cieli italiani, dai dati che verifichiamo per i check.",
+          "Qualcuno ha scritto questo indirizzo per ricevere l'Osservatorio dei Disservizi. Una email a settimana, da parte mia: i voli più in ritardo sui cieli italiani, dagli stessi dati che uso per i check.",
         ) +
-        p("Se sei stato tu, confermalo qui sotto. Da lì parte tutto.") +
+        p("Se sei stato tu, conferma qui sotto e sei dentro.") +
         bottone("Sì, confermo", link) +
-        p("Il link vale trenta giorni. Se scade, riscrivi il tuo indirizzo sul sito e te ne mando un altro."),
-      coda: "Se non hai chiesto tu questa iscrizione, butta questa email: senza il clic non ti arriva più niente e il tuo indirizzo resta fermo.",
+        p("Il link vale trenta giorni. Se scade, riscrivi il tuo indirizzo sul sito e te ne mando un altro.") +
+        firma(),
+      coda: "Se non sei stato tu, butta pure questa email: senza il clic non ti arriva più niente e il tuo indirizzo resta fermo.",
     }),
-    testo: `Manca un clic.\n\nConferma l'iscrizione all'Osservatorio dei Disservizi:\n${link}\n\nSe non hai chiesto tu questa iscrizione, ignora questa email.`,
+    testo: `Manca un clic.\n\nConferma l'iscrizione all'Osservatorio dei Disservizi:\n${link}\n\nSe non sei stato tu, ignora questa email: senza il clic non ti arriva più niente.\n\nValerio\nRivolio`,
   };
 }
 
@@ -91,22 +92,23 @@ export function componiBenvenuto(scali: ScaloOggi[], disdetta: string | null) {
       corpo:
         h("Sei dentro.") +
         p(
-          "Ogni settimana ti mando i voli più in ritardo sui cieli italiani, presi dai dati che verifichiamo per i check. Una email a settimana, niente altro.",
+          "Ci siamo. Ogni settimana ti mando i voli più in ritardo sui cieli italiani, dagli stessi dati che uso per i check. Una email, niente altro.",
         ) +
         tabella +
         bottone(seSiPaga("Analizza un tuo volo", "Controlla un tuo volo, gratis"), `${casa()}/app`) +
         p(
-          `<strong style="color:${C.inchiostro}">Intanto una cosa utile:</strong> se nell'ultimo anno hai preso un volo atterrato con più di 3 ore di ritardo, il check dice in trenta secondi in che fascia rientri (250, 400 o 600 euro). Non serve account.`,
-        ),
+          `<strong style="color:${C.inchiostro}">Intanto, una cosa utile:</strong> se nell'ultimo anno hai preso un volo atterrato con più di 3 ore di ritardo, il check ti dice in trenta secondi in che fascia rientri: 250, 400 o 600 euro. Senza account.`,
+        ) +
+        firma(),
       coda: "Ricevi questa email perché hai confermato l'iscrizione all'Osservatorio dei Disservizi di Rivolio.",
       disdetta,
     }),
     testo:
-      `Sei dentro.\n\nOgni settimana i voli più in ritardo sui cieli italiani, dai dati che verifichiamo per i check.\n` +
+      `Sei dentro.\n\nOgni settimana ti mando i voli più in ritardo sui cieli italiani, dagli stessi dati che uso per i check. Una email, niente altro.\n` +
       (scali.length
         ? `\nGli aeroporti italiani adesso:\n${scali.map((s) => `- ${s.nome}: ${s.indice.toLocaleString("it-IT", { maximumFractionDigits: 1 })}/5${s.medianaMinuti !== null ? ` (mediana ${s.medianaMinuti} min)` : ""}`).join("\n")}\n`
         : "") +
-      `\n${seSiPaga("Analizza un tuo volo", "Controlla un tuo volo, gratis")}: ${casa()}/app` +
+      `\n${seSiPaga("Analizza un tuo volo", "Controlla un tuo volo, gratis")}: ${casa()}/app\n\nValerio\nRivolio` +
       (disdetta ? `\n\nPer non ricevere più queste email: ${disdetta}` : ""),
   };
 }
@@ -126,25 +128,26 @@ export function benvenuto(a: string): Promise<Esito> {
         h("Il tuo account è pronto.") +
         p(
           seSiPaga(
-            "L'analisi di un volo si fa anche senza account. L'account serve al resto: le tue pratiche e gli avvisi.",
-            "Il check dei voli resta gratis e senza account, per te e per chiunque. L'account serve al resto: le tue pratiche e gli avvisi.",
+            "L'analisi di un volo si fa anche senza account. L'account serve al resto: seguire le tue pratiche e ricevere gli avvisi.",
+            "Il check dei voli resta gratis e senza account, per te e per chiunque. L'account serve al resto: seguire le tue pratiche e ricevere gli avvisi.",
           ),
         ) +
         `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${C.menta};border-radius:14px;padding:20px 22px;margin:0 0 8px;">
            <tr><td style="font-family:${FONT};font-size:15px;line-height:1.7;color:${C.verdeNotte};">
              <strong>Cosa ti sei aperto</strong><br>
-             1. Le pratiche si seguono passo per passo, dal sito e dall'app.<br>
-             2. I voli che salvi nell'app li ricontrolliamo il giorno dopo: se rientrano in una fascia, ti avvisiamo noi.<br>
+             1. Le tue pratiche, seguite passo per passo dal sito e dall'app.<br>
+             2. I voli che salvi nell'app li ricontrollo il giorno dopo: se rientrano in una fascia, ti avviso io.<br>
              3. Con questa email ritrovi tutto, su sito e app.
            </td></tr>
          </table>` +
         bottone(seSiPaga("Analizza un volo", "Controlla un volo, gratis"), `${casa()}/app`) +
         p(
-          "Nessun abbonamento e nessun addebito: si paga solo se apri una pratica, una volta sola. Se questo account non l'hai chiesto tu, rispondi a questa email e lo cancelliamo.",
-        ),
+          "Nessun abbonamento e nessun addebito: si paga una volta sola, e solo se apri una pratica. Se questo account non l'hai chiesto tu, rispondi a questa email e lo cancello io.",
+        ) +
+        firma(),
       coda: "Ricevi questa email perché è stato creato un account Rivolio con questo indirizzo.",
     }),
-    testo: `Il tuo account è pronto.\n\n${seSiPaga("L'analisi di un volo si fa anche senza account.", "Il check dei voli resta gratis e senza account.")} L'account serve al resto:\n1. Le pratiche si seguono passo per passo, dal sito e dall'app.\n2. I voli che salvi nell'app li ricontrolliamo il giorno dopo: se rientrano in una fascia, ti avvisiamo noi.\n3. Con questa email ritrovi tutto, su sito e app.\n\n${seSiPaga("Analizza un volo", "Controlla un volo, gratis")}: ${casa()}/app\n\nNessun abbonamento: si paga una volta sola, per quello che chiedi.`,
+    testo: `Il tuo account è pronto.\n\n${seSiPaga("L'analisi di un volo si fa anche senza account.", "Il check dei voli resta gratis e senza account.")} L'account serve al resto:\n1. Le tue pratiche, seguite passo per passo dal sito e dall'app.\n2. I voli che salvi nell'app li ricontrollo il giorno dopo: se rientrano in una fascia, ti avviso io.\n3. Con questa email ritrovi tutto, su sito e app.\n\n${seSiPaga("Analizza un volo", "Controlla un volo, gratis")}: ${casa()}/app\n\nNessun abbonamento: si paga una volta sola, e solo se apri una pratica.\n\nValerio\nRivolio`,
   });
 }
 
@@ -157,14 +160,15 @@ export function conferma(a: string, link: string): Promise<Esito> {
       titolo: "Conferma il tuo indirizzo",
       corpo:
         h("Un clic e sei dentro.") +
-        p("Serve solo a essere sicuri che questo indirizzo sia davvero tuo.") +
+        p("Mi serve solo per sapere che questo indirizzo è davvero tuo.") +
         bottone("Conferma il mio indirizzo", link) +
         p(
           `Se non hai chiesto tu questa registrazione, ignora questa email: senza il clic non succede niente.`,
-        ),
+        ) +
+        firma(),
       coda: `Ricevi questa email perché qualcuno ha usato questo indirizzo per registrarsi su ${casa().replace(/^https?:\/\//, "")}.`,
     }),
-    testo: `Un clic e sei dentro.\n\nConferma il tuo indirizzo: ${link}\n\nSe non hai chiesto tu questa registrazione, ignora questa email.`,
+    testo: `Un clic e sei dentro.\n\nConferma il tuo indirizzo: ${link}\n\nSe non hai chiesto tu questa registrazione, ignora questa email.\n\nValerio\nRivolio`,
   });
 }
 
@@ -177,11 +181,12 @@ export function linkMagico(a: string, link: string): Promise<Esito> {
       titolo: "Il tuo link per entrare",
       corpo:
         h("Entra senza password.") +
-        p("Apri questo link dallo stesso dispositivo da cui l'hai chiesto.") +
+        p("Apri questo link dallo stesso dispositivo da cui l'hai chiesto e sei dentro.") +
         bottone("Entra", link) +
-        p("Il link vale una volta sola e scade a breve. Se non l'hai chiesto tu, ignoralo."),
+        p("Vale una volta sola e scade a breve. Se non l'hai chiesto tu, ignoralo: senza il clic non entra nessuno.") +
+        firma(),
       coda: "Ricevi questa email perché è stato chiesto un accesso con questo indirizzo.",
     }),
-    testo: `Entra senza password: ${link}\n\nIl link vale una volta sola e scade a breve.`,
+    testo: `Entra senza password: ${link}\n\nVale una volta sola e scade a breve. Se non l'hai chiesto tu, ignoralo.\n\nValerio\nRivolio`,
   });
 }

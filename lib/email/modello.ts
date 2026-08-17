@@ -36,6 +36,16 @@ export function bottone(testo: string, href: string) {
   </table>`;
 }
 
+/**
+ * La firma in fondo alle email. Dietro Rivolio c'è una persona vera, e le
+ * email lo dicono: chi le riceve non parla con un sistema, parla con me.
+ * È il segnale di fiducia più semplice che abbiamo, e su un'email
+ * transazionale conta anche più che su una pagina.
+ */
+export function firma() {
+  return `<p style="margin:28px 0 0;font-family:${FONT};font-size:15px;line-height:1.5;color:${C.fumo};">Valerio<br><span style="color:${C.fumo2};">Rivolio</span></p>`;
+}
+
 /** Una riga di conto: voce a sinistra, cifra a destra. */
 export function riga(voce: string, cifra: string, forte = false) {
   return `
