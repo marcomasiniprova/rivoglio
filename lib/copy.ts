@@ -48,7 +48,11 @@ export const COPY = {
     marchio: "Rivolio",
     regolamento: "Regolamento CE 261/2004",
     caricamento: "Un attimo.",
-    erroreGenerico: "Qualcosa non ha funzionato. Riprova tra poco.",
+    /* Il ripiego quando il server non dice cosa è andato storto: vale in
+       tanti punti, quindi resta generico, ma in prima persona e senza
+       colpe. "Qualcosa non ha funzionato" è la frase d'errore più vuota
+       che ci sia, e su una pagina che vende fiducia suona come un crash. */
+    erroreGenerico: "Non ci sono riuscito. Riprova tra poco.",
     /* Il messaggio CALMO quando il collegamento è lento o cade: niente
        "qualcosa non ha funzionato" in rosso, che si legge come un crash
        (Valerio, 14/08). Il check riprova già da solo una volta prima di
@@ -293,7 +297,7 @@ export const COPY = {
         "Ritardo all'arrivo, al minuto",
         "Articoli 5, 6 e 7 del Regolamento",
       ],
-      nota: "Ogni passo è reale: interroghiamo davvero i dati del volo. Se non li troviamo, te lo diciamo.",
+      nota: "Ogni passo è reale: interrogo davvero i dati del tuo volo. Se non li trovo, te lo dico.",
     },
   },
 
