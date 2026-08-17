@@ -3,6 +3,8 @@ import {
   VERSIONE_REGOLE,
   dentroLoSpazioEuropeo,
   fasciaArt7,
+  formattaMinuti,
+  minutiRitardo,
   type FattoVolo,
   type Verdetto,
 } from "./eu261";
@@ -417,6 +419,132 @@ export function valutaCoincidenzaDueTratte(
     } di ritardo. La compensazione si calcola sull'intero viaggio, ${Math.round(
       km,
     )} km, fascia ${importo}€, e il reclamo va alla compagnia del primo volo. Restano da verificare le circostanze straordinarie, che può invocare solo la compagnia.`,
+    versioneRegole: VERSIONE_REGOLE,
+  };
+}
+
+/* ---------------------- ritardo di 5 ore e più con rinuncia (art. 6 → art. 8) */
+
+/**
+ * RITARDO DI ALMENO 5 ORE, CON RINUNCIA (art. 6 par. 1, ultimo trattino, che
+ * rimanda all'art. 8 par. 1 lett. a CE 261/2004). Quando un volo parte con
+ * almeno 5 ore di ritardo, il passeggero può RINUNCIARE e farsi RIMBORSARE il
+ * biglietto entro 7 giorni (più il volo di ritorno al primo punto di partenza,
+ * quando pertinente). NON è la compensazione dell'art. 7 (250-600): è la
+ * restituzione dei soldi del biglietto, e vale per chi NON è partito.
+ *
+ * Due cose lo rendono diverso, e forte:
+ *  - il rimborso è dovuto ANCHE con circostanze eccezionali (maltempo,
+ *    sciopero): l'esonero dell'art. 5 par. 3 vale solo sulla compensazione,
+ *    non sull'art. 8. Quindi qui lo sciopero NON è un paletto (a differenza
+ *    di tutti gli altri casi, dove `paletti` lo rende incerto);
+ *  - l'importo è il prezzo del biglietto, che sa solo l'utente (il fornitore
+ *    ci dà il volo, non quanto l'hai pagato). Come per il declassamento.
+ *
+ * ⚠️ L'ÀNCORA DELLE 5 ORE, in modo PRUDENTE. La soglia dell'art. 6 è sul
+ * ritardo alla PARTENZA, ma l'orario di partenza effettivo non è nella nostra
+ * filiera (abbiamo la partenza prevista, non quella vera). Usiamo il ritardo
+ * all'ARRIVO, che già misuriamo e certifichiamo col tracciamento ("Live"): un
+ * aereo può recuperare tempo in volo, mai perderne altro, quindi un arrivo con
+ * 5 ore di ritardo prova che la partenza era in ritardo di almeno 5 ore. È la
+ * direzione sicura: qualche caso vero (partenza 5h, arrivo 4h30) resta incerto
+ * e non si vende, mai il contrario. Un falso positivo è vietato prima di tutto.
+ */
+export type RisposteRitardoRinuncia = {
+  /** Hai rinunciato a partire (non sei salito)? Se sei partito, è un altro caso. */
+  rinuncia: "si" | "no";
+  /** Ti hanno già rimborsato il prezzo del biglietto? */
+  giaRimborsato: boolean;
+  /** Il prezzo del biglietto, in euro. */
+  prezzo: number;
+};
+
+/** La soglia dell'art. 6 che apre il diritto al rimborso: 5 ore, in minuti. */
+export const SOGLIA_RINUNCIA_MINUTI = 300;
+
+export function rispostaRitardoRinunciaValida(r: unknown): r is RisposteRitardoRinuncia {
+  const x = r as RisposteRitardoRinuncia | null;
+  return (
+    !!x &&
+    (["si", "no"] as const).includes(x.rinuncia) &&
+    typeof x.giaRimborsato === "boolean" &&
+    typeof x.prezzo === "number" &&
+    Number.isFinite(x.prezzo) &&
+    x.prezzo > 0 &&
+    x.prezzo <= 100000
+  );
+}
+
+export function valutaRitardoRinuncia(f: FattoVolo, r: RisposteRitardoRinuncia): Verdetto {
+  if (r.rinuncia === "no") {
+    return nonIdoneo(
+      "Se sei partito lo stesso, questo non è il tuo caso: il rimborso del biglietto (art. 8) vale per chi ha rinunciato a partire. Se sei arrivato con 3 ore o più di ritardo ti spetta la compensazione (250-600€): controlla il volo nel modo normale.",
+    );
+  }
+  if (r.giaRimborsato) {
+    return nonIdoneo(
+      "Ti hanno già restituito il prezzo del biglietto: il diritto è stato soddisfatto. Se invece ti hanno dato solo un voucher che non avevi chiesto, puoi pretendere i soldi (art. 7 par. 3): scrivicelo e lo gestiamo a mano.",
+    );
+  }
+
+  /* L'ambito (art. 3 par. 1): il Regolamento deve applicarsi a questo volo.
+     Non uso `paletti` perché lì lo sciopero rende incerto, e qui il rimborso
+     è dovuto ANCHE con lo sciopero: sarebbe un falso "incerto" contro il
+     cliente. Quindi controllo a mano ambito e codeshare, senza sciopero. */
+  const ambito = ambitoCE261(
+    { iata: f.partenzaIata, paese: f.partenzaPaese, icao: f.partenzaIcao },
+    { iata: f.arrivoIata, paese: f.arrivoPaese, icao: f.arrivoIcao },
+    f.vettoreUE ?? vettoreConLicenzaUE(f.vettoreOperativo),
+  );
+  if (!ambito.dentro) {
+    return ambito.certo ? nonIdoneo(ambito.motivo) : incerto(ambito.motivo);
+  }
+
+  if (f.vettoreDaDeterminare) {
+    return incerto(
+      "Questo numero di volo risulta venduto in codeshare: il rimborso lo deve la compagnia che ha operato davvero, e la determiniamo a mano. Non ti facciamo pagare niente finché non è chiaro.",
+    );
+  }
+
+  /* Il volo cancellato è un altro binario (art. 5): lì il rimborso spetta lo
+     stesso, ma con le sue domande (preavviso, volo alternativo). Si rimanda. */
+  if (f.stato === "cancellato") {
+    return incerto(
+      "Questo volo risulta cancellato, non solo in ritardo: il rimborso ti spetta lo stesso, ma per il caso giusto rispondi alle due domande della cancellazione qui sopra.",
+    );
+  }
+
+  /* L'àncora delle 5 ore, prudente: il ritardo certificato all'arrivo. Se il
+     volo non è atterrato, o l'orario non è tracciato, o mancano gli orari, non
+     possiamo provare le 5 ore: incerto, e non si vende. */
+  if (
+    f.stato !== "atterrato" ||
+    f.orarioVerificato !== true ||
+    !f.arrivoPrevistoUtc ||
+    !f.arrivoEffettivoUtc
+  ) {
+    return incerto(
+      "Non riusciamo a confermare dai dati che questo volo abbia avuto almeno 5 ore di ritardo. Se ce l'aveva, riprova più tardi: questa analisi non consuma il credito.",
+    );
+  }
+  const ritardo = minutiRitardo(f.arrivoPrevistoUtc, f.arrivoEffettivoUtc);
+  if (ritardo === null || ritardo < SOGLIA_RINUNCIA_MINUTI) {
+    return incerto(
+      "Dai dati questo volo non arriva alle 5 ore di ritardo che aprono il diritto al rimborso del biglietto. Se sei sicuro che alla partenza il ritardo era di 5 ore o più, tieni la carta d'imbarco con l'orario e scrivicelo: lo verifichiamo a mano.",
+    );
+  }
+
+  return {
+    esito: "idoneo",
+    importo: Math.round(r.prezzo),
+    ritardoMinuti: ritardo,
+    motivo: `Il volo ha avuto ${formattaMinuti(
+      ritardo,
+    )} di ritardo, oltre le 5 ore, e tu hai rinunciato a partire: l'art. 6 rimanda all'art. 8, che ti dà il RIMBORSO del prezzo del biglietto entro 7 giorni (più il volo di ritorno al punto di partenza, se pertinente). Sul prezzo che hai indicato (${Math.round(
+      r.prezzo,
+    )}€) il rimborso è ${Math.round(
+      r.prezzo,
+    )}€, e la compagnia verifica il prezzo vero del biglietto. Questo rimborso è dovuto anche se c'erano maltempo o sciopero: le circostanze eccezionali scusano solo la compensazione, non la restituzione del biglietto.`,
     versioneRegole: VERSIONE_REGOLE,
   };
 }

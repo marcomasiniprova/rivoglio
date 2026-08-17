@@ -19,6 +19,7 @@ import { LISTINO_BASE } from "@/lib/prezzi";
 import { formattaMinuti } from "@/lib/regole/eu261";
 import DomandeCancellato from "./DomandeCancellato";
 import DichiaraCaso from "./DichiaraCaso";
+import DichiaraRinuncia from "./DichiaraRinuncia";
 import ChiHaOperato from "./ChiHaOperato";
 import CardCondivisione from "./CardCondivisione";
 import CartaImbarcoScan from "@/components/rivolio/CartaImbarcoScan";
@@ -420,7 +421,9 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
       ? t.titoloNegato
       : dichiarato === "declassamento"
         ? t.titoloDeclassamento
-        : t.titoloCoincidenza
+        : dichiarato === "ritardo_rinuncia"
+          ? t.titoloRinuncia
+          : t.titoloCoincidenza
     : ritardo
       ? riempi(t.titoloTemplate, { ritardo })
       : null;
@@ -458,13 +461,21 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
             aria-hidden="true"
             className="pointer-events-none absolute left-1/2 top-0 h-56 w-[130%] -translate-x-1/2 -translate-y-1/3 rounded-full bg-menta/20 blur-3xl"
           />
-          {/* La frase della fascia, senza la cifra: la cifra È il contatore. */}
+          {/* La frase della fascia, senza la cifra: la cifra È il contatore.
+              Sul rimborso da rinuncia non è una "fascia a passeggero": è il
+              prezzo del biglietto che ti devono ridare, e le due righe lo
+              dicono giusto invece di prendere in prestito le parole della
+              compensazione. */}
           <p className="relative text-[0.95rem] text-white/75">
-            {t.fasciaTemplate.split("{importo}")[0].trim()}
+            {dichiarato === "ritardo_rinuncia"
+              ? t.rimborsoPrima
+              : t.fasciaTemplate.split("{importo}")[0].trim()}
           </p>
           <div className="relative mt-3">
             <ContatoreReveal importo={importo} />
-            <p className="mt-2 text-sm text-white/60">{t.perPasseggero}</p>
+            <p className="mt-2 text-sm text-white/60">
+              {dichiarato === "ritardo_rinuncia" ? t.rimborsoDopo : t.perPasseggero}
+            </p>
           </div>
 
           {/* Ogni numero è apribile: la trasparenza è il prodotto. */}
@@ -599,6 +610,26 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
           </div>
         )}
       </Anima>
+
+      {/* --------- l'alternativa: hai rinunciato? allora è un rimborso.
+          Un volo con 5 ore e più di ritardo esce idoneo alla COMPENSAZIONE,
+          ma chi non è partito ha diritto al RIMBORSO del biglietto (art. 6 →
+          art. 8), non alla compensazione. Si offre solo qui, dove il volo
+          qualifica davvero (≥ 300 minuti = SOGLIA_RINUNCIA_MINUTI), e solo
+          se non è già un caso dichiarato né un verdetto corretto a mano. */}
+      {!dichiarato &&
+        !dati.corretto &&
+        dati.ritardoMinuti !== null &&
+        dati.ritardoMinuti >= 300 && (
+          <Anima ritardo={0.26}>
+            <DichiaraRinuncia
+              volo={dati.volo}
+              dataVolo={dati.dataVolo}
+              idVerifica={dati.idVerifica}
+              demo={dati.demo}
+            />
+          </Anima>
+        )}
 
       {/* ------------------------- la card virale (SPEC §8, punto 5) */}
       {ritardo && (

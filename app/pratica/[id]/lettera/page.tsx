@@ -303,15 +303,17 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         }
       : verifica?.caso_dichiarato === "declassamento"
         ? { caso: "declassamento" as const, prezzo: leggiPrezzo(verifica.dichiarazione) }
-        : null;
+        : verifica?.caso_dichiarato === "ritardo_rinuncia"
+          ? { caso: "ritardo_rinuncia" as const, prezzo: leggiPrezzo(verifica.dichiarazione) }
+          : null;
 
   /* L'importo: per ritardo, negato e coincidenza è una delle fasce note;
-     per il declassamento è una quota del prezzo, quindi un numero
-     qualsiasi positivo. Il controllo sulle fasce esiste per non far
-     uscire una lettera con un importo sballato, ma su una quota va tolto,
-     se no il declassamento non passerebbe mai. */
+     per il declassamento e il ritardo con rinuncia è il prezzo del
+     biglietto, quindi un numero qualsiasi positivo. Il controllo sulle
+     fasce esiste per non far uscire una lettera con un importo sballato,
+     ma su un rimborso legato al prezzo va tolto, se no non passerebbe mai. */
   const importo =
-    dichiarato?.caso === "declassamento"
+    dichiarato?.caso === "declassamento" || dichiarato?.caso === "ritardo_rinuncia"
       ? typeof verifica?.importo === "number" && verifica.importo > 0
         ? verifica.importo
         : undefined

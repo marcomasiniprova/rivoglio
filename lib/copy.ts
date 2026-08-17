@@ -804,6 +804,48 @@ export const COPY = {
     },
 
     /**
+     * RITARDO DI 5 ORE E PIÙ CON RINUNCIA (art. 6 → art. 8).
+     *
+     * Compare SOLO sul verdetto idoneo di un volo con almeno 5 ore di
+     * ritardo: è lì che un aereo così in ritardo finisce (idoneo alla
+     * compensazione, per chi è partito). Chi invece ha rinunciato non ha
+     * diritto alla compensazione ma al RIMBORSO del biglietto, e da qui lo
+     * dichiara. Il prezzo lo mette l'utente, come nel declassamento.
+     */
+    rinuncia: {
+      invito: "Hai rinunciato a partire per il forte ritardo?",
+      invitoSotto:
+        "Se non sei salito su questo volo, invece della compensazione ti spetta il rimborso del biglietto (art. 6 e 8): la compagnia deve ridartelo entro 7 giorni, anche se c'era maltempo o sciopero.",
+      apri: "Sì, ho rinunciato: voglio il rimborso",
+      rinuncia: {
+        domanda: "Sei partito su questo volo o hai rinunciato?",
+        voci: [
+          { valore: "si", testo: "Ho rinunciato: non sono partito" },
+          { valore: "no", testo: "Sono partito lo stesso" },
+        ],
+      },
+      giaRimborsato: {
+        domanda: "Ti hanno già restituito il prezzo del biglietto?",
+        voci: [
+          { valore: "no", testo: "No, non me l'hanno restituito" },
+          { valore: "si", testo: "Sì, mi hanno già rimborsato" },
+        ],
+      },
+      prezzo: {
+        domanda: "Quanto avevi pagato il biglietto?",
+        aiuto:
+          "È l'importo che ti devono restituire. Lo trovi nell'email di acquisto del biglietto.",
+        segnaposto: "es. 120",
+      },
+      bottone: "Scopri quanto ti devono",
+      nota: seSiPaga(
+        "Le risposte restano sulla tua verifica come dichiarazione. Rispondere non costa niente.",
+        "Le risposte restano sulla tua verifica come dichiarazione. Il check resta gratuito.",
+      ),
+      notaDemo: "Esempio dimostrativo: il verdetto qui non vale per una pratica vera.",
+    },
+
+    /**
      * LE DUE DOMANDE SUI VOLI CANCELLATI.
      *
      * Scritte a fasce, non a date: chi ha volato mesi fa non ricorda "il
@@ -890,6 +932,13 @@ export const COPY = {
       titoloNegato: "Ti hanno lasciato a terra contro la tua volontà.",
       titoloCoincidenza: "Hai perso la coincidenza e sei arrivato con almeno tre ore di ritardo.",
       titoloDeclassamento: "Ti hanno messo in una classe più bassa di quella che avevi pagato.",
+      /* Ritardo 5h+ con rinuncia: non è una fascia, è il RIMBORSO del
+         biglietto (art. 8). Il titolo e le due righe del riquadro verde lo
+         dicono, così accanto alla cifra non compare "fascia... a passeggero",
+         che per un rimborso sarebbe sbagliato. */
+      titoloRinuncia: "Ti spetta il rimborso del biglietto.",
+      rimborsoPrima: "Hai rinunciato al volo: ti devono restituire",
+      rimborsoDopo: "il prezzo del tuo biglietto",
       fattoNegato:
         "Volo {volo} del {data}. Qui il ritardo non conta: la compensazione per negato imbarco è dovuta subito (art. 4, comma 3).",
       fattoCoincidenza:

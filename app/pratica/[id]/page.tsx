@@ -456,8 +456,14 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
                 "esito_rifiutata",
                 "rimborsata",
               ].includes(pratica.stato) &&
-                (verificaRiga as { caso_dichiarato?: string | null } | null)?.caso_dichiarato !==
-                  "declassamento" && (
+                /* NON sul declassamento (lì hai volato) né sul ritardo con
+                   rinuncia (lì non sei partito e chiedi indietro il
+                   biglietto): in nessuno dei due l'assistenza dell'art. 9
+                   c'entra col documento. */
+                !["declassamento", "ritardo_rinuncia"].includes(
+                  (verificaRiga as { caso_dichiarato?: string | null } | null)?.caso_dichiarato ??
+                    "",
+                ) && (
                   <SpeseCura praticaId={pratica.id} iniziale={pratica.cura_richiesta ?? false} />
                 )}
             </>

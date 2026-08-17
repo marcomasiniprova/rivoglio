@@ -6,10 +6,12 @@ import {
   rispostaCoincidenzaValida,
   rispostaDeclassamentoValida,
   rispostaNegatoValida,
+  rispostaRitardoRinunciaValida,
   valutaCoincidenza,
   valutaCoincidenzaDueTratte,
   valutaDeclassamento,
   valutaNegato,
+  valutaRitardoRinuncia,
 } from "@/lib/regole/dichiarati";
 import { verificaVolo } from "@/lib/voli/verifica";
 import { aeroportoPerIata, inItaliano } from "@/lib/voli/aeroporti";
@@ -71,7 +73,12 @@ export async function POST(req: Request) {
       { status: 400, headers: CORS },
     );
   }
-  if (c.caso !== "negato" && c.caso !== "coincidenza" && c.caso !== "declassamento") {
+  if (
+    c.caso !== "negato" &&
+    c.caso !== "coincidenza" &&
+    c.caso !== "declassamento" &&
+    c.caso !== "ritardo_rinuncia"
+  ) {
     return NextResponse.json(
       { ok: false, errore: "Caso non riconosciuto." },
       { status: 400, headers: CORS },
@@ -128,6 +135,32 @@ export async function POST(req: Request) {
     }
     verdetto = valutaDeclassamento(fatto, r);
     dichiarazione = { caso: "declassamento", volonta: r.volonta, prezzo: r.prezzo };
+  } else if (c.caso === "ritardo_rinuncia") {
+    /* Ritardo di 5 ore e più con rinuncia (art. 6 → art. 8): il prezzo del
+       biglietto lo dà l'utente, come nel declassamento. La virgola
+       all'italiana ("129,90") si normalizza qui. */
+    const grezzo =
+      typeof c.prezzo === "number"
+        ? c.prezzo
+        : Number(String(c.prezzo ?? "").replace(/[^\d.,]/g, "").replace(",", "."));
+    const r = { rinuncia: c.rinuncia, giaRimborsato: c.giaRimborsato, prezzo: grezzo };
+    if (!rispostaRitardoRinunciaValida(r)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          errore:
+            "Dimmi se hai rinunciato a partire, se ti hanno già rimborsato, e quanto avevi pagato il biglietto.",
+        },
+        { status: 400, headers: CORS },
+      );
+    }
+    verdetto = valutaRitardoRinuncia(fatto, r);
+    dichiarazione = {
+      caso: "ritardo_rinuncia",
+      rinuncia: r.rinuncia,
+      giaRimborsato: r.giaRimborsato,
+      prezzo: r.prezzo,
+    };
   } else {
     const r = { unica: c.unica, ritardoFinale: c.ritardoFinale };
     if (!rispostaCoincidenzaValida(r)) {
@@ -239,11 +272,14 @@ export async function POST(req: Request) {
              conservava quello del check di partenza (155 minuti per
              FR4001), e la pagina del verdetto e la LETTERA lo
              rileggevano da lì: uscivano 400 euro accanto a «2 h e 35
-             min di ritardo». Per questi casi il ritardo del volo non
-             c'entra niente col diritto, quindi si azzera invece di
-             lasciare in giro un numero che verrà letto come una prova.
+             min di ritardo». Per negato imbarco, coincidenza e
+             declassamento il ritardo del volo non c'entra col diritto,
+             e infatti il motore torna 0. Per il ritardo con rinuncia il
+             ritardo È il diritto (le 5 ore), quindi lo si tiene: si
+             scrive `verdetto.ritardoMinuti`, che vale 0 per gli altri
+             casi (comportamento invariato) e il ritardo vero per questo.
              Trovato l'11/08 da Valerio. */
-          ritardo_minuti: verdetto.esito === "idoneo" ? 0 : null,
+          ritardo_minuti: verdetto.esito === "idoneo" ? verdetto.ritardoMinuti : null,
           caso_dichiarato: dichiarazione.caso,
           dichiarazione,
           dichiarato_il: new Date().toISOString(),

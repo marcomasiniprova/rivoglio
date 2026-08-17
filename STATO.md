@@ -7,7 +7,10 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-17 (giro #81: i 4 fix del collaudo UX, il prezzo
+**Aggiornato:** 2026-08-17 (giro #82: il collaudo dello stato "sono pronto?"
+— pronto per la distribuzione, manca solo la cassa — le pulizie DB, e il caso
+nuovo "ritardo 5h+ con rinuncia" (art. 6 → art. 8, rimborso del biglietto) ·
+giro #81: i 4 fix del collaudo UX, il prezzo
 famiglia a 29,90, il simulatore margini in /admin/economia, e LA GARANZIA
 CHE DIVENTA UN CREDITO (la prossima pratica è su di noi, non i soldi
 indietro): tabella crediti_pratica applicata sul DB vero, grant automatico,
@@ -56,6 +59,59 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #82 (17/08): "SONO PRONTO?" — IL COLLAUDO DELLO STATO, LE PULIZIE
+  DB, E IL CASO NUOVO "RITARDO 5H+ CON RINUNCIA" (art. 6 → art. 8).** Valerio
+  ha chiesto se Rivolio è pronto per la distribuzione (pagamenti a parte) e di
+  aggiungere un caso nuovo. Fatti tutti e due.
+  - **LA RISPOSTA: Rivolio è pronto, manca solo la cassa vera.** Controllato
+    coi fatti: motore 59/59 (falsi positivi 0), Supabase senza vulnerabilità
+    (advisor di sicurezza: solo INFO, le tabelle "aperte" le legge solo la
+    chiave segreta, è voluto), tipi 0 errori, lint 0 errori. **Collaudo di
+    carico** sul sito vero: 120 richieste a concorrenza 12 (oltre i 100
+    check/giorno), **zero 5xx**, p50 landing 130ms / check 700ms / verdetto
+    800ms.
+  - **PULIZIE DATABASE applicate dal vivo** (`2026-08-17-ottimizzazioni-db.sql`):
+    6 indici di copertura, tolto un indice doppione, le 6 policy RLS delle
+    tabelle attive chiamano `auth.uid()` dentro `(select ...)`. Le tabelle
+    viaggi (eredità morta) non toccate.
+  - **Verificato dal vivo, contro note stantie:** l'email funziona
+    (`send.rivolio.it` verificato su Resend), la protezione password rubate è
+    già accesa su Supabase, il canale Telegram funziona (messaggio di prova
+    arrivato). ⚠️ Restano da mettere su Netlify `TELEGRAM_BOT_TOKEN` e
+    `TELEGRAM_ADMIN_CHAT` (8534801784) se non ci sono già, per gli allarmi
+    automatici.
+  - 🟢 **COSTRUITO: IL CASO "RITARDO DI 5 ORE E PIÙ CON RINUNCIA" (art. 6 →
+    art. 8, par. 1, lett. a).** Se il volo parte con almeno 5 ore di ritardo e
+    tu rinunci, la compagnia deve **restituirti il prezzo del biglietto** entro
+    7 giorni (più il volo di ritorno se pertinente). NON è la compensazione
+    250-600: è la restituzione dei tuoi soldi, e vale per chi non è partito.
+    Scelte di Valerio: pratica a pagamento, fonti verificate prima, piano corto
+    approvato prima di costruire.
+    - **Il punto forte, nella lettera:** il rimborso è dovuto ANCHE con
+      maltempo o sciopero (l'esonero dell'art. 5 par. 3 vale solo sulla
+      compensazione, non sull'art. 8).
+    - **L'àncora delle 5 ore è prudente:** l'orario di partenza effettivo non è
+      nella filiera, quindi si usa il ritardo all'ARRIVO, già certificato
+      ("Live"). Arrivo a 5h+ prova partenza a 5h+; qualche caso vero resta
+      incerto, mai un falso positivo.
+    - **Dove compare:** un volo con 5h+ esce idoneo alla compensazione, ed è
+      lì (ramo idoneo, `DichiaraRinuncia.tsx`) che compare la scheda "Hai
+      rinunciato a partire?". Il prezzo lo mette l'utente (come il
+      declassamento), il motore decide, la lettera cita art. 6 e 8 e chiede il
+      rimborso in 7 giorni sull'IBAN.
+    - **Toccati:** `lib/regole/dichiarati.ts`, `/api/verifica/dichiara`,
+      `lib/lettera/dichiarati.ts`, `Risultato.tsx` + `DichiaraRinuncia.tsx`,
+      `lib/copy.ts`, migrazione del vincolo `caso_dichiarato` applicata sul DB
+      vero (`2026-08-17-ritardo-rinuncia.sql`).
+    - **Prove: 9 nuove** (`prove/ritardo-rinuncia.spec.ts`), verdi. Collaudato
+      in demo (ZZ600, 5h05): scheda + rimborso 137€, lettera generata e riletta
+      (indirizzata a ITA Airways).
+    - ⚠️ **FONTI:** EUR-Lex ed ENAC bloccati da questo ambiente; la sostanza
+      (5 ore, rinuncia, 7 giorni, ritorno) è confermata dalla ricerca ma le
+      parole esatte dei due articoli vanno rilette dal PC di Valerio prima del
+      primo cliente pagante.
+    - ⚠️ **Questo giro è sul ramo di lavoro, non su `main`:** non ancora
+      deployato. Va portato su main col deploy (lo chiede Valerio).
 - **GIRO #81 (17/08): I FIX DEL COLLAUDO UX, IL PREZZO FAMIGLIA A 29,90,
   IL SIMULATORE MARGINI, E LA GARANZIA CHE DIVENTA UN CREDITO.** Sessione
   lunga, in pezzi, ognuno verde prima del prossimo. Online su `main`.

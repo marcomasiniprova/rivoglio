@@ -41,7 +41,7 @@ import { percentualeArt10 } from "@/lib/regole/dichiarati";
  * cadere una richiesta per intero.
  */
 
-export type CasoDichiarato = "negato" | "coincidenza" | "declassamento";
+export type CasoDichiarato = "negato" | "coincidenza" | "declassamento" | "ritardo_rinuncia";
 
 export type DatiDichiarazione = {
   caso: CasoDichiarato;
@@ -73,6 +73,8 @@ export function oggettoDichiarato(
     return `Richiesta di compensazione pecuniaria ex artt. 4 e 7 Reg. (CE) 261/2004, negato imbarco, volo ${voloIata} del ${giornoVolo}`;
   if (caso === "declassamento")
     return `Richiesta di rimborso ex art. 10, par. 2, Reg. (CE) 261/2004, sistemazione in classe inferiore, volo ${voloIata} del ${giornoVolo}`;
+  if (caso === "ritardo_rinuncia")
+    return `Richiesta di rimborso del prezzo del biglietto ex artt. 6 e 8, par. 1, lett. a), Reg. (CE) 261/2004, ritardo prolungato con rinuncia al viaggio, volo ${voloIata} del ${giornoVolo}`;
   return `Richiesta di compensazione pecuniaria ex art. 7 Reg. (CE) 261/2004, coincidenza persa, volo ${voloIata} del ${giornoVolo}`;
 }
 
@@ -116,6 +118,23 @@ ${
       prezzo !== null
         ? `Il prezzo del biglietto per la tratta interessata è di ${euro(prezzo)}: la quota del ${perc}% corrisponde pertanto a ${euro(verdetto.importo)}.`
         : `La quota applicabile alla tratta è pertanto del ${perc}% del prezzo del biglietto.`
+    }`;
+  }
+
+  if (caso === "ritardo_rinuncia") {
+    const prezzo = typeof dati.prezzo === "number" ? dati.prezzo : null;
+    return `Il volo indicato ha subito un ritardo di oltre cinque ore. A fronte di tale ritardo ho rinunciato al viaggio e non sono partito.${
+      fatto.kmOrtodromica ? ` La tratta misura ${km(fatto.kmOrtodromica)}.` : ""
+    }
+
+Ai sensi dell'articolo 6, paragrafo 1, del Regolamento (CE) n. 261/2004, quando un volo subisce un ritardo di almeno cinque ore rispetto all'orario di partenza previsto, al passeggero spettano le misure di cui all'articolo 8, paragrafo 1, lettera a): il rimborso, entro sette giorni, del prezzo pieno del biglietto per la parte o le parti di viaggio non effettuate, unitamente, ove pertinente, a un volo di ritorno verso il punto di partenza iniziale.
+
+Il diritto al rimborso non è escluso da eventuali circostanze eccezionali: l'esonero previsto dall'articolo 5, paragrafo 3, riguarda la sola compensazione pecuniaria dell'articolo 7, non le misure di assistenza e di rimborso dell'articolo 8.
+
+${
+      prezzo !== null
+        ? `Il prezzo del biglietto è di ${euro(prezzo)}, che costituisce l'importo del rimborso integrale dovuto.`
+        : `L'importo dovuto è pari al prezzo integrale del biglietto.`
     }`;
   }
 
