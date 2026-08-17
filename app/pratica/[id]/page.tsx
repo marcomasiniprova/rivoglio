@@ -36,7 +36,6 @@ import {
   giorniFra,
   giornoPiu,
 } from "@/lib/tempo";
-import { euro, rimborsoGaranzia } from "@/lib/prezzi";
 import { COPY } from "@/lib/copy";
 import LasciaRecensione from "@/components/rivolio/LasciaRecensione";
 import { eventoGiaRecensito } from "@/lib/recensioni/recensioni";
@@ -252,10 +251,6 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
      mai», il fascicolo: non servono più. Al loro posto la festa. */
   const vinta = pratica.stato === "esito_pagata";
   const chiusa = ["esito_pagata", "esito_rifiutata", "rimborsata"].includes(pratica.stato);
-  /* Quanto rimborsa la garanzia se la compagnia non paga: è quello che ha
-     versato DAVVERO per questa pratica (14,90 singola, 29,90 famiglia), non
-     più il "14,90" fisso che alla famiglia prometteva meno del pagato. */
-  const rimborsoTesto = euro(rimborsoGaranzia(pratica.tipo));
   /* IL FASCICOLO (scelta di Valerio col popup, 13/08). Lo stesso che
      legge l'AI prima di scrivere una replica: se lo mostriamo a lei e non
      a lui, la trasparenza che vendiamo si ferma alla porta di casa. */
@@ -578,12 +573,12 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
             guardi a che punto sei, che è quando la domanda "e se non
             pagano?" te la fai davvero.
             🔴 SPARISCE A PRATICA CHIUSA (Valerio, 16/08): se ti hanno
-            pagato, o se ti abbiamo già rimborsato, «ti rimborsiamo se non
-            pagano» è una promessa che non ha più senso. */}
+            pagato, o se la garanzia ha già dato il credito, «la prossima
+            pratica è su di noi» è una promessa che non ha più senso qui. */}
         {!chiusa && (
           <p className="mt-5 flex items-start gap-2 border-t border-bordo pt-4 text-sm leading-relaxed text-fumo">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-verde" aria-hidden="true" />
-            <span>{riempi(C.garanzia.template, { importo: rimborsoTesto })}</span>
+            <span>{C.garanzia.template}</span>
           </p>
         )}
       </section>
@@ -603,7 +598,6 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
       {["inviata", "sollecito", "enac"].includes(pratica.stato) && (
         <DichiaraEsito
           praticaId={pratica.id}
-          importoRimborso={rimborsoTesto}
           rifiutoRegistrato={Boolean(pratica.rifiuto_motivo)}
           /* La garanzia parte solo se il no è un DOCUMENTO vero caricato,
              non testo scritto a mano (anti-frode, Valerio 15/08). */

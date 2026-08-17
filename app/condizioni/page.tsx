@@ -87,21 +87,23 @@ export default function PaginaCondizioni() {
       <h2>La garanzia</h2>
       <p>
         Se la compagnia <strong>rifiuta il reclamo senza un motivo valido</strong>, oppure{" "}
-        <strong>non risponde entro i termini previsti dalla legge</strong>, ti rimborsiamo per
-        intero quello che hai pagato a Rivolio. Vale anche se la compagnia non ti riconosce
-        nulla per una ragione che smentisce i dati verificati del volo.
+        <strong>non risponde entro i termini previsti dalla legge</strong>, la garanzia ti dà un{" "}
+        <strong>credito per un&apos;altra pratica</strong>: la tua prossima pratica, dello stesso
+        tipo, è gratis. Vale anche se la compagnia non ti riconosce nulla per una ragione che
+        smentisce i dati verificati del volo.
       </p>
       <p>
-        La garanzia è legata all&apos;esito e non a una scadenza sul calendario, e la ragione
-        è a tuo favore: le compagnie rispondono spesso dopo due o tre mesi, e un termine breve
-        ti farebbe chiedere il rimborso mentre la tua pratica è ancora viva.
+        <strong>È un credito, non un rimborso in denaro</strong>, e lo diciamo chiaro: non ti
+        restituiamo i soldi versati, ti offriamo noi la pratica successiva. Il credito è legato
+        al tuo account, non scade, e copre una pratica dello stesso tipo di quella per cui è
+        scattata la garanzia (una famiglia copre una famiglia o una singola).
       </p>
       <p>
-        Come funziona in pratica: ti scriviamo noi per chiederti com&apos;è andata, e il
-        rimborso parte da noi senza moduli da compilare. Ti chiediamo solo due cose: che il
-        reclamo sia stato davvero inviato alla compagnia seguendo le istruzioni della pratica,
-        e che ci dica com&apos;è andata quando te lo chiediamo, perché l&apos;esito lo conosci
-        solo tu.
+        La garanzia è legata all&apos;esito e non a una scadenza sul calendario: le compagnie
+        rispondono spesso dopo due o tre mesi. Il credito parte da solo quando ci dici che la
+        compagnia ha rifiutato: ti chiediamo di aver davvero inviato il reclamo seguendo le
+        istruzioni, di caricare il loro no scritto e di aver mandato la replica, perché
+        l&apos;esito lo conosci solo tu e il credito nasce da un rifiuto reale.
       </p>
       <p>
         Un caso in cui la garanzia non si applica: se la compagnia ti paga, il servizio ha

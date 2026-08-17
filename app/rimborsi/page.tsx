@@ -127,14 +127,19 @@ export default function PaginaRimborsi() {
         rimborso non appartiene:{" "}
         <strong>
           se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di
-          legge, ti restituiamo per intero quello che hai speso da noi.
+          legge, la tua prossima pratica è su di noi.
         </strong>
       </p>
       <p>
+        <strong>È un credito, non un rimborso in denaro</strong>, e lo diciamo prima: non ti
+        restituiamo i soldi versati (quello è il rimborso qui sopra, e vale se abbiamo
+        sbagliato noi), ti offriamo noi la pratica successiva, dello stesso tipo. Il credito è
+        legato al tuo account e non scade.
+      </p>
+      <p>
         ⚠️ Serve pazienza, e lo diciamo prima: le compagnie rispondono in genere fra le 8 e le
-        14 settimane. Chiedere la garanzia al decimo giorno vuol dire chiuderla mentre la
-        pratica è ancora viva. Nella tua area personale vedi sempre a che punto è e cosa
-        succede dopo.
+        14 settimane. La garanzia scatta dopo che hai mandato la replica al loro no. Nella tua
+        area personale vedi sempre a che punto è e cosa succede dopo.
       </p>
 
       <h2>Le controversie sul pagamento</h2>

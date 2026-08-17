@@ -125,7 +125,7 @@ export function praticaPronta(
       ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px;">
            ${riga("Pratica", d.tipo === "famiglia" ? "Famiglia (fino a 5 passeggeri)" : "Singola")}
            ${riga("Hai pagato", prezzoIt(d.prezzo), true)}
-           ${riga("Garanzia", "Se la compagnia non paga, ti rimborsiamo")}
+           ${riga("Garanzia", "Se non ti pagano, la prossima pratica è su di noi")}
          </table>`
       : "";
 
@@ -160,14 +160,14 @@ export function praticaPronta(
           `<strong style="color:${C.inchiostro}">Perché la mandi tu e non noi:</strong> un reclamo che parte dalla casella del passeggero non può essere respinto come richiesta di un intermediario, e quello che recuperi resta tuo al 100%. Noi prepariamo, tu firmi.`,
         ) +
         p(
-          `<strong style="color:${C.inchiostro}">La garanzia:</strong> se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di legge, ti rimborsiamo per intero quello che hai pagato. Ti scrivo io per sapere com'è andata.`,
+          `<strong style="color:${C.inchiostro}">La garanzia:</strong> se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di legge, dopo la tua replica la prossima pratica è su di noi (un credito, non i soldi indietro). Ti scrivo io per sapere com'è andata.`,
         ),
       coda: CODA,
     }),
     testo: `Pagamento ricevuto. La pratica è aperta.\n\nVolo ${d.volo}${quando}.${
       d.importo ? ` Fascia: ${euro(d.importo)} a passeggero (artt. 5 e 7, Reg. CE 261/2004).` : ""
     }\n\nI due passi che restano:\n1. Entra nella pratica e carica la carta d'imbarco.\n2. Copia la lettera pronta e inviala alla compagnia dalla tua email.\n\nApri la pratica (link valido una volta sola): ${d.link}\nSe scade: ${casa()}/entra\n\nPerché la mandi tu: un reclamo dal passeggero non si respinge come richiesta di un intermediario, e il recupero resta tuo al 100%.${
-      "\nGaranzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, ti rimborsiamo per intero."
+      "\nGaranzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, dopo la tua replica la prossima pratica è su di noi (un credito)."
     }`,
   });
 }
@@ -431,7 +431,7 @@ export function comeVa(
         ) +
         bottone("Aggiorna la tua pratica", d.link) +
         p(
-          `<strong style="color:${C.inchiostro}">La garanzia vale ancora:</strong> se la compagnia ha rifiutato senza un motivo valido, o non si è fatta viva nei termini, ti rimborsiamo per intero il prezzo della pratica. Non c'è nessun modulo: basta che tu mi dica com'è andata.`,
+          `<strong style="color:${C.inchiostro}">La garanzia vale ancora:</strong> se la compagnia ha rifiutato senza un motivo valido, o non si è fatta viva nei termini, dopo la tua replica la prossima pratica è su di noi (un credito, non i soldi indietro). Basta che tu mi dica com'è andata.`,
         ),
       coda: CODA,
     }),

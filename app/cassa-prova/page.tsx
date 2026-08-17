@@ -72,7 +72,7 @@ export default async function PaginaCassaProva({
               ? "Fino a 5 passeggeri sullo stesso volo"
               : "Il sollecito e la replica al loro no, al momento giusto",
             "La segnalazione all'ente e la conciliazione, già scritte",
-            "Se la compagnia non paga, ti rimborsiamo per intero",
+            "Se non ti pagano, la prossima pratica è su di noi",
           ],
           rigaTotale: scontato
             ? `Pratica meno l'analisi che hai già pagato (${prezzoCheck(null).prezzoTesto})`

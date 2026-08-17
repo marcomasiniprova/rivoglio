@@ -880,7 +880,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
       <p className="no-stampa text-sm leading-relaxed text-fumo-2">
         {sollecito
           ? "Mandalo dalla stessa casella del primo reclamo, in risposta al messaggio di prima se ce l'hai ancora: così la loro pratica resta una sola. Se anche stavolta non rispondono, il passo dopo è l'ente nazionale, e te lo prepariamo noi."
-          : "Quando l'hai inviata, tienila: ti scriviamo noi al momento giusto per il sollecito, col testo già pronto. E se la compagnia non paga, vale la garanzia: ti rimborsiamo la pratica per intero."}
+          : "Quando l'hai inviata, tienila: ti scriviamo noi al momento giusto per il sollecito, col testo già pronto. E se la compagnia non paga, vale la garanzia: dopo la tua replica la prossima pratica è su di noi."}
       </p>
 
       {/* Il testo per i bottoni di copia: invisibile, mai stampato. */}

@@ -19,18 +19,18 @@ import DichiaraRifiuto from "./DichiaraRifiuto";
  *    stava in un box a parte.
  *
  * 🔴 LA GARANZIA NON SCATTA PIÙ SULLA PAROLA (Valerio, 15/08: «uno può
- * essere pagato e chiedere il rimborso lo stesso, come lo verifichiamo?»).
- * Non possiamo vedere il conto di nessuno. Quindi il rimborso dei 14,90
- * parte solo DOPO che c'è un no SCRITTO della compagnia registrato, che
- * leggiamo noi: chi è stato pagato non ha un no da mostrare. Il server lo
- * ricontrolla (`/api/pratiche/[id]/esito`).
+ * essere pagato e chiedere la garanzia lo stesso, come lo verifichiamo?»).
+ * Non possiamo vedere il conto di nessuno. Quindi la garanzia (dal 17/08 un
+ * CREDITO per la prossima pratica, non contanti) parte solo DOPO che c'è un
+ * no SCRITTO della compagnia registrato, che leggiamo noi: chi è stato
+ * pagato non ha un no da mostrare. Il server lo ricontrolla
+ * (`/api/pratiche/[id]/esito`).
  *
  * I due bottoni restano SEMPRE visibili: chi ha ricevuto un no e poi, dopo
  * la replica, si è visto pagare, deve poterlo dire.
  */
 export default function DichiaraEsito({
   praticaId,
-  importoRimborso,
   rifiutoRegistrato = false,
   rifiutoProvato = false,
   haCombattuto = false,
@@ -39,17 +39,12 @@ export default function DichiaraEsito({
   nuovoGiro = false,
 }: {
   praticaId: string;
-  /** Quanto rimborsa la garanzia: quello che ha pagato DAVVERO per questa
-   *  pratica (14,90 singola, 29,90 famiglia), calcolato dal chiamante sul
-   *  tipo. Prima era "14,90" fisso qui dentro, e alla famiglia (che ne paga
-   *  29,90) prometteva meno del versato. */
-  importoRimborso: string;
   /** Vero se un no scritto della compagnia è già registrato sulla pratica. */
   rifiutoRegistrato?: boolean;
   /** Vero se il no è arrivato come DOCUMENTO vero (foto/email), non testo
    *  scritto a mano: è quello che fa scattare la garanzia (anti-frode). */
   rifiutoProvato?: boolean;
-  /** Vero se l'utente ha già mandato almeno una replica: il rimborso è
+  /** Vero se l'utente ha già mandato almeno una replica: la garanzia è
    *  l'ultima spiaggia, si sblocca solo dopo aver combattuto (Valerio 16/08). */
   haCombattuto?: boolean;
   giaDichiarato?: string | null;
@@ -162,14 +157,17 @@ export default function DichiaraEsito({
               condizioni (Valerio, 15 e 16/08):
               1. il no è un DOCUMENTO vero caricato (foto/email), non testo
                  scritto a mano: è il paletto anti-frode;
-              2. hai già MANDATO la replica al loro no: il rimborso arriva
+              2. hai già MANDATO la replica al loro no: la garanzia arriva
                  DOPO aver combattuto, non al primo no (spesso il no cade
-                 proprio alla replica). Il server ricontrolla entrambe. */}
+                 proprio alla replica). Il server ricontrolla entrambe.
+              La garanzia è un CREDITO, non contanti (Valerio, 17/08): chiude
+              la pratica e ti regala la prossima. */}
           {rifiutoProvato && haCombattuto ? (
             <div className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5">
               <p className="text-[0.95rem] leading-relaxed text-inchiostro">
                 Hai mandato la replica e non hanno pagato lo stesso? Allora chiudo la pratica e
-                faccio partire la garanzia: ti rimborsiamo i {importoRimborso} che hai pagato.
+                faccio partire la garanzia: la tua prossima pratica è su di noi, te la offriamo
+                gratis.
               </p>
               {/* ⚠️ h-auto + whitespace-normal: prima il testo era su una
                   riga sola e si tagliava ai bordi sul telefono (Valerio,
@@ -181,22 +179,22 @@ export default function DichiaraEsito({
                 disabled={inCorso}
                 onClick={() => void dichiara("non_pagata")}
               >
-                {inCorso ? "Un attimo…" : `Chiudi e chiedi il rimborso (${importoRimborso})`}
+                {inCorso ? "Un attimo…" : "Chiudi e prendi il credito (prossima pratica gratis)"}
               </Button>
             </div>
           ) : rifiutoProvato ? (
             /* Ha caricato il no ma non ha ancora combattuto: la strada è la
-               replica, non il rimborso. */
+               replica, non ancora il credito della garanzia. */
             <p className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5 text-[0.9rem] leading-relaxed text-fumo">
-              Il rimborso è l&apos;ultima spiaggia. Prima manda la replica qui sopra: spessissimo il
-              loro no cade proprio lì. Se dopo la replica non pagano lo stesso, la garanzia dei{" "}
-              {importoRimborso} scatta da sola.
+              La garanzia è l&apos;ultima spiaggia. Prima manda la replica qui sopra: spessissimo il
+              loro no cade proprio lì. Se dopo la replica non pagano lo stesso, la garanzia scatta da
+              sola e la tua prossima pratica è gratis.
             </p>
           ) : rifiutoRegistrato ? (
             <p className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5 text-[0.9rem] leading-relaxed text-fumo">
-              Per far partire la garanzia dei {importoRimborso} serve la risposta VERA della
+              Per far partire la garanzia (la prossima pratica gratis) serve la risposta VERA della
               compagnia: caricala qui sopra come foto o email («Carica lo screenshot»). Il testo
-              scritto a mano prepara la replica, ma non basta per il rimborso.
+              scritto a mano prepara la replica, ma non basta per la garanzia.
             </p>
           ) : null}
         </div>

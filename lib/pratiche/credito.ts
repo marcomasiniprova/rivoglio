@@ -30,6 +30,16 @@ export type CreditoDisponibile = {
 const NESSUNO: CreditoDisponibile = { singola: false, famiglia: false };
 
 /**
+ * Un credito di tipo `creditoTipo` copre una pratica di tipo `richiesto`?
+ * Una famiglia (29,90) copre sia una famiglia sia una singola; una singola
+ * (14,90) copre solo una singola. Funzione pura: la testa una prova.
+ */
+export function creditoCopre(creditoTipo: TipoPratica, richiesto: TipoPratica): boolean {
+  if (creditoTipo === "famiglia") return true;
+  return richiesto === "singola";
+}
+
+/**
  * Concede il credito quando la garanzia scatta. Idempotente: l'indice unico
  * su `pratica_origine` impedisce che un doppio clic (o un webhook doppio) ne
  * faccia nascere due per la stessa pratica fallita.
@@ -70,9 +80,10 @@ export async function creditoDisponibile(utenteId: string): Promise<CreditoDispo
       .is("usato_il", null);
     const tipi = (data as { tipo: TipoPratica }[] | null) ?? [];
     if (tipi.length === 0) return NESSUNO;
-    const haFamiglia = tipi.some((c) => c.tipo === "famiglia");
-    // Qualsiasi credito copre una singola; solo un famiglia copre una famiglia.
-    return { singola: true, famiglia: haFamiglia };
+    return {
+      singola: tipi.some((c) => creditoCopre(c.tipo, "singola")),
+      famiglia: tipi.some((c) => creditoCopre(c.tipo, "famiglia")),
+    };
   } catch {
     return NESSUNO;
   }
@@ -101,12 +112,12 @@ export async function consumaCredito(
       .order("creato_il", { ascending: true });
 
     const candidati = (liberi as { id: string; tipo: TipoPratica }[] | null) ?? [];
-    // Una famiglia serve un credito famiglia; una singola preferisce un credito
-    // singola, e ripiega su un famiglia solo se non ce ne sono di singoli.
-    const coprono =
-      tipoRichiesto === "famiglia"
-        ? candidati.filter((c) => c.tipo === "famiglia")
-        : [...candidati.filter((c) => c.tipo === "singola"), ...candidati.filter((c) => c.tipo === "famiglia")];
+    // Prende i crediti che coprono il tipo, e mette davanti quelli del tipo
+    // ESATTO: così una singola non spreca un credito famiglia se ne ha uno
+    // singola. Fra pari tipo, il più vecchio (già ordinati per creato_il).
+    const coprono = candidati
+      .filter((c) => creditoCopre(c.tipo, tipoRichiesto))
+      .sort((a, b) => Number(b.tipo === tipoRichiesto) - Number(a.tipo === tipoRichiesto));
     if (coprono.length === 0) return { ok: false };
 
     // Prova a claimare i candidati in ordine: il primo che riusciamo a segnare

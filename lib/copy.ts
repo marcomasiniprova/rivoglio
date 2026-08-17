@@ -235,7 +235,7 @@ export const COPY = {
     puntiFiducia: [
       seSiPaga(`L'analisi costa ${PREZZO}: meno di un cappuccino al bar`, "Il check è gratis, sempre"),
       "Nessuna percentuale sulla compensazione",
-      "Se la compagnia non paga, non paghi neanche tu",
+      "Se non ti pagano, la prossima pratica è su di noi",
     ],
   },
 
@@ -340,16 +340,16 @@ export const COPY = {
 
   garanzia: {
     occhiello: "La garanzia",
-    titolo: "Se la compagnia non paga, non paghi neanche tu.",
+    titolo: "Se non ottieni la compensazione, la prossima pratica è su di noi.",
     testo:
-      "Se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di legge, ti rimborsiamo per intero quello che hai pagato. Ti scriviamo noi per sapere com'è andata: il rimborso non devi chiederlo.",
+      "Se la compagnia rifiuta senza un motivo valido, o non risponde entro i termini di legge, dopo che hai mandato la replica al loro no ti diamo un credito: la tua prossima pratica è gratis. Non ti lasciamo a mani vuote, e continuiamo a lavorare per te.",
     punti: [
-      "Rimborso integrale, non un buono",
+      "Un credito per la prossima pratica, non un rimborso in denaro",
       "Legata all'esito, non a una scadenza sul calendario",
       "Vale per ogni pratica, singola o famiglia",
     ],
     notaOnesta:
-      "Non mettiamo una scadenza a giorni perché le compagnie rispondono anche dopo due o tre mesi: un limite corto ti farebbe chiedere il rimborso mentre la tua pratica è ancora viva. Possiamo permettercela perché vendiamo solo i casi in cui il dato è solido: quelli incerti non li vendiamo.",
+      "Te lo diciamo chiaro: non è un rimborso in denaro, è un credito per un'altra pratica. Non mettiamo una scadenza a giorni perché le compagnie rispondono anche dopo due o tre mesi. Possiamo permettercela perché vendiamo solo i casi in cui il dato è solido: quelli incerti non li vendiamo.",
   },
 
   prezzi: {
@@ -445,7 +445,7 @@ export const COPY = {
       },
     },
     /** La garanzia, dentro le card: è l'obiezione numero uno di chi paga. */
-    garanziaCarta: "Garanzia: se la compagnia non paga, ti rimborsiamo per intero.",
+    garanziaCarta: "Garanzia: se non ottieni la compensazione, la prossima pratica è su di noi.",
     promemoria: "Nessun abbonamento, nessuna percentuale, nessun altro costo.",
   },
 
@@ -585,7 +585,7 @@ export const COPY = {
       {
         domanda: "E allora cosa pago, esattamente?",
         risposta:
-          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, letto dal tracciamento del volo e archiviato come prova. Quello che viene dopo il primo reclamo: il sollecito, la replica se dicono no, la segnalazione all'ente e la conciliazione gratuita, che è il canale dove i soldi si muovono davvero. La garanzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, ti rimborsiamo per intero.",
+          "Tre cose. Il dato oggettivo: l'orario effettivo di atterraggio, letto dal tracciamento del volo e archiviato come prova. Quello che viene dopo il primo reclamo: il sollecito, la replica se dicono no, la segnalazione all'ente e la conciliazione gratuita, che è il canale dove i soldi si muovono davvero. La garanzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, dopo la replica la tua prossima pratica è su di noi (un credito, non i soldi indietro).",
       },
       {
         domanda: "Quanto ricevo, se va a buon fine?",
@@ -932,7 +932,7 @@ export const COPY = {
          quella persona sta vedendo (test dei due prezzi, 9/08). */
       cta: "Prepara la pratica a {prezzo}",
       ctaFamiglia: "Eravate in più sullo stesso volo? Fino a 5 passeggeri a {prezzoFamiglia}",
-      garanziaBreve: "Se la compagnia non paga, non paghi neanche tu.",
+      garanziaBreve: "Se non ottieni la compensazione, la prossima pratica è su di noi.",
       /** Onestà quando i link Polar non sono configurati o il caso è demo. */
       checkoutNonAttivo:
         "Il pagamento non è ancora attivo. Lascia l'email qui sopra: ti scriviamo appena lo è.",
@@ -944,7 +944,7 @@ export const COPY = {
        */
       recesso: {
         etichetta: TESTO_RINUNCIA,
-        nota: "La garanzia non cambia: se la compagnia non ti paga, ti rimborsiamo per intero.",
+        nota: "La garanzia non cambia: se non ottieni la compensazione, la prossima pratica è su di noi.",
         blocco:
           "Per proseguire metti la spunta qui sopra: senza il tuo consenso non possiamo preparare la pratica subito.",
         errore: "Non siamo riusciti a registrare il consenso. Riprova tra qualche secondo.",
@@ -1249,7 +1249,7 @@ export const COPY = {
         nome: "Rifiutata",
         descrizione: "La compagnia ha rifiutato la richiesta.",
         prossimoPasso:
-          "Vale la garanzia: se la compagnia non ti paga, ti rimborsiamo la pratica per intero.",
+          "La garanzia ti ha dato un credito: la tua prossima pratica è gratis.",
       },
       rimborsata: {
         nome: "Rimborsata",
@@ -1378,18 +1378,14 @@ export const COPY = {
 
     garanzia: {
       titolo: "La garanzia",
-      /* ⚠️ NIENTE DATA, NIENTE «SENZA MODULI» (Valerio, 16/08). Prima qui
-         c'era «Se entro il 14 novembre la compagnia non ti ha pagato, ti
-         rimborsiamo, senza moduli da compilare»: una promessa di rimborso
-         AUTOMATICO a scadenza, che il sistema non mantiene. Il rimborso
-         scatta solo dopo un no scritto della compagnia caricato come
-         documento E la replica mandata (gate in /api/pratiche/[id]/esito).
-         Dirlo a data fissa e «senza moduli» era un falso positivo sui
-         soldi. Ora la riga dice la verità, e combacia col box «come è
-         andata». {importo} è quello che ha pagato davvero, per tipo di
-         pratica (14,90 o 29,90), mai un numero scritto a mano. */
+      /* ⚠️ È UN CREDITO, NON CONTANTI (Valerio, 17/08). La garanzia non
+         rimborsa i soldi: se la compagnia rifiuta senza motivo (o tace) e
+         hai già mandato la replica, ti regala la PROSSIMA PRATICA (un
+         credito sul tuo account, vedi lib/pratiche/credito.ts). Niente
+         data, niente cassa in uscita, e la riga dice la verità: combacia
+         col box «come è andata» e con le condizioni d'uso. */
       template:
-        "Se la compagnia rifiuta senza un motivo valido, o non risponde nei termini, dopo che hai mandato la replica al loro no ti rimborsiamo per intero i {importo} che hai pagato.",
+        "Se la compagnia rifiuta senza un motivo valido, o non risponde nei termini, dopo che hai mandato la replica al loro no la tua prossima pratica è su di noi: te la offriamo noi.",
     },
 
     scadenza: {

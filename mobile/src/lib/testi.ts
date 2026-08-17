@@ -65,7 +65,7 @@ export const TESTI = {
     punti: [
       seSiPaga(`L'analisi costa ${PREZZO_LANCIO} e si scala dalla pratica`, "Il check è gratis, sempre"),
       "Nessuna percentuale sulla compensazione",
-      "Se la compagnia non paga, non paghi neanche tu",
+      "Se non ti pagano, la prossima pratica è su di noi",
     ],
     errori: {
       voloMancante: "Scrivi il numero del volo.",
@@ -1028,7 +1028,7 @@ export const TESTI = {
       grazie: "Registrato. Da oggi contiamo i giorni per te.",
     },
     garanzia:
-      "Garanzia attiva: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, ti rimborsiamo per intero. Dimmi com'è andata e ci penso io.",
+      "Garanzia attiva: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, dopo la tua replica la prossima pratica è su di noi (un credito, non i soldi indietro). Dimmi com'è andata e ci penso io.",
     cronologia: "La cronologia",
     caricamento: "Sto leggendo la pratica",
     entraPrima: "Per vedere la pratica devi entrare con l'email con cui l'hai aperta.",
