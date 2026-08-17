@@ -1,5 +1,5 @@
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
-import { èNostroHost } from "./registra";
+import { èNostroHost, sorgenteAI } from "./registra";
 import type { TipoEvento } from "./registra";
 
 /**
@@ -46,6 +46,12 @@ export type Cruscotto = {
   /** Da dove arrivano, negli ultimi 7 giorni. */
   provenienze: Conteggio[] | null;
   paesi: Conteggio[] | null;
+  /**
+   * Quanti arrivano da un motore AI (ChatGPT, Perplexity...), negli ultimi
+   * 7 giorni. È il numero che dice se il marketing GEO funziona: se le
+   * pagine per compagnia vengono citate, qui cresce. null = non letto.
+   */
+  aiMotori: Conteggio[] | null;
   /** Gli ultimi fatti, in ordine: è il "tempo reale". */
   ultimi: Riga[] | null;
   /** Quanti di quelli che hanno visto il muro hanno poi pagato. */
@@ -79,6 +85,7 @@ const VUOTO: Cruscotto = {
   incassoSettimana: null,
   provenienze: null,
   paesi: null,
+  aiMotori: null,
   ultimi: null,
   conversioneMuro: null,
   parziale: false,
@@ -212,6 +219,21 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
         .map(([nome, quanti]) => ({ nome, quanti }));
     };
 
+    /* Da quali motori AI: si prende la provenienza di ogni riga e si guarda
+       se è un motore (chatgpt, perplexity...). Conta a parte da "da dove
+       arrivano" perché è la domanda che il marketing GEO fa a sé stesso:
+       "le pagine che ho scritto per farmi citare stanno funzionando?". */
+    const contaAI = () => {
+      const m = new Map<string, number>();
+      for (const r of righe) {
+        const motore = sorgenteAI(r.provenienza);
+        if (motore) m.set(motore, (m.get(motore) ?? 0) + 1);
+      }
+      return [...m.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(([nome, quanti]) => ({ nome, quanti }));
+    };
+
     /* 🔴 LE PROVE DI COLLAUDO CONTAVANO COME VENDITE. Oggi l'unico posto
        che scrive "analisi pagata" è la cassa di collaudo, cioè Valerio
        che percorre il prodotto: un venditore vero non c'è ancora. Senza
@@ -232,6 +254,7 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
       incassoSettimana: somma(righe),
       provenienze: perChiave("provenienza"),
       paesi: perChiave("paese"),
+      aiMotori: contaAI(),
       ultimi: righe.slice(0, quanteRighe).map((r) => ({
         quando: r.creato_il,
         tipo: r.tipo,

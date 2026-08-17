@@ -115,6 +115,57 @@ export function soloIlDominio(referer: string | null | undefined): string | null
   }
 }
 
+/**
+ * I MOTORI AI, normalizzati a un'etichetta pulita (GEO/AIO, 17/08).
+ *
+ * chat.openai.com e chatgpt.com sono lo stesso posto: senza normalizzare
+ * conterebbero separati, e nel cruscotto "da dove arriva" non si capirebbe
+ * quanta gente manda ChatGPT. Serve a misurare il marketing GEO: se le
+ * pagine per compagnia funzionano, qui cresce il numero da "chatgpt" e
+ * "perplexity".
+ */
+const SORGENTI_AI: Record<string, string> = {
+  "chatgpt.com": "chatgpt",
+  "chat.openai.com": "chatgpt",
+  "openai.com": "chatgpt",
+  "perplexity.ai": "perplexity",
+  "gemini.google.com": "gemini",
+  "bard.google.com": "gemini",
+  "copilot.microsoft.com": "copilot",
+  "claude.ai": "claude",
+  "you.com": "you",
+};
+
+/** Se questa provenienza è un motore AI, l'etichetta pulita; altrimenti null. */
+export function sorgenteAI(provenienza: string | null | undefined): string | null {
+  if (!provenienza) return null;
+  const d = provenienza.toLowerCase().replace(/^www\./, "");
+  if (SORGENTI_AI[d]) return SORGENTI_AI[d];
+  // anche i valori utm scritti a mano ("chatgpt.com", "perplexity") o i
+  // sottodomini: se il nome contiene il motore, si riconosce.
+  for (const nome of ["chatgpt", "perplexity", "gemini", "copilot", "claude"]) {
+    if (d.includes(nome)) return nome;
+  }
+  return null;
+}
+
+/**
+ * La provenienza di una visita, con la regola giusta per il GEO.
+ *
+ * `utm_source` VINCE sul referer: è il segnale esplicito. I motori AI
+ * spesso non mandano il referer (o lo tolgono per privacy), e i link che
+ * metti tu su Reddit o nella newsletter li tagghi con utm. Se c'è l'utm,
+ * quella è la verità; se no, si ripiega sul dominio del referer.
+ */
+export function provenienzaVisita(
+  referer: string | null | undefined,
+  utm: string | null | undefined,
+): string | null {
+  const daUtm = typeof utm === "string" && utm.trim() ? utm.trim().toLowerCase().slice(0, 80) : null;
+  if (daUtm) return daUtm;
+  return soloIlDominio(referer);
+}
+
 /** Il paese, come lo dichiara Netlify. Nessun calcolo nostro sull'IP. */
 export function paeseDi(req: Request): string | null {
   const c = req.headers.get("x-nf-geo-country") ?? req.headers.get("x-country");

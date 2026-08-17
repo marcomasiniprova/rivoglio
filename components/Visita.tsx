@@ -30,9 +30,15 @@ export default function Visita() {
          meglio un numero un filo alto che nessun numero. */
     }
 
+    /* L'etichetta esplicita del link (`?utm_source=chatgpt`): la mettiamo
+       noi sui link che pubblichiamo (Reddit, newsletter) e i motori AI a
+       volte la portano. Vince sul referer, che spesso i motori tolgono. */
+    const utm = new URLSearchParams(location.search).get("utm_source");
+
     const corpo = JSON.stringify({
       da: document.referrer || null,
       pagina: location.pathname,
+      utm: utm || null,
     });
 
     try {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ipDi, oltreIlLimite } from "@/lib/api/limite";
-import { soloIlDominio, traccia } from "@/lib/eventi/registra";
+import { provenienzaVisita, traccia } from "@/lib/eventi/registra";
 
 /**
  * «QUALCUNO È ARRIVATO SUL SITO.»
@@ -44,13 +44,22 @@ export async function POST(req: Request) {
     /* `sendBeacon` può mandare un corpo vuoto: non è un errore, si
        registra la visita senza dettagli. */
   }
-  const { da, pagina } = (corpo ?? {}) as { da?: unknown; pagina?: unknown };
+  const { da, pagina, utm } = (corpo ?? {}) as {
+    da?: unknown;
+    pagina?: unknown;
+    utm?: unknown;
+  };
 
   traccia(req, {
     tipo: "visita",
     /* La provenienza la dice il browser (`document.referrer`), non
-       l'intestazione: qui il referer sarebbe sempre il nostro sito. */
-    provenienza: soloIlDominio(typeof da === "string" ? da : null),
+       l'intestazione: qui il referer sarebbe sempre il nostro sito.
+       L'etichetta `utm_source` vince, quando c'è: è il segnale esplicito
+       che regge anche quando il motore AI toglie il referer. */
+    provenienza: provenienzaVisita(
+      typeof da === "string" ? da : null,
+      typeof utm === "string" ? utm : null,
+    ),
     extra: { pagina: paginaPulita(pagina) },
   });
 

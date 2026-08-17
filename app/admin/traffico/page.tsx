@@ -102,6 +102,16 @@ export default async function PaginaTraffico() {
       </div>
 
       <Scheda
+        titolo="Ti manda l'AI?"
+        sotto="Quante persone arrivano da ChatGPT, Perplexity e simili, ultimi 7 giorni. È il numero che dice se le pagine scritte per farsi citare stanno funzionando."
+      >
+        <BarreOrizzontali
+          righe={c.aiMotori}
+          vuotoTesto="Ancora nessuno arriva da un motore AI, o il registro è appena partito. Ci vogliono settimane perché i motori indicizzino le pagine nuove."
+        />
+      </Scheda>
+
+      <Scheda
         titolo="Visite e analisi, giorno per giorno"
         sotto={`Gli ultimi ${GIORNI} giorni. La riga tratteggiata è oggi.`}
         destra={

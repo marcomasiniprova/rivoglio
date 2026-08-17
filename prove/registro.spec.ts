@@ -1,7 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { paeseDi, soloIlDominio } from "../lib/eventi/registra";
+import {
+  paeseDi,
+  provenienzaVisita,
+  sorgenteAI,
+  soloIlDominio,
+} from "../lib/eventi/registra";
 
 /**
  * LE PROMESSE DEL REGISTRO.
@@ -87,6 +92,40 @@ test.describe("il registro non raccoglie persone", () => {
     expect(privacy).toContain("Statistiche d&apos;uso");
     expect(privacy).toContain("tiktok.com");
     expect(privacy).toContain("indirizzo IP");
+  });
+});
+
+test.describe("il traffico dai motori AI si riconosce (GEO)", () => {
+  /**
+   * Il marketing GEO ha senso solo se si può MISURARE. Queste prove
+   * tengono ferme le due regole che lo rendono misurabile: i motori AI
+   * si normalizzano a un'etichetta sola (chat.openai.com e chatgpt.com
+   * sono lo stesso posto), e l'etichetta esplicita `utm_source` vince sul
+   * referer, perché i motori spesso il referer lo tolgono.
+   */
+  test("chat.openai.com e chatgpt.com contano come 'chatgpt'", () => {
+    expect(sorgenteAI("chatgpt.com")).toBe("chatgpt");
+    expect(sorgenteAI("chat.openai.com")).toBe("chatgpt");
+    expect(sorgenteAI("www.perplexity.ai")).toBe("perplexity");
+    expect(sorgenteAI("gemini.google.com")).toBe("gemini");
+  });
+
+  test("chi non è un motore AI non viene scambiato per uno", () => {
+    expect(sorgenteAI("tiktok.com")).toBeNull();
+    expect(sorgenteAI("google.com")).toBeNull();
+    expect(sorgenteAI(null)).toBeNull();
+    expect(sorgenteAI("")).toBeNull();
+  });
+
+  test("l'etichetta utm_source vince sul referer", () => {
+    /* Il caso che conta: il motore AI non manda referer (lo toglie per
+       privacy), ma il link che ho messo io su Reddit è taggato. Senza la
+       precedenza dell'utm, quella visita finirebbe "senza provenienza". */
+    expect(provenienzaVisita(null, "chatgpt")).toBe("chatgpt");
+    expect(provenienzaVisita("https://www.reddit.com/r/x", "newsletter")).toBe("newsletter");
+    /* Senza utm si ripiega sul dominio del referer, come sempre. */
+    expect(provenienzaVisita("https://www.tiktok.com/@x/video/1", null)).toBe("tiktok.com");
+    expect(provenienzaVisita(null, null)).toBeNull();
   });
 });
 
