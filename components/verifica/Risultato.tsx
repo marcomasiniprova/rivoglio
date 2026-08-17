@@ -837,10 +837,10 @@ function AcquistoPratica({ dati }: { dati: DatiVerifica }) {
  * (Valerio, 17/08). Niente recesso e niente cassa: la pratica è coperta dal
  * credito. È un form POST, non un link: aprire una pratica e spendere un
  * credito non deve poter partire da un prefetch. Il cancello vero sta nel
- * server (/api/pratiche/gratis), che ricontrolla il credito.
+ * server (/api/pratiche/credito), che ricontrolla il credito.
  */
 function AcquistoColCredito({ dati }: { dati: DatiVerifica }) {
-  const base = `/api/pratiche/gratis?verifica=${dati.idPagina}`;
+  const base = `/api/pratiche/credito?verifica=${dati.idPagina}`;
   return (
     <div className="flex flex-col gap-2.5">
       <form method="post" action={`${base}&tipo=singola`}>

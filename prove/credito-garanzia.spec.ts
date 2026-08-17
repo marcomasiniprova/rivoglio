@@ -54,7 +54,7 @@ test.describe("Il credito si concede solo col cancello completo", () => {
 
 test.describe("Una pratica gratis si apre solo con un credito vero", () => {
   test("la rotta gratis controlla il credito PRIMA di creare la pratica", () => {
-    const r = senzaCommenti(leggi("app/api/pratiche/gratis/route.ts"));
+    const r = senzaCommenti(leggi("app/api/pratiche/credito/route.ts"));
     expect(r).toContain("creditoDisponibile");
     // `lastIndexOf`: la prima occorrenza è l'import; serve la chiamata vera.
     const iCredito = r.lastIndexOf("creditoDisponibile");
@@ -65,14 +65,14 @@ test.describe("Una pratica gratis si apre solo con un credito vero", () => {
   });
 
   test("🔴 la rotta gratis è un POST, non un GET (niente prefetch che apre pratiche)", () => {
-    const r = leggi("app/api/pratiche/gratis/route.ts");
+    const r = leggi("app/api/pratiche/credito/route.ts");
     expect(r).toContain("export async function POST");
     // Un GET verrebbe seguito da un prefetch/una scheda riaperta: qui no.
     expect(r).not.toContain("export async function GET");
   });
 
   test("richiede la sessione: il credito è sull'account", () => {
-    const r = senzaCommenti(leggi("app/api/pratiche/gratis/route.ts"));
+    const r = senzaCommenti(leggi("app/api/pratiche/credito/route.ts"));
     expect(r).toContain("utenteCollegato");
     // Senza utente collegato si esce con 401 prima di toccare qualsiasi cosa.
     expect(r).toMatch(/status:\s*401/);
