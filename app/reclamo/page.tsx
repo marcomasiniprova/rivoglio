@@ -15,8 +15,6 @@ import { COMPAGNIE_PAGINA } from "@/lib/rimborsi/pagine-compagnia";
  * "come fare reclamo alla compagnia aerea" con le cifre in cima.
  */
 
-export const dynamic = "error";
-
 export const metadata: Metadata = {
   title: "Reclamo compagnia aerea: rimborso volo in ritardo o cancellato | Rivolio",
   description:

@@ -19,8 +19,6 @@ import { datiBriciole, datiDomande, scriptDati } from "@/lib/tabellone/seo";
  * vogliamo pubblicare un numero preciso come se fosse verificato oggi.
  */
 
-export const dynamic = "error";
-
 export const metadata: Metadata = {
   title: "Alternative ad AirHelp: il confronto onesto (2026) | Rivolio",
   description:
