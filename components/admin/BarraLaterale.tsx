@@ -5,10 +5,10 @@ import { Map,
   Activity,
   Calculator,
   Cog,
-  ExternalLink,
   FolderOpen,
   Gavel,
   LayoutDashboard,
+  LogOut,
   Mail,
   Megaphone,
   Search,
@@ -20,6 +20,7 @@ import { Map,
 } from "lucide-react";
 import { Marchio } from "@/components/Logo";
 import { SEZIONI, type ChiaveSezione } from "@/lib/admin/sezioni";
+import { esci } from "@/app/entra/azioni";
 
 /**
  * LA BARRA LATERALE (richiesta di Valerio, 11/08: «metti le sezioni a
@@ -54,16 +55,6 @@ const ICONE: Record<ChiaveSezione, typeof LayoutDashboard> = {
   prodotto: Smartphone,
   impostazioni: Settings,
 };
-
-/**
- * L'unica voce che porta fuori dal pannello.
- *
- * ⚠️ Prima qui c'erano "Vedi il sito" e "La web app", e l'app non
- * compariva da nessuna parte: tre cose che il cliente vede, sparse in due
- * posti e una mancante. Adesso stanno tutte nella sezione Prodotto, e qui
- * resta solo la strada per uscire.
- */
-const FUORI = [{ href: "/app", nome: "Esci dal pannello", icona: ExternalLink }];
 
 type Props = {
   attiva: ChiaveSezione;
@@ -179,17 +170,23 @@ function Contenuto({ attiva, email, onChiudi }: Omit<Props, "aperta">) {
       </nav>
 
       <div className="mt-auto flex flex-col gap-0.5 border-t border-bordo pt-4">
-        {FUORI.map((f) => (
-          <Voce
-            key={f.href}
-            href={f.href}
-            nome={f.nome}
-            Icona={f.icona}
-            accesa={false}
-            onVai={onChiudi}
-            servizio
-          />
-        ))}
+        {/* 🔴 «ESCI DAL PANNELLO NON FUNZIONA, RESTO BLOCCATO DENTRO»
+            (Valerio, 18/08). Era un Link a /app che non ti portava fuori.
+            Scelta col popup: adesso è un LOGOUT vero. Chiude la sessione
+            (stessa azione `esci` della web app) e riporta alla home
+            pubblica; per rientrare nel pannello si rifà l'accesso. */}
+        <form action={esci}>
+          <button
+            type="submit"
+            className="group relative flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-left text-[14px] text-fumo-2 transition-colors hover:bg-nebbia hover:text-fumo"
+          >
+            <LogOut
+              className="size-[17px] shrink-0 text-fumo-2 group-hover:text-fumo"
+              aria-hidden="true"
+            />
+            Esci dal pannello
+          </button>
+        </form>
         {email && (
           <p className="truncate px-3 pt-3 text-[11.5px] text-fumo-2" title={email}>
             {email}
