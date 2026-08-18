@@ -164,6 +164,42 @@ export async function eventoGiaRecensito(
   }
 }
 
+/**
+ * Questa PERSONA ha già lasciato una recensione, in un momento qualsiasi?
+ *
+ * Serve DENTRO l'account (la pratica) per non richiederla a chi l'ha già
+ * data (Valerio, 18/08: «se uno l'ha messa, basta, non gli appare più nel
+ * suo account»). Il legame è doppio: l'id dell'account e l'email. L'email
+ * prende anche chi ha recensito da anonimo durante il check e poi apre la
+ * pratica con lo stesso indirizzo: senza, gli si richiederebbe di nuovo.
+ *
+ * ⚠️ È una regola dell'ACCOUNT, non del check pubblico: al check e al
+ * verdetto la recensione si può ancora lasciare (è lì che porta iscritti).
+ * Qui dentro no: chi ha già dato la sua, basta.
+ */
+export async function personaGiaRecensito(opts: {
+  utenteId?: string | null;
+  email?: string | null;
+}): Promise<boolean> {
+  if (!SERVIZIO_ATTIVO) return false;
+  const utenteId = opts.utenteId?.trim() || null;
+  const email = opts.email?.trim().toLowerCase() || null;
+  if (!utenteId && !email) return false;
+  try {
+    const base = supabaseServizio().from("recensioni").select("id").limit(1);
+    const filtrata =
+      utenteId && email
+        ? base.or(`utente_id.eq.${utenteId},email.ilike.${email}`)
+        : utenteId
+          ? base.eq("utente_id", utenteId)
+          : base.ilike("email", email!);
+    const { data } = await filtrata.maybeSingle();
+    return Boolean(data);
+  } catch {
+    return false;
+  }
+}
+
 /* ─────────────────────────── il pannello ─────────────────────────── */
 
 const CAMPI = "id, stelle, motivo, nome, evento_tipo, evento_rif, stato, creata_il, approvata_il";

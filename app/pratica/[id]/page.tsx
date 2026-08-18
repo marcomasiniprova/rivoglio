@@ -38,7 +38,7 @@ import {
 } from "@/lib/tempo";
 import { COPY } from "@/lib/copy";
 import LasciaRecensione from "@/components/rivolio/LasciaRecensione";
-import { eventoGiaRecensito } from "@/lib/recensioni/recensioni";
+import { eventoGiaRecensito, personaGiaRecensito } from "@/lib/recensioni/recensioni";
 import DichiaraEsito from "@/components/pratica/DichiaraEsito";
 import Traguardo from "@/components/pratica/Traguardo";
 import ProvaPagamento from "@/components/pratica/ProvaPagamento";
@@ -197,6 +197,14 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
      recensita» solo DOPO che lo riscrivevi e premevi invia (Valerio, 16/08).
      Ora lo chiediamo al server e, se c'è già, non lo riproponiamo. */
   const giaRecensito = await eventoGiaRecensito("pratica", pratica.id);
+  /* «Se uno l'ha messa, basta, non gli appare più nel suo account»
+     (Valerio, 18/08): oltre a QUESTA pratica, guardiamo se la persona ha
+     già lasciato una recensione altrove, per id account o per email (che
+     prende anche chi l'aveva lasciata da anonimo al check). */
+  const personaHaRecensito = await personaGiaRecensito({
+    utenteId: utente.id,
+    email: utente.email ?? null,
+  });
 
   const C = COPY.pratica;
   const etichetteEventi: Record<string, string> = C.lineaTempo.eventi;
@@ -673,7 +681,7 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           accanto a «carica la foto dell'accredito», due richieste in fila.
           Ora se la pratica è già recensita il box sparisce, e sulla vinta
           resta la sola foto dell'accredito. */}
-      {!giaRecensito && (
+      {!giaRecensito && !personaHaRecensito && (
         <LasciaRecensione
           eventoTipo="pratica"
           eventoRif={pratica.id}
