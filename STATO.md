@@ -7,7 +7,10 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-19 (giro #87: la casella CONVERTI del marketing
+**Aggiornato:** 2026-08-19 (giro #88: DECIDI, il posizionamento: il
+differenziatore concreto (il 35% dei portali contro la nostra cifra fissa,
+adesso anche nell'hero) e il nemico con un nome («il lasciar perdere», nella
+chiusura della landing) · giro #87: la casella CONVERTI del marketing
 B2C (blocco autorità EU261 sul verdetto, muro che dice cosa succede dopo il
 pagamento, e la sequenza di recupero via email per chi controlla e non
 compra, spenta finché non c'è la cassa) · più la ricerca sui gestori di
@@ -79,6 +82,58 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #88 (19/08): DECIDI, IL POSIZIONAMENTO. Il differenziatore
+  concreto e il nemico con un nome, dalla casella DECIDI dei 4 framework
+  di marketing B2C.** Valerio: «guarda Rivolio come business, non come
+  codice. Qual è il nostro posizionamento? La piramide della
+  consapevolezza è il nostro target». Il nostro cliente sta al **gradino
+  2**: ha preso un volo storto, ma non sa di avere un diritto. Quattro
+  scelte col popup per pezzo, poi i pezzi uno alla volta, ognuno verde e
+  in produzione prima del prossimo.
+  - **IL DIFFERENZIATORE NON È PIÙ ASTRATTO (punto 1).** Il confronto coi
+    numeri (il 35% dei portali contro la nostra cifra fissa, con le
+    banconote) c'era già, ma viveva solo nella sezione prezzi a metà
+    pagina. Ora:
+    - **Hero**: il punto-fiducia «zero percentuali trattenute» (astratto)
+      diventa «Gli altri si prendono il 35%. Qui il rimborso è tutto tuo».
+      Lo vede chi arriva, non solo chi scorre fino ai prezzi.
+    - **Prezzi, sottotitolo**: l'argomento più tagliente, «una percentuale
+      cresce col tuo rimborso, una cifra fissa no».
+    - **Confronto banconote**: la frase-bandiera con l'emozione scelta
+      («riprenditi il tuo»): «Sono soldi tuoi. Tienili tutti.».
+    - **Nota del confronto**: via il nome AirHelp dalla landing (scelta
+      «generico»: resta solo sulla pagina di confronto dedicata) e via la
+      cifra fissa scritta a mano, che il test A/B dei due prezzi poteva
+      far sbagliare. **Nessuna cifra nuova di Rivolio in euro**: le righe
+      usano solo il 35% dei portali (dai loro listini) e le fasce del CE
+      261, che sono già dichiarate altrove.
+  - **IL PUNTO 2 ERA GIÀ FATTO, e l'ho detto invece di gonfiare il
+    lavoro.** Il gancio del gradino 2 («forse non lo sai, ma ti devono
+    fino a 600€») è già nell'hero: titolo «Hai preso un volo nell'ultimo
+    anno?» più sottotitolo «Forse ti devono fino a 600€». Non è un buco,
+    non l'ho toccato.
+  - **IL NEMICO ADESSO HA UN NOME (punto 3).** Il nemico di Rivolio non è
+    la compagnia, è **il lasciar perdere**: chi non fa niente. Non era
+    detto da nessuna parte. Ora c'è una riga netta nell'invito che chiude
+    la landing, proprio prima del bottone: «Il nemico non è la compagnia.
+    È lasciar perdere. Loro contano sul fatto che non lo farai. Ma sono
+    soldi tuoi, non un favore: non lasciarli lì.». Leva scelta: il gesto
+    (loro contano sulla tua inazione). Tono: grintoso pulito, senza
+    vittimismo.
+  - **Il posizionamento in una riga**, per fissarlo: *per chi ha preso un
+    volo storto nell'ultimo anno e non sa di avere un diritto, Rivolio è
+    lo scanner che glielo dice in 30 secondi e gli prepara il reclamo a
+    cifra fissa (non a percentuale). Il nemico è il lasciar perdere.*
+  - Additivo: due commit (`1e9d725` il differenziatore, `1d0ef5c` il
+    nemico), tipi e lint verdi, nessun trattino lungo. ⚠️ Le righe nuove
+    sono testo centrato (max-w-md), nessun posizionamento assoluto: sicure
+    a 375/768/1440 per costruzione. Da qui la sandbox non apre Chrome di
+    sistema, quindi lo screenshot non l'ho fatto: è una modifica di solo
+    testo dentro colonne già centrate.
+  - **Restano le altre caselle** del marketing B2C: ATTIRA (canale a
+    pagamento e misura del canale, si accende con la cassa) e TIENITELI
+    (recensione al momento giusto, invita un amico, il recupero via email
+    del giro #87 che è pronto ma spento).
 - **GIRO #87 (19/08): IL MARKETING B2C DAI 4 FRAMEWORK DI VALERIO, E LA
   CASELLA CONVERTI COSTRUITA.** Valerio ha portato 4 artefatti (fatti con
   un'altra AI): il manuale del marketing B2C in 4 caselle (Decidi, Attira,
