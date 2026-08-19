@@ -41,6 +41,7 @@ import LasciaRecensione from "@/components/rivolio/LasciaRecensione";
 import { eventoGiaRecensito, personaGiaRecensito } from "@/lib/recensioni/recensioni";
 import DichiaraEsito from "@/components/pratica/DichiaraEsito";
 import Traguardo from "@/components/pratica/Traguardo";
+import InvitaAmico from "@/components/rivolio/InvitaAmico";
 import ProvaPagamento from "@/components/pratica/ProvaPagamento";
 
 /**
@@ -398,6 +399,21 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
         />
       )}
 
+      {/* IL MOMENTO D'ORO (TIENITELI, scelta di Valerio 19/08: «recensione
+          poi invito»). Appena vede la cifra recuperata la persona è al
+          massimo della fiducia: è lì che si chiede la recensione, e subito
+          sotto si passa parola. La recensione qui prende il posto di quella
+          in fondo (soppressa sotto quando `vinta`), per non chiederla due
+          volte. L'invito compare comunque, anche a chi ha già recensito. */}
+      {vinta && !giaRecensito && !personaHaRecensito && (
+        <LasciaRecensione
+          eventoTipo="pratica"
+          eventoRif={pratica.id}
+          titolo="Ce l'hai fatta. Com'è andata con Rivolio?"
+        />
+      )}
+      {vinta && <InvitaAmico />}
+
       {/* La foto della prova di pagamento: FACOLTATIVA, solo sulla pratica
           vinta, per un testimonial anonimo (Valerio, 16/08). */}
       {vinta && <ProvaPagamento praticaId={pratica.id} />}
@@ -696,7 +712,9 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           accanto a «carica la foto dell'accredito», due richieste in fila.
           Ora se la pratica è già recensita il box sparisce, e sulla vinta
           resta la sola foto dell'accredito. */}
-      {!giaRecensito && !personaHaRecensito && (
+      {/* La recensione della pratica NON ancora vinta (in corso). Sulla
+          vinta la chiediamo più su, al momento d'oro, e qui non ricompare. */}
+      {!vinta && !giaRecensito && !personaHaRecensito && (
         <LasciaRecensione
           eventoTipo="pratica"
           eventoRif={pratica.id}

@@ -1495,6 +1495,24 @@ export const COPY = {
     ctaCorta: "Controlla",
   },
 
+  /** L'invito a un amico dal momento d'oro (TIENITELI, il passaparola).
+      Puro passaparola: nessun premio, nessun codice (scelta di Valerio,
+      19/08). Su un prodotto una-tantum il motore della crescita è questo.
+      Il link porta l'etichetta utm_source=invito, così gli amici che
+      arrivano si contano nel registro senza un sistema di codici. */
+  invitaAmico: {
+    titolo: "Conosci qualcuno a cui è andata storta?",
+    testo:
+      "Il modo più veloce per aiutarlo: mandagli il link. In 30 secondi scopre se la compagnia gli deve un rimborso, e si prepara il reclamo da solo.",
+    /* Il testo che parte nella condivisione, in prima persona da chi ha
+       appena vinto. Niente cifra: cambia da caso a caso. */
+    messaggio:
+      "Ho usato Rivolio per un volo andato storto: in 30 secondi ti dice se la compagnia ti deve un rimborso, e ti prepara il reclamo. Controlla il tuo volo qui:",
+    bottone: "Mandalo a chi ha volato con te",
+    copiato: "Link copiato. Incollalo dove vuoi.",
+    nonRiuscita: "Non è riuscito. Copia a mano: rivolio.it",
+  },
+
   footer: {
     frase: "Rivolio è lo scanner dei rimborsi. Oggi i voli. Presto bagagli e treni.",
     cartolina: {
