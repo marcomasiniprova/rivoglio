@@ -583,6 +583,18 @@ function Idoneo({ dati, importo }: { dati: DatiVerifica; importo: number }) {
           </Card>
         ) : (
           <div className="flex flex-col gap-3">
+            {/* Il blocco autorità, appena prima dell'acquisto: il diritto è
+                legge europea, non una nostra promessa, e l'onere della prova
+                è della compagnia. È la prova che regge al posto dei numeri
+                sociali (framework CONVERTI, leva "autorità"). */}
+            <div className="rounded-2xl border border-verde/25 bg-menta-tenue/60 px-5 py-4">
+              <p className="font-display text-[1.05rem] leading-snug tracking-[-0.02em] text-verde-notte">
+                {t.autorita.titolo}
+              </p>
+              <p className="mt-1.5 text-[0.92rem] leading-relaxed text-verde-notte/80">
+                {t.autorita.testo}
+              </p>
+            </div>
             {testoAvviso && (
               <p
                 role="status"

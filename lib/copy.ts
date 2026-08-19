@@ -970,6 +970,16 @@ export const COPY = {
           "Il Regolamento CE 261/2004 fissa gli importi per distanza: 250€ fino a 1.500 km, 400€ fino a 3.500 km, 600€ oltre (ridotto a 300€ se sul lungo raggio il ritardo resta tra 3 e 4 ore).",
         trattaTemplate: "La tua tratta: {distanza} km.",
       },
+      /* Il blocco autorità sul verdetto (framework CONVERTI, leva
+         "autorità"): il diritto è legge europea, non una nostra promessa,
+         e l'onere della prova è della compagnia. Sta appena prima
+         dell'acquisto, dove serve la spinta di credibilità. Nessun numero
+         sociale, per scelta di Valerio: qui parla la legge. */
+      autorita: {
+        titolo: "Non è un favore. È la legge.",
+        testo:
+          "Questo diritto non lo decidiamo noi: lo scrive il Regolamento europeo (CE) 261/2004. Quando il volo qualifica, la compagnia deve pagarti, e tocca a lei dimostrare un'eventuale circostanza eccezionale, non a te. Lo sosteniamo con gli orari certificati del volo e le sentenze pubbliche della Corte di giustizia europea, non con delle promesse.",
+      },
       cosaServe: [
         "La carta d'imbarco o l'email di conferma",
         "2 minuti per inviare il reclamo dalla tua email",
