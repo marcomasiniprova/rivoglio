@@ -370,6 +370,11 @@ export default function ConfrontoBanconote({
           />
         ))}
       </div>
+      {/* La riga-bandiera: l'emozione dopo i numeri. Non è una didascalia
+          in grigetto, è la frase che uno si porta via. */}
+      <p className="mt-5 text-center text-[15.5px] font-semibold text-verde-scuro">
+        {C.bandiera}
+      </p>
     </div>
   );
 }

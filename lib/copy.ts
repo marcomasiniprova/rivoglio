@@ -238,11 +238,12 @@ export const COPY = {
     },
     puntiFiducia: [
       seSiPaga(`L'analisi costa ${PREZZO}: meno di un cappuccino al bar`, "Il check è gratis, sempre"),
-      /* Riscritto (skill copywriting): da funzione ("nessuna percentuale")
-         a beneficio col contrasto implicito verso le agenzie che
-         trattengono il 25-35%. Quello che l'utente vuole sentirsi dire è
-         "sono tutti tuoi", non una regola nostra. */
-      "La compensazione è tutta tua: zero percentuali trattenute",
+      /* DECIDI, differenziatore concreto (scelta di Valerio, 19/08): il
+         contrasto non è più implicito. Gli altri si prendono una
+         percentuale (il 35% è il minimo dei loro listini pubblici), qui è
+         una cifra fissa. Il numero lo vede anche chi non scorre fino ai
+         prezzi, e "tutto tuo" è l'emozione giusta: riprenditi il tuo. */
+      "Gli altri si prendono il 35%. Qui il rimborso è tutto tuo",
       "Se non ti pagano, la prossima pratica è su di noi",
     ],
   },
@@ -364,10 +365,10 @@ export const COPY = {
     occhiello: "Prezzi",
     titolo: "Prezzo fisso. La compensazione è tutta tua.",
     sottotitolo:
-      "I portali a percentuale trattengono il 35-50% della compensazione. Qui paghi una cifra fissa e tieni il 100%.",
+      "I portali a percentuale trattengono il 35-50%: una percentuale cresce col tuo rimborso, una cifra fissa no. Qui il resto è tutto tuo.",
     /** Apre il "35-50%" e lo mette in fila con i nostri prezzi. */
     notaConfronto:
-      "Il 35-50% viene dai listini pubblici dei portali a percentuale (AirHelp e simili). Il conto su una fascia da 600€: a percentuale lasci da 210€ a 300€; qui la pratica costa 14,90€.",
+      "Il 35-50% viene dai listini pubblici dei portali a percentuale. Il conto su una fascia da 600€: a percentuale lasci da 210€ a 300€; qui paghi una cifra fissa, non una fetta del rimborso.",
     /** Il confronto messo in colonna. I numeri sono quelli di notaConfronto: 600 × 35% = 210; 600 - 210 = 390; 600 - 14,90 = 585,10. */
     confronto: {
       base: "Su una compensazione da 600€",
@@ -399,6 +400,10 @@ export const COPY = {
         portale: "Una compensazione su tre resta al portale.",
         nostro: "Qui resta a te, meno il prezzo di una pizza.",
       },
+      /* La riga-bandiera sotto le banconote (DECIDI, emozione scelta da
+         Valerio: "riprenditi il tuo"). Detta netta, mai in cifre: le
+         cifre le dicono le banconote qui sopra. */
+      bandiera: "Sono soldi tuoi. Tienili tutti.",
     },
     piani: {
       check: {
