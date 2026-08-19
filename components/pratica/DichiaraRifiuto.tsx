@@ -82,6 +82,10 @@ export default function DichiaraRifiuto({
      è un'opzione, la risposta c'è. Lo stesso paletto vive anche sul
      server (Valerio, 14/08). */
   const [rispostaCaricata, setRispostaCaricata] = useState(false);
+  /* Vero quando LeggiRisposta ha letto la risposta e la replica è pronta:
+     nasconde il link «scelgo dall'elenco», che a quel punto non ha più
+     senso (Valerio, 18/08: «lasciala PRIMA della risposta, non dopo»). */
+  const [rispostaLetta, setRispostaLetta] = useState(false);
   const [motivi, setMotivi] = useState<Motivo[]>([]);
   const [scelto, setScelto] = useState<string | null>(nuovoGiro ? null : (giaDichiarato ?? null));
   const [invio, setInvio] = useState(false);
@@ -233,6 +237,7 @@ export default function DichiaraRifiuto({
         <>
           <LeggiRisposta
             praticaId={praticaId}
+            onLetta={() => setRispostaLetta(true)}
             onFallita={(messaggio) => {
               setLista(true);
               /* La risposta l'ha caricata: «non hanno risposto» sparisce
@@ -241,17 +246,22 @@ export default function DichiaraRifiuto({
               if (messaggio) setErrore(messaggio);
             }}
           />
-          <button
-            type="button"
-            onClick={() => {
-              setLista(true);
-              setRispostaCaricata(false);
-              setErrore("");
-            }}
-            className="mt-3 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
-          >
-            Non ho la loro risposta sottomano: scelgo dall&apos;elenco
-          </button>
+          {/* 🔴 «TOGLILA, LASCIALA PRIMA DELLA RISPOSTA NON DOPO» (Valerio,
+              18/08). A replica pronta il link non serve più: sparisce
+              appena LeggiRisposta ha letto. */}
+          {!rispostaLetta && (
+            <button
+              type="button"
+              onClick={() => {
+                setLista(true);
+                setRispostaCaricata(false);
+                setErrore("");
+              }}
+              className="mt-3 block text-sm text-verde underline decoration-bordo underline-offset-4 hover:text-verde-scuro"
+            >
+              Non ho la loro risposta sottomano: scelgo dall&apos;elenco
+            </button>
+          )}
         </>
       ) : (
         <>

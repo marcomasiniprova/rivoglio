@@ -38,10 +38,15 @@ export type EsitoLettura = {
 export default function LeggiRisposta({
   praticaId,
   onFallita,
+  onLetta,
 }: {
   praticaId: string;
   /** Chiamata quando conviene passare alla lista: il modello non ce l'ha fatta. */
   onFallita: (messaggio: string) => void;
+  /** Chiamata quando la risposta è stata letta e la replica è pronta: chi
+   *  contiene questo componente nasconde il link «scelgo dall'elenco», che
+   *  a replica pronta non ha più senso (Valerio, 18/08). */
+  onLetta?: () => void;
 }) {
   const [modo, setModo] = useState<"testo" | "foto">("testo");
   const [testo, setTesto] = useState("");
@@ -73,6 +78,7 @@ export default function LeggiRisposta({
           suMisura: Boolean(d.suMisura),
         });
         setStato("fatto");
+        onLetta?.();
         /* 🔴 IL RESTO DELLA PAGINA RESTAVA INDIETRO, e si contraddiceva.
            Trovato col collaudo del 13/08: incollata la risposta della
            compagnia, questo riquadro diceva «ho letto la loro risposta,
