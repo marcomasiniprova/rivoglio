@@ -26,7 +26,7 @@ const SEGRETO_SVILUPPO = "rivolio-sviluppo-non-usare-in-produzione";
 /** Quanto dura un link. Un mese: chi apre la posta tardi non resta fuori. */
 const DURATA_MS = 30 * 24 * 60 * 60 * 1000;
 
-export type Scopo = "conferma" | "disdetta";
+export type Scopo = "conferma" | "disdetta" | "recupero";
 
 function chiave(): string | null {
   if (SEGRETO) return SEGRETO;
@@ -97,4 +97,10 @@ export function linkConferma(sito: string, email: string): string | null {
 export function linkDisdetta(sito: string, email: string): string | null {
   const g = creaGettone(email, "disdetta");
   return g && `${sito}/api/iscriviti/disdetta?g=${encodeURIComponent(g)}`;
+}
+
+/** Il link per fermare i promemoria di recupero (un click, per email). */
+export function linkStopRecupero(sito: string, email: string): string | null {
+  const g = creaGettone(email, "recupero");
+  return g && `${sito}/api/recupero/stop?g=${encodeURIComponent(g)}`;
 }
