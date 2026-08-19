@@ -108,14 +108,15 @@ export default function PreparaReclamo({
         Prepara il reclamo
       </h2>
       <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-fumo">
-        Due passaggi facoltativi che rendono la lettera più solida. Falli o saltali: appena sei
-        pronto, apri il tuo reclamo qui sotto.
+        Il reclamo lo abbiamo già scritto noi. Quello che metti tu sono due cose che alzano le tue
+        probabilità: la carta d&apos;imbarco (la prova che c&apos;eri) e le spese che hai anticipato
+        (pasti o hotel, te le fai rimborsare in più). Aggiungile qui sotto, poi vai al reclamo.
       </p>
 
       <div className="mt-4 space-y-4">{prep}</div>
 
       <Button type="button" variant="pieno" className="mt-6" onClick={segnaPronto}>
-        Il mio reclamo è pronto
+        Vai al reclamo
         <ArrowRight className="size-4" aria-hidden="true" />
       </Button>
     </div>
