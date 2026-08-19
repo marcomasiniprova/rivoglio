@@ -311,6 +311,40 @@ export function promemoriaInvio(
   });
 }
 
+/* -------------------------------------------- recupero del "no non replicato" */
+/**
+ * IL NO CHE È RIMASTO SENZA REPLICA (TIENITELI, scelta di Valerio 19/08).
+ *
+ * Hai registrato il no della compagnia, ti ho preparato la replica, e lì ti
+ * sei fermato. È il punto morto più caro: un no alla prima risposta è la
+ * norma, e spesso è proprio la replica a sbloccare il pagamento. Un
+ * promemoria gentile, senza promettere niente (il no può anche reggere).
+ *
+ * ⚠️ Lo manda il cron `segui` SOLO con RECUPERO_ATTIVO=1 (spento finché non
+ * c'è la cassa: scelta di Valerio).
+ */
+export function promemoriaReplica(a: string, d: { link: string }): Promise<Esito> {
+  return spedisci({
+    a,
+    oggetto: "La tua replica è pronta: manca solo l'invio.",
+    html: vestito({
+      titolo: "Un no non è la fine",
+      corpo:
+        h("Un no non è la fine.") +
+        p(
+          "Hai registrato il no della compagnia e ti ho preparato la replica: è nella tua pratica, pronta da mandare. Un no alla prima risposta è la norma, non la parola definitiva, e spesso è proprio la replica a sbloccare il pagamento.",
+        ) +
+        bottone("Apri la pratica e manda la replica", d.link) +
+        p(
+          `Quando l'hai mandata, premi "Ho mandato la replica" nella pratica: da lì riparte l'attesa, e continuo a seguirti io.`,
+        ) +
+        firma(),
+      coda: CODA,
+    }),
+    testo: `Un no non è la fine.\n\nHai registrato il no della compagnia e ti ho preparato la replica: è nella tua pratica, pronta da mandare. Un no alla prima risposta è la norma, e spesso è proprio la replica a sbloccare il pagamento.\n\nApri la pratica: ${d.link}\n\nQuando l'hai mandata, premi "Ho mandato la replica" nella pratica.\n\nValerio\nRivolio`,
+  });
+}
+
 /* ------------------------------------------------------------ T+15 */
 /**
  * Il momento in cui quasi tutti mollano, e la compagnia lo sa. Il testo

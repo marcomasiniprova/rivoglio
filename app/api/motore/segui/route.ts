@@ -12,6 +12,7 @@ import {
   comeVa,
   praticaPronta,
   promemoriaInvio,
+  promemoriaReplica,
   reclamoEnac,
   sollecitoPronto,
 } from "@/lib/email/pratiche";
@@ -22,6 +23,13 @@ import {
   GIORNI_PRIMA_DELL_ESITO,
   GIORNI_PRIMA_DEL_SOLLECITO,
 } from "@/lib/pratiche/rifiuto";
+import {
+  deveRecuperareReplica,
+  EVENTO_RECUPERO_REPLICA,
+  RECUPERO_ATTIVO,
+  statoRepliche,
+  type StatoReplica,
+} from "@/lib/pratiche/recupero-replica";
 
 /**
  * Il cron dei follow-up (SPEC §6): una volta al giorno scorre le pratiche
@@ -202,15 +210,59 @@ async function recuperaBenvenuto(pr: PraticaConVolo, fatti: Set<string>): Promis
   return true;
 }
 
+/**
+ * IL "NO NON REPLICATO" (TIENITELI, scelta di Valerio 19/08).
+ *
+ * Chi ha registrato il no della compagnia e non ha ancora mandato la
+ * replica pronta. Un promemoria gentile qualche giorno dopo il no. Il
+ * segnale (no aperto) viene dagli stessi eventi della pagina pratica.
+ *
+ * ⚠️ Gira SOLO con RECUPERO_ATTIVO=1 (spento finché non c'è la cassa). La
+ * `statoMap` è vuota quando è spento, quindi qui non parte niente.
+ */
+async function recuperaReplica(
+  pr: PraticaConVolo,
+  statoMap: Map<string, StatoReplica>,
+): Promise<boolean> {
+  const st = statoMap.get(pr.id) ?? {
+    no: 0,
+    replicheMandate: 0,
+    promemoria: 0,
+    ultimoNoIso: null,
+  };
+  /* Una pratica aperta prima del 13/08 ha `rifiuto_motivo` pieno ma può non
+     avere l'evento `rifiuto`: la si conta come un no, come fa la pagina. */
+  if (st.no === 0 && pr.rifiuto_motivo) {
+    st.no = 1;
+    st.ultimoNoIso = pr.rifiuto_il ?? null;
+  }
+  if (!deveRecuperareReplica(st)) return false;
+
+  const spedita = await promemoriaReplica(pr.email, { link: `${casa()}/pratica/${pr.id}` });
+  if (!spedita.ok) return false;
+
+  await registraEvento(
+    pr.id,
+    EVENTO_RECUPERO_REPLICA,
+    "Promemoria: la replica al no della compagnia è pronta, va mandata.",
+  );
+  return true;
+}
+
 async function giroSegui({ budgetMs = 8000 } = {}) {
   if (!SERVIZIO_ATTIVO) return { ok: false as const, motivo: "SUPABASE_SECRET_KEY assente." };
 
   const inizio = Date.now();
   const pratiche = await praticheDaSeguire();
-  const fatti = await eventiRegistrati(pratiche.map((p) => p.id));
+  const ids = pratiche.map((p) => p.id);
+  const fatti = await eventiRegistrati(ids);
+  /* La query dei no aperti costa una lettura in più: la facciamo solo se il
+     recupero è acceso (con la cassa). Spento = mappa vuota, non parte nulla. */
+  const statoMap = RECUPERO_ATTIVO ? await statoRepliche(ids) : new Map<string, StatoReplica>();
 
   const inviate: { pratica: string; passo: Passo }[] = [];
   const recuperati: string[] = [];
+  const recuperatiReplica: string[] = [];
   let esaminate = 0;
 
   for (const pr of pratiche) {
@@ -226,6 +278,12 @@ async function giroSegui({ budgetMs = 8000 } = {}) {
         continue;
       }
 
+      // Il "no non replicato": un promemoria, ma solo se è acceso (con la cassa).
+      if (RECUPERO_ATTIVO && (await recuperaReplica(pr, statoMap))) {
+        recuperatiReplica.push(pr.id);
+        continue;
+      }
+
       const passo = passoDovuto(pr, fatti);
       if (!passo) continue;
       if (await mandaPasso(pr, passo)) inviate.push({ pratica: pr.id, passo });
@@ -235,7 +293,14 @@ async function giroSegui({ budgetMs = 8000 } = {}) {
     }
   }
 
-  return { ok: true as const, aperte: pratiche.length, esaminate, recuperati, inviate };
+  return {
+    ok: true as const,
+    aperte: pratiche.length,
+    esaminate,
+    recuperati,
+    recuperatiReplica,
+    inviate,
+  };
 }
 
 export async function POST(req: NextRequest) {
