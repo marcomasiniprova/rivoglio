@@ -65,6 +65,16 @@ function InvitoBreve() {
             {COPY.invito.testo}
           </p>
         </Anima>
+        {/* Il nemico: non la compagnia, il lasciar perdere. La spinta
+            grintosa proprio prima del bottone, dove si decide. */}
+        <Anima ritardo={0.14}>
+          <p className="mx-auto mt-6 max-w-md text-[17px] font-semibold leading-snug text-inchiostro">
+            {COPY.invito.nemico}
+          </p>
+          <p className="mx-auto mt-2 max-w-md text-[14.5px] leading-relaxed text-fumo">
+            {COPY.invito.nemicoSotto}
+          </p>
+        </Anima>
         <Anima ritardo={0.18}>
           <a
             href="#controllo"

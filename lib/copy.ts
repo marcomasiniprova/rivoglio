@@ -1483,6 +1483,13 @@ export const COPY = {
       `Trenta secondi, niente email, nessun conto da creare. L'analisi costa ${PREZZO}.`,
       "Trenta secondi, niente email, nessun conto da creare. Il check è gratis, sempre.",
     ),
+    /* DECIDI, il nemico (scelta di Valerio, 19/08): il nemico non è la
+       compagnia, è il lasciar perdere. Leva scelta: il gesto (loro contano
+       sul fatto che non lo farai). Tono: grintoso pulito, "riprenditi il
+       tuo", senza vittimismo. Va qui, nella chiusura, dove si decide. */
+    nemico: "Il nemico non è la compagnia. È lasciar perdere.",
+    nemicoSotto:
+      "Loro contano sul fatto che non lo farai. Ma sono soldi tuoi, non un favore: non lasciarli lì.",
     cta: "Controlla il tuo volo",
     /** Sotto i 360 punti di larghezza: il testo pieno non ci sta. */
     ctaCorta: "Controlla",
