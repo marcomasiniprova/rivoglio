@@ -24,6 +24,15 @@ export default function InvitaAmico() {
     // La home, col tag che fa contare l'arrivo come "amico invitato".
     const link = `${window.location.origin}/?utm_source=invito`;
 
+    /* Conta il gesto (inviti mandati) a prescindere da come finisce la
+       condivisione: è un beacon, non fa aspettare niente. Se non parte,
+       pazienza: è solo un numero del pannello, non blocca l'invito. */
+    try {
+      navigator.sendBeacon?.("/api/eventi/invito");
+    } catch {
+      /* niente da fare */
+    }
+
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({ text: t.messaggio, url: link });

@@ -118,6 +118,8 @@ function racconta(r: RigaGrezza): string {
       return `PRATICA PAGATA${volo}`;
     case "iscritto":
       return "Nuova iscrizione all'Osservatorio";
+    case "invito":
+      return "Ha invitato un amico";
     case "guasto":
       return "Qualcosa non ha funzionato";
     default:
@@ -195,6 +197,7 @@ export async function leggiCruscotto(quanteRighe = 40): Promise<Cruscotto> {
         pratica: 0,
         pagato: 0,
         iscritto: 0,
+        invito: 0,
         guasto: 0,
       };
       for (const r of dentro) {

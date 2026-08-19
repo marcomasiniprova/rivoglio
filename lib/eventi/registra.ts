@@ -38,6 +38,7 @@ export type TipoEvento =
   | "pratica" // ha aperto una pratica
   | "pagato" // ha pagato la pratica: è l'unico che vale soldi
   | "iscritto" // si è iscritto all'Osservatorio
+  | "invito" // ha premuto "invita un amico" (TIENITELI, il passaparola)
   | "guasto"; // qualcosa non ha funzionato
 
 export type Evento = {

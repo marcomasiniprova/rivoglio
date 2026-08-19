@@ -21,6 +21,7 @@ export type ChiaveSezione =
   | "pratiche"
   | "traffico"
   | "marketing"
+  | "passaparola"
   | "registro"
   | "iscritti"
   | "prodotto"
@@ -109,6 +110,16 @@ export const SEZIONI: Sezione[] = [
     href: "/admin/marketing",
     nome: "Marketing",
     sotto: "Farsi citare dai motori AI: i testi pronti da incollare e il controllo di ogni mese.",
+  },
+  {
+    /* Accanto a Traffico e Marketing, il terzo pezzo della crescita: su un
+       prodotto una-tantum il passaparola è il motore, non il riacquisto.
+       Quanti invitano, quanti amici arrivano, quante recensioni. Casella
+       TIENITELI dei 4 framework (Valerio, 19/08). */
+    chiave: "passaparola",
+    href: "/admin/passaparola",
+    nome: "Passaparola",
+    sotto: "Il motore di un prodotto una-tantum: inviti mandati, amici arrivati, recensioni.",
   },
   {
     chiave: "registro",
