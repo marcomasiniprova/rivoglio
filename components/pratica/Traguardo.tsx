@@ -39,8 +39,11 @@ export default function Traguardo({
     if (fatto.current || totale === null) return;
     fatto.current = true;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      setMostrato(totale);
-      return;
+      // Chi ha chiesto meno movimento vede subito la cifra piena. Lo stato
+      // non si tocca dentro il corpo dell'effetto (React lo vieta: rende a
+      // catena). Un rinvio di un giro basta, come nella ripresa del check.
+      const t = setTimeout(() => setMostrato(totale), 0);
+      return () => clearTimeout(t);
     }
     const durata = 1200;
     let inizio: number | null = null;
