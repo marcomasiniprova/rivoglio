@@ -132,7 +132,7 @@ export function praticaPronta(
   const famiglia =
     d.tipo === "famiglia"
       ? p(
-          "La pratica famiglia copre fino a 5 passeggeri dello stesso volo. Li aggiungi nella pratica, con nome e cognome: la lettera li elenca tutti.",
+          "La pratica famiglia copre fino a 5 passeggeri dello stesso volo. Li aggiungi nella pratica, con nome e cognome: il reclamo li elenca tutti.",
         )
       : "";
 
@@ -148,7 +148,7 @@ export function praticaPronta(
         scatola(
           `<strong>I due passi che restano</strong><br>
            1. Entra nella pratica e carica la carta d'imbarco, o l'email di conferma della prenotazione.<br>
-           2. Copia la lettera già pronta e inviala alla compagnia dalla tua email.`,
+           2. Copia il reclamo già pronto e invialo alla compagnia dalla tua email.`,
         ) +
         bottone("Apri la tua pratica", d.link) +
         p(
@@ -167,7 +167,7 @@ export function praticaPronta(
     }),
     testo: `Pagamento ricevuto. La pratica è aperta.\n\nVolo ${d.volo}${quando}.${
       d.importo ? ` Fascia: ${euro(d.importo)} a passeggero (artt. 5 e 7, Reg. CE 261/2004).` : ""
-    }\n\nI due passi che restano:\n1. Entra nella pratica e carica la carta d'imbarco.\n2. Copia la lettera pronta e inviala alla compagnia dalla tua email.\n\nApri la pratica (link valido una volta sola): ${d.link}\nSe scade: ${casa()}/entra\n\nPerché la mandi tu e non io: un reclamo dalla tua casella non si respinge come richiesta di un intermediario, e il recupero resta tuo al 100%. Io preparo tutto, tu firmi e invii.${
+    }\n\nI due passi che restano:\n1. Entra nella pratica e carica la carta d'imbarco.\n2. Copia il reclamo pronto e invialo alla compagnia dalla tua email.\n\nApri la pratica (link valido una volta sola): ${d.link}\nSe scade: ${casa()}/entra\n\nPerché la mandi tu e non io: un reclamo dalla tua casella non si respinge come richiesta di un intermediario, e il recupero resta tuo al 100%. Io preparo tutto, tu firmi e invii.${
       "\nGaranzia: se la compagnia rifiuta senza un motivo valido o non risponde nei termini, dopo la tua replica la prossima pratica è su di noi (un credito, non i soldi indietro)."
     }\n\nValerio\nRivolio`,
   });
@@ -291,21 +291,21 @@ export function promemoriaInvio(
       corpo:
         h("Manca solo l'invio.") +
         p(
-          "La tua lettera è pronta da due giorni, ma vale solo se parte. Copiala dalla pratica, incollala in un'email e mandala alla compagnia. Due minuti, davvero.",
+          "Il tuo reclamo è pronto da due giorni, ma vale solo se parte. Copialo dalla pratica, incollala in un'email e mandala alla compagnia. Due minuti, davvero.",
         ) +
         (d.importo
           ? p(
               `In ballo ci sono <strong style="color:${C.inchiostro}">${euro(d.importo)} a passeggero</strong>, la fascia fissata dal Regolamento CE 261/2004 per il tuo caso.`,
             )
           : "") +
-        bottone("Apri la pratica e copia la lettera", d.link) +
+        bottone("Apri la pratica e copia il reclamo", d.link) +
         p(
           `Quando l'hai mandata, premi "L'ho inviata" nella pratica. Da quel giorno partono i tempi del sollecito, e da lì in poi ti seguo io.`,
         ) +
         firma(),
       coda: CODA,
     }),
-    testo: `Manca solo l'invio.\n\nLa lettera è pronta da due giorni. Copiala dalla pratica, incollala in un'email e mandala alla compagnia.${
+    testo: `Manca solo l'invio.\n\nIl reclamo è pronto da due giorni. Copialo dalla pratica, incollala in un'email e mandala alla compagnia.${
       d.importo ? `\nIn ballo: ${euro(d.importo)} a passeggero (Reg. CE 261/2004).` : ""
     }\n\nApri la pratica: ${d.link}\n\nQuando l'hai mandata, premi "L'ho inviata" nella pratica: da quel giorno partono i tempi del sollecito, e da lì in poi ti seguo io.\n\nValerio\nRivolio`,
   });

@@ -66,7 +66,7 @@ export default function Fascicolo({ dossier }: { dossier: Dossier }) {
 
       <p className="mt-2 max-w-xl text-[13.5px] leading-relaxed text-fumo">
         Tutto quello che sappiamo del tuo volo, e da dove lo sappiamo. È lo stesso fascicolo che
-        leggiamo noi prima di scriverti una lettera.
+        leggiamo noi prima di scriverti il reclamo.
       </p>
 
       <div className="mt-4">

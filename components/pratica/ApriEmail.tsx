@@ -81,7 +81,7 @@ export default function ApriEmail({
           }}
         >
           <ExternalLink className="size-5 shrink-0" aria-hidden="true" />
-          Copia la lettera e apri il modulo di {modo.nome}
+          Copia il reclamo e apri il modulo di {modo.nome}
         </Button>
       ) : (
         <Button
@@ -119,7 +119,7 @@ export default function ApriEmail({
           in cui serve. */}
       {andatoAlModulo && modo.tipo === "modulo" && (
         <p className="rounded-xl bg-menta-tenue px-4 py-3 text-sm leading-relaxed text-verde-notte">
-          La lettera è negli appunti. Sul modulo di {modo.nome} cerca il campo del messaggio (di
+          Il reclamo è negli appunti. Sul modulo di {modo.nome} cerca il campo del messaggio (di
           solito si chiama <em>Additional information</em> o <em>Descrizione</em>) e incolla.
           Non si è aperto niente? Il browser ha bloccato la finestra:{" "}
           <a

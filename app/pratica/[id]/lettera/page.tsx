@@ -49,7 +49,7 @@ import type { Passeggero, TipoPratica } from "@/lib/pratiche/pratiche";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "La tua lettera | Rivolio",
+  title: "Il tuo reclamo | Rivolio",
   robots: { index: false },
 };
 
@@ -261,9 +261,9 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
   if (pratica.stato === "creata") {
     return (
       <Cornice praticaId={id}>
-        <Avviso titolo="La lettera arriva col pagamento">
-          Questa pratica è aperta ma il pagamento non risulta ancora. Appena arriva, qui trovi la
-          lettera pronta da copiare e inviare.
+        <Avviso titolo="Il reclamo arriva col pagamento">
+          Questa pratica è aperta ma il pagamento non risulta ancora. Appena arriva, qui trovi il
+          reclamo pronto da copiare e inviare.
         </Avviso>
       </Cornice>
     );
@@ -509,7 +509,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
         }
       : {
           chiave: "reclamo" as const,
-          titolo: "La tua lettera è pronta.",
+          titolo: "Il tuo reclamo è pronto.",
           sotto: "Premi il bottone: si apre la tua email con tutto già scritto. Tu premi Invia.",
           oggetto: lettera.oggetto,
           corpo: lettera.corpo,

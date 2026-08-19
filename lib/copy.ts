@@ -427,7 +427,7 @@ export const COPY = {
         periodo: "una volta sola",
         descrizione: "Il reclamo pronto da inviare, seguito fino all'esito.",
         punti: [
-          "Lettera formale con i dati verificati del volo",
+          "Reclamo formale con i dati verificati del volo",
           "Indirizzo e canale corretti della compagnia che ha operato il volo",
           "Sollecito già pronto dopo sei settimane",
           "Se dicono no, la replica che smonta il loro motivo",
@@ -481,7 +481,7 @@ export const COPY = {
       tempo: "il resto",
       voci: [
         "Verifico l'orario certificato di atterraggio e calcolo la fascia.",
-        "Scrivo la lettera col riferimento di legge e il canale reclami giusto di quella compagnia.",
+        "Scrivo il reclamo col riferimento di legge e il canale reclami giusto di quella compagnia.",
         "Ti ricordo io le scadenze, col sollecito e la replica al loro no già scritti.",
         "Se non pagano, ti preparo la segnalazione all'ente e la conciliazione: è gratuita e si fa da casa.",
         "Tengo la pratica aggiornata, e se la compagnia non paga ti restituisco i soldi.",
@@ -898,7 +898,7 @@ export const COPY = {
       esitoIdoneo: "Rientri in una fascia",
       esitoChiuso: "Il verdetto",
       dopoIdoneo:
-        "Da qui puoi aprire la pratica: prepariamo la lettera con i riferimenti di legge e il canale reclami della compagnia. Il reclamo lo invii tu e la compensazione arriva a te intera.",
+        "Da qui puoi aprire la pratica: prepariamo il reclamo con i riferimenti di legge e il canale reclami della compagnia. Lo invii tu e la compensazione arriva a te intera.",
     },
 
     /**
@@ -1222,19 +1222,19 @@ export const COPY = {
         nome: "Creata",
         descrizione: "La pratica è aperta ma il pagamento non risulta ancora arrivato.",
         prossimoPasso:
-          "Completa il pagamento dal link che ti abbiamo mandato via email. Appena arriva, qui trovi la lettera pronta.",
+          "Completa il pagamento dal link che ti abbiamo mandato via email. Appena arriva, qui trovi il reclamo pronto.",
       },
       pagata: {
         nome: "Pagata",
-        descrizione: "Pagamento ricevuto. La lettera di reclamo è pronta da copiare.",
+        descrizione: "Pagamento ricevuto. Il reclamo è pronto da copiare.",
         prossimoPasso:
-          "Apri la lettera, inviala dalla tua email e poi torna qui a premere \"Ho inviato il reclamo\".",
+          "Apri il reclamo, invialo dalla tua email e poi torna qui a premere \"Ho inviato il reclamo\".",
       },
       pronta: {
         nome: "Pronta da inviare",
-        descrizione: "La lettera di reclamo è pronta, con i dati verificati del volo.",
+        descrizione: "Il reclamo è pronto, con i dati verificati del volo.",
         prossimoPasso:
-          "Apri la lettera, inviala dalla tua email e poi torna qui a premere \"Ho inviato il reclamo\".",
+          "Apri il reclamo, invialo dalla tua email e poi torna qui a premere \"Ho inviato il reclamo\".",
       },
       inviata: {
         nome: "Inviata",
@@ -1291,7 +1291,7 @@ export const COPY = {
         descrizione:
           "La compagnia rifiuta o tace: la contro-risposta e la segnalazione all'ente nazionale sono pronte.",
         prossimoPasso:
-          "Apri la lettera: dentro trovi la segnalazione già scritta, con l'ente del paese da cui sei partito. È gratuita.",
+          "Apri la segnalazione: dentro trovi il testo già scritto, con l'ente del paese da cui sei partito. È gratuita.",
       },
       esito_pagata: {
         nome: "Pagata dalla compagnia",
@@ -1329,7 +1329,7 @@ export const COPY = {
       eventi: {
         creata: "Pratica aperta",
         pagata: "Pagamento ricevuto",
-        pronta: "Lettera pronta",
+        pronta: "Reclamo pronto",
         inviata: "Reclamo inviato alla compagnia",
         sollecito: "Sollecito pronto",
         enac: "Segnalazione all'ente pronta",
@@ -1366,7 +1366,7 @@ export const COPY = {
     },
 
     azioni: {
-      apriLettera: "Apri la lettera",
+      apriLettera: "Apri il reclamo",
       /* ⚠️ IL BOTTONE DEVE DIRE COSA APRE, e cambia col momento. Dopo un
          no dichiarato il foglio non è più il reclamo: è la replica scritta
          su quel no. Chiamarlo ancora "la lettera" faceva credere di
@@ -1393,7 +1393,7 @@ export const COPY = {
       confermaReplicaNota:
         "Premilo solo dopo aver spedito davvero la replica: da lì riparte l'attesa.",
       letteraChiusa:
-        "La lettera è pronta e si apre appena hai caricato la carta d'imbarco, qui sotto. Se non ce l'hai adesso, puoi andare avanti lo stesso.",
+        "Il reclamo è pronto e si apre appena hai caricato la carta d'imbarco, qui sotto. Se non ce l'hai adesso, puoi andare avanti lo stesso.",
     },
 
     /* ⚠️ AGGIORNATA AL FLUSSO VERO (Valerio, 16/08: «questa guida è
@@ -1413,8 +1413,8 @@ export const COPY = {
     istruzioniInvio: {
       titolo: "Come si invia, in 2 minuti",
       passi: [
-        "Premi \"Apri la lettera\": è già scritta, col destinatario giusto",
-        "Metti il tuo IBAN e il tuo nome dove la lettera li chiede: sono i campi da compilare",
+        "Premi \"Apri il reclamo\": è già scritto, col destinatario giusto",
+        "Metti il tuo IBAN e il tuo nome dove il reclamo li chiede: sono i campi da compilare",
         "Premi il bottone verde: si apre la tua email col reclamo dentro (con alcune compagnie si copia il testo e si apre il loro modulo ufficiale)",
         "Allega la carta d'imbarco, premi Invia, poi torna qui e premi \"Ho inviato il reclamo\"",
       ],
