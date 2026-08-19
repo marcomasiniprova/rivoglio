@@ -7,7 +7,10 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-19 (giro #88: DECIDI, il posizionamento: il
+**Aggiornato:** 2026-08-19 (giro #89: TIENITELI, il passaparola (il momento
+d'oro con recensione e invito a un amico sul Traguardo, il recupero del «no
+non replicato» spento fino alla cassa, e la misura in /admin/passaparola) ·
+giro #88: DECIDI, il posizionamento: il
 differenziatore concreto (il 35% dei portali contro la nostra cifra fissa,
 adesso anche nell'hero) e il nemico con un nome («il lasciar perdere», nella
 chiusura della landing) · giro #87: la casella CONVERTI del marketing
@@ -82,6 +85,51 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #89 (19/08): TIENITELI, IL PASSAPAROLA. Il momento d'oro, il
+  recupero del no non replicato, e la misura in admin.** Valerio: «Rivolio
+  è una-tantum, il passaparola è il motore: probabilmente la casella più
+  importante dopo la cassa. Procedi». Quattro scelte col popup, poi i tre
+  pezzi uno alla volta, ognuno verde e in produzione prima del prossimo.
+  - **1. IL MOMENTO D'ORO** (scelta: recensione poi invito). Il Traguardo
+    (quando la compagnia paga) mostrava solo la cifra; la recensione stava
+    sepolta in fondo alla pratica. Ora, appena vede la cifra recuperata: la
+    recensione si chiede lì a caldo (e non ricompare in fondo), e subito
+    sotto l'**invito a un amico**. Scelta: **niente premio**, puro
+    passaparola (nuovo componente `InvitaAmico`, condivisione nativa con
+    ripiego sugli appunti). Il link porta `utm_source=invito`, così gli
+    amici che arrivano si contano da soli. (commit `19bbb50`)
+  - **2. IL RECUPERO DEL «NO NON REPLICATO»** (scelta: il no non replicato).
+    Chi registra il no della compagnia e non manda la replica pronta resta
+    nel punto morto più caro: un no alla prima risposta è la norma, e spesso
+    è la replica a sbloccare il pagamento. La rotta del rifiuto passava a
+    `sollecito` ma non mandava email, e il cron toccava la pratica solo a 42
+    giorni sul silenzio: il no restava senza spinta. Adesso, qualche giorno
+    dopo il no, un promemoria gentile («apri la pratica e manda la replica»),
+    dentro il cron `segui`. Il segnale (no aperto) viene dagli stessi eventi
+    della pagina (rifiuto contro replica_inviata): **nessuna colonna nuova,
+    nessuna migrazione**. Uno solo per ogni no, mai su un no già replicato,
+    mai al buio. Logica pura sotto prova (7 casi, 14 verdi con telefono).
+    ⚠️ **SPENTO finché non c'è la cassa** (`RECUPERO_ATTIVO=1`, lo stesso
+    interruttore del recupero del check): da spento il cron non fa nemmeno
+    la query in più. (commit `97ee1fc`)
+  - **3. LA MISURA DEL PASSAPAROLA** (scelta: adesso, il misurabile). Nuova
+    sezione **/admin/passaparola** (fra Marketing e Registro): inviti
+    mandati (nuovo evento `invito`, loggato dal beacon di `InvitaAmico`),
+    amici arrivati (le visite con `utm_source=invito`, già nel registro dal
+    giro #83), recensioni totali e approvate, e la conversione da invito a
+    visita. Un `null` onesto dove non si legge, mai uno zero inventato.
+    ⚠️ **Ricavi, LTV e la riattivazione (i due recuperi via email) NON sono
+    qui**: senza incassi sarebbero zeri finti, e lo dico chiaro invece di
+    riempire la schermata. (commit `96ce213`)
+  - Prove: **tipi e lint puliti**, le 14 nuove del recupero verdi, la
+    guardia admin e il registro (privacy/provenienza) verdi, nessun trattino
+    lungo. ⚠️ Il collaudo VISIVO dal vivo (la pratica vinta dietro il login,
+    la pagina admin) non l'ho fatto da qui: serve una sessione Supabase e una
+    pratica vinta, lo stesso muro dei giri passati. I pezzi sono additivi e
+    usano componenti già collaudati (la card recensione, i Kpi del pannello).
+  - **CHIUSE 3 delle 4 caselle del marketing B2C**: Converti (#87), Decidi
+    (#88), Tieniti (#89). Resta **ATTIRA** (canale a pagamento e misura del
+    canale), che aspetta la cassa come tutto il resto.
 - **GIRO #88 (19/08): DECIDI, IL POSIZIONAMENTO. Il differenziatore
   concreto e il nemico con un nome, dalla casella DECIDI dei 4 framework
   di marketing B2C.** Valerio: «guarda Rivolio come business, non come
