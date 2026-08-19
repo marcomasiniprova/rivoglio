@@ -2,21 +2,27 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, CheckCircle2, X } from "lucide-react";
+import { AlertTriangle, Check, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DichiaraRifiuto from "./DichiaraRifiuto";
 
 /**
- * COME È ANDATA CON LA COMPAGNIA — un box solo (Valerio, 15/08).
+ * COME È ANDATA CON LA COMPAGNIA, un box solo (Valerio, 15/08).
  *
  * 🔴 Prima erano DUE riquadri per la stessa cosa: «ti ha pagato?» e «ti ha
  * risposto no?». Confondevano. Adesso sono uno: una domanda, due bottoni.
  *  - «Mi hanno pagato» → chiude la pratica come vinta (entra in classifica,
  *    se ha scelto un nome pubblico). Il bonifico arriva sul suo conto, non
  *    da noi, quindi è lui a dirlo.
- *  - «Mi hanno risposto no» → apre, QUI DENTRO, la strada del rifiuto
- *    (carica il loro no, gli preparo la replica): è la stessa che prima
- *    stava in un box a parte.
+ *  - «Mi hanno risposto no» → apre la strada del rifiuto (carica il loro no,
+ *    gli preparo la replica).
+ *
+ * 🔴 SCHERMATA DEDICATA PER IL NO (Valerio, 18/08: «premo mi hanno detto no
+ * e resta sopra il bottone mi hanno pagato, sembra tutto mischiato, non
+ * capisco di essere nella fase di caricare la risposta»). Adesso, appena
+ * premi «no», la sezione cambia TUTTA: un titolo che dice dove sei, e sotto
+ * il solo compito di adesso (caricare la loro risposta). «Mi hanno pagato»
+ * scende piccolo in fondo, per chi dopo la replica si è visto pagare.
  *
  * 🔴 LA GARANZIA NON SCATTA PIÙ SULLA PAROLA (Valerio, 15/08: «uno può
  * essere pagato e chiedere la garanzia lo stesso, come lo verifichiamo?»).
@@ -25,9 +31,6 @@ import DichiaraRifiuto from "./DichiaraRifiuto";
  * no SCRITTO della compagnia registrato, che leggiamo noi: chi è stato
  * pagato non ha un no da mostrare. Il server lo ricontrolla
  * (`/api/pratiche/[id]/esito`).
- *
- * I due bottoni restano SEMPRE visibili: chi ha ricevuto un no e poi, dopo
- * la replica, si è visto pagare, deve poterlo dire.
  */
 export default function DichiaraEsito({
   praticaId,
@@ -79,89 +82,79 @@ export default function DichiaraEsito({
 
   return (
     <section className="rounded-2xl border border-verde/30 bg-menta-tenue px-6 py-5">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-[-0.03em] text-verde-notte">
-        <CheckCircle2 className="size-5 shrink-0" aria-hidden="true" />
-        Come è andata con la compagnia?
-      </h2>
-      <p className="mt-2 text-[0.95rem] leading-relaxed text-verde-notte/80">
-        Quando sai com&apos;è finita, dimmelo qui e chiudiamo la pratica. Il bonifico arriva sul
-        tuo conto, non da noi.
-      </p>
+      {!mostraNo ? (
+        <>
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-[-0.03em] text-verde-notte">
+            <CheckCircle2 className="size-5 shrink-0" aria-hidden="true" />
+            Come è andata con la compagnia?
+          </h2>
+          <p className="mt-2 text-[0.95rem] leading-relaxed text-verde-notte/80">
+            Quando sai com&apos;è finita, dimmelo qui e chiudiamo la pratica. Il bonifico arriva sul
+            tuo conto, non da noi.
+          </p>
 
-      {/* ⚠️ BOTTONI ALTI 64px + ICONE (Valerio, 15/08 e 16/08: «sono brutti e
-          troppo magri», e TRE volte «ancora sottilissimi»).
-          🔴 PERCHÉ NON SI ALZAVANO, e l'ho scoperto misurandoli davvero nel
-          browser (24px su telefono, non 64): il colpevole era `flex-1`
-          dentro un contenitore `flex-col`. In una colonna, `flex-1` governa
-          la dimensione VERTICALE e vince sull'altezza: senza un'altezza
-          fissa sul contenitore, i bottoni collassavano al testo. `h-13`,
-          `h-14`, `h-16` non contavano niente. Su desktop (`flex-row`)
-          andavano bene, ma Valerio guarda dal telefono.
-          Fix: `flex-1` SOLO da `sm` in su; su telefono `w-full` + `h-16`,
-          e l'altezza torna a comandare. Misurato: 64px veri sul telefono.
-          La spunta sul verde, la X sul bordato. */}
-      <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
-        <Button
-          type="button"
-          className="h-16 w-full gap-2 text-base font-semibold sm:w-auto sm:flex-1"
-          disabled={inCorso}
-          onClick={() => void dichiara("pagata")}
-        >
-          {inCorso ? (
-            "Un attimo…"
-          ) : (
-            <>
-              <Check className="size-5 shrink-0" aria-hidden="true" />
-              Mi hanno pagato
-            </>
-          )}
-        </Button>
-        {/* 🔴 «IL BOTTONE MI HANNO RISPOSTO NO A VOLTE NON FUNZIONA, CONTINUO
-            A PREMERE MA NON VA» (Valerio, 16/08). Non era rotto: una volta
-            aperta la strada del no (qui sotto), premerlo di nuovo non faceva
-            niente, perché la strada era già aperta. Un bottone che resta lì
-            e non risponde SEMBRA rotto. Adesso, appena la strada è aperta, il
-            bottone sparisce: quello che serve (carica il no, scegli il
-            motivo) è già lì sotto, e «Mi hanno pagato» resta per chi, dopo la
-            replica, si è visto pagare. */}
-        {!mostraNo && (
-          <Button
-            type="button"
-            variant="contorno"
-            className="h-16 w-full gap-2 text-base font-semibold sm:w-auto sm:flex-1"
-            onClick={() => {
-              setErrore(null);
-              setMostraNo(true);
-            }}
-          >
-            <X className="size-5 shrink-0" aria-hidden="true" />
-            Mi hanno risposto no
-          </Button>
-        )}
-      </div>
+          {/* ⚠️ BOTTONI ALTI 64px + ICONE (Valerio, 15/08 e 16/08). Su telefono
+              `flex-1` in colonna collassa l'altezza al testo: qui `w-full` +
+              `h-16` e `flex-1` solo da `sm` in su. */}
+          <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
+            <Button
+              type="button"
+              className="h-16 w-full gap-2 text-base font-semibold sm:w-auto sm:flex-1"
+              disabled={inCorso}
+              onClick={() => void dichiara("pagata")}
+            >
+              {inCorso ? (
+                "Un attimo…"
+              ) : (
+                <>
+                  <Check className="size-5 shrink-0" aria-hidden="true" />
+                  Mi hanno pagato
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              variant="contorno"
+              className="h-16 w-full gap-2 text-base font-semibold sm:w-auto sm:flex-1"
+              onClick={() => {
+                setErrore(null);
+                setMostraNo(true);
+              }}
+            >
+              <X className="size-5 shrink-0" aria-hidden="true" />
+              Mi hanno detto no
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-[-0.03em] text-verde-notte">
+            <AlertTriangle className="size-5 shrink-0 text-sole" aria-hidden="true" />
+            La compagnia ti ha detto no
+          </h2>
+          <p className="mt-2 text-[0.95rem] leading-relaxed text-verde-notte/80">
+            Succede alla maggior parte dei reclami validi, e quasi sempre è un no che non regge.
+            Carica la loro risposta qui sotto: la leggo io e ti preparo la replica sui loro stessi
+            fatti.
+          </p>
 
-      {mostraNo && (
-        <div className="mt-5 border-t border-verde/20 pt-5">
-          {/* La strada del rifiuto, resa QUI DENTRO (nuda): carica il loro
-              no e prepara la replica. È la stessa di prima, senza un box a
-              parte. */}
-          <DichiaraRifiuto
-            praticaId={praticaId}
-            nudo
-            giaDichiarato={giaDichiarato}
-            etichettaScelta={etichettaScelta}
-            nuovoGiro={nuovoGiro}
-          />
+          <div className="mt-4">
+            {/* La strada del rifiuto, nuda: il titolo e l'intro li mette
+                questo box qui sopra, così si capisce dove sei. */}
+            <DichiaraRifiuto
+              praticaId={praticaId}
+              nudo
+              giaDichiarato={giaDichiarato}
+              etichettaScelta={etichettaScelta}
+              nuovoGiro={nuovoGiro}
+            />
+          </div>
 
-          {/* LA CHIUSURA CON GARANZIA È L'ULTIMA SPIAGGIA, e compare a due
-              condizioni (Valerio, 15 e 16/08):
-              1. il no è un DOCUMENTO vero caricato (foto/email), non testo
-                 scritto a mano: è il paletto anti-frode;
-              2. hai già MANDATO la replica al loro no: la garanzia arriva
-                 DOPO aver combattuto, non al primo no (spesso il no cade
-                 proprio alla replica). Il server ricontrolla entrambe.
-              La garanzia è un CREDITO, non contanti (Valerio, 17/08): chiude
-              la pratica e ti regala la prossima. */}
+          {/* LA CHIUSURA CON GARANZIA È L'ULTIMA SPIAGGIA, a due condizioni
+              (Valerio, 15 e 16/08): il no dev'essere un DOCUMENTO vero
+              caricato (anti-frode), e devi aver già MANDATO la replica (la
+              garanzia arriva dopo aver combattuto). La garanzia è un CREDITO,
+              non contanti (Valerio, 17/08). Il server ricontrolla entrambe. */}
           {rifiutoProvato && haCombattuto ? (
             <div className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5">
               <p className="text-[0.95rem] leading-relaxed text-inchiostro">
@@ -169,9 +162,6 @@ export default function DichiaraEsito({
                 faccio partire la garanzia: la tua prossima pratica è su di noi, te la offriamo
                 gratis.
               </p>
-              {/* ⚠️ h-auto + whitespace-normal: prima il testo era su una
-                  riga sola e si tagliava ai bordi sul telefono (Valerio,
-                  15/08). Adesso va a capo e il bottone cresce. */}
               <Button
                 type="button"
                 variant="scuro"
@@ -183,8 +173,6 @@ export default function DichiaraEsito({
               </Button>
             </div>
           ) : rifiutoProvato ? (
-            /* Ha caricato il no ma non ha ancora combattuto: la strada è la
-               replica, non ancora il credito della garanzia. */
             <p className="mt-4 rounded-xl border border-bordo bg-white px-4 py-3.5 text-[0.9rem] leading-relaxed text-fumo">
               La garanzia è l&apos;ultima spiaggia. Prima manda la replica qui sopra: spessissimo il
               loro no cade proprio lì. Se dopo la replica non pagano lo stesso, la garanzia scatta da
@@ -197,7 +185,21 @@ export default function DichiaraEsito({
               scritto a mano prepara la replica, ma non basta per la garanzia.
             </p>
           ) : null}
-        </div>
+
+          {/* «MI HANNO PAGATO» scende qui, piccolo e separato: per chi, dopo
+              la replica, si è visto pagare lo stesso (Valerio, 18/08). */}
+          <div className="mt-5 border-t border-verde/20 pt-4">
+            <p className="text-sm leading-relaxed text-verde-notte/70">Alla fine ti hanno pagato lo stesso?</p>
+            <button
+              type="button"
+              disabled={inCorso}
+              onClick={() => void dichiara("pagata")}
+              className="mt-1.5 text-sm font-medium text-verde-scuro underline decoration-bordo underline-offset-4 hover:text-verde disabled:opacity-60"
+            >
+              {inCorso ? "Un attimo…" : "Sì, mi hanno pagato: chiudi la pratica"}
+            </button>
+          </div>
+        </>
       )}
 
       {errore && (
