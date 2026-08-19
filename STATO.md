@@ -7,7 +7,12 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-19 (giro #86: il meteo che smonta la scusa del
+**Aggiornato:** 2026-08-19 (giro #87: la casella CONVERTI del marketing
+B2C (blocco autorità EU261 sul verdetto, muro che dice cosa succede dopo il
+pagamento, e la sequenza di recupero via email per chi controlla e non
+compra, spenta finché non c'è la cassa) · più la ricerca sui gestori di
+pagamento (email a FastSpring/Freemius/Stripe partite) ·
+giro #86: il meteo che smonta la scusa del
 maltempo, acceso sull'istanza Open-Meteo self-hosted del VPS (auth Basic,
 partenza e arrivo, raffiche/neve/nebbia, cache), provato dal vivo ·
 giro #85: il collaudo della pratica da utente
@@ -74,6 +79,59 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #87 (19/08): IL MARKETING B2C DAI 4 FRAMEWORK DI VALERIO, E LA
+  CASELLA CONVERTI COSTRUITA.** Valerio ha portato 4 artefatti (fatti con
+  un'altra AI): il manuale del marketing B2C in 4 caselle (Decidi, Attira,
+  Converti, Tieniteli), con le fonti vere del mestiere (Schwartz, Hormozi,
+  Dunford, Thiel, Bullseye di Traction, Fogg, Cialdini, AARRR, LTV/CAC di
+  Skok, Reichheld). Letti tutti, fatto il piano, poi costruita CONVERTI.
+  - **Le scelte di Valerio col popup che reggono il piano:** il check
+    resta a **1,99** (non l'esca gratis del framework: sua scelta, la
+    eseguo); l'**email** si chiede al verdetto; la prova sociale la faccio
+    **solo come autorità** (niente numeri, niente recensioni finte);
+    costruiamo **tutto in ordine**, casella per casella.
+  - **1. BLOCCO AUTORITÀ SUL VERDETTO** (leva "autorità"): appena sopra il
+    bottone d'acquisto, il diritto si presenta come **legge europea** (Reg.
+    CE 261/2004), non come una nostra promessa, con l'onere della prova a
+    carico della compagnia. È la prova che regge al posto dei numeri
+    sociali. Copy in `COPY.risultato.idoneo.autorita`.
+  - **2. IL MURO DICE COSA SUCCEDE DOPO IL PAGAMENTO** (leva "togli la
+    paura"): nel momento in cui si tira fuori la carta, il muro adesso dice
+    che dopo torni lì e l'analisi parte da sola, niente moduli da rifare,
+    niente account. Toglie il timore dell'ignoto senza togliere il muro.
+  - **3. LA SEQUENZA DI RECUPERO VIA EMAIL** (leva "recupera chi non ha
+    comprato): chi ha fatto un check, lasciato l'email e NON aperto la
+    pratica riceve fino a 2 promemoria (giorno 1 e 4), poi basta. **Idonei:
+    la cifra si dice. Incerti: MAI una cifra** (si propone di rifare il
+    controllo e caricare la carta d'imbarco). La seconda email porta la
+    scadenza onesta (due anni per legge, ma i documenti si recuperano
+    peggio col tempo). Ogni email ha il link firmato per disiscriversi.
+    Migrazione applicata sul DB vero (3 colonne su `verifiche`), cron
+    `/api/motore/recupero` + funzione Netlify giornaliera, logica e
+    contenuto sotto prova (15 nuove, verdi).
+    ⚠️ **SPENTO di default:** senza `RECUPERO_ATTIVO=1` su Netlify non manda
+    niente. Si accende il giorno che c'è una cassa che incassa (scelta di
+    Valerio: mandare gente a un pagamento che non funziona è peggio che non
+    mandarla).
+  - **LA RICERCA SUI GESTORI DI PAGAMENTO (fatta prima, stesso giorno):**
+    Polar ha detto no, quindi squadra di 6 agenti sulle fonti ufficiali di
+    ~17 MoR. Nessun MoR accoglie ESPLICITAMENTE la categoria "reclami
+    voli": chi non la nomina (FastSpring, Freemius, Stripe Managed
+    Payments) ti prende inquadrandoti come **software**; chi la nomina
+    (Paddle, Polar, Lemon Squeezy, Gumroad, 2Checkout) rifiuta. **Email di
+    richiesta d'approvazione mandate col connettore Gmail** (da
+    valerio@artecai.it) a FastSpring, Freemius e PayPro Global; Stripe
+    Managed Payments va dal pannello (testo pronto dato a Valerio). ⚠️ Il
+    nodo n.1 di tutto CONVERTI: senza una cassa viva, il motore gira a
+    folle. È la vera priorità.
+  - **Restano da fare (le altre 3 caselle):** Decidi (formalizzare
+    chi/cosa/perché, oggi vivono SOLO negli artefatti di Valerio, non nel
+    prodotto), Attira (il pagato + la misura del canale, dipende dalla
+    cassa), Tieniteli (recensione al momento d'oro, invita-un-amico,
+    recupero pratica a metà, misura AARRR/LTV).
+  - Prove: **tipi e lint puliti**, le 15 nuove del recupero verdi, il freno
+    verde (le rotte nuove non toccano il fornitore). I due pezzi frontend
+    (autorità, muro) sono additivi.
 - **GIRO #86 (19/08): IL METEO CHE SMONTA LA SCUSA DEL MALTEMPO, ACCESO SUL
   SERVER DEDICATO.** L'arretrato più vecchio (Open-Meteo nel reclamo) era
   fermo perché l'API pubblica voleva il piano commerciale da ~99 USD/mese.
