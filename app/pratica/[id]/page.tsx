@@ -554,8 +554,33 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
             </>
           );
 
+          /* La card «come si invia» va DENTRO PreparaReclamo, nel ramo del
+             reclamo aperto: prima compariva già durante i due passi
+             facoltativi (carta d'imbarco, spese) e diceva «premi Apri il
+             reclamo» quando il reclamo non era ancora aperto (Valerio,
+             18/08). Ora esce solo quando tocca davvero mandarlo. */
+          const istruzioniNode = (
+            <section className="rounded-2xl border border-bordo bg-white px-6 py-5">
+              <h2 className="font-display text-lg tracking-[-0.03em]">{C.istruzioniInvio.titolo}</h2>
+              <ol className="mt-3 flex list-none flex-col gap-2 text-[0.95rem] leading-relaxed text-fumo">
+                {C.istruzioniInvio.passi.map((passo, i) => (
+                  <li key={passo} className="flex gap-3">
+                    <span className="numeri mt-0.5 font-medium text-verde">{i + 1}.</span>
+                    {passo}
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-4 text-sm leading-relaxed text-fumo-2">{C.istruzioniInvio.perche}</p>
+            </section>
+          );
+
           return percorso.attivo === "lettera" ? (
-            <PreparaReclamo praticaId={pratica.id} prep={prepNode} lettera={letteraNode} />
+            <PreparaReclamo
+              praticaId={pratica.id}
+              prep={prepNode}
+              lettera={letteraNode}
+              istruzioni={istruzioniNode}
+            />
           ) : (
             letteraNode
           );
@@ -641,21 +666,11 @@ export default async function PaginaPratica({ params }: { params: Promise<{ id: 
           dopo aver vinto. */}
       {!vinta && <Fascicolo dossier={dossier} />}
 
-      {/* ------------------------------------------------ come si invia */}
-      {R.istruzioni && (
-        <section className="rounded-2xl border border-bordo bg-white px-6 py-5">
-          <h2 className="font-display text-lg tracking-[-0.03em]">{C.istruzioniInvio.titolo}</h2>
-          <ol className="mt-3 flex list-none flex-col gap-2 text-[0.95rem] leading-relaxed text-fumo">
-            {C.istruzioniInvio.passi.map((passo, i) => (
-              <li key={passo} className="flex gap-3">
-                <span className="numeri mt-0.5 font-medium text-verde">{i + 1}.</span>
-                {passo}
-              </li>
-            ))}
-          </ol>
-          <p className="mt-4 text-sm leading-relaxed text-fumo-2">{C.istruzioniInvio.perche}</p>
-        </section>
-      )}
+      {/* La card «come si invia» è stata spostata DENTRO PreparaReclamo, nel
+          ramo del reclamo aperto: prima compariva anche durante i passi
+          facoltativi, prima che ci fosse un reclamo da mandare (Valerio,
+          18/08). `R.istruzioni` resta nel motore dei passi, non serve più
+          qui. */}
 
       {/* La garanzia non è più un riquadro qui: è diventata una riga in
           cima, sotto lo stato. Vedi il commento lassù. */}

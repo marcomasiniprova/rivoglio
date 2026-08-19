@@ -36,6 +36,7 @@ export default function PreparaReclamo({
   praticaId,
   prep,
   lettera,
+  istruzioni,
 }: {
   /** Serve solo a ricordare il «pronto» per QUESTA pratica, non un'altra. */
   praticaId: string;
@@ -43,6 +44,9 @@ export default function PreparaReclamo({
   prep: ReactNode;
   /** Il reclamo vero e proprio: si mostra dopo «pronto». */
   lettera: ReactNode;
+  /** La card «come si invia»: si mostra solo qui, col reclamo aperto, non
+   *  durante i due passi facoltativi (Valerio, 18/08). */
+  istruzioni?: ReactNode;
 }) {
   const [pronto, setPronto] = useState(false);
   const chiave = `reclamo-pronto:${praticaId}`;
@@ -80,6 +84,7 @@ export default function PreparaReclamo({
     return (
       <>
         {lettera}
+        {istruzioni && <div className="mt-4">{istruzioni}</div>}
         {/* Una via di ritorno ai passi, per chi vuole allegare qualcosa
             dopo aver visto la lettera. Discreta: non è un passo, è un
             ripensamento. */}
