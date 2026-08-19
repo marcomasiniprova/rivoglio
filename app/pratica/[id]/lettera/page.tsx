@@ -30,8 +30,7 @@ import {
   type MotivoRifiuto,
 } from "@/lib/pratiche/rifiuto";
 import { conciliazionePerPartenza, prontoPerConciliazione } from "@/lib/lettera/conciliazione";
-import { METEO_ATTIVO, fraseMeteo, meteoStorico } from "@/lib/meteo/openmeteo";
-import { aeroporto } from "@/lib/voli/distanza";
+import { righeMeteoVolo } from "@/lib/meteo/openmeteo";
 import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
 import type { Passeggero, TipoPratica } from "@/lib/pratiche/pratiche";
 
@@ -92,14 +91,6 @@ type RigaVolo = {
   /** Il payload archiviato del fornitore: qui dentro c'è l'IATA di arrivo. */
   payload_grezzo: unknown;
 };
-
-/** L'aeroporto di arrivo, letto dal payload archiviato (AeroDataBox). */
-function iataArrivoDaPayload(payload: unknown): string | null {
-  const iata = (
-    payload as { arrival?: { airport?: { iata?: string | null } | null } | null } | null
-  )?.arrival?.airport?.iata;
-  return typeof iata === "string" && iata.trim().length === 3 ? iata.trim().toUpperCase() : null;
-}
 
 type RigaVerifica = {
   esito: "idoneo" | "incerto" | "non_idoneo";
@@ -368,24 +359,11 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
     versioneRegole: verifica.versione_regole,
   };
 
-  /* La riga meteo che disinnesca la scusa "maltempo": SPENTA finché
-     Valerio non sottoscrive il piano commerciale di Open-Meteo
-     (OPENMETEO_COMMERCIALE=1). Ogni buco nella catena = niente riga,
-     la lettera non muore mai per il meteo. */
-  let meteo: string | null = null;
-  if (METEO_ATTIVO && volo.arrivo_effettivo_utc) {
-    const scalo = aeroporto(iataArrivoDaPayload(volo.payload_grezzo));
-    if (scalo) {
-      meteo = fraseMeteo(
-        await meteoStorico(
-          scalo.lat,
-          scalo.lon,
-          volo.arrivo_effettivo_utc.slice(0, 10),
-          volo.arrivo_effettivo_utc,
-        ),
-      );
-    }
-  }
+  /* La riga meteo che disinnesca la scusa "maltempo": SPENTA finché non c'è
+     un'istanza Open-Meteo (OPENMETEO_URL, il VPS). Guarda partenza e arrivo.
+     Ogni buco nella catena = niente riga, la lettera non muore mai per il
+     meteo. */
+  const meteo = await righeMeteoVolo(volo.payload_grezzo, volo.arrivo_effettivo_utc);
 
   const lettera = generaReclamo(
     { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo, email: pratica.email },

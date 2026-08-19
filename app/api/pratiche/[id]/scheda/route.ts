@@ -9,7 +9,7 @@ import {
   generaSollecito,
 } from "@/lib/lettera/genera";
 import { conciliazionePerPartenza, prontoPerConciliazione } from "@/lib/lettera/conciliazione";
-import { METEO_ATTIVO, fraseMeteo, meteoStorico } from "@/lib/meteo/openmeteo";
+import { righeMeteoVolo } from "@/lib/meteo/openmeteo";
 import type { Passeggero, TipoPratica } from "@/lib/pratiche/pratiche";
 import { paragrafoSuMisura } from "@/lib/pratiche/dossier";
 import {
@@ -22,7 +22,6 @@ import {
 import type { FattoVolo, Verdetto } from "@/lib/regole/eu261";
 import { colonnaMancante } from "@/lib/supabase/colonne";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
-import { aeroporto } from "@/lib/voli/distanza";
 
 /**
  * GET /api/pratiche/{id}/scheda
@@ -88,14 +87,6 @@ type RigaVerifica = {
   ritardo_minuti: number | null;
   versione_regole: string;
 };
-
-/** L'aeroporto di arrivo, letto dal payload archiviato (AeroDataBox). */
-function iataArrivoDaPayload(payload: unknown): string | null {
-  const iata = (
-    payload as { arrival?: { airport?: { iata?: string | null } | null } | null } | null
-  )?.arrival?.airport?.iata;
-  return typeof iata === "string" && iata.trim().length === 3 ? iata.trim().toUpperCase() : null;
-}
 
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS });
@@ -213,20 +204,7 @@ export async function GET(req: Request, contesto: { params: Promise<{ id: string
         versioneRegole: verifica.versione_regole,
       };
 
-      let meteo: string | null = null;
-      if (METEO_ATTIVO && volo.arrivo_effettivo_utc) {
-        const scalo = aeroporto(iataArrivoDaPayload(volo.payload_grezzo));
-        if (scalo) {
-          meteo = fraseMeteo(
-            await meteoStorico(
-              scalo.lat,
-              scalo.lon,
-              volo.arrivo_effettivo_utc.slice(0, 10),
-              volo.arrivo_effettivo_utc,
-            ),
-          );
-        }
-      }
+      const meteo = await righeMeteoVolo(volo.payload_grezzo, volo.arrivo_effettivo_utc);
 
       const testo = generaReclamo(
         { passeggeri: pratica.passeggeri ?? [], tipo: pratica.tipo, email: pratica.email },

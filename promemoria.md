@@ -22,17 +22,21 @@ seconda fonte, prima di legarti ai 299 dollari al mese fissi.
 fondo la riga "RECUPERATI dalla 2ª fonte: N idonei (+X€)". Quel N è il numero
 che dice se vale la pena tenerla. Incollamelo e decidiamo insieme.
 
-### 2. Meteo sul tuo VPS (Open-Meteo self-hosted)
+### 2. Meteo sul tuo VPS (Open-Meteo self-hosted) — FATTO il 19/08
 **A cosa serve:** smontare la scusa del maltempo nella lettera di risposta a
 un "no" della compagnia. NON serve a trovare clienti: serve a vincere le liti.
-Costo in più zero, perché il VPS (KVM 4 Hostinger) ce l'hai già.
-**Stato:** il codice è pronto. Legge da una variabile `OPENMETEO_URL`. Finché
-non gliela dai, il meteo resta spento e la lettera esce lo stesso, senza la
-riga meteo. Nessun errore.
-**Cosa manca:** installare Open-Meteo sul VPS (Docker + lo scarico
-dell'archivio meteo storico). È la parte più tecnica. **Quando vuoi partire,
-dimmelo:** ti scrivo i comandi uno alla volta, in un riquadro, già provati.
-Poi su Netlify aggiungi `OPENMETEO_URL` con l'indirizzo del tuo Open-Meteo.
+Costo in più zero, perché il VPS ce l'hai già.
+**Fatto:** il modulo (`lib/meteo/openmeteo.ts`) ora parla con la tua istanza
+`https://meteo.artecai.cloud` (autenticazione Basic, password solo in variabile
+d'ambiente). Guarda partenza E arrivo del volo, e usa le variabili giuste:
+raffiche, neve e nubi basse dallo storico, codice meteo dalle previsioni per i
+voli degli ultimi 5 giorni. La cache (tabella `meteo_cache`) è già sul database
+vero. Provato dal vivo contro il tuo server: risponde 200, dati veri, tutte le
+variabili presenti. Le due variabili `OPENMETEO_URL` e `METEO_API_PASSWORD`
+sono già su Netlify: si accende da solo al prossimo deploy.
+**L'unica cosa che resta a te, e solo per lo sviluppo in LOCALE:** aggiungi le
+stesse due variabili al tuo `.env.development.local` (la password è quella che
+hai dato alla tua istanza). In produzione è già tutto pronto.
 
 ### 3. Netlify: fai reindirizzare il vecchio indirizzo al nuovo
 **Perché:** oggi il sito risponde SIA su rivolio.it SIA su
@@ -186,7 +190,8 @@ cosa fra un'email che parte e una che si perde:
 - Collaudo del motore: 55 casi d'oro + 81 sui rami, zero falsi positivi.
 - Seconda fonte AviationEdge collegata (spenta finché non metti la chiave),
   incrocio a prova di fuso orario.
-- Meteo pronto a leggere dal VPS.
+- Meteo agganciato al VPS e provato dal vivo (19/08): auth Basic, partenza e
+  arrivo, cache sul DB. Acceso su Netlify, vivo al prossimo deploy.
 - Dominio: rivolio.it è l'indirizzo ufficiale ovunque, verificato sul sito
   vero.
 - Suite prove: 1612 verdi, zero rosse.

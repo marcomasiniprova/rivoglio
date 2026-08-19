@@ -7,7 +7,10 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-19 (giro #85: il collaudo della pratica da utente
+**Aggiornato:** 2026-08-19 (giro #86: il meteo che smonta la scusa del
+maltempo, acceso sull'istanza Open-Meteo self-hosted del VPS (auth Basic,
+partenza e arrivo, raffiche/neve/nebbia, cache), provato dal vivo ·
+giro #85: il collaudo della pratica da utente
 (i pallini che rimbalzavano, la terminologia unica Reclamo/Replica, la
 schermata dedicata del no, il Traguardo sobrio con la cifra che sale), più
 l'uscita dall'admin e la recensione che non si richiede due volte ·
@@ -71,6 +74,52 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #86 (19/08): IL METEO CHE SMONTA LA SCUSA DEL MALTEMPO, ACCESO SUL
+  SERVER DEDICATO.** L'arretrato più vecchio (Open-Meteo nel reclamo) era
+  fermo perché l'API pubblica voleva il piano commerciale da ~99 USD/mese.
+  Adesso c'è un'istanza self-hosted sul VPS aziendale (`meteo.artecai.cloud`),
+  quindi si sblocca a costo zero. Quattro scelte col popup, poi costruito e
+  provato dal vivo.
+  - 🔴 **IL MODULO C'ERA (giro #27) MA SUL SERVER NUOVO NON AVREBBE
+    FUNZIONATO.** `lib/meteo/openmeteo.ts` esisteva ma: (a) non aveva
+    l'autenticazione Basic che l'istanza esige (avrebbe risposto 401 e mai
+    una riga); (b) chiedeva le variabili sbagliate (`windspeed_10m`,
+    `weathercode`), che su questa istanza tornano vuote. Ora manda l'header
+    Basic (utente "rivolio", password SOLO in `METEO_API_PASSWORD`, mai nel
+    repo) e chiede le variabili giuste.
+  - **DUE ENDPOINT, scelti da soli.** Lo storico ERA5 arriva con ~5 giorni di
+    ritardo: per i voli degli ultimi 5 giorni il modulo passa alle PREVISIONI
+    (`/v1/forecast`, col codice meteo), per i più vecchi all'ARCHIVIO
+    (`/v1/archive`, con raffiche, neve e nubi basse, che sono la prova più
+    forte). Le variabili disponibili sono diverse fra i due, e il codice lo sa.
+  - **GUARDA PARTENZA E ARRIVO** (scelta col popup), non solo l'arrivo com'era:
+    il maltempo che ferma un volo può stare da una parte o dall'altra. La riga
+    nomina lo scalo ("in partenza da Milano Malpensa (MXP)...").
+  - **DATO RICCO** (scelta col popup): oltre a tempo e pioggia, la lettera
+    porta raffiche, neve e nebbia (nubi basse molto estese), che sono quelle
+    che smontano davvero la scusa. Un buco resta un buco: `null` = niente riga,
+    mai uno zero al posto di un dato mancante.
+  - **CACHE su Supabase** (scelta col popup): tabella `meteo_cache` per
+    (aeroporto, data, ora), applicata sul database vero col connettore. Lo
+    storico non cambia: la stessa lettera, riaperta dieci volte, non richiama
+    dieci volte il server. Se la cache manca o fallisce, si scarica e basta:
+    non rompe mai la lettera.
+  - ✅ **ACCESO IO SU NETLIFY** (scelta col popup): `OPENMETEO_URL` e
+    `METEO_API_PASSWORD` messe col connettore e verificate presenti. ⚠️ Il
+    flag "segreto" del connettore fallisce ancora in silenzio (dice "upserted"
+    ma non salva): le ho messe senza, contesto "all" con `post_processing`,
+    come le altre chiavi del progetto. Vivo al prossimo deploy.
+  - ✅ **PROVATO DAL VIVO CONTRO IL SERVER, non solo a parole:** archivio e
+    previsioni rispondono 200 con l'auth, tutte le variabili presenti
+    (Malpensa, 14 feb: 10°C, raffiche 11 km/h; e il codice meteo per un giorno
+    recente). Prova o non è fatto.
+  - Prove: **tipi e lint puliti, 121 verdi** sulle suite toccate (meteo,
+    passi, dopo-lettera, replica-ai, quarto-colpo), 2 saltate (la sveglia
+    2027). Le prove nuove di `prove/meteo.spec.ts` bloccano le tre cose che
+    romperebbero l'integrazione in silenzio: auth mancante, variabili
+    sbagliate, password nel codice.
+  - ⚠️ **Resta a Valerio, solo per lo sviluppo in LOCALE:** le stesse due
+    variabili nel suo `.env.development.local`. In produzione è tutto pronto.
 - **GIRO #85 (18-19/08): IL COLLAUDO DELLA PRATICA DA UTENTE, E DUE BUCHI
   FUORI DALLA PRATICA.** Valerio ha percorso una pratica vera con gli
   screenshot e ha alzato una lista in un messaggio solo (PROCEDI, poi le 4
