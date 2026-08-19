@@ -178,7 +178,14 @@ export default function MuroCheck({
         {inCorso ? "Un attimo." : `Sblocca l'analisi · ${prezzoTesto}`}
       </Button>
 
+      {/* «Cosa succede dopo che clicco»: la leva che toglie la paura nel
+          momento in cui si tira fuori la carta (framework CONVERTI). Detto
+          prima, non dopo: leva il timore di doversi registrare o rifare tutto. */}
       <p className="mt-3 text-center text-[12.5px] leading-relaxed text-fumo-2">
+        Dopo il pagamento torni qui e l&apos;analisi parte da sola: niente moduli
+        da rifare, niente account da creare.
+      </p>
+      <p className="mt-1.5 text-center text-[12.5px] leading-relaxed text-fumo-2">
         Se il verdetto esce incerto non ti costa niente: il credito resta e lo
         usi su un altro volo.
       </p>
