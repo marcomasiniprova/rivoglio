@@ -7,7 +7,12 @@
 > (Polar ha detto no; lo shadow è stato tolto). Lo stato vero e aggiornato
 > sta in `INIZIA-QUI.md`, non nei giri datati.
 
-**Aggiornato:** 2026-08-17 (giro #83: il marketing GEO/AIO, cioè farsi
+**Aggiornato:** 2026-08-19 (giro #85: il collaudo della pratica da utente
+(i pallini che rimbalzavano, la terminologia unica Reclamo/Replica, la
+schermata dedicata del no, il Traguardo sobrio con la cifra che sale), più
+l'uscita dall'admin e la recensione che non si richiede due volte ·
+giro #84: la skill di copywriting su email e microcopy in prima persona ·
+giro #83: il marketing GEO/AIO, cioè farsi
 citare da ChatGPT e Perplexity: 79 pagine "reclamo per compagnia" + pagina
 di confronto (già online dal giro precedente), la misura del traffico dai
 motori AI, la sezione Marketing nel pannello coi testi pronti e il controllo
@@ -66,6 +71,85 @@ campo email dell'Osservatorio non più schiacciato sul telefono, immagine
 social rifatta (era rimasta al prodotto viaggi).
 
 ## Dove siamo
+- **GIRO #85 (18-19/08): IL COLLAUDO DELLA PRATICA DA UTENTE, E DUE BUCHI
+  FUORI DALLA PRATICA.** Valerio ha percorso una pratica vera con gli
+  screenshot e ha alzato una lista in un messaggio solo (PROCEDI, poi le 4
+  domande col popup). Consegnato a pezzi su `main`, ognuno verde prima del
+  prossimo.
+  - 🔴 **I PALLINI DELL'ANALISI RIMBALZAVANO.** Facendo un secondo check
+    mentre il primo era ancora in corso, i sei pallini «indietreggiavano di
+    tre e avanzavano di uno»: la vecchia analisi continuava a muovere i
+    passi anche dopo che ne era partita una nuova, e le due si pestavano i
+    piedi sugli stessi pallini. Ogni analisi adesso prende un numero di
+    corsa (`corsa` in `SchedaCheck.tsx`): appena ne parte una nuova, la
+    vecchia si accorge di non essere più quella buona e si ferma a metà
+    frase invece di scrivere sopra. Una prova legge il codice e vieta di
+    togliere il freno.
+  - **LA TERMINOLOGIA È UNA SOLA: RECLAMO E REPLICA** (scelta di Valerio
+    col popup, «la replica è la replica, non chiamarla lettera una volta e
+    replica un'altra»). La parola «lettera» spariva e ricompariva a caso.
+    Adesso il primo documento è il **Reclamo**, il secondo è la **Replica**,
+    e «lettera» resta solo dove è una parola di legge, cioè nelle guide
+    (la pagina mobilità ridotta). Sweep su `copy.ts`, la pagina del
+    documento, le email della pratica e i componenti: 22 punti.
+  - **LA SCHERMATA DEL NO È UNA SCHERMATA A SÉ** (scelta col popup:
+    schermata dedicata). Prima, premendo «Mi hanno detto no», restava sopra
+    il bottone «Mi hanno pagato» e sembrava tutto mischiato: non si capiva
+    di essere passati alla fase «carica la loro risposta». Adesso la sezione
+    cambia tutta: un titolo che dice dove sei, e sotto il solo compito di
+    adesso. «Mi hanno pagato» scende piccolo in fondo, per chi dopo la
+    replica si è visto pagare lo stesso.
+  - **«SCELGO DALL'ELENCO» STA PRIMA DELLA RISPOSTA, NON DOPO.** Il link per
+    scegliere a mano il motivo del no compariva sotto, dopo aver già
+    incollato la risposta. Adesso è lì da subito e **sparisce** appena la
+    risposta è stata letta: a quel punto il motivo l'ha già trovato l'AI,
+    non serve più sceglierlo.
+  - **SE INCOLLI UNA RISPOSTA CHE NON È DELLA COMPAGNIA, L'AI LO DICE**
+    (scelta col popup: dillo chiaro). Valerio ha incollato un testo un po'
+    ambiguo e l'AI «non aveva capito un cazzo» facendo finta di niente.
+    Adesso, quando il testo non sembra affatto una risposta di una compagnia
+    (il motivo esce «silenzio»), la pratica non lo salva e risponde in
+    chiaro: «questa non sembra una risposta della compagnia, controlla di
+    aver incollato quella giusta, oppure scegli dall'elenco».
+  - **IL PRIMO PASSO NON DICE PIÙ «IL MIO RECLAMO È PRONTO».** Il bottone
+    diceva una cosa già fatta; adesso dice **«Vai al reclamo»**, che è
+    quello che fa. E l'intro spiega la verità: il reclamo lo abbiamo scritto
+    noi, le due cose che metti tu (carta d'imbarco e spese) sono in più e
+    alzano le probabilità.
+  - **LA CARD «COME SI INVIA» ESCE SOLO QUANDO TOCCA MANDARE IL RECLAMO.**
+    Prima compariva anche durante i due passi facoltativi (carta d'imbarco,
+    spese) e diceva «premi Apri il reclamo» quando il reclamo non era ancora
+    aperto. Adesso vive dentro il passo del reclamo aperto, non prima.
+  - **VIA IL DOPPIONE «COPIA IL TESTO»** (scelta col popup: tolgo quello in
+    fondo). Nella pagina del documento c'erano due bottoni identici per
+    copiare: ne resta uno.
+  - **IL TRAGUARDO È SOBRIO, LA CIFRA CHE SALE** (scelta col popup: sobrio e
+    premium, la cifra che sale). L'animazione della vittoria «faceva pena»,
+    col trofeo e i coriandoli. Rifatta da zero: niente festa da cartone, al
+    centro la cifra recuperata, grande, che sale contando fino al totale, un
+    sigillo pulito e basta. Chi ha chiesto meno movimento la vede subito
+    piena.
+  - **DUE BUCHI FUORI DALLA PRATICA, chiusi strada facendo:**
+    - 🔴 **«ESCI DAL PANNELLO» NON USCIVA.** In admin il bottone era un
+      collegamento a `/app`, non un logout: cliccandolo restavi dentro.
+      Adesso è un vero logout (scelta col popup: sloggati del tutto).
+    - **LA RECENSIONE NON SI RICHIEDE DUE VOLTE** (scelta col popup:
+      costruiscilo una volta sola). Chi aveva già lasciato una recensione
+      dal check da sconosciuto se la ritrovava chiesta di nuovo dentro
+      l'account. Adesso il box guarda anche l'email, non solo l'account: se
+      quella persona ha già recensito, il box non ricompare.
+  - ⚠️ **LA DOMANDA SUL LOGIN, spiegata in chat e basta** (scelta col
+    popup). «Dov'è la password, chi ce l'ha»: risposta data a voce, nessun
+    codice toccato, perché il sistema era già a posto (email+password su
+    Supabase, più il link magico che entra senza password). Lo `sameAs`
+    dello schema (farsi collegare i profili social) resta **in attesa**
+    finché quei profili non esistono davvero (scelta col popup): dichiarare
+    un profilo che non c'è è un dato falso.
+  - Prove: **tipi 0 errori, lint 0 errori** (gli 8 avvisi vecchi),
+    scena-fantasma verde. ⚠️ Un errore di lint l'avevo introdotto io nel
+    Traguardo (un `setState` dentro l'effetto, che avrebbe fermato il build
+    su Netlify): trovato e chiuso rinviandolo di un giro, come già fa la
+    ripresa del check.
 - **GIRO #84 (17/08): LA SKILL DI COPYWRITING SU EMAIL E MICROCOPY, IN
   PRIMA PERSONA (VALERIO).** Valerio: «vai con email per bene e microcopy».
   Scelte col popup: tutte le email in ordine · microcopy un pezzo per
