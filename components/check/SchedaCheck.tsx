@@ -265,6 +265,13 @@ export default function SchedaCheck() {
     riprova?: () => void;
   } | null>(null);
   const inCorso = useRef(false);
+  /* 🔴 IL FRENO DELLE CORSE, contro i pallini che rimbalzano (Valerio,
+     18/08). L'animazione dei passi gira su un timer. Se sbatti sul muro e
+     poi usi il codice della recensione, parte una SECONDA analisi mentre la
+     prima non è stata spenta: due timer contano insieme sullo stesso
+     indicatore, e i pallini vanno avanti e indietro. Ogni analisi prende un
+     numero; solo l'ultima muove i pallini, le vecchie si fermano da sole. */
+  const corsa = useRef(0);
 
   // il numero
   const [volo, setVolo] = useState("");
@@ -307,6 +314,7 @@ export default function SchedaCheck() {
   async function avvia(voloDaControllare: string, giornoIso: string, codice?: string) {
     if (inCorso.current) return;
     inCorso.current = true;
+    const miaCorsa = ++corsa.current;
     setErrore(null);
     setAvviso(null);
     /* 🔴 IL MURO SI AZZERA QUI, e prima non lo faceva: premendo "Usa il
@@ -324,9 +332,11 @@ export default function SchedaCheck() {
     const sequenza = (async () => {
       for (let i = 1; i < TEATRO.passi.length; i++) {
         await attesa(PASSO_MS);
+        if (corsa.current !== miaCorsa) return; // un'analisi nuova ha preso il posto
         setPasso(i);
       }
       await attesa(PASSO_MS);
+      if (corsa.current !== miaCorsa) return;
       setPasso(TEATRO.passi.length);
       await attesa(PAUSA_FINALE_MS);
     })();
@@ -384,6 +394,10 @@ export default function SchedaCheck() {
            ferma, e a tenerlo leggibile ci pensa `scroll-mt` sulla
            sezione: se il riquadro sta già sotto la barra si vede tutto
            lo stesso. */
+        /* Il muro prende il posto del teatro: spengo la sequenza dei passi di
+           questa analisi, se no continua a contare in sottofondo e, al
+           riscatto del codice, si accavalla con quella nuova. */
+        corsa.current++;
         inCorso.current = false;
         return;
       }

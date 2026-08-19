@@ -36,3 +36,27 @@ test.describe("La scena dell'analisi non riparte al ricaricamento", () => {
     ).toContain("sessionStorage.setItem(gia,");
   });
 });
+
+/**
+ * I PALLINI DELL'ANALISI NON RIMBALZANO (Valerio, 18/08).
+ *
+ * Il bug: sbatti sul muro del pagamento, usi il codice della recensione, e
+ * parte una SECONDA analisi mentre la prima non è stata spenta. Due timer
+ * contano insieme sullo stesso indicatore e i pallini vanno avanti e
+ * indietro ("indietreggiano di 3, avanzano di 1"). Il freno: ogni analisi
+ * prende un numero (corsa) e la sequenza dei passi si ferma appena non è
+ * più la corsa corrente. Chi togliesse il freno riaprirebbe il bug.
+ */
+test.describe("I pallini dell'analisi non rimbalzano", () => {
+  test("solo l'ultima analisi muove i passi (freno per corsa)", () => {
+    const testo = leggi("components/check/SchedaCheck.tsx");
+    expect(testo, "manca il contatore delle corse").toContain("const corsa = useRef(0)");
+    expect(testo, "avvia deve prendere il numero della sua corsa").toContain(
+      "const miaCorsa = ++corsa.current",
+    );
+    expect(
+      testo,
+      "la sequenza dei passi deve fermarsi se non è più la corsa corrente",
+    ).toContain("if (corsa.current !== miaCorsa) return");
+  });
+});
