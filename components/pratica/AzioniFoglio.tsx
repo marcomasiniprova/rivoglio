@@ -22,12 +22,10 @@ import { Button } from "@/components/ui/button";
  */
 export default function AzioniFoglio({
   oggetto,
-  corpo,
   /** Etichetta del primo bottone: cambia col documento del momento. */
   etichettaCopia = "Copia l'oggetto",
 }: {
   oggetto: string;
-  corpo: string;
   etichettaCopia?: string;
 }) {
   const [detto, setDetto] = useState<string | null>(null);
@@ -48,13 +46,13 @@ export default function AzioniFoglio({
   return (
     <div className="no-stampa flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-3">
+        {/* 🔴 «DUE BOTTONI UGUALI CHE FANNO LA STESSA COSA, COPIA IL TESTO»
+            (Valerio, 18/08). Il "Copia il testo" stava sia qui sia in cima,
+            accanto a "Apri l'email". Tolto QUI (scelta col popup): in cima
+            resta il gesto principale, qui restano l'oggetto e la stampa. */}
         <Button type="button" variant="contorno" onClick={() => void copia(oggetto, "Oggetto copiato.")}>
           <Copy className="size-4" aria-hidden="true" />
           {etichettaCopia}
-        </Button>
-        <Button type="button" variant="contorno" onClick={() => void copia(corpo, "Testo copiato.")}>
-          <Copy className="size-4" aria-hidden="true" />
-          Copia il testo
         </Button>
         <Button type="button" variant="contorno" onClick={() => window.print()}>
           <Printer className="size-4" aria-hidden="true" />

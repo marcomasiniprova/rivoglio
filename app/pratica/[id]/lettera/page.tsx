@@ -673,7 +673,7 @@ export default async function PaginaLettera({ params }: { params: Promise<{ id: 
       {/* ------------------------------------------------ le azioni
           🔴 Erano collegate da uno <script> nel JSX, che non viene mai
           eseguito: due bottoni finti. Vedi components/pratica/AzioniFoglio. */}
-      <AzioniFoglio oggetto={attuale.oggetto} corpo={attuale.corpo} />
+      <AzioniFoglio oggetto={attuale.oggetto} />
 
       <p className="no-stampa rounded-xl bg-menta-tenue px-4 py-3 text-sm leading-relaxed text-verde-notte">
         Una cosa sola prima di premere Invia: al posto di [da compilare] metti il tuo IBAN
