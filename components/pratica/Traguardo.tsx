@@ -1,34 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Trophy } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Check } from "lucide-react";
 
 /**
- * IL TRAGUARDO: la festa quando la compagnia ha pagato (Valerio, 16/08:
- * «quando dichiara pagato fallo divertente, effetto wow, festa, una
- * milestone obiettivo completato»).
+ * IL TRAGUARDO: quando la compagnia ha pagato.
  *
- * È il picco emotivo di tutto il prodotto: la persona ha recuperato dei
- * soldi che le spettavano, con due clic. Qui NON serve altro sulla pagina
- * (via garanzia, fascicolo, «come mai»): serve solo far sentire la
- * vittoria.
+ * Sobrio e premium (scelta di Valerio col popup, 18/08: prima era un
+ * trofeo coi coriandoli, «fa schifo, schermata piatta»). Niente festa da
+ * cartone: al centro la cifra recuperata, grande, che sale contando. Un
+ * sigillo pulito, e basta. La soddisfazione sta nel numero, non nei fuochi
+ * d'artificio.
  *
- * ⚠️ La festa rispetta chi ha chiesto meno animazioni (prefers-reduced-
- * motion): niente coriandoli, resta il traguardo fermo. E i coriandoli
- * durano un attimo e spariscono: non ballano in eterno sotto gli occhi.
+ * ⚠️ Chi ha chiesto meno movimento (prefers-reduced-motion) vede subito la
+ * cifra piena, senza il conteggio.
  */
 
-const COLORI = ["#067A46", "#0FA968", "#F4C64B", "#7CD9A6", "#052E1F"];
-
-type Pezzo = {
-  sinistra: number;
-  ritardo: number;
-  durata: number;
-  colore: string;
-  ruota: number;
-  larghezza: number;
-  altezza: number;
-};
+/** Estrae l'intero dalla cifra già scritta ("1.200€" → 1200, "600€" → 600). */
+function numeroDa(testo: string | null): number | null {
+  if (!testo) return null;
+  const cifre = testo.replace(/[^\d]/g, "");
+  return cifre ? Number(cifre) : null;
+}
 
 export default function Traguardo({
   importoTesto,
@@ -38,81 +31,66 @@ export default function Traguardo({
   importoTesto: string | null;
   famiglia: boolean;
 }) {
-  const [pezzi, setPezzi] = useState<Pezzo[]>([]);
+  const totale = numeroDa(importoTesto);
+  const [mostrato, setMostrato] = useState(0);
+  const fatto = useRef(false);
 
   useEffect(() => {
-    // Chi ha chiesto meno movimento non riceve coriandoli.
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    // I coriandoli si generano nel browser (Math.random è lato client, ok).
-    const nuovi: Pezzo[] = Array.from({ length: 70 }, () => ({
-      sinistra: Math.random() * 100,
-      ritardo: Math.random() * 0.5,
-      durata: 2.2 + Math.random() * 1.6,
-      colore: COLORI[Math.floor(Math.random() * COLORI.length)],
-      ruota: Math.random() * 360,
-      larghezza: 6 + Math.random() * 6,
-      altezza: 9 + Math.random() * 8,
-    }));
-    /* ⚠️ Lo stato non si tocca dentro il corpo dell'effetto (React lo vieta:
-       secondo disegno a catena). Un rinvio di un giro basta, come fa la
-       ripresa dentro SchedaCheck. */
-    const avvia = setTimeout(() => setPezzi(nuovi), 0);
-    const pulisci = setTimeout(() => setPezzi([]), 4200);
-    return () => {
-      clearTimeout(avvia);
-      clearTimeout(pulisci);
+    if (fatto.current || totale === null) return;
+    fatto.current = true;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      setMostrato(totale);
+      return;
+    }
+    const durata = 1200;
+    let inizio: number | null = null;
+    let raf = 0;
+    const passo = (t: number) => {
+      if (inizio === null) inizio = t;
+      const q = Math.min(1, (t - inizio) / durata);
+      // ease-out cubica: parte decisa, rallenta arrivando al numero.
+      const e = 1 - Math.pow(1 - q, 3);
+      setMostrato(Math.round(totale * e));
+      if (q < 1) raf = requestAnimationFrame(passo);
     };
-  }, []);
+    raf = requestAnimationFrame(passo);
+    return () => cancelAnimationFrame(raf);
+  }, [totale]);
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-verde/30 bg-gradient-to-b from-menta-tenue to-white px-6 py-10 text-center">
-      {/* i coriandoli, sopra il riquadro ma sotto il testo */}
-      {pezzi.length > 0 && (
-        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-          {pezzi.map((p, i) => (
-            <span
-              key={i}
-              className="traguardo-coriandolo absolute top-[-14px] block rounded-[2px]"
-              style={{
-                left: `${p.sinistra}%`,
-                width: `${p.larghezza}px`,
-                height: `${p.altezza}px`,
-                background: p.colore,
-                transform: `rotate(${p.ruota}deg)`,
-                animationDelay: `${p.ritardo}s`,
-                animationDuration: `${p.durata}s`,
-              }}
-            />
-          ))}
-        </div>
-      )}
+    <section className="rounded-2xl border border-verde/25 bg-gradient-to-b from-menta-tenue/70 to-white px-6 py-12 text-center">
+      <span className="mx-auto grid size-12 place-items-center rounded-full border border-verde/30 bg-white text-verde shadow-[0_10px_24px_-12px_rgba(6,122,70,0.5)]">
+        <Check className="size-6" aria-hidden="true" strokeWidth={2.5} />
+      </span>
+      <p className="mt-6 text-[0.72rem] font-semibold uppercase tracking-[0.2em] text-verde">
+        La compagnia ha pagato
+      </p>
 
-      <div className="relative">
-        <span className="mx-auto grid size-16 place-items-center rounded-full bg-verde text-white shadow-[0_14px_30px_-10px_rgba(6,122,70,0.7)]">
-          <Trophy className="size-8" aria-hidden="true" />
-        </span>
-        <p className="mt-5 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-verde">
-          Obiettivo completato
-        </p>
-        <h2 className="mt-2 font-display text-3xl leading-tight tracking-[-0.03em] text-verde-notte sm:text-4xl">
-          Ce l&apos;hai fatta.
-        </h2>
-        {importoTesto && (
-          <p className="mt-3 text-[1.05rem] leading-relaxed text-verde-notte/80">
-            Hai recuperato{" "}
-            <strong className="font-display text-verde">
-              {importoTesto}
-              {famiglia ? " a passeggero" : ""}
-            </strong>
-            . I soldi sono sul tuo conto: due clic tuoi, il resto l&apos;abbiamo fatto noi.
+      {totale !== null ? (
+        <>
+          <p
+            className="numeri mt-3 font-display leading-none tracking-[-0.04em] text-verde-notte"
+            style={{ fontSize: "clamp(3rem, 12vw, 4.75rem)" }}
+            aria-label={`${importoTesto}${famiglia ? " a passeggero" : ""} recuperati`}
+          >
+            {mostrato.toLocaleString("it-IT")}
+            <span className="text-verde">€</span>
           </p>
-        )}
-        {!importoTesto && (
-          <p className="mt-3 text-[1.05rem] leading-relaxed text-verde-notte/80">
-            La compagnia ha pagato. Due clic tuoi, il resto l&apos;abbiamo fatto noi.
+          <p className="mt-3 text-[1rem] leading-relaxed text-verde-notte/75">
+            {famiglia ? "a passeggero, " : ""}sul tuo conto. Due clic tuoi, il resto l&apos;ho fatto
+            io.
           </p>
-        )}
-      </div>
+        </>
+      ) : (
+        <>
+          <h2 className="mt-3 font-display text-3xl leading-tight tracking-[-0.03em] text-verde-notte sm:text-4xl">
+            Ce l&apos;hai fatta.
+          </h2>
+          <p className="mt-3 text-[1rem] leading-relaxed text-verde-notte/75">
+            La compagnia ha pagato. Due clic tuoi, il resto l&apos;ho fatto io.
+          </p>
+        </>
+      )}
     </section>
   );
 }
