@@ -231,6 +231,25 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     );
   }
 
+  /* 🔴 «L'AI NON HA CAPITO UN CAZZO DELLA RISPOSTA» (Valerio, 18/08, col
+     test "SEI GAY NON MERITI RIMBORSO"). Quando l'utente INCOLLA un testo,
+     "silenzio" non è un esito possibile: il modello lo sceglie solo se il
+     testo non è affatto una risposta della compagnia (vedi replica.ts).
+     Quindi qui è il segnale che ha incollato la cosa sbagliata: lo diciamo
+     chiaro e NON prepariamo una replica a caso. Non si registra niente: non
+     è un fatto del fascicolo. Il "silenzio" vero (la compagnia non risponde)
+     si dichiara dall'elenco o lo porta il tempo, non da un testo incollato. */
+  if (analisi.motivo === "silenzio") {
+    return NextResponse.json(
+      {
+        ok: false,
+        errore:
+          "Questa non sembra una risposta della compagnia. Controlla di aver incollato quella giusta, oppure qui sotto scegli dall'elenco che motivo ti hanno dato.",
+      },
+      { status: 200, headers: CORS },
+    );
+  }
+
   /* ------------------------------------------------------ 5. si salva */
   const scheda = schedaRifiuto(analisi.motivo);
   await registraEvento(pratica.id, EVENTO_TESTO_RIFIUTO, rispostaLoro);
