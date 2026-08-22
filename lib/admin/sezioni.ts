@@ -22,6 +22,7 @@ export type ChiaveSezione =
   | "traffico"
   | "marketing"
   | "passaparola"
+  | "affiliati"
   | "registro"
   | "iscritti"
   | "prodotto"
@@ -120,6 +121,15 @@ export const SEZIONI: Sezione[] = [
     href: "/admin/passaparola",
     nome: "Passaparola",
     sotto: "Il motore di un prodotto una-tantum: inviti mandati, amici arrivati, recensioni.",
+  },
+  {
+    /* Il quarto pezzo della crescita, accanto agli altri: i creator che
+       mandano traffico in cambio di una commissione (30%). Qui si creano,
+       si copia il loro link e si vede quanto è maturato e quanto devi. */
+    chiave: "affiliati",
+    href: "/admin/affiliati",
+    nome: "Affiliati",
+    sotto: "I creator: il loro link, quanto hanno portato e quanto gli devi. Il pagamento è a mano.",
   },
   {
     chiave: "registro",

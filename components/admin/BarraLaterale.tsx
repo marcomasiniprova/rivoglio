@@ -17,6 +17,7 @@ import { Map,
   Smartphone,
   Star,
   TrendingUp,
+  Users,
   X,
 } from "lucide-react";
 import { Marchio } from "@/components/Logo";
@@ -52,6 +53,7 @@ const ICONE: Record<ChiaveSezione, typeof LayoutDashboard> = {
   traffico: TrendingUp,
   marketing: Megaphone,
   passaparola: Share2,
+  affiliati: Users,
   registro: Activity,
   iscritti: Mail,
   prodotto: Smartphone,
