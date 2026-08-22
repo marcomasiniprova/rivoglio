@@ -241,7 +241,7 @@ export const NODI: Nodo[] = [
     id: "pratica-acquisto",
     zona: "soldi",
     titolo: "La pratica",
-    riga: "14,90 singola, 29,90 famiglia. Una volta sola.",
+    riga: "16,90 singola, 29,90 famiglia. Una volta sola.",
     dentro:
       "Secondo punto di incasso, e quello che vale davvero. I portali a percentuale trattengono il 35-50% della compensazione: su 600 euro sono 210. Qui paghi una cifra fissa e tieni il 100%. Prima di pagare si spunta la rinuncia al recesso, perché il prodotto si consuma nell'istante in cui viene consegnato.",
     stato: "spento",

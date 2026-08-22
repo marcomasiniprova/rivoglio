@@ -60,7 +60,7 @@ export default function PaginaCondizioni() {
       <h2>Cosa compri, e quanto costa</h2>
       <ul>
         <li>
-          <strong>Pratica singola, 14,90 euro</strong>: i documenti del reclamo per un volo e
+          <strong>Pratica singola, 16,90 euro</strong>: i documenti del reclamo per un volo e
           un passeggero, il sollecito, le istruzioni ENAC e il tracker della pratica.
         </li>
         <li>

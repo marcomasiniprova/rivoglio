@@ -65,7 +65,9 @@ export function euro(n: number): string {
 }
 
 export const LISTINI: Record<Variante, Listino> = {
-  a: listino(14.9, 29.9),
+  /* I prezzi di lancio decisi da Valerio (22/08), su misura per i margini
+     con la commissione affiliati al 30%: singola 16,90, famiglia 29,90. */
+  a: listino(16.9, 29.9),
   b: listino(24.9, 39.9),
 };
 
@@ -114,7 +116,7 @@ export function confronto(listino: Listino) {
  *
  * Il totale del percorso è sempre il prezzo pieno del listino (i 1,99 del
  * check si scalano dalla pratica, non si aggiungono): quindi il rimborso è
- * `listino.singola` (14,90) o `listino.famiglia` (29,90), non un numero
+ * `listino.singola` (16,90) o `listino.famiglia` (29,90), non un numero
  * scritto a mano che il giorno di un cambio prezzo diverge in silenzio.
  * Prima "14,90" era fisso in quattro punti: la famiglia si vedeva promettere
  * meno del versato.

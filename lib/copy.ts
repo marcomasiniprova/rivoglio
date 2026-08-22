@@ -264,7 +264,7 @@ export const COPY = {
       {
         nome: "Ricevi la pratica",
         testo:
-          "Per 14,90€ prepariamo il reclamo formale: dati verificati del volo, riferimenti di legge, indirizzo corretto della compagnia che ha operato il volo.",
+          "Per 16,90€ prepariamo il reclamo formale: dati verificati del volo, riferimenti di legge, indirizzo corretto della compagnia che ha operato il volo.",
       },
       {
         nome: "Invii tu, incassi tu",
@@ -369,7 +369,7 @@ export const COPY = {
     /** Apre il "35-50%" e lo mette in fila con i nostri prezzi. */
     notaConfronto:
       "Il 35-50% viene dai listini pubblici dei portali a percentuale. Il conto su una fascia da 600€: a percentuale lasci da 210€ a 300€; qui paghi una cifra fissa, non una fetta del rimborso.",
-    /** Il confronto messo in colonna. I numeri sono quelli di notaConfronto: 600 × 35% = 210; 600 - 210 = 390; 600 - 14,90 = 585,10. */
+    /** Il confronto messo in colonna. I numeri sono quelli di notaConfronto: 600 × 35% = 210; 600 - 210 = 390; 600 - 16,90 = 583,10. */
     confronto: {
       base: "Su una compensazione da 600€",
       /* I numeri servono ANCHE all'animazione delle banconote: il
@@ -388,11 +388,11 @@ export const COPY = {
         },
         {
           nome: "Rivolio",
-          costo: "costa 14,90€",
-          resta: "a te restano 585,10€",
-          trattenuto: 14.9,
-          restano: 585.1,
-          etichettaVia: "via 14,90€",
+          costo: "costa 16,90€",
+          resta: "a te restano 583,10€",
+          trattenuto: 16.9,
+          restano: 583.1,
+          etichettaVia: "via 16,90€",
         },
       ],
       /* Le due righe sotto le banconote: dette in parole, non in cifre. */
@@ -428,7 +428,7 @@ export const COPY = {
         nome: "Una pratica",
         /** Il nastro sulla card evidenziata, come nel riferimento approvato. */
         nastro: "La più scelta",
-        prezzo: "14,90€",
+        prezzo: "16,90€",
         periodo: "una volta sola",
         descrizione: "Il reclamo pronto da inviare, seguito fino all'esito.",
         punti: [
@@ -443,7 +443,7 @@ export const COPY = {
       },
       famiglia: {
         nome: "Famiglia",
-        prezzo: "24,90€",
+        prezzo: "29,90€",
         periodo: "una volta sola",
         descrizione: "Stesso volo, fino a 5 passeggeri in una pratica sola.",
         punti: [
