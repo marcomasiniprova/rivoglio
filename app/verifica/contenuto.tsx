@@ -8,6 +8,7 @@ import { cassaDiProvaAperta, inCollaudo, passDi } from "@/lib/check/cancello";
 import { prezzoPagatoPerIlCheck, scontoDaCheck } from "@/lib/check/ingresso";
 import { COPY } from "@/lib/copy";
 import { listinoCorrente } from "@/lib/prezzi-server";
+import { stripeAttivo } from "@/lib/stripe";
 import { scadenzaStimata, valuta } from "@/lib/regole/eu261";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
@@ -49,8 +50,14 @@ function avvisoCheckoutDa(grezzo: string | string[] | undefined): DatiVerifica["
     : null;
 }
 
-/** I checkout link Polar configurati: il client non tocca mai gli env. */
+/**
+ * C'è un venditore vero? Se sì, i bottoni d'acquisto si accendono. Stripe li
+ * accende tutti e due (crea la sessione al volo, senza un link per prodotto);
+ * il vecchio Polar solo dove il link è configurato. Il client non tocca mai
+ * gli env: legge un sì/no.
+ */
 function checkoutConfigurato() {
+  if (stripeAttivo()) return { singola: true, famiglia: true };
   return {
     singola: Boolean(process.env.POLAR_CHECKOUT_PRATICA),
     famiglia: Boolean(process.env.POLAR_CHECKOUT_FAMIGLIA),

@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { versoCasa } from "@/lib/sito";
+import { casa, versoCasa } from "@/lib/sito";
 import { inCollaudo } from "@/lib/check/cancello";
 import { linkCheckout } from "@/lib/polar";
-import { COOKIE_PREZZO, TEST_DUE_PREZZI, varianteValida } from "@/lib/prezzi";
+import { COOKIE_PREZZO, TEST_DUE_PREZZI, listinoDi, varianteValida } from "@/lib/prezzi";
+import { creaSessioneCheckout, stripeAttivo } from "@/lib/stripe";
 import { traccia } from "@/lib/eventi/registra";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 
@@ -97,6 +98,34 @@ export async function GET(req: NextRequest) {
        dettaglio: è il motivo per cui uno chiude la pagina. */
     const variante =
       (TEST_DUE_PREZZI ? varianteValida(req.cookies.get(COOKIE_PREZZO)?.value) : null) ?? "a";
+
+    /* LA CASSA VERA: Stripe. Se la chiave c'è, si apre una sessione di
+       pagamento e si va lì. Prende il posto di Polar (che ci ha detto no) e
+       della cassa di prova. Il prezzo lo scriviamo noi, quindi non ci sono
+       prodotti da creare a mano nel pannello. */
+    if (stripeAttivo()) {
+      const listino = listinoDi(variante);
+      const prezzo = tipo === "famiglia" ? listino.famiglia : listino.singola;
+      const url = await creaSessioneCheckout({
+        euro: prezzo,
+        nomeProdotto: tipo === "famiglia" ? "Rivolio · Pratica famiglia" : "Rivolio · Pratica",
+        descrizione: "Reclamo CE 261/2004 pronto da inviare, seguito fino all'esito.",
+        email: verifica.email,
+        riferimento: verifica.id,
+        metadata: { verifica_id: verifica.id, tipo, variante },
+        /* Stripe rimpiazza {CHECKOUT_SESSION_ID} con l'id vero: la pagina di
+           arrivo lo usa per confermare che il pagamento è andato a buon fine. */
+        successUrl: `${casa()}/pratica/pronta?session_id={CHECKOUT_SESSION_ID}`,
+        /* Se annulla torna al risultato, col bottone ancora lì. */
+        cancelUrl: `${casa()}/verifica/${verifica.id}`,
+      });
+      if (!url) return paginaRisultato("errore");
+      traccia(req, { tipo: "pratica", extra: { tipo, variante, venditore: "stripe" } });
+      return NextResponse.redirect(url, 303);
+    }
+
+    /* Ripiego finché la chiave Stripe non è su Netlify: il vecchio Polar,
+       o la cassa di prova per il collaudatore. */
     const link = linkCheckout(tipo, verifica.id, verifica.email, variante);
     /* ⚠️ SENZA VENDITORE, IL COLLAUDATORE PASSA DALLA CASSA DI PROVA.
        Finche' non c'e' Polar (o chi per lui) questo bottone finisce in un

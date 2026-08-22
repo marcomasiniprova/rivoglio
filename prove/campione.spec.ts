@@ -85,7 +85,12 @@ test.describe("Quello che ferma davvero una vendita", () => {
   test("il cancello è la CORREZIONE, e sta sia sulla cassa sia sul webhook", () => {
     /* Se un domani sparisse da uno dei due, un caso dichiarato sbagliato
        tornerebbe vendibile da quella porta, in silenzio. */
-    for (const f of ["app/api/pratiche/checkout/route.ts", "app/api/polar/webhook/route.ts"]) {
+    for (const f of [
+      "app/api/pratiche/checkout/route.ts",
+      "app/api/polar/webhook/route.ts",
+      // La cassa Stripe: il cancello sta nella funzione di evasione condivisa.
+      "lib/pratiche/evasione.ts",
+    ]) {
       expect(leggi(f), f).toContain('conferma === "corretta"');
     }
   });

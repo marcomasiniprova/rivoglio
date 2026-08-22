@@ -64,3 +64,57 @@ export function stripe(): Stripe {
 export function inCentesimi(euro: number): number {
   return Math.round(euro * 100);
 }
+
+/**
+ * Apre una sessione di pagamento e torna l'indirizzo dove mandare la
+ * persona (o `null` se qualcosa va storto: chi chiama ripiega, non manda
+ * nessuno nel vuoto).
+ *
+ * Il prezzo lo scriviamo qui (`price_data`), quindi NON serve creare i
+ * prodotti a mano nel pannello: il giorno di un cambio prezzo si cambia una
+ * riga di codice, non una scheda in un sito esterno.
+ *
+ * `metadata` è il filo che il webhook riavvolge dopo il pagamento: ci
+ * mettiamo l'id della verifica e il tipo, così sappiamo PER COSA è arrivato
+ * l'incasso.
+ */
+export async function creaSessioneCheckout(opts: {
+  euro: number;
+  nomeProdotto: string;
+  descrizione?: string;
+  email?: string | null;
+  /** Il nostro id (verifica) anche fuori dal metadata: comodo nei report. */
+  riferimento?: string;
+  metadata: Record<string, string>;
+  successUrl: string;
+  cancelUrl: string;
+}): Promise<string | null> {
+  try {
+    const sessione = await stripe().checkout.sessions.create({
+      mode: "payment",
+      locale: "it",
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: "eur",
+            unit_amount: inCentesimi(opts.euro),
+            product_data: {
+              name: opts.nomeProdotto,
+              ...(opts.descrizione ? { description: opts.descrizione } : {}),
+            },
+          },
+        },
+      ],
+      ...(opts.email ? { customer_email: opts.email } : {}),
+      ...(opts.riferimento ? { client_reference_id: opts.riferimento } : {}),
+      metadata: opts.metadata,
+      success_url: opts.successUrl,
+      cancel_url: opts.cancelUrl,
+    });
+    return sessione.url;
+  } catch (e) {
+    console.error("[stripe] sessione di checkout non creata:", e);
+    return null;
+  }
+}
