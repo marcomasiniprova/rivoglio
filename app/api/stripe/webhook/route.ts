@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
   const email = sessione.customer_details?.email ?? sessione.customer_email ?? null;
   const tipo: TipoPratica = meta.tipo === "famiglia" ? "famiglia" : "singola";
   const prezzo = typeof sessione.amount_total === "number" ? Math.round(sessione.amount_total) / 100 : null;
+  const ref = typeof meta.ref === "string" ? meta.ref : null;
 
   const esito = await evadiPagamentoPratica(req, {
     verificaId,
@@ -83,6 +84,7 @@ export async function POST(req: NextRequest) {
     tipo,
     ordineId: sessione.id,
     venditore: "Stripe",
+    ref,
   });
   return NextResponse.json(esito.body, { status: esito.http });
 }

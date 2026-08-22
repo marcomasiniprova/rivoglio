@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { CHIAVE_PUBBLICA, SUPABASE_CONFIGURATO, URL_SUPABASE } from "@/lib/supabase/chiavi";
 import { COOKIE_PREZZO, TEST_DUE_PREZZI, tiraLaMoneta, varianteValida } from "@/lib/prezzi";
+import { COOKIE_REF, GIORNI_REF, codiceAffiliatoValido } from "@/lib/affiliati/codice";
 
 /** Pagine che esistono solo per chi è collegato. La web app (/app) NON
  * è più qui: dall'8/08 il check è aperto a tutti (decisione di Valerio),
@@ -29,16 +30,29 @@ export async function proxy(request: NextRequest) {
      nostra incoerenza invece del prezzo.
      ATTENZIONE all'ordine: il cookie NON si può scrivere qui, perché il
      client Supabase più sotto rifà la risposta da capo e se lo mangerebbe.
-     Si decide adesso e si scrive su OGNI risposta che esce (conPrezzo). */
+     Si decide adesso e si scrive su OGNI risposta che esce (conCookie). */
   const prezzoDaScrivere =
     !TEST_DUE_PREZZI || varianteValida(request.cookies.get(COOKIE_PREZZO)?.value)
       ? null
       : tiraLaMoneta();
 
-  const conPrezzo = (res: NextResponse) => {
+  /* L'AFFILIATO: chi arriva da `?ref=MARCO` si porta dietro il creator per
+     60 giorni. Qui solo la forma (l'Edge non tocca il database): la validità
+     vera del codice si controlla al momento del pagamento. Un ref nuovo
+     nell'indirizzo vince su quello vecchio (ultimo click). */
+  const refDaScrivere = codiceAffiliatoValido(request.nextUrl.searchParams.get("ref"));
+
+  const conCookie = (res: NextResponse) => {
     if (prezzoDaScrivere) {
       res.cookies.set(COOKIE_PREZZO, prezzoDaScrivere, {
         maxAge: 60 * 60 * 24 * 180,
+        sameSite: "lax",
+        path: "/",
+      });
+    }
+    if (refDaScrivere) {
+      res.cookies.set(COOKIE_REF, refDaScrivere, {
+        maxAge: 60 * 60 * 24 * GIORNI_REF,
         sameSite: "lax",
         path: "/",
       });
@@ -47,7 +61,7 @@ export async function proxy(request: NextRequest) {
   };
 
   // Senza .env.local il sito deve comunque funzionare: la landing è pubblica.
-  if (!SUPABASE_CONFIGURATO) return conPrezzo(risposta);
+  if (!SUPABASE_CONFIGURATO) return conCookie(risposta);
 
   /* 🔴 CHI NON HA MAI FATTO LOGIN NON SI CHIEDE A SUPABASE.
      Trovato misurando il sito vero il 12/08, cercando perché «ogni volta
@@ -75,9 +89,9 @@ export async function proxy(request: NextRequest) {
       const entra = request.nextUrl.clone();
       entra.pathname = "/entra";
       entra.searchParams.set("poi", percorsoAnonimo);
-      return conPrezzo(NextResponse.redirect(entra));
+      return conCookie(NextResponse.redirect(entra));
     }
-    return conPrezzo(risposta);
+    return conCookie(risposta);
   }
 
   const supabase = createServerClient(URL_SUPABASE, CHIAVE_PUBBLICA, {
@@ -106,7 +120,7 @@ export async function proxy(request: NextRequest) {
     entra.pathname = "/entra";
     // dopo il login lo riportiamo dove voleva andare
     entra.searchParams.set("poi", percorso);
-    return conPrezzo(NextResponse.redirect(entra));
+    return conCookie(NextResponse.redirect(entra));
   }
 
   // già collegato: la pagina di login non ha senso, vai all'app
@@ -114,10 +128,10 @@ export async function proxy(request: NextRequest) {
     const app = request.nextUrl.clone();
     app.pathname = "/app";
     app.search = "";
-    return conPrezzo(NextResponse.redirect(app));
+    return conCookie(NextResponse.redirect(app));
   }
 
-  return conPrezzo(risposta);
+  return conCookie(risposta);
 }
 
 export const config = {

@@ -1,9 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { casa, versoCasa } from "@/lib/sito";
-import { inCollaudo } from "@/lib/check/cancello";
+import { inCollaudo, passDi } from "@/lib/check/cancello";
+import { CHECK_A_PAGAMENTO, prezzoPagatoPerIlCheck } from "@/lib/check/ingresso";
 import { linkCheckout } from "@/lib/polar";
 import { COOKIE_PREZZO, TEST_DUE_PREZZI, listinoDi, varianteValida } from "@/lib/prezzi";
 import { creaSessioneCheckout, stripeAttivo } from "@/lib/stripe";
+import { affiliatoDaCodice } from "@/lib/affiliati/affiliati";
+import { COOKIE_REF } from "@/lib/affiliati/codice";
+import { listinoScontato } from "@/lib/pratiche/prezzo";
 import { traccia } from "@/lib/eventi/registra";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 
@@ -104,15 +108,27 @@ export async function GET(req: NextRequest) {
        della cassa di prova. Il prezzo lo scriviamo noi, quindi non ci sono
        prodotti da creare a mano nel pannello. */
     if (stripeAttivo()) {
-      const listino = listinoDi(variante);
+      /* I due sconti, calcolati come sulla pagina del risultato (stessa
+         funzione, stessi ingredienti: il prezzo del bottone e quello della
+         cassa non possono divergere). Lo sconto del creator se è arrivata da
+         un suo link; l'anticipo del check se ha già pagato l'analisi. */
+      const affiliato = await affiliatoDaCodice(req.cookies.get(COOKIE_REF)?.value);
+      const scalaCheck = CHECK_A_PAGAMENTO && passDi(req) ? prezzoPagatoPerIlCheck() : 0;
+      const listino = listinoScontato(listinoDi(variante), { affiliato, scalaCheck });
       const prezzo = tipo === "famiglia" ? listino.famiglia : listino.singola;
+
+      const metadata: Record<string, string> = { verifica_id: verifica.id, tipo, variante };
+      // Il filo che lega la vendita al creator: il webhook lo riavvolge per
+      // segnare la commissione.
+      if (affiliato) metadata.ref = affiliato.codice;
+
       const url = await creaSessioneCheckout({
         euro: prezzo,
         nomeProdotto: tipo === "famiglia" ? "Rivolio · Pratica famiglia" : "Rivolio · Pratica",
         descrizione: "Reclamo CE 261/2004 pronto da inviare, seguito fino all'esito.",
         email: verifica.email,
         riferimento: verifica.id,
-        metadata: { verifica_id: verifica.id, tipo, variante },
+        metadata,
         /* Stripe rimpiazza {CHECKOUT_SESSION_ID} con l'id vero: la pagina di
            arrivo lo usa per confermare che il pagamento è andato a buon fine. */
         successUrl: `${casa()}/pratica/pronta?session_id={CHECKOUT_SESSION_ID}`,
@@ -120,7 +136,10 @@ export async function GET(req: NextRequest) {
         cancelUrl: `${casa()}/verifica/${verifica.id}`,
       });
       if (!url) return paginaRisultato("errore");
-      traccia(req, { tipo: "pratica", extra: { tipo, variante, venditore: "stripe" } });
+      traccia(req, {
+        tipo: "pratica",
+        extra: { tipo, variante, venditore: "stripe", ref: affiliato?.codice ?? null },
+      });
       return NextResponse.redirect(url, 303);
     }
 

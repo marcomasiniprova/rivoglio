@@ -2,13 +2,16 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import Risultato, { type DatiVerifica } from "@/components/verifica/Risultato";
 import { cassaDiProvaAperta, inCollaudo, passDi } from "@/lib/check/cancello";
-import { prezzoPagatoPerIlCheck, scontoDaCheck } from "@/lib/check/ingresso";
+import { CHECK_A_PAGAMENTO, prezzoPagatoPerIlCheck, scontoDaCheck } from "@/lib/check/ingresso";
 import { COPY } from "@/lib/copy";
 import { listinoCorrente } from "@/lib/prezzi-server";
 import { stripeAttivo } from "@/lib/stripe";
+import { affiliatoDaCodice } from "@/lib/affiliati/affiliati";
+import { COOKIE_REF } from "@/lib/affiliati/codice";
+import { listinoScontato } from "@/lib/pratiche/prezzo";
 import { scadenzaStimata, valuta } from "@/lib/regole/eu261";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { SUPABASE_CONFIGURATO } from "@/lib/supabase/chiavi";
@@ -296,8 +299,21 @@ export async function contenutoVerifica(
   const cassePronte = checkoutConfigurato();
   const venditoreVero = cassePronte.singola || cassePronte.famiglia;
   const pass = passDi(await richiesta());
-  const listino =
-    pass && !venditoreVero ? scontoDaCheck(listinoPieno, prezzoPagatoPerIlCheck()) : listinoPieno;
+
+  /* Il prezzo che questa persona paga davvero, mostrato QUI uguale a quanto
+     poi incassa la cassa (stessa funzione, lib/pratiche/prezzo). Con Stripe,
+     la cassa vera sa applicare sconti al volo: si tolgono lo sconto del creator
+     (se arrivata da un suo link) e l'anticipo del check (se l'ha già pagato).
+     Senza Stripe resta la vecchia regola: il ripiego ha un prezzo bloccato,
+     quindi lo sconto del check si vede solo dove non c'è un venditore. */
+  let listino = listinoPieno;
+  if (stripeAttivo()) {
+    const affiliato = await affiliatoDaCodice((await cookies()).get(COOKIE_REF)?.value);
+    const scalaCheck = CHECK_A_PAGAMENTO && pass ? prezzoPagatoPerIlCheck() : 0;
+    listino = listinoScontato(listinoPieno, { affiliato, scalaCheck });
+  } else if (pass && !venditoreVero) {
+    listino = scontoDaCheck(listinoPieno, prezzoPagatoPerIlCheck());
+  }
 
   const dati: DatiVerifica = {
     idPagina: id,

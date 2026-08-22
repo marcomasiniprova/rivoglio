@@ -11,6 +11,7 @@ import { linkDiIngresso } from "./ingresso";
 import { SERVIZIO_ATTIVO, supabaseServizio } from "@/lib/supabase/servizio";
 import { registraDa } from "@/lib/eventi/registra";
 import { tinGuasto, tinIncasso } from "@/lib/eventi/telegram";
+import { registraCommissione } from "@/lib/affiliati/commissioni";
 
 /**
  * DA UN PAGAMENTO A UNA PRATICA: la parte che conta, in un posto solo.
@@ -46,6 +47,8 @@ export type DatiPagamento = {
   ordineId: string | null;
   /** Il nome del venditore, per i testi e i log ("Stripe"). */
   venditore: string;
+  /** Il codice del creator che ha portato la vendita, se c'è (dai metadata). */
+  ref?: string | null;
 };
 
 export type EsitoEvasione = { http: number; body: Record<string, unknown> };
@@ -194,6 +197,19 @@ export async function evadiPagamentoPratica(
     prezzo ?? 0,
     `Volo ${verifica.volo_iata} del ${verifica.data_locale}`,
   );
+
+  /* La commissione del creator, se la vendita è arrivata da un suo codice.
+     Idempotente (riferimento unico): un webhook doppio non la raddoppia. Non
+     blocca niente: una commissione persa è un problema da log, la pratica
+     vale molto di più. */
+  if (dati.ref) {
+    await registraCommissione({
+      codice: dati.ref,
+      tipo: "pratica",
+      prezzoPagato: prezzo ?? 0,
+      riferimento: ordineId ?? pratica.id,
+    });
+  }
 
   /* ---- link magico: chi ha appena pagato entra senza password. Il rimbalzo
      passa da /auth/conferma (Supabase consegna la sessione nel frammento
