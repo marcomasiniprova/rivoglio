@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { tinGuasto } from "@/lib/eventi/telegram";
 
 /**
  * Stripe, il gateway di pagamento vero.
@@ -114,7 +115,12 @@ export async function creaSessioneCheckout(opts: {
     });
     return sessione.url;
   } catch (e) {
-    console.error("[stripe] sessione di checkout non creata:", e);
+    const motivo = e instanceof Error ? e.message : String(e);
+    console.error("[stripe] sessione di checkout non creata:", motivo);
+    /* Una cassa che non si apre è vendita persa: deve squillare il telefono
+       col motivo VERO (chiave sbagliata, parametro rifiutato...), non finire
+       in un log che nessuno guarda. Il silenziatore evita mille messaggi. */
+    await tinGuasto("stripe-sessione", `Stripe non ha aperto la cassa.\nMotivo: ${motivo}`);
     return null;
   }
 }
